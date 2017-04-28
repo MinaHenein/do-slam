@@ -1,27 +1,15 @@
-classdef Object < HeterogeneousObject
-    %OBJECT class instances are used by Sensor class instances to create a
-    %representation of objects in the environment.
-    %   Different sensor subclasses perceive environment through
-    %   specialised methods. 
-    %   Objects are created and used to generate measurements.
-    %	Though sensors behave differently, representing all objects with
-    %	this class and subclasses will ensure uniformity
+classdef RigidBodyObject < BaseObject
+    %RIGIDBODYOBJECT class instances are used by Sensor class instances to 
+    %create a representation of rigid body objects in the environment.
+    %   Rigid body objects have trajectory (ie a car) - will likely be
+    %   composed of other attached objects fixed to the rigid body
     
-    %% 1. Properties
-    properties%(GetAccess = 'protected', SetAccess = 'protected')
-        parameters
+     %% 1. Properties
+    properties
+        trajectory
     end
-    
     
     %% 2. Methods
-    % Constructor
-    methods(Access = public) %set to private later??
-        function self = Object()
-        end
-        
-    end
-    
-    %
     methods(Access = private)
         function out = getSwitch(self,property,varargin)
             %output depends on varargin
@@ -30,8 +18,6 @@ classdef Object < HeterogeneousObject
                     out = self.index;
                 case 'trajectory'
                     out = self.trajectory;
-                case 'parameters'
-                    out = self.parameters;
             end
         end
         
@@ -40,8 +26,6 @@ classdef Object < HeterogeneousObject
             switch property
                 case 'index'
                     self.index = value;
-                case 'parameters'
-                    self.parameters = value;
                 case 'trajectory'
                     self.trajectory = value;
             end
@@ -131,50 +115,6 @@ classdef Object < HeterogeneousObject
                 end
             end
         end
-
-    
-        %setter for Object class arrays
-%         function self = setArr(self,locations,property,values,varargin)
-%             % inputs
-%             %   locations is 1xn array of location indexes
-%             %   property is string
-%             %   values is cell array(1xn), object array(1xn) or array(mxn)
-%             % outputs
-%             %   self
-%             
-%             %loop over locations
-%             for i = 1:numel(locations)
-%                 %check that values is mxn array or 1xn cell array 
-%                 if iscell(values)
-%                     assert(isequal(size(values),[1,numel(locations)]),...
-%                            'Error: Number of locations and values must be equal');
-%                 	self(locations(i)) = self(locations(i)).set(property,values{i},varargin);
-%                 else
-%                     assert(size(values,2)==numel(locations),...
-%                            'Error: Number of locations and values must be equal');
-%                     self(locations(i)) = self(locations(i)).set(property,values(:,i),varargin);
-%                 end
-%             end
-%         end
-%         
-%         %setter for single Object class instance
-%         function self = set(self,property,value,varargin)
-%             if isempty(varargin)
-%                 self.(property) = value;
-%             else
-%                 %use varargin depending on property
-%                 switch property
-%                     case 'index'
-%                         self.index = value;
-%                     case 'parameters'
-%                         self.parameters = value;
-%                     case 'trajectory'
-%                         self.trajectory = value;
-%                 end   
-%                 
-%             end
-%             
-%         end
         
     end
     

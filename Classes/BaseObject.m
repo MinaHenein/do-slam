@@ -1,12 +1,12 @@
-classdef HeterogeneousObject < matlab.mixin.Heterogeneous & matlab.mixin.Copyable & handle
-    %ENVIRONMENT is a hetergeneous superclass for Object and Point classes
-    %   This class allows Object and Point class instances to be stored in
-    %   a heterogeneous object array.
+classdef BaseObject < matlab.mixin.Heterogeneous & matlab.mixin.Copyable & handle
+    %BaseObject is a hetergeneous superclass for Object and Geometry classes
+    %   This class allows Object and Geometry class & subclass instances to 
+    %   be stored in a heterogeneous array.
     
     %% 1. Properties
     properties%(GetAccess = 'protected', SetAccess = 'protected')
-        index      %integer
-        trajectory %Trajectory class instance
+        index %integer - unique for instances of subclasses of BaseObject
+        connectedObjectIndexes %array of indexes
     end
     
     
@@ -15,7 +15,7 @@ classdef HeterogeneousObject < matlab.mixin.Heterogeneous & matlab.mixin.Copyabl
     methods(Access = public, Sealed = true)
         
         % Getter
-        function outArr = getHetArr(self,locations,property,varargin)
+        function outArr = getHet(self,locations,property,varargin)
             % inputs
             %   locations is 1xn array of location indexes, or str ':'
             %   property is string
@@ -31,12 +31,10 @@ classdef HeterogeneousObject < matlab.mixin.Heterogeneous & matlab.mixin.Copyabl
                 if isempty(varargin) == 0
                     outArr{i} = [self(locations(i)).(property)]; 
                 else
-                    %do something with varargin
+                    %do something with varargin depending on property
                     switch property
-                        case 'index'
-                            outArr{i} = [self(locations(i)).index];
-                        case 'trajectory'
-                            outArr{i} = [self(locations(i)).trajectory];
+                        otherwise
+                            outArr{i} = [self(locations(i)).(property)];
                     end
                 end
             end
@@ -57,7 +55,7 @@ classdef HeterogeneousObject < matlab.mixin.Heterogeneous & matlab.mixin.Copyabl
         end
         
         % Setter
-        function self = setHetArr(self,locations,property,values,varargin)
+        function self = setHet(self,locations,property,values,varargin)
             % inputs
             %   locations is 1xn array of location indexes, or str ':'
             %   property is string
@@ -86,12 +84,10 @@ classdef HeterogeneousObject < matlab.mixin.Heterogeneous & matlab.mixin.Copyabl
                 if isempty(varargin)
                     self(locations(i)).(property) = values{i};
                 else
-                    %do something with varargin
+                    %do something with varargin depending on property
                     switch property
-                        case 'index'
-                            self(locations(i)).index = values{i};
-                        case 'trajectory'
-                            self(locations(i)).trajectory = values{i};
+                        otherwise
+                            self(locations(i)).(property) = values{i};
                     end
                 end
             end

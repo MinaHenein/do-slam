@@ -1,13 +1,12 @@
-classdef Point < HeterogeneousObject
+classdef Point < BaseObject
     %POINT class instances are used by Sensor class instances to create a
     %representation of points in the environment.
-    %   Different sensor subclasses perceive points through
-    %   specialised methods. 
-    %   Points are created  and used to generate measurements
+    %   Points are created and used to generate measurements
     
     
     %% 1. Properties
     properties(GetAccess = 'private', SetAccess = 'private')
+        trajectory
     end
     
     
