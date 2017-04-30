@@ -2,6 +2,12 @@ function obj = set(obj,field,varargin)
     %SET used to set properties of the Enrivonment Primitive.
 
     switch field
+        case 'ID'
+            if numel(varargin{1})==1
+                obj.ID = varargin{1};
+            else
+                error('Incorrect ID input')
+            end
         case 'Points'
             if size(varargin{1},2)==3
                 obj.Points = varargin{1};

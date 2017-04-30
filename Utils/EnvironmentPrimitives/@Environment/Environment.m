@@ -14,7 +14,9 @@ classdef Environment < handle & matlab.mixin.Copyable
         end
         
         function obj = addEnvironmentPrimitive(obj,EnvironmentPrimitive)
+            EnvironmentPrimitive.set('ID',(numel(EnvironmentPrimitive)+1));
             obj.EnvironmentPrimitives(end+1) = EnvironmentPrimitive;
+            
         end
         
         function obj = addEnvironmentPoint(obj,EnvironmentPoint)
