@@ -1,8 +1,10 @@
 clear all
 % close all
  
-%% 1. Generate Trajectories
+%% Trajectory Initialisation
 
+
+%% 1. Generate Trajectories
 % waypoints
 waypoints = [0.1 0.15 0.25 0.4;
              0 2 4 8;
@@ -20,7 +22,9 @@ tFit = linspace(t0,t1,nPoses);
 poseTrajectory1 = PoseTrajectory('SE3','waypoints',waypoints,tFit,'poly1');
 poseTrajectory2 = PoseTrajectory('SE3','waypoints',waypoints,tFit,'poly2');
 poseTrajectory3 = PoseTrajectory('SE3','waypoints',waypoints,tFit,'linearinterp');
-poseTrajectory4 = PoseTrajectory('SE3','waypoints',waypoints,tFit,'cubicinterp');
+%Example - constructing from full po
+poseTrajectoryTemp = PoseTrajectory('SE3','waypoints',waypoints,tFit,'cubicinterp');
+poseTrajectory4 = PoseTrajectory('SE3','discrete',poseTrajectoryTemp.get('dataPoints'));
 poseTrajectory5 = PoseTrajectory('SE3','waypoints',waypoints,tFit,'smoothingspline');
 poseTrajectory6 = PoseTrajectory('R3xSO3','waypoints',waypoints,tFit,'smoothingspline');
 
@@ -110,4 +114,69 @@ poseTrajectory6.plot()
 
 suptitle('Comparison of pose trajectory fitting methods')
 
-% posi
+% position trajectory
+figure
+viewPoint = [-30,60];
+axisLimits = [-5,10,-5,8,-5,10];
+
+subplot(2,3,1)
+title('poly1')
+axis equal
+xlabel('x')
+ylabel('y')
+zlabel('z')
+view(viewPoint)
+axis(axisLimits)
+hold on
+plot3(waypoints(2,:),waypoints(3,:),waypoints(4,:),'r*')
+positionTrajectory1.plot()
+
+subplot(2,3,2)
+title('poly2')
+axis equal
+xlabel('x')
+ylabel('y')
+zlabel('z')
+view(viewPoint)
+axis(axisLimits)
+hold on
+plot3(waypoints(2,:),waypoints(3,:),waypoints(4,:),'r*')
+positionTrajectory2.plot()
+
+subplot(2,3,3)
+title('linearinterp')
+axis equal
+xlabel('x')
+ylabel('y')
+zlabel('z')
+view(viewPoint)
+axis(axisLimits)
+hold on
+plot3(waypoints(2,:),waypoints(3,:),waypoints(4,:),'r*')
+positionTrajectory3.plot()
+
+subplot(2,3,4)
+title('cubicinterp')
+axis equal
+xlabel('x')
+ylabel('y')
+zlabel('z')
+view(viewPoint)
+axis(axisLimits)
+hold on
+plot3(waypoints(2,:),waypoints(3,:),waypoints(4,:),'r*')
+positionTrajectory4.plot()
+
+subplot(2,3,5)
+title('smoothingspline')
+axis equal
+xlabel('x')
+ylabel('y')
+zlabel('z')
+view(viewPoint)
+axis(axisLimits)
+hold on
+plot3(waypoints(2,:),waypoints(3,:),waypoints(4,:),'r*')
+positionTrajectory5.plot()
+
+suptitle('Comparison of position trajectory fitting methods')

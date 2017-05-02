@@ -1,9 +1,15 @@
 clear all
 % close all
  
-%% 1. Generate Trajectories
+%% Trajectory Initialisation
+% 1. Trajectory can be initialised from waypoints, full pose/position data, or
+%    some model (see constructor in PoseTrajectory/PositionTrajectory)
+% 2. 'model' construction method not yet implemented
+% 3. SE3 or R3xSO3 currently supported for PoseTrajectory
+% 4. R3 currently supported for PositionTrajectory
 
-% waypoints
+%% 1. Generate Trajectories
+% waypoints (each column = [t,x,y,z]')
 waypoints = [0.1 0.15 0.25 0.4;
              0 2 4 8;
              0 3 5 2;
@@ -20,7 +26,9 @@ tFit = linspace(t0,t1,nPoses);
 poseTrajectory1 = PoseTrajectory('SE3','waypoints',waypoints,tFit,'poly1');
 poseTrajectory2 = PoseTrajectory('SE3','waypoints',waypoints,tFit,'poly2');
 poseTrajectory3 = PoseTrajectory('SE3','waypoints',waypoints,tFit,'linearinterp');
-poseTrajectory4 = PoseTrajectory('SE3','waypoints',waypoints,tFit,'cubicinterp');
+%Example - constructing from full pose data
+poseTrajectoryTemp = PoseTrajectory('SE3','waypoints',waypoints,tFit,'cubicinterp');
+poseTrajectory4 = PoseTrajectory('SE3','discrete',poseTrajectoryTemp.get('dataPoints'));
 poseTrajectory5 = PoseTrajectory('SE3','waypoints',waypoints,tFit,'smoothingspline');
 poseTrajectory6 = PoseTrajectory('R3xSO3','waypoints',waypoints,tFit,'smoothingspline');
 
