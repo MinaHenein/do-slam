@@ -1,4 +1,4 @@
-classdef Trajectory < handle
+classdef Trajectory
     %TRAJECTORY class represents trajectories of moving/stationary
     %components (robots, objects, points )
     %   Both dynamic and static objects will use trajectory class. Only
@@ -20,7 +20,21 @@ classdef Trajectory < handle
     methods(Access = public) %set to private later??
         function self = Trajectory(parameterisation,mode,varargin)
             switch nargin
-                case 0 %allows pre-allocation
+                case 0
+                    %allows pre-allocation
+                otherwise
+                    self.parameterisation = parameterisation;
+                    switch mode
+                        case 'waypointsToPositions'
+                            waypoints = varargin{1};
+                            self.dataPoints = fitPositionsF
+                        case 'waypointsToPoses'
+                            
+                        case 'discrete'
+                            self.dataPoints = varargin{1};
+                        case 'continuous'
+                            self.model = varargin{1};
+                    end
             end
         end
         
@@ -52,22 +66,22 @@ classdef Trajectory < handle
     
     % Get trajectory @ input times
     methods(Access = public) %set to private later??
-%         function dataPoints = getDataPoints(self,t,fitType)
-%             %inputs
-%             %   t - 1xn array of times for which trajectory desired
-%             %   fitting method - string selecting how to get poses from
-%             %   existing datapoints
-%             %output
-%             %   dataPoints - trajectory value at times in t
-%             
-%             %preallocate dataPoints
-%             dataPoints = zeros(size(self.dataPoints,1),numel(t));
-%             
-%             %check which t match with timeStamps?
-%             
-%             
-%             
-%         end
+        function dataPoints = getDataPoints(self,t,fitType)
+            %inputs
+            %   t - 1xn array of times for which trajectory desired
+            %   fitting method - string selecting how to get poses from
+            %   existing datapoints
+            %output
+            %   dataPoints - trajectory value at times in t
+            
+            %preallocate dataPoints
+            dataPoints = zeros(size(self.dataPoints,1),numel(t));
+            
+            %check which t match with timeStamps?
+            
+            
+            
+        end
     end
 end
 

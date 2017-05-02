@@ -1,6 +1,5 @@
 clear all
-close all
-addpath(genpath(pwd))
+% close all
 
 %% Getting and setting
 %   1. Each subclass of BaseObject class has its own get and set. 
@@ -25,9 +24,10 @@ addpath(genpath(pwd))
 %      its methods must be sealed and cannot be redefined in subclasses.
 %      The suffix 'Het' is added to avoid naming clashes with subclasses.
 
-%trajectories
-t1 = Trajectory('R3xSO3','continuous',@ConstantLinearVelocity);
-t2 = Trajectory('R3','discrete',0:0.1:1,rand(3,10));
+%trajectories (just placeholders - see TrajectoryInitialisation application
+%              for trajectory examples)
+t1 = Trajectory();
+t2 = Trajectory();
 
 %create geometric object
 geoObj = GeometricObject();
