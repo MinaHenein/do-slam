@@ -48,12 +48,12 @@ classdef PoseTrajectory < Trajectory
 
             %X-axis forward
             forward = [1,0,0]';
+            up      = [0,0,1]';
             %compute orientation to face direction of motion
             for i = 1:numel(tFit)-1
                 v = poses(1:3,i+1) - poses(1:3,i);
-                %compute axis angle to go from forward-> v
-                axisAngle = vrrotvec(forward,v);
-                poses(4:6,i) = axisAngle(1:3)'*axisAngle(4); 
+                poses(4:6,i) = assignOrientation(v);
+                
             end
             poses(4:6,end) = poses(4:6,end-1); %LAST POSE?
             
