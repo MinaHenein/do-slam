@@ -1,7 +1,7 @@
-function posesAbsolute = RelativeToAbsolutePose(posesOldFrame, posesRelative)
+function posesAbsolute = RelativeToAbsolutePoseR3xso3(posesOldFrame, posesRelative)
 %% converts poses from relative coords to absolute
 % inputs
-    %poseOldFrame = matrix of pose column vectors of old reference frame
+    %poseOldFrame  = matrix of pose column vectors of old reference frame
     %posesRelative = matrix of relative pose column vectors, pose = [position; axis]
 % output
     %posesAbsolute = matrix of absolute pose column vectors, pose = [position; axis]

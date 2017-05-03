@@ -1,5 +1,5 @@
-classdef Sensor < matlab.mixin.Copyable & handle
-    %SENSOR Summary of this class goes here
+classdef SimulatedEnvironmentSensor
+    %SimulatedEnvironmentSensor Summary of this class goes here
     %   Detailed explanation goes here
     
     properties

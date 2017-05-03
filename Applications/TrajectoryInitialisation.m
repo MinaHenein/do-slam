@@ -38,6 +38,14 @@ pointTrajectory3 = PointTrajectory('waypoints','R3',waypoints,tFit,'linearinterp
 pointTrajectory4 = PointTrajectory('waypoints','R3',waypoints,tFit,'cubicinterp');
 pointTrajectory5 = PointTrajectory('waypoints','R3',waypoints,tFit,'smoothingspline');
 
+%Example - transformations
+poseTrajectory7 = poseTrajectory1.copy();
+poseTrajectory7.set('poses',poseTrajectory7.get('poses').AbsoluteToRelativePose(poseTrajectory2.get('poses')));
+poseTrajectory7.set('poses',poseTrajectory7.get('poses').RelativeToAbsolutePose(poseTrajectory2.get('poses',5)));
+pointTrajectory6 = pointTrajectory1.copy();
+pointTrajectory6.set('points',pointTrajectory6.get('points').AbsoluteToRelativePoint(poseTrajectory2.get('poses')));
+pointTrajectory6.set('points',pointTrajectory6.get('points').AbsoluteToRelativePoint(poseTrajectory2.get('poses',4)));
+
 %% 2. Plot
 % pose trajectory
 figure

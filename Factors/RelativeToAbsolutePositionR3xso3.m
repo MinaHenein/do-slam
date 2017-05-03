@@ -1,4 +1,4 @@
-function positionsAbsolute = RelativeToAbsolutePosition(posesOldFrame, positionsRelative)
+function positionsAbsolute = RelativeToAbsolutePositionR3xso3(posesOldFrame, positionsRelative)
 %% converts positions from absolute coords to new reference frame
 % inputs
     %poseNewFrame = matrix of pose column vectors of new reference frame

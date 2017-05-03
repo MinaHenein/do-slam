@@ -86,5 +86,38 @@ classdef GP_Pose < GeometricPrimitive
         end
     end
     
+    % Transformations
+    methods(Access = public)
+        function poseRelative = AbsoluteToRelativePose(self,poseReference)
+            poseRelative(numel(self)) = GP_Pose;
+            if (numel(self)==numel(poseReference))
+                for i = 1:numel(self)
+                    poseRelative(i).set('R3xso3Pose',AbsoluteToRelativePoseR3xso3(self(i).get('R3xso3Pose'),poseReference(i).get('R3xso3Pose')));
+                end
+            elseif (numel(self)>1) && ((numel(poseReference)==1))
+                for i = 1:numel(self)
+                    poseRelative(i).set('R3xso3Pose',AbsoluteToRelativePoseR3xso3(self(i).get('R3xso3Pose'),poseReference.get('R3xso3Pose')));
+                end
+            else
+                error('Error: inconsistent sizes')
+            end
+        end
+        
+        function poseAbsolute = RelativeToAbsolutePose(self,poseReference)
+            poseAbsolute(numel(self)) = GP_Pose;
+            if (numel(self)==numel(poseReference))
+                for i = 1:numel(self)
+                    poseAbsolute(i).set('R3xso3Pose',RelativeToAbsolutePoseR3xso3(poseReference(i).get('R3xso3Pose'),self(i).get('R3xso3Pose')));
+                end
+            elseif (numel(self)>1) && ((numel(poseReference)==1))
+                for i = 1:numel(self)
+                    poseAbsolute(i).set('R3xso3Pose',RelativeToAbsolutePoseR3xso3(poseReference.get('R3xso3Pose'),self(i).get('R3xso3Pose')));
+                end
+            else
+                error('Error: inconsistent sizes')
+            end
+        end
+    end
+    
 end
 

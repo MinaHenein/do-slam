@@ -4,7 +4,7 @@ classdef PointTrajectory < Trajectory
     
     %% 1. Properties
     properties(GetAccess = 'protected', SetAccess = 'protected')
-        positions
+        points
     end
     
     %% 2. Methods
@@ -12,22 +12,15 @@ classdef PointTrajectory < Trajectory
     methods(Access = public) %set to protected later??
         function out = get(self,property,varargin)
             if (nargin==2)
-                out = self.(property);
-            elseif (nargin>2)
-                %do something with varargin depending on property
-                out = self.(property);
+                out = [self.(property)];
+            elseif (nargin==3) && strcmp(property,'poses')
+                out = [self.points(varargin{1})];
             end
             
         end
         
-        function self = set(self,property,value,varargin)
-            if (nargin==3)
-                self.(property) = value;
-            elseif (nargin>3)
-                %do something with varargin depending on property
-                self.(property) = value;
-            end
-            
+        function self = set(self,property,value)
+        	self.(property) = value;
         end
     end
     
@@ -54,7 +47,7 @@ classdef PointTrajectory < Trajectory
                             nPositions = numel(self.t);
                             GPPoints(nPositions) = GP_Point;
                             GPPoints.set(strcat(parameterisation,'Position'),dataPoints(2:4,:),[1:nPositions]);
-                            self.poses = GPPoints;
+                            self.points = GPPoints;
                         case 'continuous'
                             self.model = varargin{1};
                     end
@@ -83,14 +76,14 @@ classdef PointTrajectory < Trajectory
             self.t = tFit;
             GPPositions(nPositions) = GP_Point;
             GPPositions.set('R3Position',positions,[1:nPositions]);
-            self.positions = GPPositions;
+            self.points = GPPositions;
         end
     end
     
     % Plotting
     methods(Access = public)
         function plot(self,varargin)
-            positions = self.positions.get('R3Position');
+            positions = self.points.get('R3Position');
             
             %plot positions
             plot3(positions(1,:),positions(2,:),positions(3,:),'k.')

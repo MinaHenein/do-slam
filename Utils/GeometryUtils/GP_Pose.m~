@@ -32,12 +32,12 @@ classdef GP_Pose < GeometricPrimitive
         end
         
         function R = get.R(self)
-            R = rot(self.R3xso3Pose(1:3));
+            R = rot(self.R3xso3Pose(4:6));
         end
     end
-    
+        
     % Getter & Setter
-    methods(Access = public) %set to protected later??
+    methods(Access = public)
         function out = get(self,property,varargin)
             if (nargin==2)
                 out = [self.(property)];
@@ -47,25 +47,58 @@ classdef GP_Pose < GeometricPrimitive
             
         end
         
-        function self = set(self,property,value,varargin)
+        function self = set(self,property,values,varargin)
             if (nargin==3)
                 switch property
                     case 'R3xso3Pose'
-                        self.R3xso3Pose = value;
+                        self.R3xso3Pose = values;
                     case 'logSE3Pose'
-                        self.R3xso3Pose = LogSE3_Rxt(value);
+                        self.R3xso3Pose = LogSE3_Rxt(values);
                     case 'R3xso3Position'
-                        self.R3xso3Pose(1:3) = value;
+                        self.R3xso3Pose(1:3) = values;
                     case 'logSE3Position'
-                        self.R3xso3Pose = LogSE3_Rxt([value; self.logSE3Pose(4:6)]);
+                        self.R3xso3Pose = LogSE3_Rxt([values; self.logSE3Pose(4:6)]);
                     case 'axisAngle'
-                        self.R3xso3Pose(4:6) = value;
+                        self.R3xso3Pose(4:6) = values;
                     case 'R'
-                        self.R3xso3Pose(4:6) = arot(value);
+                        self.R3xso3Pose(4:6) = arot(values);
                 end
-            elseif 
+            elseif (nargin==4)
+                locations = varargin{1};
+                for i = 1:numel(locations)
+                    switch property
+                        case 'R3xso3Pose'
+                            self(locations(i)).R3xso3Pose = values(:,i);
+                        case 'logSE3Pose'
+                            self(locations(i)).R3xso3Pose = LogSE3_Rxt(values(:,i));
+                        case 'R3xso3Position'
+                            self(locations(i)).R3xso3Pose(1:3) = values(:,i);
+                        case 'logSE3Position'
+                            self(locations(i)).R3xso3Pose = LogSE3_Rxt([values(:,i); self(locations(i)).logSE3Pose(4:6)]);
+                        case 'axisAngle'
+                            self(locations(i)).R3xso3Pose(4:6) = values(:,i);
+                        case 'R'
+                            self(locations(i)).R3xso3Pose(4:6) = arot(values(:,mapping(i,3)));
+                    end
+                end
             end
             
+        end
+    end
+    
+    % Transformations
+    methods(Access = public)
+        function poseRelative = AbsoluteToRelativePose(self,poseReference)
+            poseRelative(numel(self)) = GP_Pose;
+            if (numel(self)==numel(poseReference))
+                for i = 1:numel(self)
+                    poseRelative(i).set('R3xso3Pose',AbsoluteToRelativePoseR3xso3(self(i).get('R3xso3Pose'),poseReference(i).get('R3xso3Pose')));
+                end
+            elseif (numel(self)>1) && ((numel(poseReference)==1))
+                for i = 1:numel(poseReference)
+                    poseRelative(i).set('R3xso3Pose',AbsoluteToRelativePoseR3xso3(self(i).get('R3xso3Pose'),poseReference(i).get('R3xso3Pose')));
+                end
+            end
         end
     end
     

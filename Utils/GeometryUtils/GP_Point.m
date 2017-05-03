@@ -21,7 +21,7 @@ classdef GP_Point < GeometricPrimitive
         
         function self = set(self,property,values,varargin)
             if (nargin==3)
-                self.(property) = value;
+                self.(property) = values;
             elseif (nargin==4) %set specific locations
                 locations = varargin{1};
                 for i = 1:numel(locations)
@@ -29,6 +29,39 @@ classdef GP_Point < GeometricPrimitive
                 end
             end
             
+        end
+    end
+    
+    % Transformations
+    methods(Access = public)
+        function positionRelative = AbsoluteToRelativePoint(self,poseReference)
+            positionRelative(numel(self)) = GP_Point;
+            if (numel(self)==numel(poseReference))
+                for i = 1:numel(self)
+                    positionRelative(i).set('R3Position',AbsoluteToRelativePositionR3xso3(poseReference(i).get('R3xso3Pose'),self(i).get('R3Position')));
+                end
+            elseif (numel(self)>1) && ((numel(poseReference)==1))
+                for i = 1:numel(self)
+                    positionRelative(i).set('R3Position',AbsoluteToRelativePositionR3xso3(poseReference.get('R3xso3Pose'),self(i).get('R3Position')));
+                end
+            else
+                error('Error: inconsistent sizes')
+            end
+        end
+        
+        function positionAbsolute = RelativeToAbsolutePoint(self,poseReference)
+            positionAbsolute(numel(self)) = GP_Point;
+            if (numel(self)==numel(poseReference))
+                for i = 1:numel(self)
+                    positionAbsolute(i).set('R3Position',RelativeToAbsolutePositionR3xso3(poseReference(i).get('R3xso3Pose'),self(i).get('R3Position')));
+                end
+            elseif (numel(self)>1) && ((numel(poseReference)==1))
+                for i = 1:numel(self)
+                    positionAbsolute(i).set('R3Position',RelativeToAbsolutePositionR3xso3(poseReference.get('R3xso3Pose'),self(i).get('R3Position')));
+                end
+            else
+                error('Error: inconsistent sizes')
+            end
         end
     end
     
