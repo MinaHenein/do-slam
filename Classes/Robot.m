@@ -5,7 +5,6 @@ classdef Robot < matlab.mixin.Copyable & handle
     properties
         trajectory %trajectory class instance
         sensors    %array of sensor class instances
-        relativeSensorPoses %array of pose class instances - should this be property of robot or each sensor?
     end
     
     methods

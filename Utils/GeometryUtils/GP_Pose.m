@@ -1,6 +1,13 @@
 classdef GP_Pose < GeometricPrimitive
     %GP_POSE Summary of this class goes here
     %   Detailed explanation goes here
+    %   *Dependent properties will be recomputed whenever R3xso3Pose changes
+    %   and whenever they are accessed, they are computed from R3xso3Pose
+    %   - this might be slow if R3xso3Pose changes is changed a lot
+    %   - options: remove dependent properties if they are not needed a
+    %   lot, OR remove dependencies and build this functionality into the
+    %   set method manually - whenever any property is changed, change the
+    %   rest
     
     %% 1. Properties
     properties(GetAccess = 'public', SetAccess = 'public')
@@ -13,7 +20,7 @@ classdef GP_Pose < GeometricPrimitive
     end
     
     %% 2. Methods
-    % Dependent property assignment
+    % Dependent property assignment - this might be slow *
     methods
         function logSE3Pose = get.logSE3Pose(self)
             logSE3Pose = R3xso3_LogSE3(self.R3xso3Pose);

@@ -3,6 +3,8 @@ classdef Sensor < matlab.mixin.Copyable & handle
     %   Detailed explanation goes here
     
     properties
+        poseRelativeToRobot %should this be property of robot?
+        trajectory
     end
     
     methods

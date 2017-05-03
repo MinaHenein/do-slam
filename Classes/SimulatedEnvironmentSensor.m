@@ -3,6 +3,8 @@ classdef SimulatedEnvironmentSensor
     %   Detailed explanation goes here
     
     properties
+        fieldOfView
+        maxRange
     end
     
     methods
