@@ -2,10 +2,24 @@ classdef EnvironmentPoint
     %EP_POINT Summary of this class goes here
     %   Detailed explanation goes here
     
-    properties
+    %% 1. Properties
+    properties(GetAccess = 'private', SetAccess = 'private')
+        index
+        trajectory
     end
     
-    methods
+    %% 2. Methods
+    % Constructor
+    methods(Access = public)
+        function self = EnvironmentPoint(trajectory,index)
+            switch nargin
+                case 0
+                case 2
+                    self.trajectory = trajectory;
+                    self.index      = index;
+            end
+        end
+        
     end
     
 end

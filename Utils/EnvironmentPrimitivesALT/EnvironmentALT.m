@@ -4,15 +4,20 @@ classdef EnvironmentALT < handle & matlab.mixin.Copyable
     
     %% 1. Properties
     properties(GetAccess = 'protected', SetAccess = 'protected')
-        EnvironmentPrimitives
-        EnvironmentPoints
+        environmentPrimitives
+        environmentPoints
     end
     
     %% 2. Methods
     methods(Access = public)
+        % Constructor
+        function self = EnvironmentALT()
+        end
+        
         % add Rectangle 
         function self = addRectangle(self,sideLengths,nPoints,distribution,rectangleTrajectory)
-            % generate points 
+            nSteps = numel(rectangleTrajectory.get('t'));
+            
             %relative positions
             switch distribution
                 case 'uniform'
@@ -26,9 +31,32 @@ classdef EnvironmentALT < handle & matlab.mixin.Copyable
                                                   generateRectanglePoints(sideLengths,nEdgePoints,'edges')];
             end
             
-            %
+            %generate GP_Points *PUT IN PRIVATE METHOD
+            rectanglePointTrajectories(nPoints) = PointTrajectory();
+            for i = 1:nPoints
+                iRelativePosition = rectanglePositionsRelative(:,i);
+                iRelativePoints(nSteps)    = GP_Point();
+                iRelativePoints.set('R3Position',repmat(iRelativePosition,1,nSteps),1:nSteps);
+                iAbsolutePoints = iRelativePoints.RelativeToAbsolutePoint(rectangleTrajectory.get('poses'));
+                rectanglePointTrajectories(i).set('t',rectangleTrajectory.get('t'));
+                rectanglePointTrajectories(i).set('points',iAbsolutePoints);
+            end
+            
+            % generate environment points
+            rectanglePointIndexes = numel(self.EnvironmentPoints)+1:numel(self.EnvironmentPoints)+nPoints;
+            EnvironmentPoints(rectanglePointIndexes) = EnvironmentPoint();
+            for i = 1:nPoints
+                EnvironmentPoints(rectanglePointIndexes(i)) = EnvironmentPoint(rectanglePointTrajectories(i),rectanglePointIndexes(i));
+            end
+            
             % initialise rectangle primitive
             rectangle = EP_Rectangle(sideLengths,rectangleTrajectory);
+            %rectangle.set('index',numel(self.environmentPrimitives)+1);
+            %rectangle.set('environmentPointIndexes',rectanglePointIndexes);
+            
+            % store in EnvironmentPrimitives, EnvironmentPoints
+%             environmentPrimitives(end+1) = rectangle;
+            
         end
     end
     
