@@ -4,6 +4,10 @@ classdef PoseTrajectory < Trajectory
     
     %% 1. Properties
     properties
+        %TODO
+        %poses property - GP_Pose class array
+        %get.dataPoints method - get pose data from GP_Pose array +
+        %varargin for options
     end
     
     %% 2. Methods

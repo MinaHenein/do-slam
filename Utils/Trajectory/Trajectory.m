@@ -25,7 +25,7 @@ classdef Trajectory < handle
         end
         
     end
-    
+       
     % Getter & Setter
     methods(Access = public) %set to protected later??
         function out = get(self,property,varargin)

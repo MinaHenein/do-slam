@@ -7,15 +7,17 @@ function [axisAngle] = assignOrientation(v,varargin)
 %   *NOTE: different orientation,change how xAxis,yAxis,zAxis placed into R
 %          based on varargin
 
-xAxis  = unit(v);
-vProjXY = [v(1:2); 0];
-yAxis  = unit(cross(xAxis,vProjXY));
-zAxis  = unit(cross(xAxis,yAxis));
-if zAxis(3) < 0
-    yAxis = -yAxis;
-    zAxis = -zAxis;
-end
-R      = [xAxis,yAxis,zAxis];
-axisAngle = arot(R);
+forward = [1 0 0];
+axisAngle = vrrotvec(forward,v);
+R1 = rot(unit(v)*pi/2); %reorient camera
+R2 = rot(axisAngle(1:3)'*axisAngle(4)); %face focus
+poses(4:6,i) = arot(R1*R2)'; 
+
+% xAxis  = unit(v);
+% vProjXY = [v(1:2); 0];
+% yAxis  = cross(v,vProjXY);
+% zAxis  = cross(xAxis,yAxis);
+% R      = [xAxis,yAxis,zAxis];
+% axisAngle = arot(R);
 
 end
