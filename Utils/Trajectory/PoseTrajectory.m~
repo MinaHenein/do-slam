@@ -3,34 +3,11 @@ classdef PoseTrajectory < Trajectory
     %   Detailed explanation goes here
     
     %% 1. Properties
-    properties(GetAccess = 'protected', SetAccess = 'protected')
+    properties
         poses
     end
     
     %% 2. Methods
-    % Getter & Setter
-    methods(Access = public) %set to protected later??
-        function out = get(self,property,varargin)
-            if (nargin==2)
-                out = self.(property);
-            elseif (nargin>2)
-                %do something with varargin depending on property
-                out = self.(property);
-            end
-            
-        end
-        
-        function self = set(self,property,value,varargin)
-            if (nargin==3)
-                self.(property) = value;
-            elseif (nargin>3)
-                %do something with varargin depending on property
-                self.(property) = value;
-            end
-            
-        end
-    end
-    
     % Constructor
     methods(Access = public) %set to private later??
         function self = PoseTrajectory(mode,varargin)
@@ -41,7 +18,7 @@ classdef PoseTrajectory < Trajectory
                     switch mode
                         case 'waypoints'
                             parameterisation = varargin{1};
-                            assert(strcmp(parameterisation,'R3'),'Error: Only R3 waypoints implemented.')
+                            assert((strcmp(parameterisation,'R3')),'Error: Only R3 waypoints implemented.')
                             waypoints = varargin{2};
                             tFit      = varargin{3};
                             fitType   = varargin{4};
@@ -53,7 +30,7 @@ classdef PoseTrajectory < Trajectory
                             self.t = dataPoints(1,:);
                             nPoses = numel(self.t);
                             GPPoses(nPoses) = GP_Pose;
-                            GPPoses.set(strcat(parameterisation,'Pose'),dataPoints(2:7,:),[1:nPoses]);
+                            GPPoses.set(parameterisation,poses,[1:nPoses]);
                             self.poses = GPPoses;
                         case 'continuous'
                             self.model = varargin{1};

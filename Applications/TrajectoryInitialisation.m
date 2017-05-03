@@ -5,8 +5,7 @@ clear all
 % 1. Trajectory can be initialised from waypoints, full pose/position data, or
 %    some model (see constructor in PoseTrajectory/PositionTrajectory)
 % 2. 'model' construction method not yet implemented
-% 3. SE3 or R3xSO3 currently supported for PoseTrajectory
-% 4. R3 currently supported for PositionTrajectory
+% 3. Only R3 waypoints currently implemented.
 
 %% 1. Generate Trajectories
 % waypoints (each column = [t,x,y,z]')
@@ -23,20 +22,21 @@ fitType = 'smoothingspline';
 tFit = linspace(t0,t1,nPoses);
 
 % construct trajectories
-poseTrajectory1 = PoseTrajectory('SE3','waypoints',waypoints,tFit,'poly1');
-poseTrajectory2 = PoseTrajectory('SE3','waypoints',waypoints,tFit,'poly2');
-poseTrajectory3 = PoseTrajectory('SE3','waypoints',waypoints,tFit,'linearinterp');
+poseTrajectory1 = PoseTrajectory('waypoints','R3',waypoints,tFit,'poly1');
+poseTrajectory2 = PoseTrajectory('waypoints','R3',waypoints,tFit,'poly2');
+poseTrajectory3 = PoseTrajectory('waypoints','R3',waypoints,tFit,'linearinterp');
 %Example - constructing from full pose data
-poseTrajectoryTemp = PoseTrajectory('SE3','waypoints',waypoints,tFit,'cubicinterp');
-poseTrajectory4 = PoseTrajectory('SE3','discrete',poseTrajectoryTemp.get('dataPoints'));
-poseTrajectory5 = PoseTrajectory('SE3','waypoints',waypoints,tFit,'smoothingspline');
-poseTrajectory6 = PoseTrajectory('R3xSO3','waypoints',waypoints,tFit,'smoothingspline');
+dataPoints = [poseTrajectory1.get('t');
+              poseTrajectory1.get('poses').get('R3xso3Pose')];
+poseTrajectory4 = PoseTrajectory('discrete','R3xso3',dataPoints);
+poseTrajectory5 = PoseTrajectory('waypoints','R3',waypoints,tFit,'smoothingspline');
+poseTrajectory6 = PoseTrajectory('waypoints','R3',waypoints,tFit,'smoothingspline');
 
-positionTrajectory1 = PositionTrajectory('R3','waypoints',waypoints,tFit,'poly1');
-positionTrajectory2 = PositionTrajectory('R3','waypoints',waypoints,tFit,'poly2');
-positionTrajectory3 = PositionTrajectory('R3','waypoints',waypoints,tFit,'linearinterp');
-positionTrajectory4 = PositionTrajectory('R3','waypoints',waypoints,tFit,'cubicinterp');
-positionTrajectory5 = PositionTrajectory('R3','waypoints',waypoints,tFit,'smoothingspline');
+pointTrajectory1 = PointTrajectory('waypoints','R3',waypoints,tFit,'poly1');
+pointTrajectory2 = PointTrajectory('waypoints','R3',waypoints,tFit,'poly2');
+pointTrajectory3 = PointTrajectory('waypoints','R3',waypoints,tFit,'linearinterp');
+pointTrajectory4 = PointTrajectory('waypoints','R3',waypoints,tFit,'cubicinterp');
+pointTrajectory5 = PointTrajectory('waypoints','R3',waypoints,tFit,'smoothingspline');
 
 %% 2. Plot
 % pose trajectory
@@ -93,7 +93,7 @@ plot3(waypoints(2,:),waypoints(3,:),waypoints(4,:),'r*')
 poseTrajectory4.plot()
 
 subplot(2,3,5)
-title('smoothingspline (SE3)')
+title('smoothingspline (logSE3)')
 axis equal
 xlabel('x')
 ylabel('y')
@@ -105,7 +105,7 @@ plot3(waypoints(2,:),waypoints(3,:),waypoints(4,:),'r*')
 poseTrajectory5.plot()
 
 subplot(2,3,6)
-title('smoothingspline (R3xSO3)')
+title('smoothingspline (R3xso3)')
 axis equal
 xlabel('x')
 ylabel('y')
@@ -133,7 +133,7 @@ view(viewPoint)
 axis(axisLimits)
 hold on
 plot3(waypoints(2,:),waypoints(3,:),waypoints(4,:),'r*')
-positionTrajectory1.plot()
+pointTrajectory1.plot()
 
 subplot(2,3,2)
 title('poly2')
@@ -145,7 +145,7 @@ view(viewPoint)
 axis(axisLimits)
 hold on
 plot3(waypoints(2,:),waypoints(3,:),waypoints(4,:),'r*')
-positionTrajectory2.plot()
+pointTrajectory2.plot()
 
 subplot(2,3,3)
 title('linearinterp')
@@ -157,7 +157,7 @@ view(viewPoint)
 axis(axisLimits)
 hold on
 plot3(waypoints(2,:),waypoints(3,:),waypoints(4,:),'r*')
-positionTrajectory3.plot()
+pointTrajectory3.plot()
 
 subplot(2,3,4)
 title('cubicinterp')
@@ -169,7 +169,7 @@ view(viewPoint)
 axis(axisLimits)
 hold on
 plot3(waypoints(2,:),waypoints(3,:),waypoints(4,:),'r*')
-positionTrajectory4.plot()
+pointTrajectory4.plot()
 
 subplot(2,3,5)
 title('smoothingspline')
@@ -181,6 +181,6 @@ view(viewPoint)
 axis(axisLimits)
 hold on
 plot3(waypoints(2,:),waypoints(3,:),waypoints(4,:),'r*')
-positionTrajectory5.plot()
+pointTrajectory5.plot()
 
 suptitle('Comparison of position trajectory fitting methods')
