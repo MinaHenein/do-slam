@@ -16,12 +16,7 @@ classdef SensorEnvironment
             
             %create objects from environmentPrimitives
             for i = 1:environment.nEnvironmentPrimitives
-                switch class(environment.get('environmentPrimitives',i))
-                    case  'EP_Rectangle'
-                        display(environment.get('environmentPrimitives',i).get('environmentPointIndexes'))
-                    otherwise
-                        error('Error: %s conversion not implemented',class(environment.get('environmentPrimitives',i)))
-                end
+                print(class(environment.get()))
             end
         end
     end

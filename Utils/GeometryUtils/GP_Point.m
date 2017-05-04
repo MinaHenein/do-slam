@@ -3,7 +3,7 @@ classdef GP_Point < GeometricPrimitive
     %   currently only R3 position implemented
     
     %% 1. Properties
-    properties(GetAccess = 'public', SetAccess = 'public')
+    properties(GetAccess = 'private', SetAccess = 'private')
         R3Position
     end
     
@@ -32,6 +32,19 @@ classdef GP_Point < GeometricPrimitive
         end
     end
     
+    % Constructor
+    methods(Access = public)
+        function self = GP_Point(position,varargin)
+            switch nargin
+                case 0
+                case 1
+                    self.set('R3Position',position);
+                otherwise
+                	assert(strcmp('R3',varargin{1}),'Error: only R3 position parameterisation implemented.')
+            end
+        end
+    end
+    
     % Transformations
     methods(Access = public)
         function positionRelative = AbsoluteToRelativePoint(self,poseReference)
@@ -43,6 +56,11 @@ classdef GP_Point < GeometricPrimitive
             elseif (numel(self)>1) && ((numel(poseReference)==1))
                 for i = 1:numel(self)
                     positionRelative(i).set('R3Position',AbsoluteToRelativePositionR3xso3(poseReference.get('R3xso3Pose'),self(i).get('R3Position')));
+                end
+            elseif (numel(self)==1) && ((numel(poseReference)>1))
+                positionRelative(numel(poseReference)) = GP_Point;
+                for i = 1:numel(self)
+                    positionRelative(i).set('R3Position',AbsoluteToRelativePositionR3xso3(poseReference(i).get('R3xso3Pose'),self.get('R3Position')));
                 end
             else
                 error('Error: inconsistent sizes')
@@ -58,6 +76,11 @@ classdef GP_Point < GeometricPrimitive
             elseif (numel(self)>1) && ((numel(poseReference)==1))
                 for i = 1:numel(self)
                     positionAbsolute(i).set('R3Position',RelativeToAbsolutePositionR3xso3(poseReference.get('R3xso3Pose'),self(i).get('R3Position')));
+                end
+            elseif (numel(self)==1) && ((numel(poseReference)>1))
+                positionAbsolute(numel(poseReference)) = GP_Point;
+                for i = 1:numel(self)
+                    positionAbsolute(i).set('R3Position',RelativeToAbsolutePositionR3xso3(poseReference(i).get('R3xso3Pose'),self.get('R3Position')));
                 end
             else
                 error('Error: inconsistent sizes')

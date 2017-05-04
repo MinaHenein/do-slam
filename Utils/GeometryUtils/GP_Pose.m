@@ -10,11 +10,11 @@ classdef GP_Pose < GeometricPrimitive
     %   rest
     
     %% 1. Properties
-    properties(GetAccess = 'public', SetAccess = 'public')
+    properties(GetAccess = 'private', SetAccess = 'private')
         R3xso3Pose
     end
     
-    properties(Dependent)
+    properties(GetAccess = 'private', SetAccess = 'private',Dependent)
         logSE3Pose
         R3xso3Position
         logSE3Position
@@ -45,7 +45,23 @@ classdef GP_Pose < GeometricPrimitive
             R = rot(self.R3xso3Pose(4:6));
         end
     end
-        
+    
+    % Constructor
+    methods(Access = public)
+        function self = GP_Pose(pose,varargin)
+            switch nargin
+                case 0
+                case 1
+                    self.set('R3xso3Pose',pose);
+                case 2
+                    assert(any(strcmp({'R3xSO3','logSE3'},varargin{1})),'Error: only logSE3 and R3xso3 pose parameterisation implemented.')
+                    self.set(strcmp(varargin{1},'Pose'),pose);
+                otherwise
+                    error('Error: too many arguments')
+            end
+        end
+    end
+    
     % Getter & Setter
     methods(Access = public)
         function out = get(self,property,varargin)
@@ -108,6 +124,11 @@ classdef GP_Pose < GeometricPrimitive
                 for i = 1:numel(self)
                     poseRelative(i).set('R3xso3Pose',AbsoluteToRelativePoseR3xso3(self(i).get('R3xso3Pose'),poseReference.get('R3xso3Pose')));
                 end
+            elseif (numel(self)==1) && ((numel(poseReference)>1))
+                poseRelative(numel(poseReference)) = GP_Pose();
+                for i = 1:numel(self)
+                    poseRelative(i).set('R3xso3Pose',AbsoluteToRelativePoseR3xso3(self.get('R3xso3Pose'),poseReference(i).get('R3xso3Pose')));
+                end
             else
                 error('Error: inconsistent sizes')
             end
@@ -122,6 +143,11 @@ classdef GP_Pose < GeometricPrimitive
             elseif (numel(self)>1) && ((numel(poseReference)==1))
                 for i = 1:numel(self)
                     poseAbsolute(i).set('R3xso3Pose',RelativeToAbsolutePoseR3xso3(poseReference.get('R3xso3Pose'),self(i).get('R3xso3Pose')));
+                end
+            elseif (numel(self)==1) && ((numel(poseReference)>1))
+                poseAbsolute(numel(poseReference)) = GP_Pose();
+                for i = 1:numel(poseAbsolute)
+                    poseAbsolute(i).set('R3xso3Pose',RelativeToAbsolutePoseR3xso3(poseReference(i).get('R3xso3Pose'),self.get('R3xso3Pose')));
                 end
             else
                 error('Error: inconsistent sizes')

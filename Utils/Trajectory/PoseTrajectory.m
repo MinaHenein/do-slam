@@ -66,6 +66,16 @@ classdef PoseTrajectory < Trajectory
                             GPPoses(nPoses) = GP_Pose;
                             GPPoses.set(strcat(parameterisation,'Pose'),dataPoints(2:7,:),[1:nPoses]);
                             self.poses = GPPoses;
+                        case 'stationary'
+                            parameterisation = varargin{1};
+                            assert(any(strcmp(parameterisation,{'logSE3','R3xso3'})),'Error: only logSE3 and R3xso3 pose parameterisation implemented.')
+                            self.t = varargin{2};
+                            nPoses = numel(self.t);
+                            dataPoints = repmat(varargin{3},1,nPoses);
+                            nPoses = numel(self.t);
+                            GPPoses(nPoses) = GP_Pose;
+                            GPPoses.set(strcat(parameterisation,'Pose'),dataPoints,[1:nPoses]);
+                            self.poses = GPPoses;
                         case 'continuous'
                             self.model = varargin{1};
                     end
