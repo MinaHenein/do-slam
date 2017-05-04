@@ -25,12 +25,12 @@ tFit = linspace(t0,t1,nPoses);
 poseTrajectory1 = PoseTrajectory('waypoints','R3',waypoints,tFit,'poly1');
 poseTrajectory2 = PoseTrajectory('waypoints','R3',waypoints,tFit,'poly2');
 poseTrajectory3 = PoseTrajectory('waypoints','R3',waypoints,tFit,'linearinterp');
-%Example - constructing from full pose data
-dataPoints = [poseTrajectory1.get('t');
-              poseTrajectory1.get('poses').get('R3xso3Pose')];
-poseTrajectory4 = PoseTrajectory('discrete','R3xso3',dataPoints);
+poseTrajectory4 = PoseTrajectory('waypoints','R3',waypoints,tFit,'cubicinterp');
 poseTrajectory5 = PoseTrajectory('waypoints','R3',waypoints,tFit,'smoothingspline');
-poseTrajectory6 = PoseTrajectory('waypoints','R3',waypoints,tFit,'smoothingspline');
+%Example - constructing from full pose data
+dataPoints = [poseTrajectory5.get('t');
+              poseTrajectory5.get('poses').get('R3xso3Pose')];
+poseTrajectory6 = PoseTrajectory('discrete','R3xso3',dataPoints);
 
 pointTrajectory1 = PointTrajectory('waypoints','R3',waypoints,tFit,'poly1');
 pointTrajectory2 = PointTrajectory('waypoints','R3',waypoints,tFit,'poly2');
@@ -101,7 +101,7 @@ plot3(waypoints(2,:),waypoints(3,:),waypoints(4,:),'r*')
 poseTrajectory4.plot()
 
 subplot(2,3,5)
-title('smoothingspline (logSE3)')
+title('smoothingspline')
 axis equal
 xlabel('x')
 ylabel('y')
@@ -111,18 +111,6 @@ axis(axisLimits)
 hold on
 plot3(waypoints(2,:),waypoints(3,:),waypoints(4,:),'r*')
 poseTrajectory5.plot()
-
-subplot(2,3,6)
-title('smoothingspline (R3xso3)')
-axis equal
-xlabel('x')
-ylabel('y')
-zlabel('z')
-view(viewPoint)
-axis(axisLimits)
-hold on
-plot3(waypoints(2,:),waypoints(3,:),waypoints(4,:),'r*')
-poseTrajectory6.plot()
 
 suptitle('Comparison of pose trajectory fitting methods')
 

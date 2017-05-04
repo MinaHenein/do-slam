@@ -41,7 +41,7 @@ classdef EnvironmentALT < handle & matlab.mixin.Copyable
                     end
                     
                     for i = 1:numel(varargin{1})
-                        out(i) = [self.(property)(varargin{1}(i))];
+                        out(i) = [self.(property)];
                     end
             end
         end
@@ -132,12 +132,14 @@ classdef EnvironmentALT < handle & matlab.mixin.Copyable
     
     % Plot
     methods(Access = public)
-        function h = plot(self,timeStep)
-            %get environment points positions at timeStep
-            positions = self.get('environmentPoints'). ...
-                                    get('trajectory'). ...
-                                    get('points','timeStep',timeStep). ...
-                                    get('R3Position');
+        function h = plot(self,time)
+            %get environment points positions at time t
+            %*ADJUST GETS TO MAKE THIS CLEANER
+            trajectories = self.get('environmentPoints').get('trajectory');
+            positions = zeros(3,self.nEnvironmentPoints);
+            for i = 1:numel(trajectories)
+                positions(:,i) = trajectories(i).get('points').get('R3Position',time);
+            end
             h = plot3(positions(1,:),positions(2,:),positions(3,:),'k.');
             
             %*TODO: loop over primitives and plot too

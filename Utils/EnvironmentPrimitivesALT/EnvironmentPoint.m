@@ -9,6 +9,17 @@ classdef EnvironmentPoint
     end
     
     %% 2. Methods
+    % Getter & Setter
+    methods(Access = public) %set to protected later??
+        function out = get(self,property)
+        	out = [self.(property)];
+        end
+        
+        function self = set(self,property,value)
+        	self.(property) = value;
+        end
+    end
+    
     % Constructor
     methods(Access = public)
         function self = EnvironmentPoint(trajectory,index)

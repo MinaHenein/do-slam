@@ -9,6 +9,8 @@ close all
 
 %% 3. Initialise Sensor
 
-%% 4. Generate Measurements
+%% 4. Create SensorObjects
 
-%% 5. Save Measurements to Graph File
+%% 5. Generate Measurements
+
+%% 6. Save Measurements to Graph File

@@ -15,16 +15,9 @@ classdef PointTrajectory < Trajectory
                 out = [self.(property)];
             elseif (nargin==4) && strcmp(property,'points')
                 switch varargin{1}
-                    case 'timeStep'
-                        %get points of each trajectory for time step varargin{2}
-                        assert(numel(varargin{2})==1,'Unsafe to get points for multiple trajectories at multiple times')
-                        nTrajectories = numel(self);
-                        out(nTrajectories) = GP_Point();
-                        for i = 1:nTrajectories
-                            out(i) = [self(i).points(varargin{2})];
-                        end
+                    case 'index'
                     case 'time'
-                        %get points of each trajectory for time varargin{2}
+                        %get points of each trajectory for time varargin{1}
                         nTrajectories = numel(self);
                         out(nTrajectories) = GP_Point();
                         for i = 1:nTrajectories

@@ -13,8 +13,26 @@ classdef PoseTrajectory < Trajectory
         function out = get(self,property,varargin)
             if (nargin==2)
                 out = [self.(property)];
-            elseif (nargin==3) && strcmp(property,'poses')
-                out = [self.poses(varargin{1})];
+            elseif (nargin==4) && strcmp(property,'poses')
+                switch varargin{1}
+                    case 'timeStep'
+                        %get poses of each trajectory for time step varargin{2}
+                        assert(numel(varargin{2})==1,'Unsafe to get poses for multiple trajectories at multiple times')
+                        nTrajectories = numel(self);
+                        out(nTrajectories) = GP_Pose();
+                        for i = 1:nTrajectories
+                            out(i) = self(i).poses(varargin{2});
+                        end
+                    case 'time'
+                        %get poses of each trajectory for time varargin{2}
+                        nTrajectories = numel(self);
+                        out(nTrajectories) = GP_Pose();
+                        for i = 1:nTrajectories
+                            poseLogical = (self(i).t==varargin{2});
+                            assert(sum(poseLogical)==1,'Exactly 1 pose must exist at input time for each trajectory')
+                            out(i) = self(i).poses(poseLogical);
+                        end
+                end
             end
             
         end

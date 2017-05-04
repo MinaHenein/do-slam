@@ -12,6 +12,9 @@ classdef GP_Pose < GeometricPrimitive
     %% 1. Properties
     properties(GetAccess = 'public', SetAccess = 'public')
         R3xso3Pose
+    end
+    
+    properties(Dependent)
         logSE3Pose
         R3xso3Position
         logSE3Position

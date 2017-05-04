@@ -14,15 +14,17 @@ switch distribution
         edge2Indexes = edge1Indexes(end)+1:edge1Indexes(end)+floor(nPoints*xRatio/2);
         edge3Indexes = edge2Indexes(end)+1:edge2Indexes(end)+ceil(nPoints*yRatio/2);
         edge4Indexes = edge3Indexes(end)+1:nPoints;
-        positions(1,edge1Indexes) = sideLengths(1)*rand(1,numel(edge1Indexes));
-        positions(1,edge2Indexes) = sideLengths(1)*rand(1,numel(edge2Indexes));
-        positions(2,edge2Indexes) = sideLengths(2);
-        positions(1,edge4Indexes) = sideLengths(1);
-        positions(2,edge3Indexes) = sideLengths(2)*rand(1,numel(edge3Indexes));
-        positions(2,edge4Indexes) = sideLengths(2)*rand(1,numel(edge4Indexes));
+        positions(1,edge1Indexes) = sideLengths(1)*rand(1,numel(edge1Indexes)) - sideLengths(1)/2;
+        positions(1,edge2Indexes) = sideLengths(1)*rand(1,numel(edge2Indexes)) - sideLengths(1)/2;
+        positions(2,edge1Indexes) = 0 - sideLengths(2)/2;
+        positions(2,edge2Indexes) = sideLengths(2) - sideLengths(2)/2;
+        positions(1,edge3Indexes) = 0 - sideLengths(1)/2;
+        positions(1,edge4Indexes) = sideLengths(1) - sideLengths(1)/2;
+        positions(2,edge3Indexes) = sideLengths(2)*rand(1,numel(edge3Indexes)) - sideLengths(2)/2;
+        positions(2,edge4Indexes) = sideLengths(2)*rand(1,numel(edge4Indexes)) - sideLengths(2)/2;
     case 'uniform'
-        positions(1,:) = sideLengths(1)*rand(1,nPoints);
-        positions(2,:) = sideLengths(2)*rand(1,nPoints);
+        positions(1,:) = sideLengths(1)*rand(1,nPoints) - sideLengths(1)/2;
+        positions(2,:) = sideLengths(2)*rand(1,nPoints) - sideLengths(2)/2;
 end
 
 end
