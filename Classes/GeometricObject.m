@@ -12,28 +12,12 @@ classdef GeometricObject < BaseObject
     
     %% 2. Methods
     methods(Access = private)
-        function out = getSwitch(self,property,varargin)
-            %output depends on varargin
-            switch property
-                case 'index'
-                    out = self.index;
-                case 'parameters'
-                    out = self.parameters;
-                case 'trajectory'
-                    out = self.trajectory;
-            end
+        function out = get(self,property)
+        	out = [self.(property)];
         end
         
-        function self = setSwitch(self,property,value,varargin)
-            %depends on varargin
-            switch property
-                case 'index'
-                    self.index = value;
-                case 'parameters'
-                    self.parameters = value;
-                case 'trajectory'
-                    self.trajectory = value;
-            end
+        function self = set(self,property,value)
+        	self.(property) = value;
         end
     end
     

@@ -1,4 +1,4 @@
-classdef GP_Point < GeometricPrimitive
+classdef GP_Point < GeometricPrimitive & ArrayGetSet
     %GP_POINT represents a position in 3D space
     %   currently only R3 position implemented
     
@@ -7,40 +7,43 @@ classdef GP_Point < GeometricPrimitive
         R3Position
     end
     
-    %% 2. Methods
-    % Getter & Setter
-    methods(Access = public)
-        function out = get(self,property,varargin)
-            if (nargin==2)
-                out = [self.(property)];
-            elseif (nargin==3) %specific location required
-                out = [self(varargin{1}).(property)];
-            end
-            
-        end
-        
-        function self = set(self,property,values,varargin)
-            if (nargin==3)
-                self.(property) = values;
-            elseif (nargin==4) %set specific locations
-                locations = varargin{1};
-                for i = 1:numel(locations)
-                    self(locations(i)).(property) = values(:,i);
-                end
-            end
-            
-        end
-    end
-    
+        %% 2. Methods
     % Constructor
     methods(Access = public)
         function self = GP_Point(position,varargin)
             switch nargin
                 case 0
                 case 1
-                    self.set('R3Position',position);
+                    self.R3Position = position;
                 otherwise
-                	assert(strcmp('R3',varargin{1}),'Error: only R3 position parameterisation implemented.')
+                    %do something with varargin
+                    self.R3Position = position;
+            end
+%             assert(isequal([3,1],size(self.R3Position)),'Error: position must be 3x1')
+        end
+    end
+    
+    % Get & Set
+    methods(Access = public)
+        % Can get values that are not properties
+        % Compute from R3Position property
+        function value = getSwitch(self,property,varargin)
+            switch property
+                case 'R3Position'
+                    value = self.R3Position;
+                otherwise 
+                    error('Error: invalid property')
+            end
+        end
+        
+        % Can set values that are not properties
+        % Compute R3xso3Pose property
+        function self = setSwitch(self,property,value,varargin)
+            switch property
+                case 'R3Position'
+                    self.R3Position = value;
+                otherwise 
+                    error('Error: invalid property')
             end
         end
     end

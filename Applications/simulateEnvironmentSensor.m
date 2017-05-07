@@ -1,7 +1,5 @@
 clear all 
-close all 
-
-%% 
+% close all 
 
 %% 1. Config
 % *TODO: create config class
@@ -23,8 +21,10 @@ dynamicTrajectory = PoseTrajectory('waypoints','R3',dynamicWaypoints,t,'smoothin
 % initialise environment
 environment = EnvironmentALT();
 % add primitives to environment
-environment.addRectangle([10,15],100,'mixed',staticTrajectory1);
-environment.addRectangle([8,6],50,'mixed',staticTrajectory2);
+tic
+environment.addRectangle([10,15],10000,'mixed',staticTrajectory1);
+environment.addRectangle([8,6],5000,'mixed',staticTrajectory2);
+toc
 
 %% 3. Initialise Sensor
 fieldOfView = [-pi/3,pi/3,-pi/6,pi/6];

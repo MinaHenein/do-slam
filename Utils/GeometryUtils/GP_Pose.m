@@ -1,114 +1,84 @@
-classdef GP_Pose < GeometricPrimitive
-    %GP_POSE Summary of this class goes here
-    %   Detailed explanation goes here
-    %   *Dependent properties will be recomputed whenever R3xso3Pose changes
-    %   and whenever they are accessed, they are computed from R3xso3Pose
-    %   - this might be slow if R3xso3Pose changes is changed a lot
-    %   - options: remove dependent properties if they are not needed a
-    %   lot, OR remove dependencies and build this functionality into the
-    %   set method manually - whenever any property is changed, change the
-    %   rest
+classdef GP_Pose < GeometricPrimitive & ArrayGetSet
+    %GP_POSE represents pose
+    %   R3xso3 pose parameterisation is stored
+    %   When other parameterisations/properties are requested, they are 
+    %   computed from the stored R3xso3 pose value
+    %   When other parameterisations/properties are set, the new R3xso3
+    %   pose is computed and set
+
     
     %% 1. Properties
     properties(GetAccess = 'private', SetAccess = 'private')
         R3xso3Pose
     end
     
-    properties(GetAccess = 'private', SetAccess = 'private',Dependent)
-        logSE3Pose
-        R3xso3Position
-        logSE3Position
-        axisAngle
-        R
-    end
-    
     %% 2. Methods
-    % Dependent property assignment - this might be slow *
-    methods
-        function logSE3Pose = get.logSE3Pose(self)
-            logSE3Pose = R3xso3_LogSE3(self.R3xso3Pose);
-        end
-        
-        function logSE3Position = get.logSE3Position(self)
-            logSE3Position = self.logSE3Pose(1:3);
-        end
-        
-        function R3xso3Position = get.R3xso3Position(self)
-            R3xso3Position = self.R3xso3Pose(1:3);
-        end
-        
-        function axisAngle = get.axisAngle(self)
-            axisAngle = self.R3xso3Pose(4:6);
-        end
-        
-        function R = get.R(self)
-            R = rot(self.R3xso3Pose(4:6));
-        end
-    end
-    
     % Constructor
     methods(Access = public)
         function self = GP_Pose(pose,varargin)
             switch nargin
                 case 0
                 case 1
-                    self.set('R3xso3Pose',pose);
-                case 2
-                    assert(any(strcmp({'R3xSO3','logSE3'},varargin{1})),'Error: only logSE3 and R3xso3 pose parameterisation implemented.')
-                    self.set(strcmp(varargin{1},'Pose'),pose);
+                    self.R3xso3Pose = pose;
                 otherwise
-                    error('Error: too many arguments')
+                    switch varargin{1}
+                        case 'R3xso3'
+                            self.R3xso3Pose = pose;
+                        case 'logSE3'
+                            self.R3xso3Pose = logSE3_Rxt(pose);
+                        otherwise
+                            error('Error: invalid parameterisation')
+                    end
             end
+%             assert(isequal([6,1],size(self.R3xso3Pose)),'Error: pose must be 6x1')
         end
     end
     
-    % Getter & Setter
+    % Get & Set
     methods(Access = public)
-        function out = get(self,property,varargin)
-            if (nargin==2)
-                out = [self.(property)];
-            elseif (nargin==3) %specific poses
-                out = [self(varargin{1}).(property)];
+        % Can get values that are not properties
+        % Compute from R3xso3Pose property
+        function value = getSwitch(self,property,varargin)
+            switch property
+                case 'R3xso3Pose'
+                    value = self.R3xso3Pose;
+                case 'logSE3Pose'
+                    value = R3xso3_LogSE3(self.R3xso3Pose);
+                case 'R3xso3Position'
+                    value = self.R3xso3Pose(1:3);
+                case 'logSE3Position'
+                    value = R3xso3_LogSE3(self.R3xso3Pose);
+                    value = value(1:3);
+                case 'axisAngle'
+                    value = self.R3xso3Pose(4:6);
+                case 'R'
+                    value = rot(self.R3xso3Pose(4:6));
+                otherwise 
+                    error('Error: invalid property')
             end
-            
         end
         
-        function self = set(self,property,values,varargin)
-            if (nargin==3)
-                switch property
-                    case 'R3xso3Pose'
-                        self.R3xso3Pose = values;
-                    case 'logSE3Pose'
-                        self.R3xso3Pose = LogSE3_Rxt(values);
-                    case 'R3xso3Position'
-                        self.R3xso3Pose(1:3) = values;
-                    case 'logSE3Position'
-                        self.R3xso3Pose = LogSE3_Rxt([values; self.logSE3Pose(4:6)]);
-                    case 'axisAngle'
-                        self.R3xso3Pose(4:6) = values;
-                    case 'R'
-                        self.R3xso3Pose(4:6) = arot(values);
-                end
-            elseif (nargin==4)
-                locations = varargin{1};
-                for i = 1:numel(locations)
-                    switch property
-                        case 'R3xso3Pose'
-                            self(locations(i)).R3xso3Pose = values(:,i);
-                        case 'logSE3Pose'
-                            self(locations(i)).R3xso3Pose = LogSE3_Rxt(values(:,i));
-                        case 'R3xso3Position'
-                            self(locations(i)).R3xso3Pose(1:3) = values(:,i);
-                        case 'logSE3Position'
-                            self(locations(i)).R3xso3Pose = LogSE3_Rxt([values(:,i); self(locations(i)).logSE3Pose(4:6)]);
-                        case 'axisAngle'
-                            self(locations(i)).R3xso3Pose(4:6) = values(:,i);
-                        case 'R'
-                            self(locations(i)).R3xso3Pose(4:6) = arot(values(:,mapping(i,3)));
-                    end
-                end
+        % Can set values that are not properties
+        % Compute R3xso3Pose property
+        function self = setSwitch(self,property,value,varargin)
+            switch property
+                case {'pose','R3xso3Pose'}
+                    self.R3xso3Pose = value;
+                case 'logSE3Pose'
+                    self.R3xso3Pose = logSE3_Rxt(value);
+                case 'R3xso3Position'
+                    self.R3xso3Pose = [value; self.R3xso3Pose(4:6)];
+                case 'logSE3Position'
+                    logSE3Pose = self.getSwitch('logSE3Pose');
+                    logSE3Pose(1:3) = value;
+                    self.R3xso3Pose = logSE3_Rxt(logSE3Pose);
+                case 'axisAngle'
+                    self.R3xso3Pose = [self.R3xso3Pose(1:3); value];
+                case 'R'
+                    self.R3xso3Pose = [self.R3xso3Pose(1:3); arot(value)];
+                otherwise 
+                    error('Error: invalid property')
             end
-            
         end
     end
     
