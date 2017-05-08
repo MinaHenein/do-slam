@@ -22,9 +22,10 @@ classdef PositionModelPoseTrajectory < PoseTrajectory
     
     %% 2. Methods    
     % Constructor
-    methods(Access = public) %set to private later??
+    methods(Access = public)
         function self = PositionModelPoseTrajectory(waypoints,parameterisation,fitType)
             assert(strcmp(parameterisation,'R3'),'Error: Only R3 waypoints implemented.')
+            %fit x,y,z to waypoints
             self.xModel = fit(waypoints(1,:)',waypoints(2,:)',fitType);
             self.yModel = fit(waypoints(1,:)',waypoints(3,:)',fitType);
             self.zModel = fit(waypoints(1,:)',waypoints(4,:)',fitType);
@@ -58,13 +59,17 @@ classdef PositionModelPoseTrajectory < PoseTrajectory
     % Computes pose @ time t
     methods(Access = private)
         function pose = computePose(self,t)
+            %compute position from x,y,z models
             position = [self.xModel(t);
                         self.yModel(t);
                         self.zModel(t)];
+            %differentiate models at time t to get velocity
             velocity = [differentiate(self.xModel,t);
                         differentiate(self.yModel,t);
                         differentiate(self.zModel,t)];
+            %assign orientation from velocity
             orientation = assignOrientation(velocity);
+            %output is GP_Pose
             pose = GP_Pose([position; orientation]);            
         end
         

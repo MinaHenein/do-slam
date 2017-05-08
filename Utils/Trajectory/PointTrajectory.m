@@ -21,13 +21,18 @@ classdef PointTrajectory < Trajectory
     
     % Transformations
     methods(Access = public)
+        % @ time t, get relative position between two trajectories/trajectory 
+        % GP_Point 
         function out = AbsoluteToRelativePoint(self,poseReference,t,varargin)
             pointAbsolute = self.get('GP_Point',t);
+            % if reference is trajectory, get pose at time t
             if any(strcmp(superclasses(poseReference),'PoseTrajectory'))
                 poseReference = poseReference.get('GP_Pose',t);
             end
+            % poseReference MUST now be GP_Pose
             assert(strcmp(class(poseReference),'GP_Pose'),'Error: poseReference must be PoseTrajectory or GP_Pose')
             pointRelative = pointAbsolute.AbsoluteToRelativePoint(poseReference); 
+            % output GP_Point or one of its properties
             if numel(varargin) > 0
                 property = varargin{1};
                 out = pointRelative.get(property);
@@ -36,13 +41,18 @@ classdef PointTrajectory < Trajectory
             end
         end
         
+        % @ time t, get absolute position of trajectory w.r.t. another
+        % trajectory or GP_Point
         function out = RelativeToAbsolutePoint(self,poseReference,t,varargin)
             pointRelative = self.get('GP_Point',t);
+            % if reference is trajectory, get pose at time t
             if any(strcmp(superclasses(poseReference),'PoseTrajectory'))
                 poseReference = poseReference.get('GP_Pose',t);
             end
+            % poseReference MUST now be GP_Pose
             assert(strcmp(class(poseReference),'GP_Pose'),'Error: poseReference must be PoseTrajectory or GP_Pose')
             pointAbsolute = pointRelative.RelativeToAbsolutePoint(poseReference); 
+            % output GP_Point or one of its properties
             if numel(varargin) > 0
                 property = varargin{1};
                 out = pointAbsolute.get(property);
