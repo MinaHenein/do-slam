@@ -1,11 +1,10 @@
-classdef GP_Pose < GeometricPrimitive & ArrayGetSet
-    %GP_POSE represents pose
+classdef GP_Pose < GeometricPrimitive
+    %GP_POSE represents 6D pose geometry
     %   R3xso3 pose parameterisation is stored
     %   When other parameterisations/properties are requested, they are 
     %   computed from the stored R3xso3 pose value
     %   When other parameterisations/properties are set, the new R3xso3
     %   pose is computed and set
-
     
     %% 1. Properties
     properties(GetAccess = 'private', SetAccess = 'private')
@@ -65,7 +64,7 @@ classdef GP_Pose < GeometricPrimitive & ArrayGetSet
                 case {'pose','R3xso3Pose'}
                     self.R3xso3Pose = value;
                 case 'logSE3Pose'
-                    self.R3xso3Pose = logSE3_Rxt(value);
+                    self.R3xso3Pose = LogSE3_Rxt(value);
                 case 'R3xso3Position'
                     self.R3xso3Pose = [value; self.R3xso3Pose(4:6)];
                 case 'logSE3Position'
@@ -85,7 +84,9 @@ classdef GP_Pose < GeometricPrimitive & ArrayGetSet
     % Transformations
     methods(Access = public)
         function poseRelative = AbsoluteToRelativePose(self,poseReference)
+            %preallocate
             poseRelative(numel(self)) = GP_Pose;
+            %indexing depends on size of input and output
             if (numel(self)==numel(poseReference))
                 for i = 1:numel(self)
                     poseRelative(i).set('R3xso3Pose',AbsoluteToRelativePoseR3xso3(self(i).get('R3xso3Pose'),poseReference(i).get('R3xso3Pose')));
@@ -105,7 +106,9 @@ classdef GP_Pose < GeometricPrimitive & ArrayGetSet
         end
         
         function poseAbsolute = RelativeToAbsolutePose(self,poseReference)
+            %preallocate
             poseAbsolute(numel(self)) = GP_Pose;
+            %indexing depends on size of input and output
             if (numel(self)==numel(poseReference))
                 for i = 1:numel(self)
                     poseAbsolute(i).set('R3xso3Pose',RelativeToAbsolutePoseR3xso3(poseReference(i).get('R3xso3Pose'),self(i).get('R3xso3Pose')));

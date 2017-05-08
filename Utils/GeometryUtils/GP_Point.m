@@ -1,6 +1,8 @@
-classdef GP_Point < GeometricPrimitive & ArrayGetSet
+classdef GP_Point < GeometricPrimitive
     %GP_POINT represents a position in 3D space
     %   currently only R3 position implemented
+    %   transformation methods allow points to be converted between
+    %   absolute/relative position given a GP_Pose input
     
     %% 1. Properties
     properties(GetAccess = 'private', SetAccess = 'private')
@@ -51,7 +53,9 @@ classdef GP_Point < GeometricPrimitive & ArrayGetSet
     % Transformations
     methods(Access = public)
         function positionRelative = AbsoluteToRelativePoint(self,poseReference)
+            %preallocate
             positionRelative(numel(self)) = GP_Point;
+            %indexing depends on size of input and output
             if (numel(self)==numel(poseReference))
                 for i = 1:numel(self)
                     positionRelative(i).set('R3Position',AbsoluteToRelativePositionR3xso3(poseReference(i).get('R3xso3Pose'),self(i).get('R3Position')));
@@ -71,7 +75,9 @@ classdef GP_Point < GeometricPrimitive & ArrayGetSet
         end
         
         function positionAbsolute = RelativeToAbsolutePoint(self,poseReference)
+            %preallocate
             positionAbsolute(numel(self)) = GP_Point;
+            %indexing depends on size of input and output
             if (numel(self)==numel(poseReference))
                 for i = 1:numel(self)
                     positionAbsolute(i).set('R3Position',RelativeToAbsolutePositionR3xso3(poseReference(i).get('R3xso3Pose'),self(i).get('R3Position')));

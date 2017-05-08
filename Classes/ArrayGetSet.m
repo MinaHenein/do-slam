@@ -9,7 +9,7 @@ classdef ArrayGetSet < handle & matlab.mixin.Copyable
     end
     
     %% 2. Methods
-    methods(Access = public)
+    methods(Access = public, Sealed = true)
         % Get
         %   assumes self is 1xn object array
         %   if location provided, gets property of each self(location)
