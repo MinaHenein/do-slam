@@ -27,11 +27,20 @@ classdef StaticPoseTrajectory < PoseTrajectory
     % Get & Set
     methods(Access = public)
         function value = getSwitch(self,property,varargin)
+            if numel(varargin) > 0
+                nPoses = numel(varargin{1});
+            else
+                nPoses = 1;
+            end
             switch property
                 case 'GP_Pose'
-                    value = self.GP_Pose;
+                    value(nPoses) = GP_Pose();
+                    for i = 1:nPoses
+                        value(i) = self.GP_Pose.copy();
+                    end
                 case {'R3xso3Pose','logSE3Pose','R3xso3Position','logSE3Position','axisAngle','R'}
                     value = self.GP_Pose.get(property);
+                    value = repmat(value,1,nPoses);
                 otherwise 
                     error('Error: invalid property')
             end

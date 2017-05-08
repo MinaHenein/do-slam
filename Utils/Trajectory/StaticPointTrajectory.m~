@@ -30,17 +30,13 @@ classdef StaticPointTrajectory < PointTrajectory
             if numel(varargin) > 0
                 nPoints = numel(varargin{1});
             else
-                nPoints = 1;
+                nPoints
             end
             switch property
                 case 'GP_Point'
-                    value(nPoints) = GP_Point();
-                    for i = 1:nPoints
-                        value(i) = self.GP_Point.copy();
-                    end
+                    value = self.GP_Point;
                 case {'R3Position'}
                     value = self.GP_Point.get(property);
-                    value = repmat(value,1,nPoints);
                 otherwise 
                     error('Error: invalid property')
             end

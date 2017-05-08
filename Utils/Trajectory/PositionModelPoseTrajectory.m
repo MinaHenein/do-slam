@@ -56,21 +56,28 @@ classdef PositionModelPoseTrajectory < PoseTrajectory
         
     end
     
-    % Computes pose @ time t
+    % Computes pose @ times t
     methods(Access = private)
-        function pose = computePose(self,t)
+        function poses = computePose(self,t)
+            nPoses = numel(t);
             %compute position from x,y,z models
-            position = [self.xModel(t);
-                        self.yModel(t);
-                        self.zModel(t)];
+            position = [self.xModel(t)';
+                        self.yModel(t)';
+                        self.zModel(t)'];
             %differentiate models at time t to get velocity
-            velocity = [differentiate(self.xModel,t);
-                        differentiate(self.yModel,t);
-                        differentiate(self.zModel,t)];
+            velocity = [differentiate(self.xModel,t)';
+                        differentiate(self.yModel,t)';
+                        differentiate(self.zModel,t)'];
             %assign orientation from velocity
-            orientation = assignOrientation(velocity);
+            orientation = zeros(3,nPoses);
+            for i = 1:nPoses
+                orientation(:,i) = assignOrientation(velocity(:,i));
+            end
             %output is GP_Pose
-            pose = GP_Pose([position; orientation]);            
+            poses(nPoses) = GP_Pose();
+            for i = 1:nPoses
+                poses(i) = GP_Pose([position(:,i); orientation(:,i)]); 
+            end
         end
         
     end

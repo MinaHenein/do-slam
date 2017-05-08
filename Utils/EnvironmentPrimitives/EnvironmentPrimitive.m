@@ -1,4 +1,4 @@
-classdef EnvironmentPrimitiveALT < handle & matlab.mixin.Copyable & matlab.mixin.Heterogeneous
+classdef EnvironmentPrimitive < handle & matlab.mixin.Copyable & matlab.mixin.Heterogeneous
     %ENVIRONMENTPRIMITIVEALT Summary of this class goes here
     %   Detailed explanation goes here
     
@@ -23,7 +23,7 @@ classdef EnvironmentPrimitiveALT < handle & matlab.mixin.Copyable & matlab.mixin
     
     
 %     methods(Access = public)
-%         function self = EnvironmentPrimitiveALT()
+%         function self = EnvironmentPrimitive()
 %         end
 %     end
     

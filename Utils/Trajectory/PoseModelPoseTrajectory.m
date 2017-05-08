@@ -55,14 +55,18 @@ classdef PoseModelPoseTrajectory < PoseTrajectory
         end
     end
     
-    % Computes pose @ time t
+    % Computes pose @ times t
     methods(Access = private)
-        function pose = computePose(self,t)
-            pose = [self.xModel(t);
-                    self.yModel(t);
-                    self.zModel(t);
-                    self.orientationModel(t)];
-            pose = GP_Pose(pose);            
+        function poses = computePose(self,t)
+            nPoses = numel(t);
+            R3xso3Poses = [self.xModel(t)';
+                           self.yModel(t)';
+                           self.zModel(t)';
+                           self.orientationModel(t)'];
+            poses(nPoses) = GP_Pose();
+            for i = 1:nPoses
+                poses(i) = GP_Pose(R3xso3Poses(:,i)); 
+            end
         end
     end
     

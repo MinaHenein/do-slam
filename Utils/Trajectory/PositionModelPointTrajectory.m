@@ -51,14 +51,18 @@ classdef PositionModelPointTrajectory < PointTrajectory
         end
     end
     
-    %use x,y,z models to compute position at time t
+    %use x,y,z models to compute position at times t
     methods(Access = private)
-        function point = computePoint(self,t)
-            position = [self.xModel(t);
-                        self.yModel(t);
-                        self.zModel(t)];
+        function points = computePoint(self,t)
+            nPoints = numel(t);
+            position = [self.xModel(t)';
+                        self.yModel(t)';
+                        self.zModel(t)'];
             %output is GP_Point
-            point = GP_Point(position);            
+            points(nPoints) = GP_Point();
+            for i = 1:nPoints
+                points(i) = GP_Point(position(:,i));  
+            end
         end
     end
     

@@ -15,9 +15,11 @@ trajectory3 = PositionModelPointTrajectory(waypoints,'R3','smoothingspline');
 trajectory4 = StaticPointTrajectory([5 5 5]','R3');
 
 % getting and setting
+trajectory1.get('GP_Pose',1:0.1:1.5)
+trajectory1.get('R3xso3Pose',1:0.1:1.5)
 trajectory1.get('logSE3Pose',3)
 trajectory2.set('logSE3Pose',[0 0 1 0 pi/3 0]');
-trajectory3.get('R3Position',2)
+trajectory3.get('R3Position',1:2)
 trajectories = [trajectory1 trajectory2];
 trajectories.get('R3xso3Pose',3)
 
