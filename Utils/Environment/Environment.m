@@ -1,5 +1,6 @@
-classdef Environment < handle & matlab.mixin.Copyable
-    %ENVIRONMENTALT Summary of this class goes here
+classdef Environment < ArrayGetSet
+    %Environment class stores environment primitives and environment points
+    %and has methods to construct and manipulate them
     %   Detailed explanation goes here
     
     %% 1. Properties
@@ -23,38 +24,11 @@ classdef Environment < handle & matlab.mixin.Copyable
         function nEnvironmentPoints = get.nEnvironmentPoints(self)
             nEnvironmentPoints = numel(self.environmentPoints);
         end
-    end
-    
-    % Getter & Setter
-    methods(Access = public) %set to protected later??
-        function out = get(self,property,varargin)
-            switch nargin
-                case 2
-                    out = [self.(property)];
-                case 3
-                    if strcmp('environmentPrimitives',property)
-                        out(numel(varargin{1})) = EnvironmentPrimitiveALT();
-                    elseif strcmp('environmentPoints',property)
-                        out(numel(varargin{1})) = EnvironmentPoint();
-                    else
-                        error('Only provide location for environmentPrimitives/environmentPoints properties')
-                    end
-                    
-                    for i = 1:numel(varargin{1})
-                        out(i) = [self.(property)(varargin{1}(i))];
-                    end
-            end
-        end
-        
-        function self = set(self,property,value)
-        	self.(property) = value;
-        end
-    end
+    end   
     
     % Constructor
     methods(Access = public)
         function self = Environment()
-           
         end
     end
     

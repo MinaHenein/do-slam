@@ -5,7 +5,6 @@ classdef EnvironmentPoint
     %% 1. Properties
     properties(GetAccess = 'private', SetAccess = 'private')
         index
-        trajectory
     end
     
     %% 2. Methods

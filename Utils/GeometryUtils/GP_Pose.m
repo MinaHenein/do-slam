@@ -24,7 +24,7 @@ classdef GP_Pose < GeometricPrimitive
                         case 'R3xso3'
                             self.R3xso3Pose = pose;
                         case 'logSE3'
-                            self.R3xso3Pose = logSE3_Rxt(pose);
+                            self.R3xso3Pose = LogSE3_Rxt(pose);
                         otherwise
                             error('Error: invalid parameterisation')
                     end

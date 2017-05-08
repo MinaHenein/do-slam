@@ -87,7 +87,7 @@ classdef ArrayGetSet < handle & matlab.mixin.Copyable
                 nColumns = size(values,2);
                 width = nColumns/numel(locations);
                 assert(mod(nColumns,numel(locations))==0,'Error: Number of columns must be equally distributable among locations')
-                valuesCell = mat2cell(values,size(values,1),repmat(size(values,2),nColumns/width));
+                valuesCell = mat2cell(values,size(values,1),repmat(width,1,nColumns/width));
             end
             %setSwitch
             for i = 1:numel(locations)
