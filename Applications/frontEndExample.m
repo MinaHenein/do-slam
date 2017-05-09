@@ -32,11 +32,11 @@ cameraPoseRelativeToRobot = GP_Pose([0,0,0,0,0,-pi/8]');
 cameraTrajectory = RelativePoseTrajectory(robotTrajectory,cameraPoseRelativeToRobot);
 camera = SimulatedEnvironmentSensor(fieldOfView,maxRange,cameraTrajectory);
 
-% %% 4. Create SensorObjects
+%% 4. Create SensorObjects
 sensorEnvironment = SensorEnvironment(environment);
-% 
-% %% 5. Generate Measurements & Save to Graph File
-% % camera.generateMeasurements(sensorEnvironment);
+
+%% 5. Generate Measurements & Save to Graph File
+camera.generateMeasurements(sensorEnvironment,t);
 
 %% 6. Plot
 figure

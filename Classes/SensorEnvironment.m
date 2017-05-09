@@ -1,4 +1,4 @@
-classdef SensorEnvironment
+classdef SensorEnvironment < ArrayGetSet
     %SENSORENVIRONMENT Summary of this class goes here
     %   Detailed explanation goes here
     
@@ -13,18 +13,7 @@ classdef SensorEnvironment
         nObjects
     end
     
-    %% 2. Methods
-    % Dependent properties
-    methods
-        function nPoints = get.nPoints(self)
-            nPoints = numel(self.points);
-        end
-        
-        function nObjects = get.nObjects(self)
-            nObjects = numel(self.objects);
-        end
-    end 
-    
+    %% 2. Methods   
     % Constructor
     methods(Access = public)
         function self = SensorEnvironment(environment)
@@ -39,7 +28,7 @@ classdef SensorEnvironment
             for i = 1:environment.nEnvironmentPrimitives
                 switch class(environment.get('environmentPrimitives',i))
                     case 'EP_Rectangle'
-                        assert(environment.get('environmentPrimitives',i).get('static'),'Error: plane must be formed from static rectangle')
+                        assert(logical(environment.get('environmentPrimitives',i).get('static')),'Error: plane must be formed from static rectangle')
                         objects(i) = GEO_Plane(environment.get('environmentPrimitives',i));
                     otherwise
                         error('Error: object conversion for %s not yet implemented',class(environment.get('environmentPrimitives',i)))
@@ -53,15 +42,31 @@ classdef SensorEnvironment
     end
     
     % Getter & Setter
-    methods(Access = public) %set to protected later??
-        function out = getSwitch(self,property)
-        	out = self.(property);
+    methods
+        function out = getSwitch(self,property,varargin)
+            switch property
+                case 'points'
+                    if numel(varargin)==1
+                        out = self.points(varargin{1});
+                    else
+                        out = self.points;
+                    end
+                case 'objects'
+                    if numel(varargin)==1
+                        out = self.objects(varargin{1});
+                    else
+                        out = self.objects;
+                    end
+                otherwise
+                    out = self.(property);
+            end
+        	
         end
         
-        function self = setSwitch(self,property,value)
-        	self.(property) = value;
+        function nObjects = get.nObjects(self)
+            nObjects = numel(self.objects);
         end
-    end
+    end 
     
 end
 

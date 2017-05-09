@@ -6,7 +6,6 @@ classdef GeometricEntityObject < Object
     
     %% 1. Properties
     properties
-        parameters
     end
     
     %% 2. Methods

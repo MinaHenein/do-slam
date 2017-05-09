@@ -8,8 +8,18 @@ classdef GEO_Plane < GeometricEntityObject
         distance
     end
     
+%     properties(Dependent)
+%         parameters
+%     end
     
-    %% 2. Methods   
+    %% 2. Methods
+    % Dependent properties
+%     methods
+%         function parameters = get.parameters(self)
+%             parameters = [self.normal; self.distance];
+%         end
+%     end 
+    
     % Constructor
     methods(Access = public)
         function self = GEO_Plane(rectangle)
@@ -20,18 +30,7 @@ classdef GEO_Plane < GeometricEntityObject
                     pose = rectangle.get('GP_Pose',0);
                     position = pose.get('R3xso3Position');
                     R = pose.get('R');
-                    %compute parameters
                     normal = R(:,3);
-                    distance = dot(position,normal);
-                    %constrain distance >= 0
-                    if distance < 0
-                        self.normal   = -normal;
-                        self.distance = -distance;
-                    else
-                        self.normal   = normal;
-                        self.distance = distance;
-                    end
-                        
             end
         end
         
@@ -40,12 +39,7 @@ classdef GEO_Plane < GeometricEntityObject
     % Getter & Setter
     methods(Access = public) %set to protected later??
         function out = getSwitch(self,property,varargin)
-            switch property 
-                case 'parameters'
-                    out = [self.normal; self.distance];
-                otherwise
-                    out = self.(property);
-            end
+        	out = self.(property);
         end
         
         function self = setSwitch(self,property,value)

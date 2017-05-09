@@ -18,5 +18,7 @@ classdef SimulatedEnvironmentSensor < Sensor
         end
     end
     
+    % Measurements
+    
 end
 

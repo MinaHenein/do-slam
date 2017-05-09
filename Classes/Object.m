@@ -5,6 +5,7 @@ classdef Object < ArrayGetSet & matlab.mixin.Heterogeneous
     
     %% 1. Properties
     properties
+        index
     end
     
     %% 2. Methods
