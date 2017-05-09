@@ -29,6 +29,8 @@ classdef EnvironmentPoint < ArrayGetSet & matlab.mixin.Heterogeneous
             switch property
                 case {'GP_Point','R3Position'}
                     out = self.trajectory.get(property,varargin{1});
+                case 'static'
+                    out = self.trajectory.get(property);
                 otherwise
                     out = self.(property);
             end

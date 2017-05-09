@@ -15,7 +15,7 @@ dynamicWaypoints = [0:2:tN; 4 5 7 10 7 3; 12 11 10 5 8 14; 8 5 2 3 6 4];
 %construct trajectories
 staticTrajectory1 = StaticPoseTrajectory(staticPose1,'R3xso3');
 staticTrajectory2 = StaticPoseTrajectory(staticPose2,'R3xso3');
-dynamicTrajectory = PositionModelPoseTrajectory(dynamicWaypoints,'R3','smoothingspline');
+robotTrajectory = PositionModelPoseTrajectory(dynamicWaypoints,'R3','smoothingspline');
 
 %% 2. Generate Environment
 % initialise environment
@@ -23,18 +23,15 @@ environment = Environment();
 % % add primitives to environment
 environment.addRectangle([10,15],100,'mixed',staticTrajectory1);
 environment.addRectangle([8,6],50,'mixed',staticTrajectory2);
-environment.addPrimitive(3*rand(3,50)-1.5,'R3',dynamicTrajectory);
+environment.addPrimitive(3*rand(3,50)-1.5,'R3',robotTrajectory);
 
-% 
-% 
-% %% 3. Initialise Sensor
-% fieldOfView = [-pi/3,pi/3,-pi/6,pi/6];
-% maxRange    = 10;
-% cameraPoseRelativeToRobot = GP_Pose([0,0,0,0,0,-pi/8]');
-% %*TODO: write trajectory methods to do this
-% cameraTrajectory = dynamicTrajectory.copy();
-% cameraTrajectory.set('poses',cameraPoseRelativeToRobot.RelativeToAbsolutePose(cameraTrajectory.get('poses')));
-% camera = SimulatedEnvironmentSensor(fieldOfView,maxRange,cameraTrajectory);
+%% 3. Initialise Sensor
+fieldOfView = [-pi/3,pi/3,-pi/6,pi/6];
+maxRange    = 10;
+cameraPoseRelativeToRobot = GP_Pose([0,0,0,0,0,-pi/8]');
+%*TODO: write trajectory methods to do this
+cameraTrajectory = RelativePoseTrajectory(robotTrajectory,cameraPoseRelativeToRobot);
+camera = SimulatedEnvironmentSensor(fieldOfView,maxRange,cameraTrajectory);
 % 
 % %% 4. Create SensorObjects
 % sensorEnvironment = SensorEnvironment(environment);
@@ -56,7 +53,7 @@ axis(axisLimits)
 hold on
 staticTrajectory1.plot()
 staticTrajectory2.plot()
-dynamicTrajectory.plot(t)
+cameraTrajectory.plot(t)
 environment.plot(t)
 % camera.get('trajectory').plot()
 % for i = 1:nSteps

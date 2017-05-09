@@ -49,6 +49,8 @@ classdef PoseModelPoseTrajectory < PoseTrajectory
                     t = varargin{1};
                     pose = computePose(self,t);
                     value = pose.get(property);
+                case 'static'
+                    value = 0;
                 otherwise 
                     error('Error: invalid property')
             end

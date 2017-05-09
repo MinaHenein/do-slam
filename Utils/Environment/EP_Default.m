@@ -18,6 +18,8 @@ classdef EP_Default < EnvironmentPrimitive
             switch property
                 case {'GP_Pose','R3xso3Pose','logSE3Pose','R3xso3Position','logSE3Position','axisAngle','R'}
                     out = self.trajectory.get(property,varargin{1});
+                case 'static'
+                    out = self.trajectory.get(property);
                 otherwise
                     out = self.(property);
             end

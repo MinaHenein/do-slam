@@ -46,6 +46,8 @@ classdef StaticPoseTrajectory < PoseTrajectory
                 case {'R3xso3Pose','logSE3Pose','R3xso3Position','logSE3Position','axisAngle','R'}
                     value = self.GP_Pose.get(property);
                     value = repmat(value,1,nPoses);
+                case 'static'
+                    value = 1;
                 otherwise 
                     error('Error: invalid property')
             end

@@ -46,6 +46,8 @@ classdef PositionModelPointTrajectory < PointTrajectory
                     t = varargin{1};
                     point = computePoint(self,t);
                     value = point.get(property);
+                case 'static'
+                    value = 0;
                 otherwise 
                     error('Error: invalid property')
             end

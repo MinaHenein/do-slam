@@ -46,6 +46,8 @@ classdef StaticPointTrajectory < PointTrajectory
                 case {'R3Position'}
                     value = self.GP_Point.get(property);
                     value = repmat(value,1,nPoints);
+                case 'static'
+                    value = 1;
                 otherwise 
                     error('Error: invalid property')
             end

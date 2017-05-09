@@ -50,11 +50,11 @@ classdef Environment < ArrayGetSet
         function self = addPrimitive(self,positionsRelative,parameterisation,trajectory)
             nPoints = size(positionsRelative,2);
             
-            %construct fixedPoints
-            fixedPoints(nPoints) = FixedEnvironmentPoint();
+            %initialise points
+            points(nPoints) = EnvironmentPoint();
             for i = 1:nPoints
-                fixedPoints(i) = FixedEnvironmentPoint();
-                fixedPoints(i).set('trajectory',StaticPointTrajectory(positionsRelative(:,i),parameterisation));
+                iRelativePoint = GP_Point(positionsRelative(:,i),parameterisation);
+                points(i).set('trajectory',RelativePointTrajectory(trajectory,iRelativePoint));
             end
             
             %construct primitive
@@ -62,7 +62,7 @@ classdef Environment < ArrayGetSet
             primitive.set('trajectory',trajectory);
             
             %pair
-            self.addPrimitiveAndPoints(primitive,fixedPoints);
+            self.addPrimitiveAndPoints(primitive,points);
         end
         
         % Rectangle
@@ -80,19 +80,19 @@ classdef Environment < ArrayGetSet
                     rectanglePositionsRelative = [generateRectanglePoints(sideLengths,nCentrePoints,'uniform'),...
                                                   generateRectanglePoints(sideLengths,nEdgePoints,'edges')];
             end
-            
-            %initialise fixed points
-            rectangleFixedPoints(nPoints) = FixedEnvironmentPoint();
+                        
+            %initialise points
+            rectanglePoints(nPoints) = EnvironmentPoint();
             for i = 1:nPoints
-                rectangleFixedPoints(i) = FixedEnvironmentPoint();
-                rectangleFixedPoints(i).set('trajectory',StaticPointTrajectory(rectanglePositionsRelative(:,i),'R3'));
+                iRelativePoint = GP_Point(rectanglePositionsRelative(:,i));
+                rectanglePoints(i).set('trajectory',RelativePointTrajectory(rectangleTrajectory,iRelativePoint));
             end
             
             %initialise EP_Rectangle primitive
             rectanglePrimitive = EP_Rectangle(sideLengths,rectangleTrajectory);
             
             %pair
-            self.addPrimitiveAndPoints(rectanglePrimitive,rectangleFixedPoints);
+            self.addPrimitiveAndPoints(rectanglePrimitive,rectanglePoints);
             
         end
        
@@ -100,22 +100,21 @@ classdef Environment < ArrayGetSet
     
     % Add primitive & points
     methods(Access = private, Hidden = true)
-        function self = addPrimitiveAndPoints(self,primitive,fixedPoints)
+        function self = addPrimitiveAndPoints(self,primitive,points)
             primitiveIndex = self.nEnvironmentPrimitives + 1;
-            pointIndexes   = self.nEnvironmentPoints + 1:self.nEnvironmentPoints + numel(fixedPoints);
+            pointIndexes   = self.nEnvironmentPoints + 1:self.nEnvironmentPoints + numel(points);
             
             %set primitive indexes
             primitive.set('index',primitiveIndex);
             primitive.set('pointIndexes',pointIndexes);
             
             %set point indexes
-            fixedPoints.set('index',pointIndexes);
-            fixedPoints.set('primitiveIndexes',repmat(primitiveIndex,1,numel(fixedPoints)));
-            fixedPoints.set('referencePrimitiveIndex',repmat(primitiveIndex,1,numel(fixedPoints)));
+            points.set('index',pointIndexes);
+            points.set('primitiveIndexes',repmat(primitiveIndex,1,numel(points)));
             
             %add to self
             self.environmentPrimitives = [self.environmentPrimitives primitive];
-            self.environmentPoints = [self.environmentPoints fixedPoints];
+            self.environmentPoints = [self.environmentPoints points];
         end
     end
 
@@ -123,21 +122,14 @@ classdef Environment < ArrayGetSet
     methods(Access = public)
         function plot(self,t)
             %identify dynamic points and dynamic primitives
-            dynamicPointIndexes = [];
-            dynamicPrimitiveIndexes = [];
-            for i = 1:self.nEnvironmentPrimitives
-                if ~strcmp('StaticPoseTrajectory',class(self.environmentPrimitives(i).get('trajectory')))
-                    dynamicPointIndexes = [dynamicPointIndexes self.environmentPrimitives(i).get('pointIndexes')];
-                    dynamicPrimitiveIndexes = [dynamicPrimitiveIndexes self.environmentPrimitives(i).get('index')];
-                end
-            end
-            for i = 1:self.nEnvironmentPoints
-                if ~strcmp('StaticPointTrajectory',class(self.environmentPoints(i).get('trajectory')))
-                     dynamicPointIndexes = [dynamicPointIndexes self.environmentPoints(i).get('index')];
-                end
-            end
-            staticPointIndexes = setdiff(1:self.nEnvironmentPoints,dynamicPointIndexes);
-            staticPrimitiveIndexes = setdiff(1:self.nEnvironmentPrimitives,dynamicPrimitiveIndexes);
+            staticPointLogical      = self.get('environmentPoints').get('static');
+            staticPrimitiveLogical  = self.get('environmentPrimitives').get('static');
+            dynamicPointLogical     = ~staticPointLogical;
+            dynamicPrimitiveLogical = ~staticPrimitiveLogical;
+            staticPointIndexes      = find(staticPointLogical);
+            staticPrimitiveIndexes  = find(staticPrimitiveLogical);
+            dynamicPointIndexes     = find(dynamicPointLogical);
+            dynamicPrimitiveIndexes = find(dynamicPrimitiveLogical);
             self.plotStatic(staticPointIndexes,staticPrimitiveIndexes)
             self.plotDynamic(dynamicPointIndexes,dynamicPrimitiveIndexes,t)
         end
@@ -150,14 +142,7 @@ classdef Environment < ArrayGetSet
             %get point positions
             positions = zeros(3,nPoints);
             for i = 1:nPoints
-                if strcmp('FixedEnvironmentPoint',class(self.environmentPoints(staticPointIndexes(i))))
-                    pointTrajectory = self.environmentPoints(staticPointIndexes(i)).get('trajectory');
-                    primitiveIndex = self.environmentPoints(staticPointIndexes(i)).get('referencePrimitiveIndex');
-                    primitiveTrajectory = self.environmentPrimitives(primitiveIndex).get('trajectory');
-                    positions(:,i) = pointTrajectory.RelativeToAbsolutePoint(primitiveTrajectory,0,'R3Position');
-                else
-                    positions(:,i) = self.environmentPoints(staticPointIndexes(i)).get('R3Position',0);
-                end
+                positions(:,i) = self.environmentPoints(staticPointIndexes(i))
             end
             %plot positions
             plot3(positions(1,:),positions(2,:),positions(3,:),'k.')
@@ -167,25 +152,27 @@ classdef Environment < ArrayGetSet
 %             end
         end
         function plotDynamic(self,dynamicPointIndexes,dynamicPrimitiveIndexes,t)
-            for i = 1:numel(t)
+            nSteps = numel(t);
+            for i = 1:nSteps
                 nPoints     = numel(dynamicPointIndexes);
                 nPrimitives = numel(dynamicPrimitiveIndexes);
+                %get point positions
                 positions = zeros(3,nPoints);
-                for i = 1:self.nEnvironmentPoints
-                    if strcmp('FixedEnvironmentPoint',class(self.environmentPoints(dynamicPointIndexes(i))))
-                        pointTrajectory = self.environmentPoints(dynamicPointIndexes(i)).get('trajectory');
-                        primitiveIndex = self.environmentPoints(dynamicPointIndexes(i)).get('referencePrimitiveIndex');
-                        primitiveTrajectory = self.environmentPrimitives(primitiveIndex).get('trajectory');
-                        positions(:,i) = pointTrajectory.RelativeToAbsolutePoint(primitiveTrajectory,t(i),'R3Position');
-                    else
-                        positions(:,i) = self.environmentPoints(dynamicPointIndexes(i)).get('R3Position',t(i));
-                    end
-                    h = plot3(positions(1,:),positions(2,:),positions(3,:),'k.');
-                    drawnow
-                    pause(0.01)
-                    if i < nSteps
-                        delete(h)
-                    end
+                for j = 1:nPoints
+                end
+                %plot positions
+                h1 = plot3(positions(1,:),positions(2,:),positions(3,:),'k.');
+                %plot primitives
+%                 for j = 1:staticPrimitiveIndexes
+%                     h2{j} = self.environmentPrimitives(staticPrimitiveIndexes(i)).plot()
+%                 end
+
+                %draw current timestep, delete
+                drawnow
+                pause(0)
+                if i < nSteps
+                    delete(h1)
+%                     delete(h2)
                 end
             end
         end
