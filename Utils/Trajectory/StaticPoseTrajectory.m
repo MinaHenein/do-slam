@@ -16,10 +16,15 @@ classdef StaticPoseTrajectory < PoseTrajectory
     % Constructor
     methods(Access = public) %set to private later??
         function self = StaticPoseTrajectory(pose,varargin)
-            if ~strcmp(class(pose),'GP_Pose')
-                pose = GP_Pose(pose,varargin{:});
+            switch nargin
+                case 0 %allow preallocation
+                otherwise
+                    if ~strcmp(class(pose),'GP_Pose')
+                        pose = GP_Pose(pose,varargin{:});
+                    end
+                    self.GP_Pose = pose;
             end
-            self.GP_Pose = pose;
+            
         end
         
     end

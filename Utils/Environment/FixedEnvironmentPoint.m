@@ -1,36 +1,46 @@
-classdef EnvironmentPoint
+classdef FixedEnvironmentPoint < EnvironmentPoint
     %EP_POINT Summary of this class goes here
     %   Detailed explanation goes here
     
     %% 1. Properties
-    properties(GetAccess = 'private', SetAccess = 'private')
-        index
+    properties(GetAccess = 'protected', SetAccess = 'protected')
+        referencePrimitiveIndex
     end
     
     %% 2. Methods
-    % Getter & Setter
-    methods(Access = public) %set to protected later??
-        function out = get(self,property)
-        	out = [self.(property)];
-        end
-        
-        function self = set(self,property,value)
-        	self.(property) = value;
-        end
-    end
-    
     % Constructor
     methods(Access = public)
-        function self = EnvironmentPoint(trajectory,index)
+        function self = FixedEnvironmentPoint(index,trajectory,referencePrimitiveIndex)
             switch nargin
                 case 0
-                case 2
-                    self.trajectory = trajectory;
-                    self.index      = index;
+                otherwise
+                    self.index                   = index;
+                    self.trajectory              = trajectory;
+                    self.referencePrimitiveIndex = referencePrimitiveIndex;
+
             end
         end
         
     end
+    
+    % Getter & Setter
+    methods(Access = public) %set to protected later??
+        function out = getSwitch(self,property,varargin)
+            switch property
+                case {'GP_Point','R3Position'}
+                    out = self.trajectory.get(property,varargin{1});
+                otherwise
+                    out = self.(property);
+            end
+        	
+        end
+        
+        function self = setSwitch(self,property,value)
+        	self.(property) = value;
+        end
+    end
+    
+    
     
 end
 

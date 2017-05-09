@@ -38,16 +38,24 @@ classdef ArrayGetSet < handle & matlab.mixin.Copyable
             end
             %convert valuesCell to array/object array
             try
+                %convert to array
                 values = cell2mat(valuesCell);
             catch
                 try
-                    cellSizes = cellfun('length',valuesCell);
-                    cellIndexes = [0 cumsum(cellSizes)];
-                    values(sum(cellSizes)) = feval(class(valuesCell{1}));
+                    %Object arrays - slow but preserves class
+                    values = [];
                     for i = 1:numel(valuesCell)
-                        values(cellIndexes(i)+1:cellIndexes(i+1)) = valuesCell{i};
+                        values = [values valuesCell{i}];
                     end
+                    %Doesn't preserve class in heterogeneous arrays
+%                     cellSizes = cellfun('length',valuesCell);
+%                     cellIndexes = [0 cumsum(cellSizes)];
+%                     values(sum(cellSizes)) = feval(class(valuesCell{1}));
+%                     for i = 1:numel(valuesCell)
+%                         values(cellIndexes(i)+1:cellIndexes(i+1)) = valuesCell{i};
+%                     end
                 catch
+                    %Cell arrays unchanged
                     values = valuesCell;    
                 end
             end

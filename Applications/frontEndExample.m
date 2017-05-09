@@ -21,8 +21,10 @@ dynamicTrajectory = PositionModelPoseTrajectory(dynamicWaypoints,'R3','smoothing
 % initialise environment
 environment = Environment();
 % % add primitives to environment
-% environment.addRectangle([10,15],100,'mixed',staticTrajectory1);
-% environment.addRectangle([8,6],50,'mixed',staticTrajectory2);
+environment.addRectangle([10,15],100,'mixed',staticTrajectory1);
+environment.addRectangle([8,6],50,'mixed',staticTrajectory2);
+environment.addPrimitive(3*rand(3,50)-1.5,'R3',dynamicTrajectory);
+
 % 
 % 
 % %% 3. Initialise Sensor
@@ -55,6 +57,7 @@ hold on
 staticTrajectory1.plot()
 staticTrajectory2.plot()
 dynamicTrajectory.plot(t)
+environment.plot(t)
 % camera.get('trajectory').plot()
 % for i = 1:nSteps
 %     h = environment.plot(i);

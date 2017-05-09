@@ -23,12 +23,16 @@ classdef PoseModelPoseTrajectory < PoseTrajectory
     % Constructor
     methods(Access = public) %set to private later??
         function self = PoseModelPoseTrajectory(waypoints,parameterisation,fitType)
-            assert(strcmp(parameterisation,'R3'),'Error: Only R3 waypoints implemented.')
-            self.xModel = fit(waypoints(1,:)',waypoints(2,:)',fitType);
-            self.yModel = fit(waypoints(1,:)',waypoints(3,:)',fitType);
-            self.zModel = fit(waypoints(1,:)',waypoints(4,:)',fitType);
-%             self.orientationModel = 
-            error('Error: orientation model not implemented')
+            switch nargin
+                case 0 %allow preallocation
+                otherwise
+                    assert(strcmp(parameterisation,'R3'),'Error: Only R3 waypoints implemented.')
+                    self.xModel = fit(waypoints(1,:)',waypoints(2,:)',fitType);
+                    self.yModel = fit(waypoints(1,:)',waypoints(3,:)',fitType);
+                    self.zModel = fit(waypoints(1,:)',waypoints(4,:)',fitType);
+        %             self.orientationModel = 
+                    error('Error: orientation model not implemented')
+            end
         end
         
     end

@@ -18,7 +18,8 @@ classdef GP_Point < GeometricPrimitive
                 case 1
                     self.R3Position = position;
                 otherwise
-                    %do something with varargin
+                    %check parameterisation
+                    assert(strcmp(varargin{1},'R3'),'Error: only R3 parameterisation implemented')
                     self.R3Position = position;
             end
 %             assert(isequal([3,1],size(self.R3Position)),'Error: position must be 3x1')

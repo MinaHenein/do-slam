@@ -16,10 +16,15 @@ classdef StaticPointTrajectory < PointTrajectory
     % Constructor
     methods(Access = public) %set to private later??
         function self = StaticPointTrajectory(point,varargin)
-            if ~strcmp(class(point),'GP_Point')
-                point = GP_Point(point,varargin{:});
+            switch nargin
+                case 0 %allow preallocation
+                otherwise
+                    if ~strcmp(class(point),'GP_Point')
+                        point = GP_Point(point,varargin{:});
+                    end
+                    self.GP_Point = point;
             end
-            self.GP_Point = point;
+            
         end
         
     end

@@ -24,11 +24,16 @@ classdef PositionModelPoseTrajectory < PoseTrajectory
     % Constructor
     methods(Access = public)
         function self = PositionModelPoseTrajectory(waypoints,parameterisation,fitType)
-            assert(strcmp(parameterisation,'R3'),'Error: Only R3 waypoints implemented.')
-            %fit x,y,z to waypoints
-            self.xModel = fit(waypoints(1,:)',waypoints(2,:)',fitType);
-            self.yModel = fit(waypoints(1,:)',waypoints(3,:)',fitType);
-            self.zModel = fit(waypoints(1,:)',waypoints(4,:)',fitType);
+            switch nargin
+                case 0 %allow preallocation
+                otherwise
+                    assert(strcmp(parameterisation,'R3'),'Error: Only R3 waypoints implemented.')
+                    %fit x,y,z to waypoints
+                    self.xModel = fit(waypoints(1,:)',waypoints(2,:)',fitType);
+                    self.yModel = fit(waypoints(1,:)',waypoints(3,:)',fitType);
+                    self.zModel = fit(waypoints(1,:)',waypoints(4,:)',fitType);
+            end
+                    
         end
         
     end
