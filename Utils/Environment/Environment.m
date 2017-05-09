@@ -35,7 +35,23 @@ classdef Environment < ArrayGetSet
     % Get & Set
     methods(Access = public)
         function out = getSwitch(self,property,varargin)
-        	out = self.(property);
+            switch property
+                case 'environmentPoints'
+                    if numel(varargin)==1
+                        out = self.environmentPoints(varargin{1});
+                    else
+                        out = self.environmentPoints;
+                    end
+                case 'environmentPrimitives'
+                    if numel(varargin)==1
+                        out = self.environmentPrimitives(varargin{1});
+                    else
+                        out = self.environmentPrimitives;
+                    end
+                otherwise
+                    out = self.(property);
+            end
+        	
         end
         
         function self = setSwitch(self,property,value,varargin)

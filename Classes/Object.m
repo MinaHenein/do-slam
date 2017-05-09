@@ -1,4 +1,4 @@
-classdef BaseObject < ArrayGetSet & matlab.mixin.Heterogeneous
+classdef Object < ArrayGetSet & matlab.mixin.Heterogeneous
     %BaseObject is a hetergeneous superclass for Object and Geometry classes
     %   This class allows Object and Geometry class & subclass instances to 
     %   be stored in a heterogeneous array.

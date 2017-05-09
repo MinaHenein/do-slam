@@ -23,7 +23,7 @@ environment = Environment();
 % % add primitives to environment
 environment.addRectangle([10,15],100,'mixed',staticTrajectory1);
 environment.addRectangle([8,6],50,'mixed',staticTrajectory2);
-% environment.addPrimitive(3*rand(3,50)-1.5,'R3',robotTrajectory);
+environment.addPrimitive(3*rand(3,50)-1.5,'R3',robotTrajectory);
 
 %% 3. Initialise Sensor
 fieldOfView = [-pi/3,pi/3,-pi/6,pi/6];

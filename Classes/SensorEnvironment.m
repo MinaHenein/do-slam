@@ -4,45 +4,61 @@ classdef SensorEnvironment
     
     %% 1. Properties
     properties(GetAccess = 'private', SetAccess = 'private')
+        points
         objects
     end
     
+    properties(Dependent)
+        nPoints
+        nObjects
+    end
+    
     %% 2. Methods
+    % Dependent properties
+    methods
+        function nPoints = get.nPoints(self)
+            nPoints = numel(self.points);
+        end
+        
+        function nObjects = get.nObjects(self)
+            nObjects = numel(self.objects);
+        end
+    end 
+    
     % Constructor
     methods(Access = public)
         function self = SensorEnvironment(environment)
-            self.objects = BaseObject();
-            self.objects(environment.nEnvironmentPoints + environment.nEnvironmentPrimitives) = BaseObject();
-            
-            objectCount = 0;
-            %create points from environmentPoints
+            points(environment.nEnvironmentPoints) = Point();
+            %loop over environmentPoints, create Points
             for i = 1:environment.nEnvironmentPoints
-                objectCount = objectCount + 1;
-                self.objects(objectCount) = Point();
-                self.objects(objectCount).set('index',objectCount);
+                points(i) = Point(environment.get('environmentPoints',i));
             end
             
-            %create objects from environmentPrimitives
+            %loop over environmentPrimitives, create objects
+            objects(environment.nEnvironmentPrimitives) = Object();
             for i = 1:environment.nEnvironmentPrimitives
-                objectCount = objectCount + 1;
                 switch class(environment.get('environmentPrimitives',i))
-                    case  'EP_Rectangle'
-                        self.objects(objectCount) = GeometricEntity();
+                    case 'EP_Rectangle'
+                        assert(environment.get('environmentPrimitives',i).get('static'),'Error: plane must be formed from static rectangle')
+                        objects(i) = GEO_Plane(environment.get('environmentPrimitives',i));
                     otherwise
-                        error('Error: %s conversion not implemented',class(environment.get('environmentPrimitives',i)))
+                        error('Error: object conversion for %s not yet implemented',class(environment.get('environmentPrimitives',i)))
                 end
-                self.objects(objectCount).set('index',objectCount);
             end
+            
+            %add
+            self.points  = points;
+            self.objects = objects;
         end
     end
     
     % Getter & Setter
     methods(Access = public) %set to protected later??
-        function out = get(self,property)
-        	out = [self.(property)];
+        function out = getSwitch(self,property)
+        	out = self.(property);
         end
         
-        function self = set(self,property,value)
+        function self = setSwitch(self,property,value)
         	self.(property) = value;
         end
     end
