@@ -34,6 +34,8 @@ classdef GP_Point < GeometricPrimitive
             switch property
                 case 'R3Position'
                     value = self.R3Position;
+                case 'S2xRPosition'
+                    value = R3_S2xR(self.R3Position);
                 otherwise 
                     error('Error: invalid property')
             end

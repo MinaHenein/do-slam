@@ -16,7 +16,8 @@ classdef GEO_Plane < GeometricEntityObject
             switch nargin
                 case 0
                 otherwise
-                    self.index = rectangle.get('index');
+                    self.index        = rectangle.get('index');
+                    self.pointIndexes = rectangle.get('pointIndexes');
                     pose = rectangle.get('GP_Pose',0);
                     position = pose.get('R3xso3Position');
                     R = pose.get('R');

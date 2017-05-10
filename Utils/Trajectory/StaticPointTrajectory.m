@@ -43,7 +43,7 @@ classdef StaticPointTrajectory < PointTrajectory
                     for i = 1:nPoints
                         value(i) = self.GP_Point.copy();
                     end
-                case {'R3Position'}
+                case {'R3Position','S2xRPosition'}
                     value = self.GP_Point.get(property);
                     value = repmat(value,1,nPoints);
                 case 'static'

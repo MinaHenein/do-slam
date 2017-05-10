@@ -42,7 +42,7 @@ classdef PositionModelPointTrajectory < PointTrajectory
                     t = varargin{1};
                     point = computePoint(self,t);
                     value = point;
-                case {'R3Position'}
+                case {'R3Position','S2xRPosition'}
                     t = varargin{1};
                     point = computePoint(self,t);
                     value = point.get(property);

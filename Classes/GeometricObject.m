@@ -5,7 +5,7 @@ classdef GeometricObject < Object
     %   side length
     
     %% 1. Properties
-    properties
+    properties(GetAccess = 'protected', SetAccess = 'protected')
         trajectory
         parameters
     end

@@ -6,7 +6,7 @@ classdef DeformableObject < Object
     %   relative to the trajectory of the deformable object
     
      %% 1. Properties
-    properties
+    properties(GetAccess = 'protected', SetAccess = 'protected')
         trajectory
     end
     

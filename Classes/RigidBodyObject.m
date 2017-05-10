@@ -5,7 +5,7 @@ classdef RigidBodyObject < Object
     %   composed of other attached objects fixed to the rigid body
     
      %% 1. Properties
-    properties
+    properties(GetAccess = 'protected', SetAccess = 'protected')
         trajectory
     end
     

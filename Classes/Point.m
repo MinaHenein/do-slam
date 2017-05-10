@@ -1,14 +1,15 @@
-classdef Point
+classdef Point < ArrayGetSet
     %POINT class instances are used by Sensor class instances to create a
     %representation of points in the environment.
     %   Points are created and used to generate measurements
     
     
     %% 1. Properties
-    properties(GetAccess = 'private', SetAccess = 'private')
+    properties(GetAccess = 'protected', SetAccess = 'protected')
         index
         trajectory
         objectIndexes
+        vertexIndex
     end
     
     
@@ -31,7 +32,7 @@ classdef Point
     methods(Access = public) %set to protected later??
         function out = getSwitch(self,property,varargin)
             switch property
-                case {'GP_Point','R3Position'}
+                case {'GP_Point','R3Position','S2xRPosition'}
                     out = self.trajectory.get(property,varargin{1});
                 case 'static'
                     out = self.trajectory.get(property);

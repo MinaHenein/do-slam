@@ -4,8 +4,10 @@ classdef Object < ArrayGetSet & matlab.mixin.Heterogeneous
     %   be stored in a heterogeneous array.
     
     %% 1. Properties
-    properties
+    properties(GetAccess = 'protected', SetAccess = 'protected')
         index
+        pointIndexes
+        vertexIndex
     end
     
     %% 2. Methods

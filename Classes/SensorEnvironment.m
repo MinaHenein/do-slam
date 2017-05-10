@@ -14,6 +14,16 @@ classdef SensorEnvironment < ArrayGetSet
     end
     
     %% 2. Methods   
+    % Dependent properties
+    methods
+        function nPoints = get.nPoints(self)
+            nPoints = numel(self.points);
+        end
+        function nObjects = get.nObjects(self)
+            nObjects = numel(self.objects);
+        end
+    end
+    
     % Constructor
     methods(Access = public)
         function self = SensorEnvironment(environment)
@@ -42,7 +52,7 @@ classdef SensorEnvironment < ArrayGetSet
     end
     
     % Getter & Setter
-    methods
+    methods(Access = public)
         function out = getSwitch(self,property,varargin)
             switch property
                 case 'points'
@@ -63,10 +73,8 @@ classdef SensorEnvironment < ArrayGetSet
         	
         end
         
-        function nObjects = get.nObjects(self)
-            nObjects = numel(self.objects);
-        end
     end 
+    
     
 end
 
