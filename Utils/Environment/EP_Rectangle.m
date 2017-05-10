@@ -1,6 +1,5 @@
 classdef EP_Rectangle < EnvironmentPrimitive
-    %EP_RECTANGLE Summary of this class goes here
-    %   Detailed explanation goes here
+    %EP_RECTANGLE Represents a rectangle primitive
     
     %% 1. Properties
     properties

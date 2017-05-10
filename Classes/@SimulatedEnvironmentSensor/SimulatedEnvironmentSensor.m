@@ -37,8 +37,11 @@ classdef SimulatedEnvironmentSensor < Sensor
     
     %Declare external methods
     methods(Access = public)
+        % point visibility
+        [visibility,relativePoint] = pointVisible(self,point,t)
         % Measurements
         generateMeasurements(self,config,sensorEnvironment)
+        
     end
     
 end

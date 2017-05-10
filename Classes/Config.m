@@ -7,6 +7,9 @@ classdef Config < ArrayGetSet
         %array of time values when measurements are made
         t 
         
+        % rng seed
+        rngSeed 
+        
         %measurement std dev
         stdPosePrior
         stdPointPrior

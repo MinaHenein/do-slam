@@ -19,7 +19,8 @@ robotTrajectory = PositionModelPoseTrajectory(dynamicWaypoints,'R3','smoothingsp
 % construct config & set properties
 config = Config();
 config.set('t',t);
-config.set('poseParameterisation','logSE3');
+config.set('rngSeed',1);
+config.set('poseParameterisation','R3xso3');
 config.set('poseVertexLabel'     , 'VERTEX_POSE_LOG_SE3');
 config.set('pointVertexLabel'    ,'VERTEX_POINT_3D');
 config.set('planeVertexLabel'    ,'VERTEX_PLANE_4D');
@@ -71,12 +72,3 @@ staticTrajectory1.plot()
 staticTrajectory2.plot()
 cameraTrajectory.plot(t)
 environment.plot(t)
-% camera.get('trajectory').plot()
-% for i = 1:nSteps
-%     h = environment.plot(i);
-%     drawnow
-%     pause(0.01)
-%     if i < nSteps
-%         delete(h)
-%     end
-% end

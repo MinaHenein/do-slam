@@ -1,6 +1,9 @@
 classdef RelativePointTrajectory < PointTrajectory
-    %RELATIVEPOINTTRAJECTORY Summary of this class goes here
-    %   Detailed explanation goes here
+    %RELATIVEPOINTTRAJECTORY Implements a point trajectory relative to
+    %a pose trajectory
+    %   The trajectory is initialised with a referenceTrajectory and
+    %   relativePoint. Externally, this trajectory can be treated as any
+    %   other PointTrajectory
     
     %% 1. Properties
     properties(GetAccess = 'protected', SetAccess = 'protected')

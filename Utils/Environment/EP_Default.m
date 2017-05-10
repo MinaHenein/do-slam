@@ -1,6 +1,7 @@
 classdef EP_Default < EnvironmentPrimitive
-    %EP_DEFAULT Summary of this class goes here
-    %   Detailed explanation goes here
+    %EP_DEFAULT represents any geometric primitive formed from a set of
+    %relative points
+    %   EP_Default will likely be used to construct a RigidBodyObject
     
     %% 1. Properties
     properties(GetAccess = 'protected', SetAccess = 'protected')

@@ -1,6 +1,9 @@
 classdef RelativePoseTrajectory < PoseTrajectory
-    %RELATIVEPOSETRAJECTORY Summary of this class goes here
-    %   Detailed explanation goes here
+    %RELATIVEPOSETRAJECTORY Implements a pose trajectory relative to
+    %another
+    %   The trajectory is initialised with a referenceTrajectory and
+    %   relativePose. Externally, this trajectory can be treated as any
+    %   other PoseTrajectory
     
     %% 1. Properties
     properties(GetAccess = 'protected', SetAccess = 'protected')
