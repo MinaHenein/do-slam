@@ -1,6 +1,8 @@
-classdef GP_Point < GeometricPrimitive & ArrayGetSet
+classdef GP_Point < GeometricPrimitive
     %GP_POINT represents a position in 3D space
     %   currently only R3 position implemented
+    %   transformation methods allow points to be converted between
+    %   absolute/relative position given a GP_Pose input
     
     %% 1. Properties
     properties(GetAccess = 'private', SetAccess = 'private')
@@ -16,7 +18,8 @@ classdef GP_Point < GeometricPrimitive & ArrayGetSet
                 case 1
                     self.R3Position = position;
                 otherwise
-                    %do something with varargin
+                    %check parameterisation
+                    assert(strcmp(varargin{1},'R3'),'Error: only R3 parameterisation implemented')
                     self.R3Position = position;
             end
 %             assert(isequal([3,1],size(self.R3Position)),'Error: position must be 3x1')
@@ -31,6 +34,8 @@ classdef GP_Point < GeometricPrimitive & ArrayGetSet
             switch property
                 case 'R3Position'
                     value = self.R3Position;
+                case 'S2xRPosition'
+                    value = R3_S2xR(self.R3Position);
                 otherwise 
                     error('Error: invalid property')
             end
@@ -51,7 +56,9 @@ classdef GP_Point < GeometricPrimitive & ArrayGetSet
     % Transformations
     methods(Access = public)
         function positionRelative = AbsoluteToRelativePoint(self,poseReference)
+            %preallocate
             positionRelative(numel(self)) = GP_Point;
+            %indexing depends on size of input and output
             if (numel(self)==numel(poseReference))
                 for i = 1:numel(self)
                     positionRelative(i).set('R3Position',AbsoluteToRelativePositionR3xso3(poseReference(i).get('R3xso3Pose'),self(i).get('R3Position')));
@@ -71,7 +78,9 @@ classdef GP_Point < GeometricPrimitive & ArrayGetSet
         end
         
         function positionAbsolute = RelativeToAbsolutePoint(self,poseReference)
+            %preallocate
             positionAbsolute(numel(self)) = GP_Point;
+            %indexing depends on size of input and output
             if (numel(self)==numel(poseReference))
                 for i = 1:numel(self)
                     positionAbsolute(i).set('R3Position',RelativeToAbsolutePositionR3xso3(poseReference(i).get('R3xso3Pose'),self(i).get('R3Position')));

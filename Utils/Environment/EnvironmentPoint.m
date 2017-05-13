@@ -1,28 +1,23 @@
-classdef Point < ArrayGetSet
-    %POINT class instances are used by Sensor class instances to create a
-    %representation of points in the environment.
-    %   Points are created and used to generate measurements
-    
+classdef EnvironmentPoint < ArrayGetSet & matlab.mixin.Heterogeneous
+    %EnvironmentPoint Summary of this class goes here
+    %   Detailed explanation goes here
     
     %% 1. Properties
     properties(GetAccess = 'protected', SetAccess = 'protected')
         index
         trajectory
-        objectIndexes
-        vertexIndex
+        primitiveIndexes
     end
-    
     
     %% 2. Methods
     % Constructor
-    methods(Access = public) %set to private later??
-        function self = Point(environmentPoint)
+    methods(Access = public)
+        function self = EnvironmentPoint(index,trajectory)
             switch nargin
-                case 0 %preallocate
+                case 0
                 otherwise
-                    self.index         = environmentPoint.get('index');
-                    self.trajectory    = environmentPoint.get('trajectory');
-                    self.objectIndexes = environmentPoint.get('primitiveIndexes');
+                    self.trajectory = trajectory;
+                    self.index      = index;
             end
         end
         
@@ -32,7 +27,7 @@ classdef Point < ArrayGetSet
     methods(Access = public) %set to protected later??
         function out = getSwitch(self,property,varargin)
             switch property
-                case {'GP_Point','R3Position','S2xRPosition'}
+                case {'GP_Point','R3Position'}
                     out = self.trajectory.get(property,varargin{1});
                 case 'static'
                     out = self.trajectory.get(property);
@@ -46,6 +41,5 @@ classdef Point < ArrayGetSet
         	self.(property) = value;
         end
     end
-    
 end
 

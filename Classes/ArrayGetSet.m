@@ -9,7 +9,7 @@ classdef ArrayGetSet < handle & matlab.mixin.Copyable
     end
     
     %% 2. Methods
-    methods(Access = public)
+    methods(Access = public, Sealed = true)
         % Get
         %   assumes self is 1xn object array
         %   if location provided, gets property of each self(location)
@@ -38,16 +38,24 @@ classdef ArrayGetSet < handle & matlab.mixin.Copyable
             end
             %convert valuesCell to array/object array
             try
+                %convert to array
                 values = cell2mat(valuesCell);
             catch
                 try
-                    cellSizes = cellfun('length',valuesCell);
-                    cellIndexes = [0 cumsum(cellSizes)];
-                    values(sum(cellSizes)) = feval(class(valuesCell{1}));
+                    %Object arrays - slow but preserves class
+                    values = [];
                     for i = 1:numel(valuesCell)
-                        values(cellIndexes(i)+1:cellIndexes(i+1)) = valuesCell{i};
+                        values = [values valuesCell{i}];
                     end
+                    %Doesn't preserve class in heterogeneous arrays
+%                     cellSizes = cellfun('length',valuesCell);
+%                     cellIndexes = [0 cumsum(cellSizes)];
+%                     values(sum(cellSizes)) = feval(class(valuesCell{1}));
+%                     for i = 1:numel(valuesCell)
+%                         values(cellIndexes(i)+1:cellIndexes(i+1)) = valuesCell{i};
+%                     end
                 catch
+                    %Cell arrays unchanged
                     values = valuesCell;    
                 end
             end
@@ -87,7 +95,7 @@ classdef ArrayGetSet < handle & matlab.mixin.Copyable
                 nColumns = size(values,2);
                 width = nColumns/numel(locations);
                 assert(mod(nColumns,numel(locations))==0,'Error: Number of columns must be equally distributable among locations')
-                valuesCell = mat2cell(values,size(values,1),repmat(size(values,2),nColumns/width));
+                valuesCell = mat2cell(values,size(values,1),repmat(width,1,nColumns/width));
             end
             %setSwitch
             for i = 1:numel(locations)
