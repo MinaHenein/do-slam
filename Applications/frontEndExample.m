@@ -21,7 +21,7 @@ config = Config();
 config.set('t',t);
 config.set('rngSeed',1);
 config.set('poseParameterisation','R3xso3');
-config.set('poseVertexLabel'     , 'VERTEX_POSE_LOG_SE3');
+config.set('poseVertexLabel'     ,'VERTEX_POSE_LOG_SE3');
 config.set('pointVertexLabel'    ,'VERTEX_POINT_3D');
 config.set('planeVertexLabel'    ,'VERTEX_PLANE_4D');
 config.set('posePoseEdgeLabel'   ,'EDGE_LOG_SE3');
@@ -37,12 +37,10 @@ config.set('stdPosePoint' ,[0.02,0.02,0.02]');
 config.set('stdPointPlane',0.001);
 
 %% 2. Generate Environment
-% initialise environment
+if config.rngSeed; rng(config.rngSeed); end;
 environment = Environment();
-% % add primitives to environment
 environment.addRectangle([10,15],100,'mixed',staticTrajectory1);
 environment.addRectangle([8,6],50,'mixed',staticTrajectory2);
-% environment.addPrimitive(3*rand(3,50)-1.5,'R3',robotTrajectory);
 
 %% 3. Initialise Sensor
 fieldOfView = [-pi/3,pi/3,-pi/6,pi/6,1,10]; %az,el,r limits
@@ -51,10 +49,13 @@ cameraTrajectory = RelativePoseTrajectory(robotTrajectory,cameraPoseRelativeToRo
 camera = SimulatedEnvironmentSensor(fieldOfView,cameraTrajectory);
 
 %% 4. Create SensorObjects
-sensorEnvironment = SensorEnvironment(environment);
+%robot.addObjects(environment);
+%robot.addSensor(camera);
+sensorObjects = SensorObjects(environment);
 
 %% 5. Generate Measurements & Save to Graph File
-camera.generateMeasurements(config,sensorEnvironment);
+%robot.generateMeasurements(config);
+camera.generateMeasurements(config,sensorObjects);
 
 %% 6. Plot
 figure

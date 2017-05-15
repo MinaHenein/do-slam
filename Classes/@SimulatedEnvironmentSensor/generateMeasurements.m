@@ -14,7 +14,6 @@ mFileID  = fopen(strcat(config.folderPath,config.sep,'GraphFiles',...
                  config.sep,config.graphFileFolderName,config.sep,config.measurementsFileName),'w');
 t      = config.t;
 nSteps = numel(t);
-if config.rngSeed; rng(config.rngSeed); end;
 
 % indexing variables
 vertexCount         = 0;

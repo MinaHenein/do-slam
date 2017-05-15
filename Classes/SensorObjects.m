@@ -1,5 +1,5 @@
-classdef SensorEnvironment < ArrayGetSet
-    %SENSORENVIRONMENT Summary of this class goes here
+classdef SensorObjects < ArrayGetSet
+    %SENSOROBJECTS Summary of this class goes here
     %   Detailed explanation goes here
     
     %% 1. Properties
@@ -26,7 +26,7 @@ classdef SensorEnvironment < ArrayGetSet
     
     % Constructor
     methods(Access = public)
-        function self = SensorEnvironment(environment)
+        function self = SensorObjects(environment)
             points(environment.nEnvironmentPoints) = Point();
             %loop over environmentPoints, create Points
             for i = 1:environment.nEnvironmentPoints
