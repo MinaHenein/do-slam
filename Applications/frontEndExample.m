@@ -3,7 +3,7 @@ clear all
 
 %% 1. Config
 % time
-nSteps = 51;
+nSteps = 21;
 t0 = 0;
 tN = 10;
 t  = linspace(t0,tN,nSteps);
@@ -20,7 +20,10 @@ robotTrajectory = PositionModelPoseTrajectory(dynamicWaypoints,'R3','smoothingsp
 config = Config();
 config.set('t',t);
 config.set('rngSeed',1);
-config.set('poseParameterisation','R3xso3');
+config.set('noiseModel','Gaussian');
+% config.set('noiseModel','Off');
+% config.set('poseParameterisation','R3xso3');
+config.set('poseParameterisation','logSE3');
 config.set('poseVertexLabel'     ,'VERTEX_POSE_LOG_SE3');
 config.set('pointVertexLabel'    ,'VERTEX_POINT_3D');
 config.set('planeVertexLabel'    ,'VERTEX_PLANE_4D');

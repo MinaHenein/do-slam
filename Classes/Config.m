@@ -10,6 +10,9 @@ classdef Config < ArrayGetSet
         % rng seed
         rngSeed 
         
+        % noise model
+        noiseModel
+        
         %measurement std dev
         stdPosePrior
         stdPointPrior

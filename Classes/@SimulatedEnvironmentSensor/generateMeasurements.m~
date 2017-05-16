@@ -46,19 +46,18 @@ for i = 1:nSteps
     if i> 1
         prevSensorPose = self.get('GP_Pose',t(i-1));
         poseRelative = currentSensorPose.AbsoluteToRelativePose(prevSensorPose);
-        poseRelativeNoisy = poseRelative.addNoise(config.noiseModel,zeros(size(config.stdPosePose)),config.stdPosePose);
+        poseRelativeNoisy = poseRelative.addNoise(,zeros(6,1),config.stdPosePose);
         %WRITE EDGE TO FILE
         label = config.posePoseEdgeLabel;
         switch config.poseParameterisation
             case 'R3xso3'
-                valueGT   = poseRelative.get('R3xso3Pose');
-                valueMeas = poseRelativeNoisy.get('R3xso3Pose');
+                valueGT = poseRelative.get('R3xso3Pose');
             case 'logSE3'
-                valueGT   = poseRelative.get('logSE3Pose');
-                valueMeas = poseRelativeNoisy.get('logSE3Pose');
+                valueGT = poseRelative.get('logSE3Pose');
             otherwise
                 error('Error: unsupported pose parameterisation')
         end
+        valueMeas = valueGT;
         covariance = config.covPosePose;
         index1 = cameraVertexIndexes(i-1);
         index2 = cameraVertexIndexes(i);
@@ -86,18 +85,14 @@ for i = 1:nSteps
             label = config.posePointEdgeLabel;
             switch config.poseParameterisation
                 case 'R3xso3'
-                    jPointRelativeNoisy = jPointRelative.addNoise(config.noiseModel,zeros(size(config.stdPosePoint)),config.stdPosePoint); 
-                    valueGT   = jPointRelative.get('R3Position');
-                    valueMeas = jPointRelativeNoisy.get('R3Position');
+                    valueGT = jPointRelative.get('R3Position');
                 case 'logSE3'
-                    jPointRelativeLogSE3      = jPoint.get('GP_Point',t(i)).AbsoluteToRelativePoint(self.get('GP_Pose',t(i)),'logSE3');
-                    jPointRelativeLogSE3Noisy = jPointRelativeLogSE3.addNoise(config.noiseModel,zeros(size(config.stdPosePoint)),config.stdPosePoint); 
-                    valueGT   = jPointRelativeLogSE3.get('R3Position');
-                    valueMeas = jPointRelativeLogSE3Noisy.get('R3Position');
-
+                    jpointRelativeLogSE3 = jPoint.get('GP_Point',t(i)).AbsoluteToRelativePoint(self.get('GP_Pose',t(i)),'logSE3');
+                    valueGT = jpointRelativeLogSE3.get('R3Position');
                 otherwise
                     error('Error: unsupported pose parameterisation')
             end
+            valueMeas = valueGT; 
             covariance = config.covPosePoint;
             index1 = cameraVertexIndexes(i);
             index2 = jPoint.get('vertexIndex');

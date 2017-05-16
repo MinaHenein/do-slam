@@ -165,7 +165,8 @@ classdef GP_Point < GeometricPrimitive
                     mean   = varargin{1};
                     stdDev = varargin{2};
                     noise = normrnd(mean,stdDev);
-                    poseNoisy = GP_Point(self.get('R3Position') + noise);
+                    poseNoisy = GP_Point();
+                    poseNoisy.set('R3Position',self.get('R3Position'))
                 case 'Off'
                     poseNoisy = self;
                 otherwise

@@ -90,18 +90,18 @@ classdef GP_Pose < GeometricPrimitive
             if (numel(self)==numel(poseReference))
                 for i = 1:numel(self)
                     poseRelative(i) = GP_Pose();
-                    poseRelative(i).set('R3xso3Pose',AbsoluteToRelativePoseR3xso3(self(i).get('R3xso3Pose'),poseReference(i).get('R3xso3Pose')));
+                    poseRelative(i).set('R3xso3Pose',AbsoluteToRelativePoseR3xso3(poseReference(i).get('R3xso3Pose'),self(i).get('R3xso3Pose')));
                 end
             elseif (numel(self)>1) && ((numel(poseReference)==1))
                 for i = 1:numel(self)
                     poseRelative(i) = GP_Pose();
-                    poseRelative(i).set('R3xso3Pose',AbsoluteToRelativePoseR3xso3(self(i).get('R3xso3Pose'),poseReference.get('R3xso3Pose')));
+                    poseRelative(i).set('R3xso3Pose',AbsoluteToRelativePoseR3xso3(poseReference.get('R3xso3Pose'),self(i).get('R3xso3Pose')));
                 end
             elseif (numel(self)==1) && ((numel(poseReference)>1))
                 poseRelative(numel(poseReference)) = GP_Pose();
                 for i = 1:numel(self)
                     poseRelative(i) = GP_Pose();
-                    poseRelative(i).set('R3xso3Pose',AbsoluteToRelativePoseR3xso3(self.get('R3xso3Pose'),poseReference(i).get('R3xso3Pose')));
+                    poseRelative(i).set('R3xso3Pose',AbsoluteToRelativePoseR3xso3(poseReference(i).get('R3xso3Pose'),self.get('R3xso3Pose')));
                 end
             else
                 error('Error: inconsistent sizes')
@@ -134,5 +134,21 @@ classdef GP_Pose < GeometricPrimitive
         end
     end
     
+    % Add Noise
+    methods(Access = public)
+        function poseNoisy = addNoise(self,noiseModel,varargin)
+            switch noiseModel
+                case 'Gaussian'
+                    mean   = varargin{1};
+                    stdDev = varargin{2};
+                    noise = normrnd(mean,stdDev);
+                    poseNoisy = self.RelativeToAbsolutePose(GP_Pose(noise));
+                case 'Off'
+                    poseNoisy = self;
+                otherwise
+                    error('Error: invalid noise model')
+            end
+        end
+    end
 end
 
