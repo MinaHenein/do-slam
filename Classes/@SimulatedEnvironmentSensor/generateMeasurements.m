@@ -114,7 +114,7 @@ for i = 1:nSteps
                 %WRITE VERTEX TO FILE
                 label = config.planeVertexLabel;
                 index = jObject.get('vertexIndex');
-                value = jObject.get('parameters');
+                value = jObject.get('parameters',t(i));
                 writeVertex(label,index,value,gtFileID);
             end
         end

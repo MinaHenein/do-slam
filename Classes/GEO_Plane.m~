@@ -17,7 +17,23 @@ classdef GEO_Plane < GeometricEntityObject
                 otherwise
                     self.index        = rectangle.get('index');
                     self.pointIndexes = rectangle.get('pointIndexes');
-                    self.rectangleTrajectory = rectangle.get('trajectory');                      
+                    self.rectangleTrajectory = rectangle.get('trajectory');
+                    
+                    pose = rectangle.get('GP_Pose',0);
+                    position = pose.get('R3xso3Position');
+                    R = pose.get('R');
+                    %compute parameters
+                    normal = R(:,3);
+                    distance = dot(position,normal);
+                    %constrain distance >= 0
+                    if distance < 0
+                        self.normal   = -normal;
+                        self.distance = -distance;
+                    else
+                        self.normal   = normal;
+                        self.distance = distance;
+                    end
+                        
             end
         end
         
@@ -28,16 +44,7 @@ classdef GEO_Plane < GeometricEntityObject
         function out = getSwitch(self,property,varargin)
             switch property 
                 case 'parameters'
-                    t = varargin{1};
-                    out = self.computePlaneParameters(t);
-                case 'normal'
-                    t = varargin{1};
-                    parameters = self.computePlaneParameters(t);
-                    out = parameters(1:3,:);
-                case 'distance'
-                    t = varargin{1};
-                    parameters = self.computePlaneParameters(t);
-                    out = parameters(4,:);
+                    out = [self.normal; self.distance];
                 otherwise
                     out = self.(property);
             end
@@ -58,10 +65,13 @@ classdef GEO_Plane < GeometricEntityObject
             normal = R(:,3:3:end);
             distance = dot(position,normal);
             %constrain distance >= 0
-            negativeLogical = (distance <= 0);
-            normal(negativeLogical) = -normal(negativeLogical);
-            distance(negativeLogical) = -distance(negativeLogical);
-            parameters = [normal; distance];
+            if distance < 0
+                self.normal   = -normal;
+                self.distance = -distance;
+            else
+                self.normal   = normal;
+                self.distance = distance;
+            end
         end
     end
     

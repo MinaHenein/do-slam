@@ -41,6 +41,7 @@ if config.rngSeed; rng(config.rngSeed); end;
 environment = Environment();
 environment.addRectangle([10,15],100,'mixed',staticTrajectory1);
 environment.addRectangle([8,6],50,'mixed',staticTrajectory2);
+% environment.addRectangle([2,3],50,'edges',robotTrajectory);
 
 %% 3. Initialise Sensor
 fieldOfView = [-pi/3,pi/3,-pi/6,pi/6,1,10]; %az,el,r limits

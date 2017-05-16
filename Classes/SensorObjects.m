@@ -38,7 +38,6 @@ classdef SensorObjects < ArrayGetSet
             for i = 1:environment.nEnvironmentPrimitives
                 switch class(environment.get('environmentPrimitives',i))
                     case 'EP_Rectangle'
-                        assert(logical(environment.get('environmentPrimitives',i).get('static')),'Error: plane must be formed from static rectangle')
                         objects(i) = GEO_Plane(environment.get('environmentPrimitives',i));
                     otherwise
                         error('Error: object conversion for %s not yet implemented',class(environment.get('environmentPrimitives',i)))
