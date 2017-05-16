@@ -8,8 +8,12 @@ function [axisAngle] = assignOrientation(v,varargin)
 %          based on varargin
 
 xAxis  = unit(v);
-vProjXY = [v(1:2); 0];
-yAxis  = unit(cross(xAxis,vProjXY));
+vProjXY = [xAxis(1:2); 0];
+if dot(xAxis,vProjXY)==1
+	yAxis = unit(cross(xAxis,[0 0 1]')); 
+else
+    yAxis = unit(cross(xAxis,vProjXY));
+end
 zAxis  = unit(cross(xAxis,yAxis));
 if zAxis(3) < 0
     yAxis = -yAxis;

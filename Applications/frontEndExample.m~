@@ -3,7 +3,7 @@ clear all
 
 %% 1. Config
 % time
-nSteps = 51;
+nSteps = 21;
 t0 = 0;
 tN = 10;
 t  = linspace(t0,tN,nSteps);
@@ -15,7 +15,7 @@ dynamicWaypoints = [0:2:tN; 4 5 7 10 7 3; 12 11 10 5 8 14; 8 5 2 3 6 4];
 %construct trajectories
 staticTrajectory1 = StaticPoseTrajectory(staticPose1,'R3xso3');
 staticTrajectory2 = StaticPoseTrajectory(staticPose2,'R3xso3');
-robotTrajectory = PositionModelPoseTrajectory(dynamicWaypoints,'R3','smoothingspline');
+robotTrajectory = PositionModelPoseTrajectory(dynamicWaypoints,'R3','linearinterp');
 
 % construct config & set properties
 config = Config();
@@ -49,14 +49,15 @@ environment.addRectangle([8,6],50,'mixed',staticTrajectory2);
 
 %% 3. Initialise Sensor
 fieldOfView = [-pi/3,pi/3,-pi/6,pi/6,1,10]; %az,el,r limits
-cameraPoseRelativeToRobot = GP_Pose([0,0,0,0,0,-pi/8]');
+% cameraPoseRelativeToRobot = GP_Pose([0,0,0,0,0,-pi/8]');
+cameraPoseRelativeToRobot = GP_Pose([0,0,0,0,0,0]');
 cameraTrajectory = RelativePoseTrajectory(robotTrajectory,cameraPoseRelativeToRobot);
 sensor = SimulatedEnvironmentSensor();
 sensor.addEnvironment(environment);
 sensor.addCamera(fieldOfView,cameraTrajectory);
 
 %% 5. Generate Measurements & Save to Graph File
-sensor.generateMeasurements(config);
+% sensor.generateMeasurements(config);
 
 %% 6. Plot
 figure

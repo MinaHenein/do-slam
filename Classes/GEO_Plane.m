@@ -59,7 +59,7 @@ classdef GEO_Plane < GeometricEntityObject
             distance = dot(position,normal);
             %constrain distance >= 0
             negativeLogical = (distance <= 0);
-            normal(negativeLogical) = -normal(negativeLogical);
+            normal(:,negativeLogical) = -normal(:,negativeLogical);
             distance(negativeLogical) = -distance(negativeLogical);
             parameters = [normal; distance];
         end
