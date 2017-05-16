@@ -35,18 +35,6 @@ classdef SimulatedEnvironmentSensor < Sensor
                     out = self.trajectory.get(property,varargin{1});
                 case 'static'
                     out = self.trajectory.get(property);
-                case 'points'
-                    if numel(varargin)==1
-                        out = self.points(varargin{1});
-                    else
-                        out = self.points;
-                    end
-                case 'objects'
-                    if numel(varargin)==1
-                        out = self.objects(varargin{1});
-                    else
-                        out = self.objects;
-                    end
                 otherwise
                     out = self.(property);
             end
@@ -92,7 +80,7 @@ classdef SimulatedEnvironmentSensor < Sensor
     
     % Add camera
     methods(Access = public)
-        function self = addCamera(self,fieldOfView,trajectory)
+        function self = addCamera(fieldOfView,trajectory)
             self.fieldOfView = fieldOfView;
             self.trajectory  = trajectory;
         end
@@ -103,7 +91,7 @@ classdef SimulatedEnvironmentSensor < Sensor
         % point visibility
         [visibility,relativePoint] = pointVisible(self,point,t)
         % Measurements
-        generateMeasurements(self,config)
+        generateMeasurements(self,config,sensorEnvironment)
         
     end
     

@@ -1,4 +1,4 @@
-function generateMeasurements(self,config,sensorEnvironment)
+function generateMeasurements(self,config)
 %GENERATEMEASUREMENTS simulates measurements and creates ground truth and
 %measurements graph files
 
@@ -18,7 +18,7 @@ nSteps = numel(t);
 % indexing variables
 vertexCount         = 0;
 cameraVertexIndexes = zeros(1,nSteps);
-pointVisibility     = zeros(sensorEnvironment.nPoints,nSteps);
+pointVisibility     = zeros(self.nPoints,nSteps);
 
 %% 2. Loop over timestep, simulate observations, write to graph file
 for i = 1:nSteps
@@ -65,8 +65,8 @@ for i = 1:nSteps
     end
     
     %point observations
-    for j = 1:sensorEnvironment.nPoints
-        jPoint = sensorEnvironment.get('points',j);
+    for j = 1:self.nPoints
+        jPoint = self.get('points',j);
         [jPointVisible,jPointRelative] = self.pointVisible(jPoint,t(i));
         if jPointVisible
             pointVisibility(j,i) = 1;
@@ -100,8 +100,8 @@ for i = 1:nSteps
     end
     
     %point-plane observations
-    for j = 1:sensorEnvironment.nObjects
-        jObject = sensorEnvironment.get('objects',j);
+    for j = 1:self.nObjects
+        jObject = self.get('objects',j);
         jPointIndexes = jObject.get('pointIndexes');
         jPointVisibility = logical(pointVisibility(jPointIndexes,i));
         jNVisiblePoints  = sum(jPointVisibility);
@@ -110,7 +110,7 @@ for i = 1:nSteps
         if jNVisiblePoints > 3
             if isempty(jObject.get('vertexIndex'))
                 vertexCount = vertexCount + 1;
-                jObject.set('vertexIndex',vertexCount); %*Passed by reference - changes sensorEnvironment 
+                jObject.set('vertexIndex',vertexCount); %*Passed by reference - changes sensorObjects 
                 %WRITE VERTEX TO FILE
                 label = config.planeVertexLabel;
                 index = jObject.get('vertexIndex');
@@ -126,7 +126,7 @@ for i = 1:nSteps
                 valueGT = 0;
                 valueMeas = valueGT;
                 covariance = config.covPointPlane;
-                index1 = sensorEnvironment.get('points',jVisiblePointIndexes(k)).get('vertexIndex');
+                index1 = self.get('points',jVisiblePointIndexes(k)).get('vertexIndex');
                 index2 = jObject.get('vertexIndex');
                 writeEdge(label,index1,index2,valueGT,covariance,gtFileID);
                 writeEdge(label,index1,index2,valueMeas,covariance,mFileID);

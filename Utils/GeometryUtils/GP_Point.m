@@ -61,15 +61,18 @@ classdef GP_Point < GeometricPrimitive
             %indexing depends on size of input and output
             if (numel(self)==numel(poseReference))
                 for i = 1:numel(self)
+                    positionRelative(i) = GP_Point();
                     positionRelative(i).set('R3Position',AbsoluteToRelativePositionR3xso3(poseReference(i).get('R3xso3Pose'),self(i).get('R3Position')));
                 end
             elseif (numel(self)>1) && ((numel(poseReference)==1))
                 for i = 1:numel(self)
+                    positionRelative(i) = GP_Point();
                     positionRelative(i).set('R3Position',AbsoluteToRelativePositionR3xso3(poseReference.get('R3xso3Pose'),self(i).get('R3Position')));
                 end
             elseif (numel(self)==1) && ((numel(poseReference)>1))
                 positionRelative(numel(poseReference)) = GP_Point;
                 for i = 1:numel(self)
+                    positionRelative(i) = GP_Point();
                     positionRelative(i).set('R3Position',AbsoluteToRelativePositionR3xso3(poseReference(i).get('R3xso3Pose'),self.get('R3Position')));
                 end
             else
@@ -83,15 +86,18 @@ classdef GP_Point < GeometricPrimitive
             %indexing depends on size of input and output
             if (numel(self)==numel(poseReference))
                 for i = 1:numel(self)
+                    positionAbsolute(i) = GP_Point();
                     positionAbsolute(i).set('R3Position',RelativeToAbsolutePositionR3xso3(poseReference(i).get('R3xso3Pose'),self(i).get('R3Position')));
                 end
             elseif (numel(self)>1) && ((numel(poseReference)==1))
                 for i = 1:numel(self)
+                    positionAbsolute(i) = GP_Point();
                     positionAbsolute(i).set('R3Position',RelativeToAbsolutePositionR3xso3(poseReference.get('R3xso3Pose'),self(i).get('R3Position')));
                 end
             elseif (numel(self)==1) && ((numel(poseReference)>1))
                 positionAbsolute(numel(poseReference)) = GP_Point;
                 for i = 1:numel(self)
+                    positionAbsolute(i) = GP_Point();
                     positionAbsolute(i).set('R3Position',RelativeToAbsolutePositionR3xso3(poseReference(i).get('R3xso3Pose'),self.get('R3Position')));
                 end
             else
