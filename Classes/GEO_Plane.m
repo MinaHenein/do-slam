@@ -1,6 +1,12 @@
 classdef GEO_Plane < GeometricEntityObject
-    %GEO_PLANE Summary of this class goes here
-    %   Detailed explanation goes here
+    %GEO_PLANE represents a geometric plane parameterised by normal
+    %(perpendicular to origin) and distance (distance to origin)
+    %   GEO_Plane is formed from an EP_Rectangle
+    %   trajectory of the rectangle is stored
+    %   When parameters @ t are requested, normal and distance are computed
+    %   from the rectangleTrajectory
+    %   Parameters are constrained so the distance >= 0 and normal is an
+    %   element of S2
     
     %% 1. Properties
     properties(GetAccess = 'protected', SetAccess = 'protected')

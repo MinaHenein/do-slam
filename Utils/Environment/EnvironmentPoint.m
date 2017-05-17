@@ -1,6 +1,13 @@
 classdef EnvironmentPoint < ArrayGetSet & matlab.mixin.Heterogeneous
-    %EnvironmentPoint Summary of this class goes here
-    %   Detailed explanation goes here
+    %EnvironmentPoint represents point in environment
+    %   Environment points are typically initialised by creating points on
+    %   an EnvironmentPrimitive. The trajectories of these points are
+    %   generated as relative to the trajectory of the primitive
+    %   The primitiveIndexes stores indexes of primitives the point is to
+    %   be associated with. *NOTE: By default, this will contain the index 
+    %   of the primitive used to generate the point, but it does not have
+    %   to. primitiveIndexes can contain indexes of any primitives that the
+    %   point should be constrained to when generating a graph file
     
     %% 1. Properties
     properties(GetAccess = 'protected', SetAccess = 'protected')

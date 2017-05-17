@@ -1,6 +1,16 @@
 classdef SimulatedEnvironmentSensor < Sensor
-    %SimulatedEnvironmentSensor Summary of this class goes here
-    %   Detailed explanation goes here
+    %SimulatedEnvironmentSensor represents a sensor used to generate
+    %measurements of a primitives and points in the Environment class
+    %   -SimulatedEnvironmentSensor converts the environment primitives and
+    %    environment points to objects and points
+    %   -This intermediate object representation allows more freedom in the
+    %    kinds of observations and constraints which can be generated from
+    %    environment primitives and points
+    %   -ie different SimulatedEnvironmentSensor subclasses can rerepresent
+    %    the same Environment class in different ways (ie planes vs
+    %    rectangles)
+    %   -Measurements of these points are generated and stored in a graph
+    %    file, along with a ground truth graph file
     
     %% 1. Properties
     properties(GetAccess = 'protected', SetAccess = 'protected')
@@ -24,8 +34,6 @@ classdef SimulatedEnvironmentSensor < Sensor
             nObjects = numel(self.objects);
         end
     end
-    
-    
     
     % Getter & Setter
     methods(Access = public) %set to protected later??

@@ -1,6 +1,12 @@
 classdef Config < ArrayGetSet
-    %CONFIG Summary of this class goes here
-    %   Detailed explanation goes here
+    %CONFIG is used to store user settings
+    %   Properties must be set with the 'set' method
+    %   Properties can be accessed with '.' notation instead of the 'get'
+    %   method for ease of use.
+    %
+    %   *Suggestion: rather than each user adding properties only relevant
+    %   to their application, subclasses should be created with
+    %   non-fundamental properties for specific applications   
     
     %% 1. Properties
     properties(GetAccess = 'public', SetAccess = 'private')

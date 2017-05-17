@@ -3,7 +3,6 @@ classdef Point < ArrayGetSet
     %representation of points in the environment.
     %   Points are created and used to generate measurements
     
-    
     %% 1. Properties
     properties(GetAccess = 'protected', SetAccess = 'protected')
         index

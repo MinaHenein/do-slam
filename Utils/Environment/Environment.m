@@ -1,7 +1,6 @@
 classdef Environment < ArrayGetSet
     %Environment class stores environment primitives and environment points
     %and has methods to construct and manipulate them
-    %   Detailed explanation goes here
     
     %% 1. Properties
     properties(GetAccess = 'protected', SetAccess = 'protected')
@@ -62,7 +61,8 @@ classdef Environment < ArrayGetSet
     
     % Construct primitives
     methods(Access = public)
-        % Default
+        % Default - any primitive formed from relative positions of points
+        % it contains
         function self = addPrimitive(self,positionsRelative,parameterisation,trajectory)
             nPoints = size(positionsRelative,2);
             
@@ -70,6 +70,8 @@ classdef Environment < ArrayGetSet
             points(nPoints) = EnvironmentPoint();
             for i = 1:nPoints
                 iRelativePoint = GP_Point(positionsRelative(:,i),parameterisation);
+                % trajectory of each point is represented with position
+                % relative to primitive trajectory
                 points(i).set('trajectory',RelativePointTrajectory(trajectory,iRelativePoint));
             end
             
@@ -77,7 +79,7 @@ classdef Environment < ArrayGetSet
             primitive = EP_Default();
             primitive.set('trajectory',trajectory);
             
-            %pair
+            %pair primitive and points
             self.addPrimitiveAndPoints(primitive,points);
         end
         
@@ -86,11 +88,11 @@ classdef Environment < ArrayGetSet
             
             %relative positions
             switch distribution
-                case 'uniform'
+                case 'uniform' % distribute points randomly on rectangle
                     rectanglePositionsRelative = generateRectanglePoints(sideLengths,nPoints,'uniform');
-                case 'edges'
+                case 'edges'   % distribute points randomly on edges only
                     rectanglePositionsRelative = generateRectanglePoints(sideLengths,nPoints,'edges');
-                case 'mixed'
+                case 'mixed'   % combine uniform and edge distribution
                     nCentrePoints = 0.7*nPoints;
                     nEdgePoints   = nPoints - nCentrePoints;
                     rectanglePositionsRelative = [generateRectanglePoints(sideLengths,nCentrePoints,'uniform'),...
@@ -101,13 +103,15 @@ classdef Environment < ArrayGetSet
             rectanglePoints(nPoints) = EnvironmentPoint();
             for i = 1:nPoints
                 iRelativePoint = GP_Point(rectanglePositionsRelative(:,i));
+                % trajectory of each point is represented with position
+                % relative to primitive trajectory
                 rectanglePoints(i).set('trajectory',RelativePointTrajectory(rectangleTrajectory,iRelativePoint));
             end
             
             %initialise EP_Rectangle primitive
             rectanglePrimitive = EP_Rectangle(sideLengths,rectangleTrajectory);
             
-            %pair
+            %pair primitive and points
             self.addPrimitiveAndPoints(rectanglePrimitive,rectanglePoints);
             
         end
@@ -115,6 +119,8 @@ classdef Environment < ArrayGetSet
     end
     
     % Add primitive & points
+    %   adds primitive and points to environment
+    %   adds indexes to pair primitive and points together
     methods(Access = private, Hidden = true)
         function self = addPrimitiveAndPoints(self,primitive,points)
             primitiveIndex = self.nEnvironmentPrimitives + 1;
@@ -152,6 +158,7 @@ classdef Environment < ArrayGetSet
     end
     
     methods(Access = private, Hidden = true)
+        % plot static features in environment
         function plotStatic(self,staticPointIndexes,staticPrimitiveIndexes)
             nPoints     = numel(staticPointIndexes);
             nPrimitives = numel(staticPrimitiveIndexes);
@@ -167,6 +174,7 @@ classdef Environment < ArrayGetSet
 %                 self.environmentPrimitives(staticPrimitiveIndexes(i)).plot()
 %             end
         end
+        % plot dynamic features of environment over time steps t
         function plotDynamic(self,dynamicPointIndexes,dynamicPrimitiveIndexes,t)
             nSteps = numel(t);
             for i = 1:nSteps

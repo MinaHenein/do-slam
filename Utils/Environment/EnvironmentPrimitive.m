@@ -1,6 +1,8 @@
 classdef EnvironmentPrimitive < ArrayGetSet & matlab.mixin.Heterogeneous
-    %ENVIRONMENTPRIMITIVEALT Summary of this class goes here
-    %   Detailed explanation goes here
+    %ENVIRONMENTPRIMITIVEALT represents a primitive in the environment
+    %   This is a base class from which specific primitives inherit
+    %   It inherits from matlab.mixin.Heterogeneous which allows different
+    %   environment primitives to be stored together in object arrays
     
     %% 1. Properties
     properties(GetAccess = 'protected', SetAccess = 'protected')

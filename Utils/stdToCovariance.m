@@ -1,6 +1,5 @@
 function [covariance] = stdToCovariance(variance)
-%VARIANCETOCOVARIANCE Summary of this function goes here
-%   Detailed explanation goes here
+%STDTOCOVARIANCE converts stdDev vector to covariance matrix
 
 covariance = diag(variance.^2);
 

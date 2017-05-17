@@ -1,6 +1,6 @@
 function [vec] = covToUpperTriVec(cov)
-%COVTOUPPERTRIVEC Summary of this function goes here
-%   Detailed explanation goes here
+%COVTOUPPERTRIVEC converts square covariance matrix to vector
+%representation of upper triangle
 
 %*TODO - get rid of find
 vec = cov(find(triu(ones(size(cov)))'))';

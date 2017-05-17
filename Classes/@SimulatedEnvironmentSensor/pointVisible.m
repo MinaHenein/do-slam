@@ -1,8 +1,8 @@
 function [visibility,relativePoint] = pointVisible(self,point,t)
-%POINTVISIBLE Summary of this function goes here
-%   Detailed explanation goes here
+%POINTVISIBLE determines if point is visible to SimulatedEnvironmentSensor
+%(self) @ time t based on camera fieldOfView
 
-%GP_Point - relative position between camera, point at time t
+%GP_Point - relative position between camera & point at time t
 relativePoint = point.get('trajectory').AbsoluteToRelativePoint(self.get('trajectory'),t);
 
 %convert to spherical coords

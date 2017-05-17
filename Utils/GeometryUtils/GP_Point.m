@@ -1,6 +1,6 @@
 classdef GP_Point < GeometricPrimitive
     %GP_POINT represents a position in 3D space
-    %   currently only R3 position implemented
+    %   R3 & S2xR point parameterisations implemented
     %   transformation methods allow points to be converted between
     %   absolute/relative position given a GP_Pose input
     
@@ -47,6 +47,8 @@ classdef GP_Point < GeometricPrimitive
             switch property
                 case 'R3Position'
                     self.R3Position = value;
+                case 'S2xRPosition'
+                    self.R3Position = S2xR_R3(value);
                 otherwise 
                     error('Error: invalid property')
             end
@@ -58,6 +60,7 @@ classdef GP_Point < GeometricPrimitive
         function positionRelative = AbsoluteToRelativePoint(self,poseReference,varargin)
             %preallocate
             positionRelative(numel(self)) = GP_Point;
+            % Default - transformations use R3xso3 pose parameterisation
             if isempty(varargin) || strcmp(varargin{1},'R3xso3')
                 %indexing depends on size of input and output
                 if (numel(self)==numel(poseReference))
@@ -79,6 +82,7 @@ classdef GP_Point < GeometricPrimitive
                 else
                     error('Error: inconsistent sizes')
                 end
+            % if logSE3 pose parameterisation desired
             elseif strcmp(varargin{1},'logSE3')
                 %indexing depends on size of input and output
                 if (numel(self)==numel(poseReference))
@@ -109,6 +113,7 @@ classdef GP_Point < GeometricPrimitive
         function positionAbsolute = RelativeToAbsolutePoint(self,poseReference,varargin)
             %preallocate
             positionAbsolute(numel(self)) = GP_Point;
+            % Default - transformations use R3xso3 pose parameterisation
             if isempty(varargin) || strcmp(varargin{1},'R3xso3')
                 %indexing depends on size of input and output
                 if (numel(self)==numel(poseReference))
@@ -130,6 +135,7 @@ classdef GP_Point < GeometricPrimitive
                 else
                     error('Error: inconsistent sizes')
                 end
+            % if logSE3 pose parameterisation desired
             elseif strcmp(varargin{1},'logSE3')
                 %indexing depends on size of input and output
                 if (numel(self)==numel(poseReference))

@@ -15,7 +15,7 @@ dynamicWaypoints = [0:2:tN; 4 5 7 10 7 3; 12 11 10 5 8 14; 8 5 2 3 6 4];
 %construct trajectories
 staticTrajectory1 = StaticPoseTrajectory(staticPose1,'R3xso3');
 staticTrajectory2 = StaticPoseTrajectory(staticPose2,'R3xso3');
-robotTrajectory = PositionModelPoseTrajectory(dynamicWaypoints,'R3','smoothingspline');
+robotTrajectory   = PositionModelPoseTrajectory(dynamicWaypoints,'R3','smoothingspline');
 
 % construct config & set properties
 config = Config();

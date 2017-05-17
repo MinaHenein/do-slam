@@ -4,21 +4,27 @@ function [axisAngle] = assignOrientation(v,varargin)
 %   absolute coords are (X,Y,Z)
 %   this implementation forces x axis of orientation to align with v, and z
 %   axis of orientation to lie in plane vProjXY-Z, where X,Y,Z are absolute
-%   *NOTE: different orientation,change how xAxis,yAxis,zAxis placed into R
-%          based on varargin
 
+% x points in direction of motion
 xAxis  = unit(v);
 vProjXY = [xAxis(1:2); 0];
+
+% y axis normal to plane formed by xAxis and projection of xAxis onto XY
+% plane
 if dot(xAxis,vProjXY)==1
 	yAxis = unit(cross(xAxis,[0 0 1]')); 
 else
     yAxis = unit(cross(xAxis,vProjXY));
 end
+
+% z axis 
 zAxis  = unit(cross(xAxis,yAxis));
 if zAxis(3) < 0
     yAxis = -yAxis;
     zAxis = -zAxis;
 end
+
+% compute scaled axis orientation
 R      = [xAxis,yAxis,zAxis];
 axisAngle = arot(R);
 
