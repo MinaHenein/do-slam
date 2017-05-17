@@ -9,7 +9,7 @@ classdef Config < ArrayGetSet
     %   non-fundamental properties for specific applications   
     
     %% 1. Properties
-    properties(GetAccess = 'public', SetAccess = 'private')
+    properties(GetAccess = 'public', SetAccess = 'protected')
         %array of time values when measurements are made
         t 
         
@@ -58,12 +58,7 @@ classdef Config < ArrayGetSet
     % Constructor
     methods(Access = public) 
         function self = Config()
-            if ispc
-                self.sep = '\';
-            elseif isunix || ismac
-                self.sep = '/';
-            end
-            self.folderPath = pwd;
+            self.initPath();
         end
     end
     
@@ -94,6 +89,18 @@ classdef Config < ArrayGetSet
         end
         function covPointPlane = get.covPointPlane(obj)
             covPointPlane = stdToCovariance(obj.stdPointPlane);
+        end
+    end
+    
+    % initialise file stuff
+    methods(Access = protected) 
+    	function self = initPath(self)
+        	if ispc
+                self.sep = '\';
+            elseif isunix || ismac
+                self.sep = '/';
+            end
+            self.folderPath = pwd;
         end
     end
     

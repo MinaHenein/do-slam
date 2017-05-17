@@ -12,14 +12,12 @@ staticPose1  = [5,8,0,0,0,0]';
 staticPose2  = [4 16 4 pi/2 0 0]';
 dynamicWaypoints = [0:2:tN; 4 5 7 10 7 3; 12 11 10 5 8 14; 8 5 2 3 6 4];
 
-% construct trajectories
+%construct trajectories
 staticTrajectory1 = StaticPoseTrajectory(staticPose1,'R3xso3');
 staticTrajectory2 = StaticPoseTrajectory(staticPose2,'R3xso3');
 robotTrajectory   = PositionModelPoseTrajectory(dynamicWaypoints,'R3','smoothingspline');
 
 % construct config & set properties
-% CameraConfig is subclass of Config with properties specific to
-% applications with a camera
 config = CameraConfig();
 % set properties of Config
 config.set('t',t);
@@ -45,7 +43,6 @@ config.set('stdPointPlane',0.001);
 % set properties of CameraConfig
 config.set('fieldOfView',[-pi/3,pi/3,-pi/6,pi/6,1,10]); %az,el,r limits
 config.set('cameraRelativePose',GP_Pose([0,0,0,0,0,-pi/8]'));
-
 %% 2. Generate Environment
 if config.rngSeed; rng(config.rngSeed); end;
 environment = Environment();
@@ -54,7 +51,8 @@ environment.addRectangle([8,6],50,'mixed',staticTrajectory2);
 % environment.addRectangle([2,3],50,'edges',robotTrajectory);
 
 %% 3. Initialise Sensor
-cameraTrajectory = RelativePoseTrajectory(robotTrajectory,config.cameraRelativePose);
+cameraPoseRelativeToRobot = ;
+cameraTrajectory = RelativePoseTrajectory(robotTrajectory,cameraPoseRelativeToRobot);
 sensor = SimulatedEnvironmentSensor();
 sensor.addEnvironment(environment);
 sensor.addCamera(config.fieldOfView,cameraTrajectory);

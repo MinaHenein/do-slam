@@ -1,18 +1,18 @@
-classdef ExampleApplicationConfig < Config
-    %EXAMPLEAPPLICATIONCONFIG is example of Config for specific application
+classdef CameraConfig < Config
+    %CAMERACONFIG is example of Config for specific application
     %   This subclass used to add properties specific to a certain
     %   application that should not be in base Config class
     %% 1. Properties
     properties(GetAccess = 'public', SetAccess = 'private')
-        
+        fieldOfView
+        cameraRelativePose
     end
-    
- 
     
     %% 2. Methods
     % Constructor
     methods(Access = public) 
-        function self = ExampleApplicationConfig()
+        function self = CameraConfig()
+            self.initPath();
         end
     end
     
@@ -26,7 +26,5 @@ classdef ExampleApplicationConfig < Config
         	self.(property) = value;
         end
     end
-    
-    
 end
 
