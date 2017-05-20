@@ -1,20 +1,23 @@
 %% general setup
 % run startup first
+clear all
+close all
+
 nSteps = 3;
 
 %% set up sensor
 sensorPose = zeros(6,nSteps);
 %constant linear velocity in x-axis direction, constant angular velocity about x-axis
-sensorPose(1,:) = 5*sin(linspace(0,pi/2,nSteps));
-sensorPose(2,:) = 5 - 5*cos(linspace(0,pi/2,nSteps));
-sensorPose(3,:) = linspace(0,2,nSteps);
-sensorPose(4,:) = linspace(0,pi/4,nSteps);
-sensorPose(5,:) = linspace(0,pi/8,nSteps);
+sensorPose(1,:) = -5+linspace(0,2,nSteps);
+sensorPose(2,:) = linspace(0,1,nSteps);
+sensorPose(3,:) = linspace(0,0,nSteps);
+sensorPose(4,:) = linspace(0,0,nSteps);
+sensorPose(5,:) = linspace(0,0,nSteps);
 sensorPose(6,:) = linspace(0,pi/6,nSteps);
 
 %adjust based on parameterisation
 for i = 1:nSteps
-        sensorPose(:,i) = R3xso3_LogSE3(sensorPose(:,i));
+    sensorPose(:,i) = R3xso3_LogSE3(sensorPose(:,i));
 end
 
 %% set up object
@@ -42,6 +45,7 @@ objPts = cell2mat(objPts);
 %% create ground truth and measurements
 groundTruthVertices = {};
 groundTruthEdges = {};
+vertexCount = 1;
 
 for i=1:nSteps
     % create vertex for odometry reading
@@ -49,7 +53,7 @@ for i=1:nSteps
     currentVertex.label = 'VERTEX_POSE_LOG_SE3';
     grountTruthVertex.time = i;
     currentVertex.value = sensorPose(:,i);
-    currentVertex.count = vertexCount;
+    currentVertex.index = vertexCount;
     groundTruthVertices{end+1} = currentVertex;
     vertexCount = vertexCount+1;
 end
@@ -58,8 +62,7 @@ for j=1:size(objPts,2)
     % create vertex for point location
     currentVertex = struct();
     currentVertex.label = 'VERTEX_POINT_3D';
-    currentVertex.time = i;
-    currentVertex.count = vertexCount;
+    currentVertex.index = vertexCount;
     currentVertex.value = objPts(:,j);
     groundTruthVertices{end+1} = currentVertex;
     vertexCount = vertexCount+1;
@@ -95,4 +98,29 @@ for i=1:size(measurementEdges,2) % add noise on measurements
     measurementEdges{i}.value = measurementEdges{i}.value+noise;
 end
     
+groundTruthGraph = fopen('groundTruth.graph','w');
 
+for i=1:size(groundTruthVertices,2)
+    vertex = groundTruthVertices{i};
+    formatSpec = strcat('%s %d ',repmat(' %6.6f',1,numel(vertex.value)),'\n');
+    fprintf(groundTruthGraph, formatSpec, vertex.label, vertex.index, vertex.value);
+end
+
+for i=1:size(groundTruthEdges,2)
+    edge = groundTruthEdges{i};
+    formatSpec = strcat('%s %d %d',repmat(' %.6f',1,numel(edge.value)),repmat(' %.6f',1,numel(edge.std)),'\n');
+    fprintf(groundTruthGraph, formatSpec, edge.label, edge.index1, edge.index2, edge.value, edge.std);
+end
+
+fclose(groundTruthGraph);
+measurementGraph = fopen('measurementGraph.graph','w');
+
+for i=1:size(measurementEdges,2)
+    edge = measurementEdges{i};
+    formatSpec = strcat('%s %d %d',repmat(' %.6f',1,numel(edge.value)),repmat(' %.6f',1,numel(edge.std)),'\n');
+    fprintf(measurementGraph, formatSpec, edge.label, edge.index1, edge.index2, edge.value, edge.std);
+end
+
+fclose(measurementGraph);
+
+    
