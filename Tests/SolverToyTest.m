@@ -4,7 +4,7 @@ clear all
 close all
 
 nSteps = 3;
-
+rng(2); 
 %% set up sensor
 sensorPose = zeros(6,nSteps);
 %constant linear velocity in x-axis direction, constant angular velocity about x-axis
@@ -75,6 +75,7 @@ for i=2:size(sensorPose,2)
     currentEdge.label = 'EDGE_LOG_SE3';
     currentEdge.value = AbsoluteToRelativePoseSE3(sensorPose(:,i),sensorPose(:,i-1));
     currentEdge.std = [0.01,0.01,0.01,pi/90,pi/90,pi/90]';
+    currentEdge.cov = covToUpperTriVec(stdToCovariance(currentEdge.std));
     groundTruthEdges{end+1} = currentEdge;
 end
 
@@ -86,6 +87,7 @@ for i=1:size(sensorPose,2)
         currentEdge.label = 'EDGE_3D';
         currentEdge.value = RelativePoint2AbsolutePoint3D(sensorPose(:,i),objPts(:,j));
         currentEdge.std = [0.02,0.02,0.02]';
+        currentEdge.cov = covToUpperTriVec(stdToCovariance(currentEdge.std));
         groundTruthEdges{end+1} = currentEdge;
     end
 end
@@ -93,12 +95,12 @@ end
 measurementEdges = groundTruthEdges; % copies grouthTruth to add noise
 rng(2); % fixes random seed
 for i=1:size(measurementEdges,2) % add noise on measurements
-    dim = size(measurementEdges{i}.std,1);
+    dim = size(measurementEdges{i}.cov,1);
     noise = normrnd(zeros(dim,1),measurementEdges{i}.std);
     measurementEdges{i}.value = measurementEdges{i}.value+noise;
 end
     
-groundTruthGraph = fopen('groundTruth.graph','w');
+groundTruthGraph = fopen('groundTruthToyTest.graph','w');
 
 for i=1:size(groundTruthVertices,2)
     vertex = groundTruthVertices{i};
@@ -108,17 +110,17 @@ end
 
 for i=1:size(groundTruthEdges,2)
     edge = groundTruthEdges{i};
-    formatSpec = strcat('%s %d %d',repmat(' %.6f',1,numel(edge.value)),repmat(' %.6f',1,numel(edge.std)),'\n');
-    fprintf(groundTruthGraph, formatSpec, edge.label, edge.index1, edge.index2, edge.value, edge.std);
+    formatSpec = strcat('%s %d %d',repmat(' %.6f',1,numel(edge.value)),repmat(' %.6f',1,numel(edge.cov)),'\n');
+    fprintf(groundTruthGraph, formatSpec, edge.label, edge.index1, edge.index2, edge.value, edge.cov);
 end
 
 fclose(groundTruthGraph);
-measurementGraph = fopen('measurementGraph.graph','w');
+measurementGraph = fopen('measurementsToyTest.graph','w');
 
 for i=1:size(measurementEdges,2)
     edge = measurementEdges{i};
-    formatSpec = strcat('%s %d %d',repmat(' %.6f',1,numel(edge.value)),repmat(' %.6f',1,numel(edge.std)),'\n');
-    fprintf(measurementGraph, formatSpec, edge.label, edge.index1, edge.index2, edge.value, edge.std);
+    formatSpec = strcat('%s %d %d',repmat(' %.6f',1,numel(edge.value)),repmat(' %.6f',1,numel(edge.cov)),'\n');
+    fprintf(measurementGraph, formatSpec, edge.label, edge.index1, edge.index2, edge.value, edge.cov);
 end
 
 fclose(measurementGraph);
