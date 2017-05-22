@@ -92,7 +92,7 @@ classdef SimulatedEnvironmentSensor < Sensor
                 end
             end
             
-            %add
+            %add properties
             self.points  = points;
             self.objects = objects;
         end

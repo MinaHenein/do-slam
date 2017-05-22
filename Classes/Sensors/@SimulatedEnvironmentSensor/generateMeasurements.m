@@ -22,9 +22,6 @@ pointVisibility     = zeros(self.nPoints,nSteps);
 
 %% 2. Loop over timestep, simulate observations, write to graph file
 for i = 1:nSteps
-    %*Write to several graph files at once -> no need to
-    %preallocate & store noise
-
     %sensor @ time t
     currentSensorPose = self.get('GP_Pose',t(i));
     vertexCount = vertexCount + 1;
@@ -75,7 +72,7 @@ for i = 1:nSteps
             %check if point observed before
             if isempty(jPoint.get('vertexIndex'))
                 vertexCount = vertexCount + 1;
-                jPoint.set('vertexIndex',vertexCount); %*Passed by reference - changes sensorEnvironment 
+                jPoint.set('vertexIndex',vertexCount); %*Passed by reference - changes point
                 %WRITE VERTEX TO FILE
                 label = config.pointVertexLabel;
                 index = jPoint.get('vertexIndex');
@@ -117,7 +114,7 @@ for i = 1:nSteps
         if jNVisiblePoints > 3
             if isempty(jObject.get('vertexIndex'))
                 vertexCount = vertexCount + 1;
-                jObject.set('vertexIndex',vertexCount); %*Passed by reference - changes sensorObjects 
+                jObject.set('vertexIndex',vertexCount); %*Passed by reference - changes object
                 %WRITE VERTEX TO FILE
                 label = config.planeVertexLabel;
                 index = jObject.get('vertexIndex');

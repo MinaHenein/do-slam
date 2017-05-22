@@ -14,7 +14,7 @@ trajectory2 = StaticPoseTrajectory([1 2 3 0 0 pi/2]','R3xso3');
 trajectory3 = PositionModelPointTrajectory(waypoints,'R3','smoothingspline');
 trajectory4 = StaticPointTrajectory([5 5 5]','R3');
 trajectory5 = DiscretePoseTrajectory(trajectory1.get('R3xso3Pose',t),t);
-trajectory6 = DiscretePointTrajectory(5*rand(3,numel(t)),t);
+trajectory
 
 % getting and setting
 trajectory1.get('GP_Pose',1:0.1:1.5)
@@ -24,7 +24,6 @@ trajectory2.set('logSE3Pose',[0 0 1 0 pi/3 0]');
 trajectory3.get('R3Position',1:2)
 trajectory5.get('R3xso3Pose',[1 2 3])
 trajectory5.set('R',eye(3),1);
-trajectory6.set('R3Position',[1 2 3],1)
 trajectories = [trajectory1 trajectory2];
 trajectories.get('R3xso3Pose',3)
 
@@ -35,7 +34,6 @@ trajectory1.RelativeToAbsolutePose(trajectory2,2,'R3xso3Pose')
 trajectory3.AbsoluteToRelativePoint(trajectory2,1,'R3Position')
 trajectory5.AbsoluteToRelativePose(trajectory2,[1 2])
 trajectory5.RelativeToAbsolutePose(trajectory2,[1 2],'R3xso3Pose')
-trajectory4.AbsoluteToRelativePoint(trajectory1,[1 2 3],'R3Position')
 
 figure
 hold on
@@ -48,4 +46,3 @@ trajectory2.plot()
 trajectory3.plot(t)
 trajectory4.plot()
 trajectory5.plot(t)
-trajectory6.plot(t)
