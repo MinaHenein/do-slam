@@ -1,3 +1,8 @@
+%--------------------------------------------------------------------------
+% Author: Montiel Abello - montiel.abello@gmail.com - 23/05/17
+% Contributors:
+%--------------------------------------------------------------------------
+
 classdef EP_Default < EnvironmentPrimitive
     %EP_DEFAULT represents any geometric primitive formed from a set of
     %relative points

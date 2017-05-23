@@ -1,3 +1,8 @@
+%--------------------------------------------------------------------------
+% Author: Montiel Abello - montiel.abello@gmail.com - 23/05/17
+% Contributors:
+%--------------------------------------------------------------------------
+
 classdef Config < ArrayGetSet
     %CONFIG is used to store user settings
     %   Properties must be set with the 'set' method

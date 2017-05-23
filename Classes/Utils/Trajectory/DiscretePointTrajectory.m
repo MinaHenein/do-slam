@@ -1,3 +1,8 @@
+%--------------------------------------------------------------------------
+% Author: Montiel Abello - montiel.abello@gmail.com - 23/05/17
+% Contributors:
+%--------------------------------------------------------------------------
+
 classdef DiscretePointTrajectory < PointTrajectory
     %DISCRETEPOSETRAJECTORY is trajectory represented only by GP_Point
     %waypoints

@@ -1,3 +1,8 @@
+%--------------------------------------------------------------------------
+% Author: Montiel Abello - montiel.abello@gmail.com - 23/05/17
+% Contributors:
+%--------------------------------------------------------------------------
+
 classdef SimulatedEnvironmentSensor < Sensor
     %SimulatedEnvironmentSensor represents a sensor used to generate
     %measurements of a primitives and points in the Environment class
@@ -11,12 +16,24 @@ classdef SimulatedEnvironmentSensor < Sensor
     %    rectangles)
     %   -Measurements of these points are generated and stored in a graph
     %    file, along with a ground truth graph file
+    %
+    %   ***Building your own sensor:
+    %   1. Create subclass of SimulatedEnvironmentSensor
+    %   2. Write an addEnvironment method that converts environment to
+    %      objects you require 
+    %   3. Write generateMeasurements method that simulates measurements of
+    %      those objects and writes them to a graph file
     
     %% 1. Properties
     properties(GetAccess = 'protected', SetAccess = 'protected')
         points
         objects
         fieldOfView
+    end
+    
+    properties(Hidden)
+        pointVisibility
+        objectVisibility
     end
     
     properties(Dependent)

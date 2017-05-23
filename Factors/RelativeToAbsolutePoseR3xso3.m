@@ -1,3 +1,8 @@
+%--------------------------------------------------------------------------
+% Author: Montiel Abello - montiel.abello@gmail.com - 23/05/17
+% Contributors:
+%--------------------------------------------------------------------------
+
 function posesAbsolute = RelativeToAbsolutePoseR3xso3(posesOldFrame, posesRelative)
 %% converts poses from relative coords to absolute
 % inputs

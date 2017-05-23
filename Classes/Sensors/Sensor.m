@@ -1,3 +1,8 @@
+%--------------------------------------------------------------------------
+% Author: Montiel Abello - montiel.abello@gmail.com - 23/05/17
+% Contributors:
+%--------------------------------------------------------------------------
+
 classdef Sensor < ArrayGetSet & matlab.mixin.Heterogeneous
     %SENSOR is a base class to represent sensors in the environment
     %   It inherits from matlab.mixin.Heterogeneous which allows different

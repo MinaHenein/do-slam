@@ -1,4 +1,9 @@
-function posesRelative = AbsoluteToRelativePose(posesAbsolute,posesNewFrame)
+%--------------------------------------------------------------------------
+% Author: Montiel Abello - montiel.abello@gmail.com - 23/05/17
+% Contributors:
+%--------------------------------------------------------------------------
+
+function posesRelative = AbsoluteToRelativePoseSE3(posesAbsolute,posesNewFrame)
 %% converts poses from absolute coords to new reference frame
 % inputs
     %posesNewFrame = matrix of pose column vectors of new reference frame

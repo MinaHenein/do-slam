@@ -1,3 +1,8 @@
+%--------------------------------------------------------------------------
+% Author: Montiel Abello - montiel.abello@gmail.com - 23/05/17
+% Contributors:
+%--------------------------------------------------------------------------
+
 classdef StaticPointTrajectory < PointTrajectory
     %StaticPointTrajectory represents a static point trajectory
     %   This class essentially wraps a GP_Point object with the methods of

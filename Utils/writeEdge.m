@@ -1,3 +1,8 @@
+%--------------------------------------------------------------------------
+% Author: Montiel Abello - montiel.abello@gmail.com - 23/05/17
+% Contributors:
+%--------------------------------------------------------------------------
+
 function writeEdge(label,vIn,vOut,value,covariance,fileID)
 %WRITEEDGE writes edge to graph file
 

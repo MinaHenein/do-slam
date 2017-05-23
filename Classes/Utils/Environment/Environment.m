@@ -1,3 +1,8 @@
+%--------------------------------------------------------------------------
+% Author: Montiel Abello - montiel.abello@gmail.com - 23/05/17
+% Contributors:
+%--------------------------------------------------------------------------
+
 classdef Environment < ArrayGetSet
     %Environment class stores environment primitives and environment points
     %and has methods to construct and manipulate them

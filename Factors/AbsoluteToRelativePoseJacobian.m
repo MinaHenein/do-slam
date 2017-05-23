@@ -1,3 +1,8 @@
+%--------------------------------------------------------------------------
+% Author: Montiel Abello - montiel.abello@gmail.com - 23/05/17
+% Contributors:
+%--------------------------------------------------------------------------
+
 function [F1,F2] = AbsoluteToRelativePoseJacobian(config,pose1,pose2,poseRelative)
 % Jacobian of the AbsoluteToRelativePose Function
 

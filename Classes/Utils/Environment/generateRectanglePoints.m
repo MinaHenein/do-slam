@@ -1,3 +1,8 @@
+%--------------------------------------------------------------------------
+% Author: Montiel Abello - montiel.abello@gmail.com - 23/05/17
+% Contributors:
+%--------------------------------------------------------------------------
+
 function [positions] = generateRectanglePoints(sideLengths,nPoints,distribution)
 %GENERATERECTANGLEPOINTS generates points on rectangle
 %   rectangle lies in XY plane

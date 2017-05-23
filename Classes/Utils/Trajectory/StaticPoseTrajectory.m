@@ -1,3 +1,8 @@
+%--------------------------------------------------------------------------
+% Author: Montiel Abello - montiel.abello@gmail.com - 23/05/17
+% Contributors:
+%--------------------------------------------------------------------------
+
 classdef StaticPoseTrajectory < PoseTrajectory
     %StaticPoseTrajectory represents a static pose trajectory
     %   This class essentially wraps a GP_Pose object with the methods of

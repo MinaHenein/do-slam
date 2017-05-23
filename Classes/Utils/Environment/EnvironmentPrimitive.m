@@ -1,3 +1,8 @@
+%--------------------------------------------------------------------------
+% Author: Montiel Abello - montiel.abello@gmail.com - 23/05/17
+% Contributors:
+%--------------------------------------------------------------------------
+
 classdef EnvironmentPrimitive < ArrayGetSet & matlab.mixin.Heterogeneous
     %ENVIRONMENTPRIMITIVEALT represents a primitive in the environment
     %   This is a base class from which specific primitives inherit

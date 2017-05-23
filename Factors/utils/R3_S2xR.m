@@ -1,3 +1,8 @@
+%--------------------------------------------------------------------------
+% Author: Montiel Abello - montiel.abello@gmail.com - 23/05/17
+% Contributors:
+%--------------------------------------------------------------------------
+
 function [S2xRPosition] = R3_S2xR(R3Position)
 %R3_S2XR Converts from 3D cartesian coordinates to spherical coordinates
 %   Detailed explanation goes here

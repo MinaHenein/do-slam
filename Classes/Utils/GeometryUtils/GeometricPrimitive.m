@@ -1,3 +1,8 @@
+%--------------------------------------------------------------------------
+% Author: Montiel Abello - montiel.abello@gmail.com - 23/05/17
+% Contributors:
+%--------------------------------------------------------------------------
+
 classdef GeometricPrimitive < ArrayGetSet & matlab.mixin.Heterogeneous
     %GEOMETRICPRIMITIVE is a base class for representing geometrices
     %   GeometricPrimitive class has no properties or methods itself. It 

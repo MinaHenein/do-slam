@@ -1,3 +1,8 @@
+%--------------------------------------------------------------------------
+% Author: Montiel Abello - montiel.abello@gmail.com - 23/05/17
+% Contributors:
+%--------------------------------------------------------------------------
+
 classdef RelativePointTrajectory < PointTrajectory
     %RELATIVEPOINTTRAJECTORY Implements a point trajectory relative to
     %a pose trajectory

@@ -1,3 +1,8 @@
+%--------------------------------------------------------------------------
+% Author: Montiel Abello - montiel.abello@gmail.com - 23/05/17
+% Contributors:
+%--------------------------------------------------------------------------
+
 classdef Trajectory < ArrayGetSet & matlab.mixin.Heterogeneous
     %TRAJECTORY class represents trajectories of moving/stationary objects
     %   Trajectory class has no properties or methods itself. It inherits

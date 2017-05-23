@@ -1,3 +1,8 @@
+%--------------------------------------------------------------------------
+% Author: Montiel Abello - montiel.abello@gmail.com - 23/05/17
+% Contributors:
+%--------------------------------------------------------------------------
+
 classdef GEO_Plane < GeometricEntityObject
     %GEO_PLANE represents a geometric plane parameterised by normal
     %(perpendicular to origin) and distance (distance to origin)

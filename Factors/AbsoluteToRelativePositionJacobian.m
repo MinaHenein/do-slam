@@ -1,3 +1,8 @@
+%--------------------------------------------------------------------------
+% Author: Montiel Abello - montiel.abello@gmail.com - 23/05/17
+% Contributors:
+%--------------------------------------------------------------------------
+
 function [H1, H2] = AbsoluteToRelativePositionJacobian(config,poseAbsolute,positionAbsolute,positionRelative)
 % Jacobian of the AbsoluteToRelativePosition Function
 

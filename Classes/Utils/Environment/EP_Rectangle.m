@@ -1,3 +1,8 @@
+%--------------------------------------------------------------------------
+% Author: Montiel Abello - montiel.abello@gmail.com - 23/05/17
+% Contributors:
+%--------------------------------------------------------------------------
+
 classdef EP_Rectangle < EnvironmentPrimitive
     %EP_RECTANGLE Represents a rectangle primitive
     

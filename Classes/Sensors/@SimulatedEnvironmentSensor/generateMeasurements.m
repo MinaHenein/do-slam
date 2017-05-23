@@ -1,3 +1,8 @@
+%--------------------------------------------------------------------------
+% Author: Montiel Abello - montiel.abello@gmail.com - 23/05/17
+% Contributors:
+%--------------------------------------------------------------------------
+
 function generateMeasurements(self,config)
 %GENERATEMEASUREMENTS simulates measurements and creates ground truth and
 %measurements graph files
@@ -18,7 +23,8 @@ nSteps = numel(t);
 % indexing variables
 vertexCount         = 0;
 cameraVertexIndexes = zeros(1,nSteps);
-pointVisibility     = zeros(self.nPoints,nSteps);
+self.pointVisibility     = zeros(self.nPoints,nSteps);
+self.objectVisibility    = zeros(self.nObjects,nSteps);
 
 %% 2. Loop over timestep, simulate observations, write to graph file
 for i = 1:nSteps
@@ -68,7 +74,7 @@ for i = 1:nSteps
         jPoint = self.get('points',j);
         [jPointVisible,jPointRelative] = self.pointVisible(jPoint,t(i));
         if jPointVisible
-            pointVisibility(j,i) = 1;
+            self.pointVisibility(j,i) = 1;
             %check if point observed before
             if isempty(jPoint.get('vertexIndex'))
                 vertexCount = vertexCount + 1;
@@ -107,11 +113,14 @@ for i = 1:nSteps
     for j = 1:self.nObjects
         jObject = self.get('objects',j);
         jPointIndexes = jObject.get('pointIndexes');
-        jPointVisibility = logical(pointVisibility(jPointIndexes,i));
+        jPointVisibility = logical(self.pointVisibility(jPointIndexes,i));
         jNVisiblePoints  = sum(jPointVisibility);
         jVisiblePointIndexes = jPointIndexes(jPointVisibility);
         %check visibility
         if jNVisiblePoints > 3
+            %plane visible
+            self.objectVisibility(jObject.get('index'),i) = 1;
+            
             if isempty(jObject.get('vertexIndex'))
                 vertexCount = vertexCount + 1;
                 jObject.set('vertexIndex',vertexCount); %*Passed by reference - changes object
@@ -144,6 +153,9 @@ end
 fclose(gtFileID);
 fclose(mFileID);
 
+% clear visibility - not an intrinsic property of sensor - depends on t
+self.pointVisiblity   = [];
+self.objectVisibility = [];
 
 end
 

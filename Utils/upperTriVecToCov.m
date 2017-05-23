@@ -1,3 +1,8 @@
+%--------------------------------------------------------------------------
+% Author: Montiel Abello - montiel.abello@gmail.com - 23/05/17
+% Contributors:
+%--------------------------------------------------------------------------
+
 function [cov] = upperTriVecToCov(vec)
 %UPPERTRIVECTOCOV converts vector representation of upper triangle to
 %square covariance matrix

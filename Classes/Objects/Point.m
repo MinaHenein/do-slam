@@ -1,3 +1,8 @@
+%--------------------------------------------------------------------------
+% Author: Montiel Abello - montiel.abello@gmail.com - 23/05/17
+% Contributors:
+%--------------------------------------------------------------------------
+
 classdef Point < ArrayGetSet
     %POINT class instances are used by Sensor class instances to create a
     %representation of points in the environment.

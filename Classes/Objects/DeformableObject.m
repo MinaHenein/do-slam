@@ -1,3 +1,8 @@
+%--------------------------------------------------------------------------
+% Author: Montiel Abello - montiel.abello@gmail.com - 23/05/17
+% Contributors:
+%--------------------------------------------------------------------------
+
 classdef DeformableObject < Object
     %DEFORMABLEOBJECT class instances are used by Sensor class instances to 
     %create a representation of rigid body objects in the environment.

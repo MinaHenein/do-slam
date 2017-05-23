@@ -1,3 +1,8 @@
+%--------------------------------------------------------------------------
+% Author: Montiel Abello - montiel.abello@gmail.com - 23/05/17
+% Contributors:
+%--------------------------------------------------------------------------
+
 classdef GP_Point < GeometricPrimitive
     %GP_POINT represents a position in 3D space
     %   R3 & S2xR point parameterisations implemented

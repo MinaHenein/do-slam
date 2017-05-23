@@ -1,3 +1,8 @@
+%--------------------------------------------------------------------------
+% Author: Montiel Abello - montiel.abello@gmail.com - 23/05/17
+% Contributors:
+%--------------------------------------------------------------------------
+
 classdef PoseModelPoseTrajectory < PoseTrajectory
     %PoseModelPoseTrajectory class is not yet fully implemented. It is
     %intended as a PoseTrajectory subclass that is instantiated from 6D

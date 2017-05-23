@@ -1,3 +1,8 @@
+%--------------------------------------------------------------------------
+% Author: Montiel Abello - montiel.abello@gmail.com - 23/05/17
+% Contributors:
+%--------------------------------------------------------------------------
+
 classdef GP_Pose < GeometricPrimitive
     %GP_POSE represents 6D pose geometry
     %   R3xso3 pose parameterisation is stored

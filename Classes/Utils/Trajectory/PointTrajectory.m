@@ -1,3 +1,8 @@
+%--------------------------------------------------------------------------
+% Author: Montiel Abello - montiel.abello@gmail.com - 23/05/17
+% Contributors:
+%--------------------------------------------------------------------------
+
 classdef PointTrajectory < Trajectory
     %PointTrajectory represents 3D positions
     %   subclasses of PoseTrajectory are:

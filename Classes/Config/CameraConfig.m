@@ -1,3 +1,8 @@
+%--------------------------------------------------------------------------
+% Author: Montiel Abello - montiel.abello@gmail.com - 23/05/17
+% Contributors:
+%--------------------------------------------------------------------------
+
 classdef CameraConfig < Config
     %CAMERACONFIG is example of Config for specific application
     %   This subclass used to add properties specific to a certain

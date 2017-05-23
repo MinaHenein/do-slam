@@ -1,3 +1,8 @@
+%--------------------------------------------------------------------------
+% Author: Montiel Abello - montiel.abello@gmail.com - 23/05/17
+% Contributors:
+%--------------------------------------------------------------------------
+
 classdef Object < ArrayGetSet & matlab.mixin.Heterogeneous
     %BaseObject is a hetergeneous superclass for Object and Geometry classes
     %   This class allows Object and Geometry class & subclass instances to 

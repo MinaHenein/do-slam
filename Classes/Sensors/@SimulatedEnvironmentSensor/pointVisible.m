@@ -1,3 +1,8 @@
+%--------------------------------------------------------------------------
+% Author: Montiel Abello - montiel.abello@gmail.com - 23/05/17
+% Contributors:
+%--------------------------------------------------------------------------
+
 function [visibility,relativePoint] = pointVisible(self,point,t)
 %POINTVISIBLE determines if point is visible to SimulatedEnvironmentSensor
 %(self) @ time t based on camera fieldOfView

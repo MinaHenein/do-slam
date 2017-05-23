@@ -1,3 +1,8 @@
+%--------------------------------------------------------------------------
+% Author: Montiel Abello - montiel.abello@gmail.com - 23/05/17
+% Contributors:
+%--------------------------------------------------------------------------
+
 function posesRelative = AbsoluteToRelativePoseR3xso3(posesAbsolute,posesNewFrame)
 %% converts poses from absolute coords to new reference frame
 % inputs

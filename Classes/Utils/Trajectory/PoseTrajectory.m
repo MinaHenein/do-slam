@@ -1,3 +1,8 @@
+%--------------------------------------------------------------------------
+% Author: Montiel Abello - montiel.abello@gmail.com - 23/05/17
+% Contributors:
+%--------------------------------------------------------------------------
+
 classdef PoseTrajectory < Trajectory
     %PoseTrajectory represents 6D poses
     %   subclasses of PoseTrajectory are:

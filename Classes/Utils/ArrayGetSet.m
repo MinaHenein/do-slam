@@ -1,3 +1,8 @@
+%--------------------------------------------------------------------------
+% Author: Montiel Abello - montiel.abello@gmail.com - 23/05/17
+% Contributors:
+%--------------------------------------------------------------------------
+
 classdef ArrayGetSet < handle & matlab.mixin.Copyable
     %ARRAYGETSET implements get and set for object arrays
     %   All classes required get/set will inherit from ArrayGetSet

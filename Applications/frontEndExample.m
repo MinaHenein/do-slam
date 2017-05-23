@@ -1,5 +1,9 @@
-clear all 
+%--------------------------------------------------------------------------
+% Author: Montiel Abello - montiel.abello@gmail.com - 23/05/17
+% Contributors:
+%--------------------------------------------------------------------------
 
+clear all 
 % close all 
 
 %% 1. Config

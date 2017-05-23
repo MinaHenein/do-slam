@@ -1,3 +1,8 @@
+%--------------------------------------------------------------------------
+% Author: Montiel Abello - montiel.abello@gmail.com - 23/05/17
+% Contributors:
+%--------------------------------------------------------------------------
+
 classdef GeometricObject < Object
     %GEOMETRICOBJECT class instances are used by Sensor class instances to 
     %create a representation of geometric objects in the environment.

@@ -1,3 +1,8 @@
+%--------------------------------------------------------------------------
+% Author: Montiel Abello - montiel.abello@gmail.com - 23/05/17
+% Contributors:
+%--------------------------------------------------------------------------
+
 classdef PositionModelPoseTrajectory < PoseTrajectory
     %PositionModelPoseTrajectory represents a dynamic trajectory that is
     %instantiated from 3D position waypoints

@@ -1,3 +1,8 @@
+%--------------------------------------------------------------------------
+% Author: Montiel Abello - montiel.abello@gmail.com - 23/05/17
+% Contributors:
+%--------------------------------------------------------------------------
+
 classdef EnvironmentPoint < ArrayGetSet & matlab.mixin.Heterogeneous
     %EnvironmentPoint represents point in environment
     %   Environment points are typically initialised by creating points on

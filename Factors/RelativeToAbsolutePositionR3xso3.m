@@ -1,3 +1,8 @@
+%--------------------------------------------------------------------------
+% Author: Montiel Abello - montiel.abello@gmail.com - 23/05/17
+% Contributors:
+%--------------------------------------------------------------------------
+
 function positionsAbsolute = RelativeToAbsolutePositionR3xso3(posesOldFrame, positionsRelative)
 %% converts positions from absolute coords to new reference frame
 % inputs
