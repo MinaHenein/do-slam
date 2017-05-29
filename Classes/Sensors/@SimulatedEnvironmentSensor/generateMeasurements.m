@@ -154,8 +154,8 @@ fclose(gtFileID);
 fclose(mFileID);
 
 % clear visibility - not an intrinsic property of sensor - depends on t
-self.pointVisiblity   = [];
-self.objectVisibility = [];
+% self.pointVisiblity   = [];
+% self.objectVisibility = [];
 
 end
 

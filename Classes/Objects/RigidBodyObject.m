@@ -3,7 +3,7 @@
 % Contributors:
 %--------------------------------------------------------------------------
 
-classdef RigidBodyObject < Object
+classdef RigidBodyObject < SensorObject
     %RIGIDBODYOBJECT class instances are used by Sensor class instances to 
     %create a representation of rigid body objects in the environment.
     %   Rigid body objects have trajectory (ie a car) - will likely be

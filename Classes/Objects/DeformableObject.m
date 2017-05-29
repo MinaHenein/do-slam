@@ -3,7 +3,7 @@
 % Contributors:
 %--------------------------------------------------------------------------
 
-classdef DeformableObject < Object
+classdef DeformableObject < SensorObject
     %DEFORMABLEOBJECT class instances are used by Sensor class instances to 
     %create a representation of rigid body objects in the environment.
     %   Deformable objects have trajectory (ie a person) - will likely be

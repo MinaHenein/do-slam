@@ -31,7 +31,7 @@ classdef SimulatedEnvironmentSensor < Sensor
         fieldOfView
     end
     
-    properties(Hidden)
+    properties(GetAccess='public', SetAccess='public')
         pointVisibility
         objectVisibility
     end
@@ -99,7 +99,7 @@ classdef SimulatedEnvironmentSensor < Sensor
             end
             
             %loop over environmentPrimitives, create objects
-            objects(environment.nEnvironmentPrimitives) = Object();
+            objects(environment.nEnvironmentPrimitives) = SensorObject();
             for i = 1:environment.nEnvironmentPrimitives
                 switch class(environment.get('environmentPrimitives',i))
                     case 'EP_Rectangle'

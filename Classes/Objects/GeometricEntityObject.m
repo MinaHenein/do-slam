@@ -3,7 +3,7 @@
 % Contributors:
 %--------------------------------------------------------------------------
 
-classdef GeometricEntityObject < Object
+classdef GeometricEntityObject < SensorObject
     %GEOMETRICENTITY class instances are used by Sensor class instances to 
     %create a representation of geometric entities in the environment.
     %   Geometric entities are represented by a mathematical function ie
