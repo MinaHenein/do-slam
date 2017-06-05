@@ -1,16 +1,13 @@
+%--------------------------------------------------------------------------
+% Author: Yash Vyas - yjvyas@gmail.com - 30/05/17
+% Contributors:
+%--------------------------------------------------------------------------
+
 classdef SimulatedEnvironmentOcclusionSensor < SimulatedEnvironmentSensor
-    %SimulatedEnvironmentSensor represents a sensor used to generate
-    %measurements of a primitives and points in the Environment class
-    %   -SimulatedEnvironmentSensor converts the environment primitives and
-    %    environment points to objects and points
-    %   -This intermediate object representation allows more freedom in the
-    %    kinds of observations and constraints which can be generated from
-    %    environment primitives and points
-    %   -ie different SimulatedEnvironmentSensor subclasses can rerepresent
-    %    the same Environment class in different ways (ie planes vs
-    %    rectangles)
-    %   -Measurements of these points are generated and stored in a graph
-    %    file, along with a ground truth graph file.
+    %SimulatedEnvironmentOcclusionSensor is an adaptation of
+    %SimulatedEnvironment Sensor with occlusion. It does this by using mesh
+    %property of rigid bodies to set visibility for point observations.
+    %For the full documentation, see SimulatedEnvironmentSensor.
     
     %% 1. Properties
     properties
@@ -24,11 +21,11 @@ classdef SimulatedEnvironmentOcclusionSensor < SimulatedEnvironmentSensor
     
     %Declare external methods
     methods(Access = public)
-        % point visibility
-        [visibility,relativePoint] = pointOcclusion(self,point,t)
-        % Measurements
-        generateMeasurements(self,config)
-        
+        % point visibility with occlusion
+        [visibility,relativePoint] = pointVisible(self,point,t)
+        % generate measurements with occlusion
+        generateMeasurementsOcclusion(self,config)
+        meshes = generateMeshes(self,t)
     end
     
 end

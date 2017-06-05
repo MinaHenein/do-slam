@@ -31,7 +31,7 @@ classdef SimulatedEnvironmentSensor < Sensor
         fieldOfView
     end
     
-    properties(GetAccess='public', SetAccess='public')
+    properties(GetAccess='protected', SetAccess='protected')
         pointVisibility
         objectVisibility
     end
@@ -104,6 +104,10 @@ classdef SimulatedEnvironmentSensor < Sensor
                 switch class(environment.get('environmentPrimitives',i))
                     case 'EP_Rectangle'
                         objects(i) = GEO_Plane(environment.get('environmentPrimitives',i));
+                    case 'EP_default'
+                        objects(i) = RigidBodyObject();
+                        objects(i).RBOfromEP(environment.get('environmentPrimitives',i)); % runs special internal function for rigid body
+                        % that creates from Environment Primitives
                     otherwise
                         error('Error: object conversion for %s not yet implemented',class(environment.get('environmentPrimitives',i)))
                 end

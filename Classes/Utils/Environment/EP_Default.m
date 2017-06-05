@@ -10,6 +10,7 @@ classdef EP_Default < EnvironmentPrimitive
     
     %% 1. Properties
     properties(GetAccess = 'protected', SetAccess = 'protected')
+        mesh
     end
     
     %% 2. Methods 
