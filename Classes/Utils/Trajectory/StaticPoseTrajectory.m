@@ -24,7 +24,7 @@ classdef StaticPoseTrajectory < PoseTrajectory
             switch nargin
                 case 0 %allow preallocation
                 otherwise
-                    if isa(pose,'GP_Pose')
+                    if ~isa(pose,'GP_Pose')
                         pose = GP_Pose(pose,varargin{:});
                     end
                     self.GP_Pose = pose;
