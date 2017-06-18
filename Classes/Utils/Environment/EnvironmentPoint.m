@@ -1,6 +1,6 @@
 %--------------------------------------------------------------------------
 % Author: Montiel Abello - montiel.abello@gmail.com - 23/05/17
-% Contributors:
+% Contributors: Yash Vyas - yjvyas@gmail.com - 15/06/17
 %--------------------------------------------------------------------------
 
 classdef EnvironmentPoint < ArrayGetSet & matlab.mixin.Heterogeneous

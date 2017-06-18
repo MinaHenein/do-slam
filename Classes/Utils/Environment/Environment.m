@@ -1,6 +1,6 @@
 %--------------------------------------------------------------------------
 % Author: Montiel Abello - montiel.abello@gmail.com - 23/05/17
-% Contributors:
+% Contributors: Yash Vyas - yjvyas@gmail.com - 16/06/17
 %--------------------------------------------------------------------------
 
 classdef Environment < ArrayGetSet
@@ -121,7 +121,32 @@ classdef Environment < ArrayGetSet
             
         end
        
+        
+        function self = addEllipsoid(self,radii,N,parameterisation,trajectory)
+            % create relative points
+            [positions, links] = generateEllipsoidPoints(radii,N);
+            nPositions = size(positions,2);
+            points = positions(:,randsample(nPositions,floor(nPositions/5)));
+            nPoints = size(points,2);
+            
+            %initialise points
+            ellipsoidPoints(nPoints) = EnvironmentPoint();
+            for i=1:nPoints
+                iRelativePoint = GP_Point(points(:,i),parameterisation);
+                ellipsoidPoints(i).set('trajectory',RelativePointTrajectory(trajectory,iRelativePoint));
+            end
+            
+            %initialise EP_Default primitive
+            ellipsoidPrimitive = EP_Default();
+            ellipsoidPrimitive.set('trajectory',trajectory);
+            ellipsoidPrimitive.set('meshPoints',positions);
+            ellipsoidPrimitive.set('meshLinks',links);
+            
+            %pair primitive and points
+            self.addPrimitiveAndPoints(ellipsoidPrimitive,ellipsoidPoints);
+        end
     end
+    
     
     % Add primitive & points
     %   adds primitive and points to environment
@@ -186,23 +211,27 @@ classdef Environment < ArrayGetSet
                 nPoints     = numel(dynamicPointIndexes);
                 nPrimitives = numel(dynamicPrimitiveIndexes);
                 %get point positions
-                positions = zeros(3,nPoints);
-                for j = 1:nPoints
-                    positions(:,j) = self.environmentPoints(dynamicPointIndexes(j)).get('R3Position',t(i));
-                end
+                positions = self.environmentPoints(dynamicPointIndexes).get('R3Position',t(i));
                 %plot positions
                 h1 = plot3(positions(1,:),positions(2,:),positions(3,:),'k.');
                 %plot primitives
-%                 for j = 1:dynamicPrimitiveIndexes
-%                     h2{j} = self.environmentPrimitives(dynamicPrimitiveIndexes(i)).plot()
-%                 end
+                h2 = {};
+                for p = 1:dynamicPrimitiveIndexes
+                    if isa(self.get('environmentPrimitives',p),'EP_Default')
+                        meshPoints = self.get('environmentPrimitives',p).get('meshPointsAbsolute',t(i));
+                        meshLinks = self.get('environmentPrimitives',p).get('meshLinks');
+                        h2{end+1} = trimesh(meshLinks,meshPoints(1,:)',meshPoints(2,:)',meshPoints(3,:)','edgecolor','y');                
+                    end
+                end
 
                 %draw current timestep, delete
                 drawnow
                 pause(0)
                 if i < nSteps
                     delete(h1)
-%                     delete(h2)
+                    for p=1:numel(h2)
+                        delete(h2{p})
+                    end
                 end
             end
         end

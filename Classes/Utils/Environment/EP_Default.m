@@ -1,6 +1,7 @@
 %--------------------------------------------------------------------------
-% Author: Montiel Abello - montiel.abello@gmail.com - 23/05/17
-% Contributors:
+% Author: Montiel Abello - montiel.abello@gmail.com - 23/05/17 
+%         Yash Vyas - yjvyas@gmail.com - 02/06/17
+% Contributors: 
 %--------------------------------------------------------------------------
 
 classdef EP_Default < EnvironmentPrimitive
@@ -10,10 +11,12 @@ classdef EP_Default < EnvironmentPrimitive
     
     %% 1. Properties
     properties(GetAccess = 'protected', SetAccess = 'protected')
-        mesh
+        meshPoints % points representing the mesh
+        meshLinks % set of triangle links between meshPoints representing the triangulation
     end
     
-    %% 2. Methods 
+    %% 2. Methods   
+    % constructor
     methods(Access = public)
         function self = EP_Default()
         end
@@ -27,6 +30,23 @@ classdef EP_Default < EnvironmentPrimitive
                     out = self.trajectory.get(property,varargin{1});
                 case 'static'
                     out = self.trajectory.get(property);
+                case 'meshPointsAbsolute'
+                    t = varargin{1};
+                    objectPose = self.get('GP_Pose',t).get('R3xso3Pose');
+                    points = self.meshPoints;
+                    for p=1:size(points,2)
+                        points(:,p) = RelativeToAbsolutePositionR3xso3(objectPose,points(:,p));
+                    end
+                    out = points;                    
+                case 'meshRelative'
+                    points = self.meshPoints;
+                    links = self.meshLinks;
+                    out = [points(:,links(:,1))' points(:,links(:,2))' points(:,links(:,3))'];
+                case 'meshAbsolute'
+                    t = varargin{1};
+                    points = self.get('meshPointsAbsolute',t);
+                    links = self.meshLinks;
+                    out = [points(:,links(:,1))' points(:,links(:,2))' points(:,links(:,3))'];
                 otherwise
                     out = self.(property);
             end
