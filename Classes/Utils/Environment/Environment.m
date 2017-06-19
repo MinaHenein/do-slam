@@ -168,10 +168,7 @@ classdef Environment < ArrayGetSet
             nPoints     = numel(staticPointIndexes);
             nPrimitives = numel(staticPrimitiveIndexes);
             %get point positions
-            positions = zeros(3,nPoints);
-            for i = 1:nPoints
-                positions(:,i) = self.environmentPoints(staticPointIndexes(i)).get('R3Position',0);
-            end
+            positions = self.environmentPoints(staticPointIndexes).get('R3Position',0);
             %plot positions
             plot3(positions(1,:),positions(2,:),positions(3,:),'k.')
             %plot primitives
@@ -179,6 +176,7 @@ classdef Environment < ArrayGetSet
 %                 self.environmentPrimitives(staticPrimitiveIndexes(i)).plot()
 %             end
         end
+
         % plot dynamic features of environment over time steps t
         function plotDynamic(self,dynamicPointIndexes,dynamicPrimitiveIndexes,t)
             nSteps = numel(t);
