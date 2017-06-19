@@ -19,12 +19,7 @@ classdef RigidBodyObject < SensorObject
     methods
         function self = RBOfromEP(self, EP_default)
             % creates Rigid Body Object from EP
-            mesh = EP_default.get('mesh');
-            if size(mesh,2)==9
-                self.set('mesh', mesh);
-            else
-                error('Mesh input incorrect.')
-            end
+            mesh = EP_default.get('meshRelative');
             self.set('trajectory', EP_default.get('trajectory'));
             self.set('index', EP_default.get('index'));
             self.set('pointIndexes', EP_default.get('pointIndexes'));

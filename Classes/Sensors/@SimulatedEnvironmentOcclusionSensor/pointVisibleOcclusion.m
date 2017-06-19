@@ -1,7 +1,6 @@
 %--------------------------------------------------------------------------
-% Author: Montiel Abello - montiel.abello@gmail.com - 23/05/17, Yash Vyas -
-% yjvyas@gmail.com
-% Contributors:
+% Author: Yash Vyas - yjvyas@gmail.com - 02/06/17
+% Contributors: Montiel Abello - montiel.abello@gmail.com - 23/05/17
 %--------------------------------------------------------------------------
 
 function [visibility,relativePoint] = pointVisibleOcclusion(self,point,meshes,t)
