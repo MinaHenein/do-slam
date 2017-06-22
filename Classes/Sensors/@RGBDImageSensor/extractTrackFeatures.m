@@ -1,4 +1,9 @@
-function extractTrackFeatures(self,config,firstFrame, increment, lastFrame, method)
+function extractTrackFeatures(self,config,firstFrame,increment,lastFrame,method)
+
+%--------------------------------------------------------------------------
+% Author: Mina Hnenein - mina.henein@anu.edu.au - 20/06/17
+% Contributors:
+%--------------------------------------------------------------------------
 
 % In the case of No GT data available:
 %   - detects SIFT/SURF/FAST features in one frame,
@@ -17,22 +22,26 @@ function extractTrackFeatures(self,config,firstFrame, increment, lastFrame, meth
 % number of features per frame
 
 % 0- set paths for images and depth images
-filePath = strcat(config.folderPath,config.sep,config.imagesFolderName);
+rgbFilePath = strcat(config.folderPath,config.sep,config.rgbImagesFolderName);
 depthFilePath = strcat(config.folderPath,config.sep,config.depthImagesFolderName);
-gtFilePath = strcat(config.gtFolderPath,config.sep,config.groundTruthFileName);
+gtFilePath = strcat(config.folderPath,config.sep,config.graphFileFolderName,...
+    config.sep,config.groundTruthFileName);
 gtFileID = fopen(gtFilePath);
-fileName = config.imageName;
+rgbFileName = config.rgbImageName;
+[rgbFileNameFormat,rgbFileNameExtension] = getFileNameFormatAndExtension(rgbFileName);
+depthFileName = config.depthImageName;
+[depthFileNameFormat,depthFileNameExtension] = getFileNameFormatAndExtension(depthFileName);
 
 % 1- set parameters
 % sift realted parameters
-% sift threshold
+    % sift threshold
 siftThreshold = 0.03;
-% match threshold
+    % match threshold
 minMatchScore = 0.8;
 % random feature extraction related parameters
-% number of steps in image height
+    % number of steps in image height
 nStepsH = 4;
-% number of steps in image width
+    % number of steps in image width
 nStepsW = 4;
 % number of frames forward to look for each feature
 nFrames = 5;
@@ -40,8 +49,6 @@ nFrames = 5;
 desiredPointsPerFrame = 60;
 % disp progress
 print = 0;
-
-KCam = self.K;
 
 % 2- intialise
 features = [];
@@ -51,16 +58,38 @@ uniqueValid3DPointsCameras=[];
 featureCount = 0;
 pointCount = 0;
 framePoints = zeros((lastFrame-(firstFrame-increment))/increment,1);
+KCam = self.K;
 
-% 4- extract features
+% 3- Check if data is synchronized, and synchorinze if neccessary
+synchronizedData = config.synchronizedData;
+if ~synchronizedData
+syncedData = synchronise(config);
+end
+
+% 4- get loop closures
+loopClosureFrames = detectLoopClosures(firstFrame,increment,lastFrame,...
+            config,syncedData,gtFilePath);
+
+% 5- extract features
 for i=firstFrame:increment:lastFrame
     if(print)
         disp(strcat('Extracting features from frame : ', num2str(i))) ;
     end
     % extract features from frame i
-    I = imread(strcat(filePath,'/',fileName,num2str(i),'.png'));
-    depth = reshape(load(strcat(depthFilePath,'/',fileName,num2str(i),'.depth')),640,480)';
-    
+    if ~isempty(syncedData)
+        rgbInSyncedData = length(depthFileNameFormat)+2:length(rgbFileNameFormat)-1;
+        rgbFile = strcat(syncedData(i,rgbInSyncedData),rgbFileNameExtension);
+        I = imread(strcat(rgbFilePath,'/',rgbFile));
+        % get depth file
+        depthInSyncedData = 1:length(depthFileNameFormat);
+        depthFile= strcat(syncedData(i,depthInSyncedData),depthFileNameExtension);
+        depth = reshape(imread(strcat(depthFilePath,'/',depthFile)),640, 480)';
+        depth = double(depth);
+    else
+        I = imread(strcat(rgbFilePath,'/',rgbFileName,num2str(i),rgbFileNameExtension));
+        depth = reshape(load(strcat(depthFilePath,'/',depthFileName,num2str(i),...
+            depthFileNameExtension)),640,480)';
+    end
     [imgH,imgW,~] = size(I);
     
     switch method
@@ -103,7 +132,17 @@ for i=firstFrame:increment:lastFrame
                     idx2 = randperm(nPts);
                     for l=1:nPts
                         featureCount = featureCount+1;
-                        features(featureCount,:) = [i,idx2(l)+k,idx1(l)+j];
+                        % check that feature is within image quadrant
+                        if (idx2(l)+k < k+stepW && idx1(l)+j < j+stepH)
+                            features(featureCount,:) = [i,idx2(l)+k,idx1(l)+j];
+                        elseif (idx2(l)+k < k+stepW && idx1(l)+j > j+stepH)
+                            features(featureCount,:) = [i,idx2(l)+k,min(j+stepH,imgH)];
+                        elseif (idx2(l)+k > k+stepW && idx1(l)+j < j+stepH)
+                            features(featureCount,:) = [i,min(k+stepW,imgW),idx1(l)+j];
+                        else
+                            features(featureCount,:) = [i,min(k+stepW,imgW),...
+                                min(j+stepH,imgH)];
+                        end
                     end
                 end
             end
@@ -112,32 +151,34 @@ for i=firstFrame:increment:lastFrame
             framePoints((i-(firstFrame-increment))/increment,1) = nFeatures;
     end
     
-    % 5- project extracted features forward
+    % 6- project extracted features forward
     for j=1:nFeatures
         if(print && j==1)
             X = strcat('Projecting features extracted from frame ', num2str(i),' to 3D points');
             disp(X);
         end
-        % 5.1- get 3D point
+        % 6.1- get 3D point
         pt = [features(frameFeatures(j),2);features(frameFeatures(j),3);1];
-        eta = (KCam \ pt);
-        eta = eta/norm(eta);
         PCamera = KCam \ pt;
-        zCamera = depth(round(features(frameFeatures(j),3)), round(features(frameFeatures(j),2)))*eta(3);
-        % reject points in a field of view greater than 1 km in distance
-        if (depth(round(features(frameFeatures(j),3)), round(features(frameFeatures(j),2))) > 1000)
-            continue
+        zCamera = depth(round(features(frameFeatures(j),3)),...
+            round(features(frameFeatures(j),2)))/1000;
+        if ~isempty(syncedData)
+            gtInSyncedData = length(depthFileNameFormat)+length(rgbFileNameFormat)+3;
+            lineScan = textscan(gtFileID,'%s',1,'delimiter','\n','headerlines',...
+                str2double(syncedData(i,gtInSyncedData:end))-1);
+        else
+            lineScan = textscan(gtFileID,'%s',1,'delimiter','\n','headerlines', i-1);
         end
-        lineScan = textscan(gtFileID, '%s', 1, 'delimiter', '\n', 'headerlines', i-1);
         cameraIDPose = str2num(cell2mat(strsplit(cell2mat(lineScan{1,1}),'')));
         fclose(gtFileID);
         cameraPose = cameraIDPose(2:end);
         cameraTranslation = cameraPose(1:3)';
-        cameraRotation = quaternion2Axis([cameraPose(4);cameraPose(5);cameraPose(6);cameraPose(7)]);
+        cameraRotation = quaternion2Axis([cameraPose(4);cameraPose(5);cameraPose(6);...
+            cameraPose(7)]);
         cameraToWorld = [rot(cameraRotation), cameraTranslation; 0 0 0 1];
         PCamera = PCamera*zCamera;
         PWorld = cameraToWorld * [PCamera; 1];
-        rgb = double(I(round(features(frameFeatures(j),3)), round(features(frameFeatures(j),2)),:));
+        rgb = double(I(round(features(frameFeatures(j),3)),round(features(frameFeatures(j),2)),:));
         % Add all 3D Points of features extracted from 1st frame
         if(isempty(uniqueValid3DPoints)) 
             pointCount = pointCount+1;
@@ -145,8 +186,10 @@ for i=firstFrame:increment:lastFrame
             uniqueValid3DPointsWeights(pointCount,1) = 1;
             uniqueValid3DPointsCameras{pointCount,end+1} = i;
         else
-            distances = sqrt(bsxfun(@plus,bsxfun(@plus,(uniqueValid3DPoints(:,1).'-PWorld(1,1)).^2,...
-                (uniqueValid3DPoints(:,2).'-PWorld(2,1)).^2),(uniqueValid3DPoints(:,3).'-PWorld(3,1)).^2))';
+            distances = sqrt(bsxfun(@plus,bsxfun(@plus,...
+                (uniqueValid3DPoints(:,1).'-PWorld(1,1)).^2,...
+                (uniqueValid3DPoints(:,2).'-PWorld(2,1)).^2),...
+                (uniqueValid3DPoints(:,3).'-PWorld(3,1)).^2))';
             [index,~] = find(distances==min(distances));
             if(norm(PWorld(1:3,1)' - uniqueValid3DPoints(index,1:3))<0.1)
                 uniqueValid3DPointsWeights(index,1) = uniqueValid3DPointsWeights(index,1)+1;
@@ -159,7 +202,7 @@ for i=firstFrame:increment:lastFrame
             end
         end
         
-        % 5.2- project forward in N-next frames (nFrames) to get pixel coordinate
+        % 6.2- project forward in N-next frames (nFrames) to get pixel coordinate
         % get next camera pose
         if(print && j==1)
             X = strcat('Projecting 3D Points got from features extracted from frame ', num2str(i),' into next frame pixels');
@@ -169,29 +212,51 @@ for i=firstFrame:increment:lastFrame
         start = i;
         [framePoints,uniqueValid3DPointsWeights,featureCount,...
             features,uniqueValid3DPointsCameras] = projectForward(start,n,framePoints,...
-            firstFrame,increment,desiredPointsPerFrame,depthFilePath,KCam,PWorld,uniqueValid3DPoints,...
-            uniqueValid3DPointsWeights,featureCount,features,uniqueValid3DPointsCameras);
-        
-        
+            firstFrame,increment,desiredPointsPerFrame,depthFilePath,K_Cam,PWorld,...
+            uniqueValid3DPoints,uniqueValid3DPointsWeights,featureCount,features,...
+            uniqueValid3DPointsCameras,syncedData,gtFilePath);
+                
         % 6- Loop Closures - detect pairs of frames that close the loop
         % for each 2 frames that close the loop, project forward and backward for
         % 2*nFrames in each direction (i.e start from loopClosureFrame-2*nFrames and
         % project forward for 4*nFrames frames)
-        loopClosureFrames = detectLoopClosures(firstFrame,increment,lastFrame);
-        
         k = find(loopClosureFrames(:,1)==i,1);
         if (~isempty(k))
             [framePoints,uniqueValid3DPointsWeights,featureCount,...
-                features,uniqueValid3DPointsCameras] = projectForward(loopClosureFrames(k,2)-2*n,4*n,framePoints,...
-                firstFrame,increment,desiredPointsPerFrame,depthFilePath,K_Cam,PWorld,uniqueValid3DPoints,...
-                uniqueValid3DPointsWeights,featureCount,features,uniqueValid3DPointsCameras);
+                features,uniqueValid3DPointsCameras] = ...
+                projectForward(loopClosureFrames(k,2)-2*n,4*n,framePoints,...
+                firstFrame,increment,desiredPointsPerFrame,depthFilePath,K_Cam,PWorld,...
+                uniqueValid3DPoints,uniqueValid3DPointsWeights,featureCount,features,...
+                uniqueValid3DPointsCameras,syncedData,gtFilePath);
         end
-        
+    end
+end
+
+unique3DPoints = [];
+unique3DPointsCameras = [];
+
+for k = 1:size(uniqueValid3DPoints,1)
+    weight = uniqueValid3DPointsWeights(k,1);
+    if weight < 3
+        uniqueValid3DPoints(k,:) = [];
+        uniqueValid3DPointsCameras(k,:) = [];
+        continue
+    end
+    PWorld = uniqueValid3DPoints(k,:);
+    if(isempty(unique3DPoints))
+        unique3DPoints = [unique3DPoints; PWorld];
+    elseif (sum(unique3DPoints(:,1)==PWorld(1,1) &...
+            unique3DPoints(:,2)==PWorld(1,2) &...
+            unique3DPoints(:,3)==PWorld(1,3))==0)
+        unique3DPoints = [unique3DPoints; PWorld];
+        unique3DPointsCameras{size(unique3DPoints,1),:} = uniqueValid3DPointsCameras(k,:) ;
     end
 end
 
 if print
     disp('Features Extraction & Tracking: -- Done --');
 end
+
+
 
 end

@@ -11,14 +11,11 @@ classdef RGBDImageSensor < Sensor
     %   -This intermediate object representation allows more freedom in the
     %    kinds of observations and constraints which can be generated from
     %    environment primitives and points
-    %   -ie different SimulatedEnvironmentSensor subclasses can rerepresent
-    %    the same Environment class in different ways (ie planes vs
-    %    rectangles)
     %   -Measurements of these points are generated and stored in a graph
     %    file.
     %
     %   ***Building your own sensor:
-    %   1. Create subclass of SimulatedEnvironmentSensor
+    %   1. Create subclass of Sensor
     %   2. Write an addEnvironment method that converts environment to
     %      objects you require 
     %   3. Write generateMeasurements method that simulates measurements of
@@ -116,19 +113,19 @@ classdef RGBDImageSensor < Sensor
     
     % Add camera
     methods(Access = public)
-        function self = addCamera(self,fieldOfView,trajectory)
-            self.fieldOfView = fieldOfView;
+        function self = addCamera(self,trajectory)
             self.trajectory  = trajectory;
         end
     end
     
     %Declare external methods
     methods(Access = public)
-        % point visibility
-        [visibility,relativePoint] = pointVisible(self,point,t)
+        % Data Synchronization
+        syncedData = synchronise(self,config)
+        % Feature Extraction & Tracking
+        extractTrackFeatures(self,config,firstFrame,increment,lastFrame,method)        
         % Measurements
         generateMeasurements(self,config)
-        
     end
     
 end
