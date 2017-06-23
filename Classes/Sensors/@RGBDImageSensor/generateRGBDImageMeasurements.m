@@ -3,7 +3,7 @@
 % Contributors:
 %--------------------------------------------------------------------------
 
-function generateMeasurements(self,config)
+function generateRGBDImageMeasurements(self,config,unique3DPointsCameras)
 %GENERATEMEASUREMENTS simulates measurements and creates ground truth and
 %measurements graph files
 
@@ -17,6 +17,7 @@ gtFileID = fopen(strcat(config.folderPath,config.sep,'GraphFiles',...
                  config.sep,config.graphFileFolderName,config.sep,config.groundTruthFileName),'w');
 mFileID  = fopen(strcat(config.folderPath,config.sep,'GraphFiles',...
                  config.sep,config.graphFileFolderName,config.sep,config.measurementsFileName),'w');
+
 t      = config.t;
 nSteps = numel(t);
 
@@ -72,7 +73,9 @@ for i = 1:nSteps
     %point observations
     for j = 1:self.nPoints
         jPoint = self.get('points',j);
-        [jPointVisible,jPointRelative] = self.pointVisible(jPoint,t(i));
+        jPointVisible = any(cell2mat(unique3DPointsCamera(j))==i);
+        jPointRelative = point.get('trajectory').AbsoluteToRelativePoint(self.get('trajectory'),t);
+
         if jPointVisible
             self.pointVisibility(j,i) = 1;
             %check if point observed before
@@ -152,10 +155,5 @@ end
 
 fclose(gtFileID);
 fclose(mFileID);
-
-% clear visibility - not an intrinsic property of sensor - depends on t
-% self.pointVisiblity   = [];
-% self.objectVisibility = [];
-
 end
 

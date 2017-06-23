@@ -121,11 +121,12 @@ classdef RGBDImageSensor < Sensor
     %Declare external methods
     methods(Access = public)
         % Data Synchronization
-        syncedData = synchronise(self,config)
+        syncedData = synchroniseData(self,config)
         % Feature Extraction & Tracking
-        extractTrackFeatures(self,config,firstFrame,increment,lastFrame,method)        
+         [unique3DPoints,unique3DPointsCameras] = ...
+             extractTrackFeatures(self,config,firstFrame,increment,lastFrame,method)        
         % Measurements
-        generateMeasurements(self,config)
+        generateRGBDImageMeasurements(self,config,unique3DPoints,unique3DPointsCameras)
     end
     
 end

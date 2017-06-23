@@ -1,4 +1,4 @@
-function syncedData = synchronise(~,config)
+function syncedData = synchroniseData(~,config)
 
 %--------------------------------------------------------------------------
 % Author: Mina Hnenein - mina.henein@anu.edu.au - 20/06/17
@@ -54,16 +54,8 @@ for k=1:3
     tline = fgetl(fid);
     line = line+1;
 end
-switch config.poseRotationRepresentation
-    case 'quaternion'
-        timeStampedCameraPoseFormat = '%f %f %f %f %f %f %f %f';
-    case {'axis-angle','euler angles'}
-        timeStampedCameraPoseFormat = '%f %f %f %f %f %f %f';
-    case 'rotation matrix'
-        timeStampedCameraPoseFormat = '%f %f %f %f %f %f %f %f %f %f %f %f %f';
-    otherwise 
-        error('Undefined camera pose rotation representation')
-end
+
+timeStampedCameraPoseFormat = getGTDataFormat(config);
 
 while (~feof(fid))
    tline = fgetl(fid);

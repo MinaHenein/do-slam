@@ -1,4 +1,5 @@
-function extractTrackFeatures(self,config,firstFrame,increment,lastFrame,method)
+function [unique3DPoints,unique3DPointsCameras] = ...
+    extractTrackFeatures(self,config,firstFrame,increment,lastFrame,method)
 
 %--------------------------------------------------------------------------
 % Author: Mina Hnenein - mina.henein@anu.edu.au - 20/06/17
@@ -238,25 +239,29 @@ unique3DPointsCameras = [];
 for k = 1:size(uniqueValid3DPoints,1)
     weight = uniqueValid3DPointsWeights(k,1);
     if weight < 3
-        uniqueValid3DPoints(k,:) = [];
-        uniqueValid3DPointsCameras(k,:) = [];
         continue
     end
+    allCameras = uniqueValid3DPointsCameras(k,:);
+    allCameras = allCameras(~cellfun('isempty',allCameras)); 
+    allCamerasUnique = unique(cell2mat(allCameras));
     PWorld = uniqueValid3DPoints(k,:);
     if(isempty(unique3DPoints))
         unique3DPoints = [unique3DPoints; PWorld];
+        for i = 1:size(allCamerasUnique,2)
+           unique3DPointsCameras{size(unique3DPoints,1),i} =  allCamerasUnique(1,i); 
+        end
     elseif (sum(unique3DPoints(:,1)==PWorld(1,1) &...
             unique3DPoints(:,2)==PWorld(1,2) &...
             unique3DPoints(:,3)==PWorld(1,3))==0)
         unique3DPoints = [unique3DPoints; PWorld];
-        unique3DPointsCameras{size(unique3DPoints,1),:} = uniqueValid3DPointsCameras(k,:) ;
+        for i = 1:size(allCamerasUnique,2)
+           unique3DPointsCameras{size(unique3DPoints,1),i} =  allCamerasUnique(1,i); 
+        end
     end
 end
 
 if print
     disp('Features Extraction & Tracking: -- Done --');
 end
-
-
 
 end

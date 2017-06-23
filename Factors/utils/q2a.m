@@ -1,4 +1,4 @@
-function axis=quaternion2Axis(q)
+function axis=q2a(q)
 
 theta=2*acos(q(1));
 
