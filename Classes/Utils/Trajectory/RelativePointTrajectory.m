@@ -40,6 +40,12 @@ classdef RelativePointTrajectory < PointTrajectory
                     value         = pose.get(property);
                 case 'static'
                     value = self.referenceTrajectory.get('static');
+                case 'relativePoint'
+                    value = self.relativePoint;
+                case 'relativeR3Position'
+                    value = self.relativePoint.get('R3Position');
+                case 'referenceTrajectory'
+                    value = self.referenceTrajectory;
                 otherwise 
                     error('Error: invalid property')
             end

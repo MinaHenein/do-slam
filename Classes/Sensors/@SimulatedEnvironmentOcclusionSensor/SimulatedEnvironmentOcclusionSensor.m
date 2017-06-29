@@ -22,7 +22,7 @@ classdef SimulatedEnvironmentOcclusionSensor < SimulatedEnvironmentSensor
     %Declare external methods
     methods(Access = public)
         % point visibility with occlusion
-        [visibility,relativePoint] = pointVisible(self,point,t)
+        [visibility,relativePoint] = pointVisibleOcclusion(self,point,t)
         % generate measurements with occlusion
         generateMeasurementsOcclusion(self,config)
         meshes = generateMeshes(self,t)

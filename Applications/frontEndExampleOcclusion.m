@@ -5,7 +5,7 @@
 %--------------------------------------------------------------------------
 
 clear all 
-% close all 
+close all 
 
 %% 1. Config
 % time
@@ -30,7 +30,7 @@ config.set('planeVertexLabel'    ,'VERTEX_PLANE_4D');
 config.set('posePoseEdgeLabel'   ,'EDGE_LOG_SE3');
 config.set('posePointEdgeLabel'  ,'EDGE_3D');
 config.set('pointPlaneEdgeLabel' ,'EDGE_1D');
-config.set('graphFileFolderName' ,'Testing');
+config.set('graphFileFolderName' ,'OcclusionTesting');
 config.set('groundTruthFileName' ,'groundTruth.graph');
 config.set('measurementsFileName','measurements.graph');
 config.set('stdPosePrior' ,[0.001,0.001,0.001,pi/600,pi/600,pi/600]');
@@ -80,9 +80,9 @@ dynamicTrajectory.plot(t)
 environment.plot(t)
 
 %% 3. Initialise Sensor
-% robotTrajectory   = PositionModelPoseTrajectory(dynamicWaypoints,'R3','smoothingspline');
-% cameraTrajectory = RelativePoseTrajectory(robotTrajectory,config.cameraRelativePose);
-% sensor = SimulatedEnvironmentSensor();
+robotTrajectory   = PositionModelPoseTrajectory(dynamicWaypoints,'R3','smoothingspline');
+cameraTrajectory = RelativePoseTrajectory(robotTrajectory,config.cameraRelativePose);
+sensor = SimulatedEnvironmentOcclusionSensor();
 % sensor.addEnvironment(environment);
 % sensor.addCamera(config.fieldOfView,cameraTrajectory);
 % 
