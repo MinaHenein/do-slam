@@ -63,28 +63,29 @@ environment.addRectangle([8,6],50,'mixed',staticTrajectory2);
 environment.addEllipsoid([1 1 2],10,'R3',dynamicTrajectory);
 
 %% 3. Plot
-figure
-viewPoint = [-50,25];
-axisLimits = [-1,15,-1,20,-1,10];
-title('Environment')
-axis equal
-xlabel('x')
-ylabel('y')
-zlabel('z')
-view(viewPoint)
-axis(axisLimits)
-hold on
-staticTrajectory1.plot()
-staticTrajectory2.plot()
-dynamicTrajectory.plot(t)
-environment.plot(t)
+% figure
+% viewPoint = [-50,25];
+% axisLimits = [-1,15,-1,20,-1,10];
+% title('Environment')
+% axis equal
+% xlabel('x')
+% ylabel('y')
+% zlabel('z')
+% view(viewPoint)
+% axis(axisLimits)
+% hold on
+% staticTrajectory1.plot()
+% staticTrajectory2.plot()
+% dynamicTrajectory.plot(t)
+% environment.plot(t)
 
 %% 3. Initialise Sensor
 robotTrajectory   = PositionModelPoseTrajectory(dynamicWaypoints,'R3','smoothingspline');
 cameraTrajectory = RelativePoseTrajectory(robotTrajectory,config.cameraRelativePose);
 sensor = SimulatedEnvironmentOcclusionSensor();
-% sensor.addEnvironment(environment);
-% sensor.addCamera(config.fieldOfView,cameraTrajectory);
+sensor.addEnvironment(environment);
+sensor.addCamera(config.fieldOfView,cameraTrajectory);
+sensor.setVisibility(config,environment);
 % 
 % %% 5. Generate Measurements & Save to Graph File
 % sensor.generateMeasurements(config);

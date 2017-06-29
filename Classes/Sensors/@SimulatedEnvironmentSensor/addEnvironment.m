@@ -15,7 +15,7 @@ function self = addEnvironment(self,environment)
         switch class(environment.get('environmentPrimitives',i))
             case 'EP_Rectangle'
                 objects(i) = GEO_Plane(environment.get('environmentPrimitives',i));
-            case 'EP_default'
+            case 'EP_Default'
                 objects(i) = self.RBOfromEP(environment.get('environmentPrimitives',i)); % runs special internal function for rigid body
                 % that creates from Environment Primitives
             otherwise

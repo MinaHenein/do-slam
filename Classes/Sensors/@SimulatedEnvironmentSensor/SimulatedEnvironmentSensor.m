@@ -99,13 +99,15 @@ classdef SimulatedEnvironmentSensor < Sensor
     
     %Declare external methods
     methods(Access = public)
-        self = addEnvironment(self,environment);
+        self = addEnvironment(self,environment)
         % point visibility
         [visibility,relativePoint] = pointVisible(self,point,t)
         % Measurements
         generateMeasurements(self,config)
-        object = RBOfromEP(environmentPrimitive);
-        
+    end
+    
+    methods(Static, Access=public)
+        object = RBOfromEP(EP_Default)
     end
     
 end

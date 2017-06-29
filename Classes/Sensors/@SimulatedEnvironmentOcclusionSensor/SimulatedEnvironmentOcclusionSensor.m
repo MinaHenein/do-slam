@@ -10,22 +10,24 @@ classdef SimulatedEnvironmentOcclusionSensor < SimulatedEnvironmentSensor
     %For the full documentation, see SimulatedEnvironmentSensor.
     
     %% 1. Properties
-    properties
+    properties(GetAccess='protected', SetAccess='protected')
+        pointObservationRelative        
     end
     
     %% 2. Methods
   
-    % Add environment
-    methods(Access = public)
-    end
-    
     %Declare external methods
     methods(Access = public)
         % point visibility with occlusion
-        [visibility,relativePoint] = pointVisibleOcclusion(self,point,t)
+        [visibility,relativePoint] = pointVisibleOcclusion(self,point,meshes,t)
+        self = setVisibility(self,config,environment)
         % generate measurements with occlusion
-        generateMeasurementsOcclusion(self,config)
-        meshes = generateMeshes(self,t)
+        generateMeasurements(self,config)
+        meshes = generateMeshes(self,environment,t)
+    end
+    
+    methods(Static)
+        pointVisibility = checkOcclusion(point, meshes)
     end
     
 end

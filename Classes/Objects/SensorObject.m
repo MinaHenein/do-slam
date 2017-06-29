@@ -1,6 +1,6 @@
 %--------------------------------------------------------------------------
 % Author: Montiel Abello - montiel.abello@gmail.com - 23/05/17
-% Contributors:
+% Contributors: Yash Vyas - yjvyas@gmail.com - 29/06/17
 %--------------------------------------------------------------------------
 
 classdef SensorObject < ArrayGetSet & matlab.mixin.Heterogeneous
@@ -16,7 +16,14 @@ classdef SensorObject < ArrayGetSet & matlab.mixin.Heterogeneous
     end
     
     %% 2. Methods
-    methods
+    methods(Access = public)
+        function out = getSwitch(self,property,varargin)
+            out = self.(property); 
+        end
+        
+        function self = setSwitch(self,property,value,varargin)
+        	self.(property) = value;
+        end
     end
     
 end
