@@ -23,20 +23,26 @@ trajectory6 = DiscretePointTrajectory(5*rand(3,numel(t)),t);
 
 % getting and setting
 trajectory1.get('GP_Pose',1:0.1:1.5)
+trajectory1.get('GP_Pose',1:0.1:1.5).get('R3xso3Pose')
 trajectory1.get('R3xso3Pose',1:0.1:1.5)
 trajectory1.get('logSE3Pose',3)
-trajectory2.set('logSE3Pose',[0 0 1 0 pi/3 0]');
+trajectory2.set('logSE3Pose',[0 0 1 0 pi/3 0]')
 trajectory3.get('R3Position',1:2)
 trajectory5.get('R3xso3Pose',[1 2 3])
+% trajectory5.get('R3xso3Pose',1:0.1:1.5) % should create an error
+trajectory5.get('R3xso3Pose',1.2:0.2:3)
 trajectory5.set('R',eye(3),1);
 trajectory6.set('R3Position',[1 2 3],1)
 trajectories = [trajectory1 trajectory2];
 trajectories.get('R3xso3Pose',3)
 
 % transformation example inputs = (reference,time,varargin{1} = property)
-trajectory1.AbsoluteToRelativePose(trajectory2,2) %returns GP_Pose
-trajectory1.AbsoluteToRelativePose(trajectory2,2,'R3xso3Position')
-trajectory1.RelativeToAbsolutePose(trajectory2,2,'R3xso3Pose')
+trajectory2.AbsoluteToRelativePose(trajectory1,2) %returns GP_Pose
+trajectory2.AbsoluteToRelativePose(trajectory1,2,'R3xso3Position')
+trajectory1.AbsoluteToRelativePose(trajectory2,2)
+trajectory1.AbsoluteToRelativePose(trajectory2,2,'R3xso3Position') % trajectory2 wrt trajectory1
+AbsoluteToRelativePoseR3xso3(trajectory2.get('R3xso3Pose',2),trajectory1.get('R3xso3Pose',2))
+trajectory1.RelativeToAbsolutePose(a,2,'R3xso3Pose')
 trajectory3.AbsoluteToRelativePoint(trajectory2,1,'R3Position')
 trajectory5.AbsoluteToRelativePose(trajectory2,[1 2])
 trajectory5.RelativeToAbsolutePose(trajectory2,[1 2],'R3xso3Pose')
