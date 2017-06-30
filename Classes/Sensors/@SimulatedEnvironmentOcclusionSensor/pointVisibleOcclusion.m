@@ -17,7 +17,7 @@ if (S2xRRelativePosition(1) >= self.fieldOfView(1)) && (S2xRRelativePosition(1) 
    (S2xRRelativePosition(2) >= self.fieldOfView(3)) && (S2xRRelativePosition(2) <= self.fieldOfView(4)) &&...   
    (S2xRRelativePosition(3) >= self.fieldOfView(5)) && (S2xRRelativePosition(3) <= self.fieldOfView(6))
     % add check for triangle intersection here
-    visibility = checkOcclusion(relativePoint.get('R3Position'),meshes);
+    visibility = self.checkOcclusion(relativePoint.get('R3Position'),meshes);
 else
     visibility = 0;
 end

@@ -17,14 +17,13 @@ classdef RigidBodyObject < SensorObject
     
     %% 2. Methods
     methods
-        function self = RBOfromEP(self, EP_default)
-            % creates Rigid Body Object from EP
-            mesh = EP_default.get('meshRelative');
-            self.set('trajectory', EP_default.get('trajectory'));
-            self.set('index', EP_default.get('index'));
-            self.set('pointIndexes', EP_default.get('pointIndexes'));
+        function out = getSwitch(self,property,varargin)
+            out = self.(property); 
         end
-    
+        
+        function self = setSwitch(self,property,value,varargin)
+        	self.(property) = value;
+        end    
     end
 end
 

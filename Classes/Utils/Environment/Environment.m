@@ -136,10 +136,15 @@ classdef Environment < ArrayGetSet
                 ellipsoidPoints(i).set('trajectory',RelativePointTrajectory(trajectory,iRelativePoint));
             end
             
+            meshPoints = GP_Point.empty();
+            for i=1:nPositions
+                meshPoints(i) = GP_Point(positions(:,i));
+            end
+            
             %initialise EP_Default primitive
             ellipsoidPrimitive = EP_Default();
             ellipsoidPrimitive.set('trajectory',trajectory);
-            ellipsoidPrimitive.set('meshPoints',positions);
+            ellipsoidPrimitive.set('meshPoints',meshPoints);
             ellipsoidPrimitive.set('meshLinks',links);
             
             %pair primitive and points
@@ -211,12 +216,14 @@ classdef Environment < ArrayGetSet
                 %get point positions
                 positions = self.environmentPoints(dynamicPointIndexes).get('R3Position',t(i));
                 %plot positions
-                h1 = plot3(positions(1,:),positions(2,:),positions(3,:),'k.');
+                if positions
+                    h1 = plot3(positions(1,:),positions(2,:),positions(3,:),'k.');
+                end
                 %plot primitives
                 h2 = {};
                 for p = 1:dynamicPrimitiveIndexes
                     if isa(self.get('environmentPrimitives',p),'EP_Default')
-                        meshPoints = self.get('environmentPrimitives',p).get('meshPointsAbsolute',t(i));
+                        meshPoints = self.get('environmentPrimitives',p).get('meshPointsAbsolute',t(i)).get('R3Position');
                         meshLinks = self.get('environmentPrimitives',p).get('meshLinks');
                         h2{end+1} = trimesh(meshLinks,meshPoints(1,:)',meshPoints(2,:)',meshPoints(3,:)','edgecolor','y');                
                     end
@@ -226,7 +233,9 @@ classdef Environment < ArrayGetSet
                 drawnow
                 pause(0)
                 if i < nSteps
-                    delete(h1)
+                    if (positions) 
+                        delete(h1) 
+                    end
                     for p=1:numel(h2)
                         delete(h2{p})
                     end

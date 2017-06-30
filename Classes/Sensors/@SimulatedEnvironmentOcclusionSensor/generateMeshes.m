@@ -2,46 +2,45 @@
 % Author: Yash Vyas - yjvyas@gmail.com - 30/05/2017
 % Contributors:
 %--------------------------------------------------------------------------
-function meshes = generateMeshes(self,t)
-%GENERATEMESHES takes the sensor environment and generates the meshes for
-%the relevant objects within the camera FoV, in relative coordinate
+function meshes = generateMeshes(self,environment,t)
+%GENERATEMESHES takes the original sensor environment and generates the 
+%meshes for the relevant objects within the camera FoV, in relative coordinate
 
-currentSensorPose = self.get('GP_Pose',t).get('R3xso3Pose');
+currentSensorPose = self.get('GP_Pose',t);
 meshes = [];
 for i=1:self.nObjects
     % calculations are done in SE3
-    meshAbsolute = self.get('objects').get('mesh');
-    meshRelative = zeros(size(meshAbsolute));
-    for p=1:size(meshRelative,1)
-        % original relative which is the relative to the object frame
-        meshRelative(p,1:3) = RelativeToAbsoluteR3xso3(currentSensorPose,meshAbsolute(p,1:3)')';
-        meshRelative(p,4:6) = RelativeToAbsoluteR3xso3(currentSensorPose,meshAbsolute(p,4:6)')';
-        meshRelative(p,7:9) = RelativeToAbsoluteR3xso3(currentSensorPose,meshAbsolute(p,7:9)')';
+    environmentPrimitive = environment.get('environmentPrimitives',i);
+    meshRelative = [];
+    if isa(environmentPrimitive,'EP_Default')
+        meshPointsAbsolute = environmentPrimitive.get('meshPointsAbsolute',t);
+        meshRelative = meshPointsAbsolute.RelativeToAbsolutePoint(currentSensorPose);
+        pointsRelative = meshRelative.get('R3Position');
+        links = environmentPrimitive.get('meshLinks');
+        meshRelative = [pointsRelative(:,links(:,1))' pointsRelative(:,links(:,2))' pointsRelative(:,links(:,3))'];
     end
     meshes = [meshes; meshRelative];
-    
 end
 
 visibility = zeros(size(meshes));
 for p=1:size(meshes,1)
     for i=[1 4 7] % all 3 points in the row representation
-        S2xRelativePosition = R3_S2xR(meshRelative(p,i:i+2));
-        % check for FoV - saves in long run
+        S2xRRelativePosition = R3_S2xR(meshRelative(p,i:i+2));
+        % check this meshTriangle points for FoV - saves in long run
         if (S2xRRelativePosition(1) >= self.fieldOfView(1)) && (S2xRRelativePosition(1) <= self.fieldOfView(2)) &&...
         (S2xRRelativePosition(2) >= self.fieldOfView(3)) && (S2xRRelativePosition(2) <= self.fieldOfView(4)) &&...   
         (S2xRRelativePosition(3) >= self.fieldOfView(5)) && (S2xRRelativePosition(3) <= self.fieldOfView(6))
-            visibility(p,i:i+2) = 1;
+            visibility(p,i) = 1;
         else
-            visibility(p,i:i+2) = 0;
-        end
-        if ~any(visibility(p,:))
-            continue
-        else
-            meshes = [meshes; meshRelative(p,:)];
+            visibility(p,i) = 0;
         end
     end
+    if ~any(visibility(p,:))
+        continue
+    else
+        meshes = [meshes(:,p-1); meshes(:,p+1:end)];
+    end
 end
-    % only take mesh triangles where at least one point is in FoV
     
     
 end

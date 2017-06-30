@@ -4,7 +4,7 @@
 % Contributors:
 %--------------------------------------------------------------------------
 
-function generateMeasurementsOcclusion(self,config)
+function generateMeasurements(self,config)
 %GENERATEMEASUREMENTSOCCLUSION very similar to generateMeasurements for the
 %SimulatedEnvironmentSensor class, but includes extraction of mesh points
 %for use.
@@ -24,8 +24,6 @@ nSteps = numel(t);
 % indexing variables
 vertexCount         = 0;
 cameraVertexIndexes = zeros(1,nSteps);
-self.pointVisibility     = zeros(self.nPoints,nSteps);
-self.objectVisibility    = zeros(self.nObjects,nSteps);
 
 %% 2. Loop over timestep, simulate observations, write to graph file
 for i = 1:nSteps
@@ -71,12 +69,12 @@ for i = 1:nSteps
     end
     
     %point observations with occlusion
-    meshes = self.generateMeshes(self,t(i));
+%     meshes = self.generateMeshes(self,t(i));
     for j = 1:self.nPoints
-        jPoint = self.get('points',j);
-        [jPointVisible,jPointRelative] = self.pointVisibleOcclusion(jPoint,meshes,t(i));
+%         jPoint = self.get('points',j);
+%         [jPointVisible,jPointRelative] = self.pointVisibleOcclusion(jPoint,meshes,t(i));
+        jPointVisible = self.pointVisibility(j,i);
         if jPointVisible
-            self.pointVisibility(j,i) = 1;
             %check if point observed before
             if isempty(jPoint.get('vertexIndex'))
                 vertexCount = vertexCount + 1;

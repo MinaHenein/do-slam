@@ -31,7 +31,6 @@ classdef GEO_Plane < GeometricEntityObject
                     self.rectangleTrajectory = rectangle.get('trajectory');                      
             end
         end
-        
     end
     
     % Getter & Setter
