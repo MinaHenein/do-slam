@@ -32,4 +32,3 @@ classdef CameraConfig < Config
         end
     end
 end
-

@@ -42,7 +42,6 @@ trajectory2.AbsoluteToRelativePose(trajectory1,2,'R3xso3Position')
 trajectory1.AbsoluteToRelativePose(trajectory2,2)
 trajectory1.AbsoluteToRelativePose(trajectory2,2,'R3xso3Position') % trajectory2 wrt trajectory1
 AbsoluteToRelativePoseR3xso3(trajectory2.get('R3xso3Pose',2),trajectory1.get('R3xso3Pose',2))
-trajectory1.RelativeToAbsolutePose(a,2,'R3xso3Pose')
 trajectory3.AbsoluteToRelativePoint(trajectory2,1,'R3Position')
 trajectory5.AbsoluteToRelativePose(trajectory2,[1 2])
 trajectory5.RelativeToAbsolutePose(trajectory2,[1 2],'R3xso3Pose')

@@ -12,15 +12,15 @@ classdef Config < ArrayGetSet
     %
     %   *Suggestion: rather than each user adding properties only relevant
     %   to their application, subclasses should be created with
-    %   non-fundamental properties for specific applications   
+    %   non-fundamental properties for specific applications
     
     %% 1. Properties
     properties(GetAccess = 'public', SetAccess = 'protected')
         %array of time values when measurements are made
-        t 
+        t
         
         % rng seed
-        rngSeed 
+        rngSeed
         
         % noise model
         noiseModel
@@ -28,12 +28,22 @@ classdef Config < ArrayGetSet
         %measurement std dev
         stdPosePrior
         stdPointPrior
-        stdPosePose   
-        stdPosePoint 
+        stdPosePose
+        stdPosePoint
         stdPointPlane
         
         %R3xso3 or logSE3
         poseParameterisation
+        
+        absoluteToRelativePoseHandle 
+        absoluteToRelativePointHandle
+        relativeToAbsolutePoseHandle
+        relativeToAbsolutePointHandle
+        
+        %% TODO: both shouldnt be here!!
+        cameraPointParameterisation
+        cameraControlInput
+        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
         
         %dimensions
         dimPose
@@ -62,7 +72,7 @@ classdef Config < ArrayGetSet
         solverType
         threshold
         maxNormDX
-        maxIterations  
+        maxIterations
         
         %graph file labels
         poseVertexLabel
@@ -70,12 +80,12 @@ classdef Config < ArrayGetSet
         planeVertexLabel
         posePoseEdgeLabel
         posePointEdgeLabel
-        pointPlaneEdgeLabel   
+        pointPlaneEdgeLabel
         posePriorEdgeLabel
         
         %files
         sep
-        folderPath 
+        folderPath
         graphFileFolderName
         groundTruthFileName
         measurementsFileName
@@ -93,20 +103,20 @@ classdef Config < ArrayGetSet
     
     %% 2. Methods
     % Constructor
-    methods(Access = public) 
+    methods(Access = public)
         function self = Config()
             self.initPath();
         end
     end
     
     % Get & Set
-    methods(Access = public) 
-    	function out = getSwitch(self,property)
-        	out = self.(property);
+    methods(Access = public)
+        function out = getSwitch(self,property)
+            out = self.(property);
         end
         
         function self = setSwitch(self,property,value)
-        	self.(property) = value;
+            self.(property) = value;
         end
     end
     
@@ -130,9 +140,9 @@ classdef Config < ArrayGetSet
     end
     
     % initialise file stuff
-    methods(Access = protected) 
-    	function self = initPath(self)
-        	if ispc
+    methods(Access = protected)
+        function self = initPath(self)
+            if ispc
                 self.sep = '\';
             elseif isunix || ismac
                 self.sep = '/';
@@ -140,6 +150,4 @@ classdef Config < ArrayGetSet
             self.folderPath = pwd;
         end
     end
-    
 end
-

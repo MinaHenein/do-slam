@@ -33,11 +33,13 @@ config.set('noiseModel','Gaussian');
 % config.set('noiseModel','Off');
 config.set('poseParameterisation','R3xso3');
 % config.set('poseParameterisation','logSE3');
+config.setFactorsFunctionsHandles();
 
-% config.set('absoluteToRelativePoseHandle',@AbsoluteToRelativePoseR3xso3);
-% config.set('absoluteToRelativePointHandle',@AbsoluteToRelativePositionR3xso3);
-% config.set('relativeToAbsolutePoseHandle',@RelativeToAbsolutePoseR3xso3);
-% config.set('relativeToAbsolutePointHandle',@RelativeToAbsolutePositionR3xso3);
+
+    self.absoluteToRelativePoseHandle  = @AbsoluteToRelativePose;
+    self.absoluteToRelativePointHandle = @AbsoluteToRelativePosition;
+    self.relativeToAbsolutePoseHandle  = @RelativeToAbsolutePose;
+    self.relativeToAbsolutePointHandle = @RelativeToAbsolutePosition;
 
 config.set('cameraPointParameterisation','euclidean');
 config.set('cameraControlInput','relativePose');
