@@ -19,23 +19,23 @@ obj.edges(1:nEdges) = Edge();
 %construct vertices
 for i = 1:nVertices
     switch verticesCell{i}{1}
-        case config.labelPoseVertex
+        case config.poseVertexLabel
             type = 'pose';
             value = verticesCell{i}{3};
-        case config.labelPointVertex
+        case config.pointVertexLabel
             type = 'point';
             value = verticesCell{i}{3};
-        case config.labelPointRGBVertex    
+        case config.pointRGBVertexLabel    
             type = 'point';
             value = verticesCell{i}{3}(1:3);
             pointColour = verticesCell{i}{3}(4:6);
-        case config.labelPlaneVertex
+        case config.planeVertexLabel
             type = 'plane';
             value = verticesCell{i}{3};
-        case config.labelAngleVertex
+        case config.angleVertexLabel
             type = 'angle';
             value = verticesCell{i}{3};
-        case config.labelDistanceVertex
+        case config.distanceVertexLabel
             type = 'distance';
             value = verticesCell{i}{3};
         otherwise; error('wrong type')
@@ -48,7 +48,7 @@ for i = 1:nVertices
     obj.vertices(i) = Vertex(value,covariance,type,iEdges,index);
     
     %add colour
-    if strcmp(verticesCell{i}{1},config.labelPointRGBVertex)
+    if strcmp(verticesCell{i}{1},config.pointRGBVertexLabel)
         obj.vertices(i).colour = pointColour;
     end
 end
@@ -56,40 +56,40 @@ end
 %construct edges
 for i = 1:nEdges
     switch edgesCell{i}{1}
-        case config.labelPosePoseEdge
+        case config.posePoseEdgeLabel
             type = 'pose-pose';
             value = edgesCell{i}{5};
             covariance = upperTriVecToCov(edgesCell{i}{6});
-        case config.labelPosePointEdge
+        case config.posePointEdgeLabel
             type = 'pose-point';
             value = edgesCell{i}{5};
             covariance = upperTriVecToCov(edgesCell{i}{6});
-        case config.labelPointPointRGBEdge
+        case config.pointPointRGBEdgeLabel
             type = 'pose-point';
             value = edgesCell{i}{5}(1:3);
             pointColour = edgesCell{i}{5}(4:6);
             covariance = upperTriVecToCov(edgesCell{i}{6});
-        case config.labelPointPlaneEdge
+        case config.pointPlaneEdgeLabel
             type = 'point-plane';
             value = edgesCell{i}{5};
             covariance = edgesCell{i}{6};
-        case config.labelAngleEdge
+        case config.angleEdgeLabel
             type = 'plane-plane-angle';
             value = edgesCell{i}{5};
             covariance = edgesCell{i}{6};
-        case config.labelFixedAngleEdge
+        case config.fixedAngleEdgeLabel
             type = 'plane-plane-fixedAngle';
             value = edgesCell{i}{5};
             covariance = edgesCell{i}{6};
-        case config.labelDistanceEdge
+        case config.distanceEdgeLabel
             type = 'plane-plane-distance';
             value = edgesCell{i}{5};
             covariance = edgesCell{i}{6};
-        case config.labelFixedDistanceEdge
+        case config.fixedDistanceEdgeLabel
             type = 'plane-plane-fixedDistance';
             value = edgesCell{i}{5};
             covariance = edgesCell{i}{6};
-        case config.labelPlanePriorEdge
+        case config.planePriorEdgeLabel
         otherwise; error('wrong type')
     end
     jacobians   = [];
@@ -102,7 +102,7 @@ for i = 1:nEdges
         obj.vertices(iVertices(j)).iEdges = ...
             unique([obj.vertices(iVertices(j)).iEdges index]); %order doesn't matter here
         %and colour
-        if strcmp(edgesCell{i}{1},config.labelPointRGBVertex)
+        if strcmp(edgesCell{i}{1},config.pointRGBVertexLabel)
             iPointVertex = iVertices(1);
             obj.vertices(iPointVertex).colour = pointColour;
         end

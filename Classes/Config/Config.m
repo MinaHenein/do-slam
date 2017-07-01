@@ -35,10 +35,7 @@ classdef Config < ArrayGetSet
         %R3xso3 or logSE3
         poseParameterisation
         
-        absoluteToRelativePoseHandle 
-        absoluteToRelativePointHandle
-        relativeToAbsolutePoseHandle
-        relativeToAbsolutePointHandle
+        % function handles moved to public temporarily
         
         %% TODO: both shouldnt be here!!
         cameraPointParameterisation
@@ -82,14 +79,32 @@ classdef Config < ArrayGetSet
         posePointEdgeLabel
         pointPlaneEdgeLabel
         posePriorEdgeLabel
+        angleVertexLabel
+        angleEdgeLabel
+        distanceVertexLabel
+        distanceEdgeLabel
+        pointRGBVertexLabel
+        pointPointRGBEdgeLabel
+        
+        % general settings
+        displayProgress
+        plotPlanes
         
         %files
         sep
         folderPath
+        savePath
         graphFileFolderName
         groundTruthFileName
         measurementsFileName
         
+    end
+    
+    properties(GetAccess = 'public', SetAccess = 'public')
+        absoluteToRelativePoseHandle 
+        absoluteToRelativePointHandle
+        relativeToAbsolutePoseHandle
+        relativeToAbsolutePointHandle
     end
     
     properties (Dependent)

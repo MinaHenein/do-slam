@@ -13,11 +13,11 @@ end
 %% 1. write vertices
 for i = 1:obj.nVertices
     switch obj.vertices(i).type
-        case 'pose';        vertexLabel = config.labelPoseVertex;
-        case 'point';       vertexLabel = config.labelPointVertex;
-        case 'plane';       vertexLabel = config.labelPlaneVertex;
-        case 'angle';       vertexLabel = config.labelAngleVertex;
-        case 'distance';    vertexLabel = config.labelDistanceVertex;
+        case 'pose';        vertexLabel = config.poseVertexLabel;
+        case 'point';       vertexLabel = config.pointVertexLabel;
+        case 'plane';       vertexLabel = config.planeVertexLabel;
+        case 'angle';       vertexLabel = config.angleVertexLabel;
+        case 'distance';    vertexLabel = config.distanceVertexLabel;
         otherwise; error('type invalid')
     end
     vertexIndex = obj.vertices(i).index;
@@ -31,37 +31,37 @@ for i = 1:obj.nEdges
     writeEdge = 1;
     switch obj.edges(i).type
         case 'pose-pose'                  
-            edgeLabel = config.labelPosePoseEdge;
+            edgeLabel = config.posePoseEdgeLabel;
             verticesIn = obj.edges(i).iVertices(1);
             verticesOut = obj.edges(i).iVertices(2);
             edgeCovariance = covToUpperTriVec(obj.edges(i).covariance); 
         case 'pose-point'                  
-            edgeLabel = config.labelPosePointEdge;
+            edgeLabel = config.posePointEdgeLabel;
             verticesIn = obj.edges(i).iVertices(1);
             verticesOut = obj.edges(i).iVertices(2);
             edgeCovariance = covToUpperTriVec(obj.edges(i).covariance);
         case 'point-plane'               
-            edgeLabel = config.labelPointPlaneEdge;
+            edgeLabel = config.pointPlaneEdgeLabel;
             verticesIn = obj.edges(i).iVertices(1);
             verticesOut = obj.edges(i).iVertices(2);
             edgeCovariance = obj.edges(i).covariance;
         case 'plane-plane-angle'          
-            edgeLabel = config.labelAngleEdge;
+            edgeLabel = config.angleEdgeLabel;
             verticesIn = obj.edges(i).iVertices(1:2);
             verticesOut = obj.edges(i).iVertices(3);
             edgeCovariance = obj.edges(i).covariance;
         case 'plane-plane-fixedAngle'    
-            edgeLabel = config.labelFixedAngleEdge;
+            edgeLabel = config.fixedAngleEdgeLabel;
             verticesIn = obj.edges(i).iVertices;
             verticesOut = [];
             edgeCovariance = obj.edges(i).covariance;
         case 'plane-plane-distance'       
-            edgeLabel = config.labelDistanceEdge;
+            edgeLabel = config.distanceEdgeLabel;
             verticesIn = obj.edges(i).iVertices(1:2);
             verticesOut = obj.edges(i).iVertices(3);
             edgeCovariance = obj.edges(i).covariance;
-        case 'plane-plane-fixedDistance';  
-            edgeLabel = config.labelFixedDistanceEdge;
+        case 'plane-plane-fixedDistance'
+            edgeLabel = config.fixedDistanceEdgeLabel;
             verticesIn = obj.edges(i).iVertices;
             verticesOut = [];
             edgeCovariance = obj.edges(i).covariance;

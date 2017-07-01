@@ -40,8 +40,9 @@
                 case 'Dog-Leg'
                     obj = obj.DLSolver(config,graph0,measurementsCell);
             end
-                
+        
         end
+        
     end
     
 end

@@ -28,7 +28,7 @@ if nargin==3 && strcmp(varargin{1},'noAngleConstraints')
 end
 
 %read lines
-tline = fgets(fileID);
+tline = fopen(fileID);
 while ischar(tline)
     lineSplit = strsplit(tline);
     label = lineSplit{1};

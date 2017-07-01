@@ -34,10 +34,11 @@ config.set('noiseModel','Gaussian');
 config.set('poseParameterisation','R3xso3');
 % config.set('poseParameterisation','logSE3');
 
-% config.set('absoluteToRelativePoseHandle',@AbsoluteToRelativePoseR3xso3);
-% config.set('absoluteToRelativePointHandle',@AbsoluteToRelativePositionR3xso3);
-% config.set('relativeToAbsolutePoseHandle',@RelativeToAbsolutePoseR3xso3);
-% config.set('relativeToAbsolutePointHandle',@RelativeToAbsolutePositionR3xso3);
+% temporarily changed function handles to public for setting
+config.absoluteToRelativePoseHandle = @AbsoluteToRelativePoseR3xso3;
+config.absoluteToRelativePointHandle = @AbsoluteToRelativePositionR3xso3;
+config.relativeToAbsolutePoseHandle = @RelativeToAbsolutePoseR3xso3;
+config.relativeToAbsolutePointHandle = @RelativeToAbsolutePositionR3xso3;
 
 config.set('cameraPointParameterisation','euclidean');
 config.set('cameraControlInput','relativePose');
@@ -83,6 +84,9 @@ config.set('solverType','Levenberg-Marquardt');
 config.set('threshold',10e-4);
 config.set('maxNormDX',1e10);
 config.set('maxIterations',1000);
+config.set('displayProgress',1);
+config.set('savePath',pwd);
+config.set('plotPlanes',1);
 
 %% 2. Generate Environment
 if config.rngSeed; rng(config.rngSeed); end;
@@ -161,4 +165,4 @@ plotGraph(config,graph0,[0 1 1]);
 plotGraphFile(config,groundTruthCell,[1 0 0]);
 %plot results
 resultsCell = graphFileToCell(config,'results.graph');
-plotGraphFile(config,resultsCell,[0 0 1])
+plotGraphFile(config,resultsCell,'r')
