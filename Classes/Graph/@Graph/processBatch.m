@@ -13,18 +13,18 @@ measurementsCell = reshapeCell(measurementsCell,'array');
 
 %create prior
 %find odometry rows
-odometryRows = find(strcmp({measurementsCell{:,1}}',config.labelPosePoseEdge));
+odometryRows = find(strcmp({measurementsCell{:,1}}',config.posePoseEdgeLabel));
 odometryIndex = 1; %first pose
 startPoseVertex = measurementsCell{odometryRows(odometryIndex),3};
 poseRows = [];
 for i = 1:numel(groundTruthCell)
-    if strcmp(groundTruthCell{i}{1},config.labelPoseVertex)
+    if strcmp(groundTruthCell{i}{1},config.poseVertexLabel)
         poseRows = [poseRows,i];
     end
 end
 startPoseValue = groundTruthCell{poseRows(odometryIndex)}{3};
 startPoseCovariance = config.covPosePrior;
-priorLine = {config.labelPosePriorEdge,1,[],startPoseVertex,startPoseValue,startPoseCovariance};
+priorLine = {config.posePriorEdgeLabel,1,[],startPoseVertex,startPoseValue,startPoseCovariance};
 
 %add prior line
 measurementsCell = vertcat(priorLine,measurementsCell);
@@ -44,7 +44,7 @@ nSteps = numel(odometryRows) + 1;
 for i = 1:nSteps
     %identify rows from this time step
     %add elements so formula for iRows works for first and last steps
-    odometryRows = [1; find(strcmp(measurementsCell(:,1),config.labelPosePoseEdge)); size(measurementsCell,1)+1];
+    odometryRows = [1; find(strcmp(measurementsCell(:,1),config.posePoseEdgeLabel)); size(measurementsCell,1)+1];
     iRows = odometryRows(i):odometryRows(i+1)-1;
     nRows = numel(iRows);
     
@@ -52,21 +52,21 @@ for i = 1:nSteps
     for j = 1:nRows
         jRow = measurementsCell(iRows(j),:);
         switch jRow{1}
-            case config.labelPosePriorEdge %posePrior
+            case config.posePriorEdgeLabel %posePrior
                 %edge index
                 jRow{2} = obj.nEdges+1;
                 %construct pose vertex
                 obj = obj.constructPoseVertex(config,jRow);
                 %construct prior edge
                 obj = obj.constructPosePriorEdge(config,jRow);
-            case config.labelPosePoseEdge %odometry
+            case config.posePoseEdgeLabel %odometry
                 %edge index
                 jRow{2} = obj.nEdges+1;
                 %construct pose vertex
                 obj = obj.constructPoseVertex(config,jRow);
                 %construct pose-pose edge
                 obj = obj.constructPosePoseEdge(config,jRow);
-            case config.labelPosePointEdge
+            case config.posePointEdgeLabel
                 %edge index
                 jRow{2} = obj.nEdges+1;
                 %create point vertex if it doesn't exist
@@ -75,7 +75,7 @@ for i = 1:nSteps
                 end
                 %construct pose-point edge
                 obj = obj.constructPosePointEdge(config,jRow);
-            case config.labelPointPlaneEdge
+            case config.pointPlaneEdgeLabel
                 %edge index
                 jRow{2} = obj.nEdges+1;
                 %create plane vertex if it doesn't exist
@@ -87,7 +87,7 @@ for i = 1:nSteps
                 end
                 %construct point-plane edge
                 obj = obj.constructPointPlaneEdge(config,jRow);
-            case config.labelPlanePriorEdge
+            case config.planePriorEdgeLabel
                 %edge index
                 jRow{2} = obj.nEdges+1;
                 %construct plane vertex
@@ -108,7 +108,7 @@ for i = 1:nSteps
                 %edge covariance
                 jRow{6} = config.covPlaneNormal;
                 obj = obj.constructPlanePriorEdge(config,jRow);    
-            case config.labelAngleEdge
+            case config.angleEdgeLabel
                 %edge index
                 jRow{2} = obj.nEdges+1;
                 %create angle edge if it doesn't exist
@@ -116,18 +116,18 @@ for i = 1:nSteps
                     obj = obj.constructAngleVertex(config,jRow);
                 end
                 obj = obj.constructAngleEdge(config,jRow);
-            case config.labelFixedAngleEdge
+            case config.fixedAngleEdgeLabel
                 %edge index
                 jRow{2} = obj.nEdges+1;
                 obj = obj.constructFixedAngleEdge(config,jRow);
-            case config.labelDistanceEdge
+            case config.distanceEdgeLabel
                 %edge index
                 jRow{2} = obj.nEdges+1;
                 if jRow{4} > obj.nVertices
                     obj = obj.constructDistanceVertex(config,jRow);
                 end
                 obj = constructDistanceEdge(config,jRow);
-            case config.labelFixedDistanceEdge
+            case config.fixedDistanceEdgeLabel
                 %edge index
                 jRow{2} = obj.nEdges+1;
                 obj = obj.constructFixedDistanceEdge(config,jRow);

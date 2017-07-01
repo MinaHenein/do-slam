@@ -1,6 +1,7 @@
 %--------------------------------------------------------------------------
 % Author: Montiel Abello - montiel.abello@gmail.com - 23/05/17
 % Contributors:
+%               Mina Henein -- aded solver related parameters
 %--------------------------------------------------------------------------
 
 classdef Config < ArrayGetSet
@@ -34,13 +35,43 @@ classdef Config < ArrayGetSet
         %R3xso3 or logSE3
         poseParameterisation
         
+        %dimensions
+        dimPose
+        dimPoint
+        
+        %plane parameterisation
+        planeNormalParameterisation
+        
+        %constraints
+        applyAngleConstraints
+        automaticAngleConstraints
+        
+        %first linearisation point
+        startPose
+        
+        %static assumption
+        staticAssumption
+        
+        %solver settings
+        sortVertices
+        sortEdges
+        processing
+        nVerticesThreshold
+        nEdgesThreshold
+        solveRate
+        solverType
+        threshold
+        maxNormDX
+        maxIterations  
+        
         %graph file labels
         poseVertexLabel
         pointVertexLabel
         planeVertexLabel
         posePoseEdgeLabel
         posePointEdgeLabel
-        pointPlaneEdgeLabel     
+        pointPlaneEdgeLabel   
+        posePriorEdgeLabel
         
         %files
         sep
@@ -48,6 +79,7 @@ classdef Config < ArrayGetSet
         graphFileFolderName
         groundTruthFileName
         measurementsFileName
+        
     end
     
     properties (Dependent)

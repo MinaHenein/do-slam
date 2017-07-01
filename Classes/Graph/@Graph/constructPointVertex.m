@@ -8,10 +8,10 @@ edgeIndex = edgeRow{2};
 poseVertex = edgeRow{3};
 pointVertex = edgeRow{4};
 switch edgeLabel
-    case config.labelPosePointEdge
+    case config.posePointEdgeLabel
         edgeValue = edgeRow{5};
         pointColour = [];
-    case config.labelPosePointRGBEdge
+    case config.posePointRGBEdgeLabel
         edgeValue = edgeRow{5}(1:3);
         pointColour = edgeRow{5}(4:6);
 end

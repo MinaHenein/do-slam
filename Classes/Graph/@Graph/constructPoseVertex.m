@@ -12,9 +12,9 @@ edgeCovariance = edgeRow{6};
 
 %% 2. compute pose
 switch edgeLabel
-    case config.labelPosePriorEdge %prior
+    case config.posePriorEdgeLabel %prior
         pose2 = edgeValue;     
-    case config.labelPosePoseEdge %odometry
+    case config.posePoseEdgeLabel %odometry
         pose1 = obj.vertices(inputVertices).value;
         controlInput = edgeValue;
         switch config.cameraControlInput
