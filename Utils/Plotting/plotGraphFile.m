@@ -39,14 +39,12 @@ for i = 1:sum(poseVertices)
         iPose = LogSE3_Rxt(iPose);
     end
     
-%     plotiCamera = plotCamera('Location',iPose(1:3),'Orientation',rot(-iPose(4:6))); %LHS invert pose
-    scale = 0.5;
-    plotCoordinates(iPose(1:3),scale*rot(iPose(4:6)))
-%     plotiCamera.Opacity = 0.1;
-%     plotiCamera.Size = 0.05;
-%     plotiCamera.Size = 0.5;
-%     plotiCamera.Size = 0.01;
-%     plotiCamera.Color = graphColour;
+    plotiCamera = plotCamera('Location',iPose(1:3),'Orientation',rot(-iPose(4:6))); %LHS invert pose
+%     scale = 0.5;
+%     plotCoordinates(iPose(1:3),scale*rot(iPose(4:6)))
+    plotiCamera.Opacity = 0.1;
+    plotiCamera.Size = 0.1;
+    plotiCamera.Color = graphColour;
 end
 
 %% 6. plot points

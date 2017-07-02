@@ -77,6 +77,7 @@ classdef Config < ArrayGetSet
         planeVertexLabel
         posePoseEdgeLabel
         posePointEdgeLabel
+        pointPointEdgeLabel
         pointPlaneEdgeLabel
         posePriorEdgeLabel
         angleVertexLabel
@@ -91,6 +92,7 @@ classdef Config < ArrayGetSet
         % general settings
         displayProgress
         plotPlanes
+        displaySPPARMS
         
         %files
         sep
