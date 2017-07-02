@@ -8,10 +8,10 @@ function [graphCell] = graphFileToCell(config,fileName,varargin)
 
 %open file
 if ispc
-    fileID = fopen(strcat(config.folderPath,config.sep,'GraphFiles',...
+    fileID = fopen(strcat(config.folderPath,config.sep,'Data',...
         config.sep,config.graphFileFolderName,config.sep,fileName),'r');
 elseif isunix || ismac
-	fileID = fopen(strcat(config.folderPath,config.sep,'GraphFiles',...
+	fileID = fopen(strcat(config.folderPath,config.sep,'Data',...
         config.sep,config.graphFileFolderName,config.sep,fileName),'r');
 end
 
@@ -28,7 +28,7 @@ if nargin==3 && strcmp(varargin{1},'noAngleConstraints')
 end
 
 %read lines
-tline = fopen(fileID);
+tline = fgets(fileID);
 while ischar(tline)
     lineSplit = strsplit(tline);
     label = lineSplit{1};

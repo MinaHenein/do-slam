@@ -85,6 +85,8 @@ classdef Config < ArrayGetSet
         distanceEdgeLabel
         pointRGBVertexLabel
         pointPointRGBEdgeLabel
+        fixedAngleEdgeLabel
+        fixedDistanceEdgeLabel
         
         % general settings
         displayProgress

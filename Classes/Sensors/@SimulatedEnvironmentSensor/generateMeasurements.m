@@ -9,13 +9,13 @@ function generateMeasurements(self,config)
 
 %% 1. Initialise variables
 % load frequently accessed variables from config
-graphFileFolderPath = strcat(config.folderPath,config.sep,'GraphFiles',config.sep,config.graphFileFolderName);
+graphFileFolderPath = strcat(config.folderPath,config.sep,'Data',config.sep,config.graphFileFolderName);
 if ~exist(graphFileFolderPath,'dir')
     mkdir(graphFileFolderPath)
 end
-gtFileID = fopen(strcat(config.folderPath,config.sep,'GraphFiles',...
+gtFileID = fopen(strcat(config.folderPath,config.sep,'Data',...
                  config.sep,config.graphFileFolderName,config.sep,config.groundTruthFileName),'w');
-mFileID  = fopen(strcat(config.folderPath,config.sep,'GraphFiles',...
+mFileID  = fopen(strcat(config.folderPath,config.sep,'Data',...
                  config.sep,config.graphFileFolderName,config.sep,config.measurementsFileName),'w');
 t      = config.t;
 nSteps = numel(t);
