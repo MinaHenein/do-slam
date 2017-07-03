@@ -76,6 +76,10 @@ while ischar(tline)
 %             lineCell = {label,[],values(1),values(2),values(3:8)',values(9:14)};
 %             %store
 %             graphCell{end+1,1} = lineCell;
+        case config.pointPointEdgeLabel
+            lineCell = {label,[],values(1),values(2),values(3:5)',values(6:11)};
+             %store
+            graphCell{end+1,1} = lineCell;
         case config.pointPlaneEdgeLabel 
             %need to add plane prior edge if first time plane vertex seen
             if strcmp(config.planeNormalParameterisation,'R3') && noVertices

@@ -75,6 +75,11 @@ for i = 1:nSteps
                 end
                 %construct pose-point edge
                 obj = obj.constructPosePointEdge(config,jRow);
+            case config.pointPointEdgeLabel
+                %edgeIndex
+                jRow{2} = obj.nEdges+1;
+                % construct point-point edge - both points should already exist
+                obj = obj.constructPointPointEdge(config,jRow);
             case config.pointPlaneEdgeLabel
                 %edge index
                 jRow{2} = obj.nEdges+1;

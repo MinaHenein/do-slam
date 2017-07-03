@@ -19,6 +19,8 @@ for i = 1:obj.nEdges
             obj.iPosePoseEdges = [obj.iPosePoseEdges; i];
         case 'pose-point'
             obj.iPosePointEdges = [obj.iPosePointEdges; i];
+        case 'point-point'
+            obj.iPointPointEdges = [obj.iPointPointEdges; i];
     end
 end
 

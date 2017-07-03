@@ -22,6 +22,8 @@ switch obj.edges(iEdge).type
 %         residual = config.absoluteToRelativePoseHandle(measurement,measurementPredicted);
     case 'pose-point'
         residual = measurement - obj.edges(iEdge).value;
+    case 'point-point'
+        residual = measurement - obj.edges(iEdge).value;
     case 'point-plane'
         residual = measurement - obj.edges(iEdge).value;
     case 'point-rectangle'

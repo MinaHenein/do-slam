@@ -19,6 +19,7 @@ classdef Graph
         iPointVertices
         iPosePoseEdges
         iPosePointEdges
+        iPointPointEdges
     end
     
     properties (Dependent)

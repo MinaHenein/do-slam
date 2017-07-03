@@ -30,6 +30,7 @@ classdef Config < ArrayGetSet
         stdPointPrior
         stdPosePose
         stdPosePoint
+        stdPointPoint
         stdPointPlane
         
         %R3xso3 or logSE3
@@ -117,6 +118,7 @@ classdef Config < ArrayGetSet
         covPointPrior
         covPosePose
         covPosePoint
+        covPointPoint
         covPointPlane
     end
     
@@ -152,6 +154,9 @@ classdef Config < ArrayGetSet
         end
         function covPosePoint = get.covPosePoint(obj)
             covPosePoint = stdToCovariance(obj.stdPosePoint);
+        end
+        function covPointPoint = get.covPointPoint(obj)
+            covPointPoint = stdToCovariance(obj.stdPointPoint);
         end
         function covPointPlane = get.covPointPlane(obj)
             covPointPlane = stdToCovariance(obj.stdPointPlane);

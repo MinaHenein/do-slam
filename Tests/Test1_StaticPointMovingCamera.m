@@ -8,6 +8,8 @@ nSteps = 3;
 %% config setup 
 config = CameraConfig();
 config = setUnitTestConfig(config);
+config.set('groundTruthFileName' ,'groundTruthTest1.graph');
+config.set('measurementsFileName','measurementsTest1.graph');
 
 rng(config.rngSeed);
 %% set up sensor - MANUAL
@@ -125,7 +127,6 @@ results = errorAnalysis(config,graphGT,graphN);
 %% plot graph files
 h = figure; 
 axis equal;
-axis([-6 1 -5 2 -1 5])
 xlabel('x')
 ylabel('y')
 zlabel('z')

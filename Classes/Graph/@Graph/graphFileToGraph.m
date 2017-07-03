@@ -52,6 +52,10 @@ for i = 1:nVertices
         obj.vertices(i).colour = pointColour;
     end
 end
+% sort vertices just in case
+[~, I] = sort([obj.vertices.index]);
+vertices = obj.vertices(I);
+obj.vertices = vertices;
 
 %construct edges
 for i = 1:nEdges
@@ -64,10 +68,14 @@ for i = 1:nEdges
             type = 'pose-point';
             value = edgesCell{i}{5};
             covariance = upperTriVecToCov(edgesCell{i}{6});
-        case config.pointPointRGBEdgeLabel
-            type = 'pose-point';
-            value = edgesCell{i}{5}(1:3);
-            pointColour = edgesCell{i}{5}(4:6);
+%         case config.posePointRGBEdgeLabel
+%             type = 'pose-point';
+%             value = edgesCell{i}{5}(1:3);
+%             pointColour = edgesCell{i}{5}(4:6);
+%             covariance = upperTriVecToCov(edgesCell{i}{6});
+        case config.pointPointEdgeLabel
+            type = 'point-point';
+            value = edgesCell{i}{5};
             covariance = upperTriVecToCov(edgesCell{i}{6});
         case config.pointPlaneEdgeLabel
             type = 'point-plane';
