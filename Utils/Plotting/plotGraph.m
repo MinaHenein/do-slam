@@ -11,23 +11,27 @@ end
 
 %% 1. plot camera
 plotCameras = [];
+poses = [graph.vertices(graph.iPoseVertices).value];
+plot3(poses(1,:),poses(2,:),poses(3,:),'Color',graphColour,'Marker','o','LineStyle','none');
 for i = 1:numel(graph.iPoseVertices)
     iPose = graph.vertices(graph.iPoseVertices(i)).value;
     if strcmp(config.poseParameterisation,'SE3')
         iPose = LogSE3_Rxt(iPose);
     end
-    plotiCamera = plotCamera('Location',iPose(1:3),'Orientation',rot(-iPose(4:6))); %LHS invert pose
-    plotiCamera.Opacity = 0.1;
-    plotiCamera.Size = 0.5;
-    plotiCamera.Color = graphColour;
-    plotCameras = [plotCameras plotiCamera];
+    scale = 0.2;
+    plotCoordinates(iPose(1:3,:),scale*rot(iPose(4:6,1)))
+%     plotiCamera = plotCamera('Location',iPose(1:3),'Orientation',rot(-iPose(4:6))); %LHS invert pose
+%     plotiCamera.Opacity = 0.1;
+%     plotiCamera.Size = 0.5;
+%     plotiCamera.Color = graphColour;
+%     plotCameras = [plotCameras plotiCamera];
 end
 
 %% 2. plot points
 points = [graph.vertices(graph.iPointVertices).value];
 plotPoints = plot3(points(1,:),points(2,:),points(3,:),'.');
 set(plotPoints,'MarkerEdgeColor',graphColour)
-set(plotPoints,'MarkerSize',10)
+set(plotPoints,'MarkerSize',8)
 
 %% 3. plot entities & objects
 plotPlanePoints = [];

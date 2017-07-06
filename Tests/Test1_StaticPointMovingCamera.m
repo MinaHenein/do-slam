@@ -1,3 +1,8 @@
+%--------------------------------------------------------------------------
+% Author: Yash Vyas - yjvyas@gmail.com - 06/07/2017
+% Contributors:
+%--------------------------------------------------------------------------
+
 %% general setup
 % run startup first
 clear all
@@ -14,17 +19,20 @@ config.set('measurementsFileName','measurementsTest1.graph');
 rng(config.rngSeed);
 %% set up sensor - MANUAL
 sensorPose = zeros(6,nSteps);
-%constant linear velocity in x-axis direction, constant angular velocity about x-axis
-sensorPose(1,:) = -5+linspace(0,2,nSteps);
-sensorPose(2,:) = linspace(0,0,nSteps);
-sensorPose(3,:) = linspace(0,0,nSteps);
-sensorPose(4,:) = linspace(0,0,nSteps);
-sensorPose(5,:) = linspace(pi/2,pi/2,nSteps);
-sensorPose(6,:) = linspace(pi/6,-pi/6,nSteps);
+
+% applies relative motion - constant velocity in forward (x) axis and rotation about z axis
+for i=2:nSteps
+    rotationMatrix = eul2rot([pi/12 0 0]);
+    orientationMatrix = rot(sensorPose(4:6,i));
+    relativeSensorPose = [1; 0; 0; arot(orientationMatrix*rotationMatrix)];
+    sensorPose(:,i) = RelativeToAbsolutePoseR3xso3(sensorPose(:,i-1),relativeSensorPose);
+end
 
 %% set up object
 objPts = {[0 0 0]',[1 -1 1]',[1 1 1]'};
+objPose = repmat([5, 0, 0, 0, 0, 0]',1,3);
 objPts = cell2mat(objPts);
+objPts = RelativeToAbsolutePositionR3xso3(objPose,objPts);
 
 %% create ground truth and measurements
 groundTruthVertices = {};
@@ -131,6 +139,7 @@ xlabel('x')
 ylabel('y')
 zlabel('z')
 hold on
-plotGraphFile(config,groundTruthCell,[1 0 0]);
-resultsCell = graphFileToCell(config,'resultsTest1.graph');
-plotGraphFile(config,resultsCell,[0 0 1])
+plotGraphFile(config,groundTruthCell,'blue');
+% resultsCell = graphFileToCell(config,'resultsTest1.graph');
+% plotGraph(config,resultsCell,[0 0 1])
+plotGraph(config,graphN,'red');

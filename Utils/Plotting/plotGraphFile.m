@@ -33,18 +33,21 @@ points = [verticesCell{pointVertices,3}];
 planes = [verticesCell{planeVertices,3}];
 
 %% 5. plot poses
+plot3(poses(1,:),poses(2,:),poses(3,:),'Color',graphColour,'Marker','o','LineStyle','none');
 for i = 1:sum(poseVertices)
     iPose = poses(:,i);
     if strcmp(config.poseParameterisation,'SE3')
         iPose = LogSE3_Rxt(iPose);
     end
     
-    plotiCamera = plotCamera('Location',iPose(1:3),'Orientation',rot(-iPose(4:6))); %LHS invert pose
+    scale = 0.2;
+    plotCoordinates(iPose(1:3,:),scale*rot(iPose(4:6,1)))
+%     plotiCamera = plotCamera('Location',iPose(1:3),'Orientation',rot(-iPose(4:6))); %LHS invert pose
 %     scale = 0.5;
 %     plotCoordinates(iPose(1:3),scale*rot(iPose(4:6)))
-    plotiCamera.Opacity = 0.1;
-    plotiCamera.Size = 0.1;
-    plotiCamera.Color = graphColour;
+%     plotiCamera.Opacity = 0.1;
+%     plotiCamera.Size = 0.1;
+%     plotiCamera.Color = graphColour;
 end
 
 %% 6. plot points

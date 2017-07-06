@@ -3,7 +3,7 @@
 clear all
 close all
 
-nSteps = 3;
+nSteps = 2;
 
 %% config setup 
 config = CameraConfig();
@@ -14,13 +14,15 @@ config.set('measurementsFileName','measurementsTest3.graph');
 rng(config.rngSeed);
 %% set up sensor - MANUAL
 sensorPose = zeros(6,nSteps);
-%constant linear velocity in x-axis direction, constant angular velocity about x-axis
-sensorPose(1,:) = -5+linspace(0,2,nSteps);
-sensorPose(2,:) = linspace(0,0,nSteps);
-sensorPose(3,:) = linspace(0,0,nSteps);
-sensorPose(4,:) = linspace(0,0,nSteps);
-sensorPose(5,:) = linspace(pi/2,pi/2,nSteps);
-sensorPose(6,:) = linspace(-pi/6,pi/6,nSteps);
+
+% applies relative motion - linear velocity in forward (x) axis and 
+%constant rotation about z axis
+for i=2:nSteps
+    rotationMatrix = eul2rot([pi/12 0 0]);
+    orientationMatrix = rot(sensorPose(4:6,i));
+    relativeSensorPose = [1; 0; 0; arot(orientationMatrix*rotationMatrix)];
+    sensorPose(:,i) = RelativeToAbsolutePoseR3xso3(sensorPose(:,i-1),relativeSensorPose);
+end
 
 %% set up object
 objPtsRelative = {[0 0 0]',[1 -1 1]',[1 1 1]'};
@@ -28,7 +30,7 @@ objPts = objPtsRelative;
 
 % pose is set in R3xSO3
 objPose = zeros(6,nSteps); % initialises 3 poses
-objPose(1,:) = linspace(0,5,nSteps);
+objPose(1,:) = linspace(5,7,nSteps);
 objPose(2,:) = linspace(0,2,nSteps); % moves in y direction
 objPose(6,:) = linspace(0,pi/4,nSteps); % slight rotation about z axis to expose different points
 

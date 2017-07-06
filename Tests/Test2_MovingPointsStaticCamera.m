@@ -3,7 +3,7 @@
 clear all
 close all
 
-nSteps = 3;
+nSteps = 2;
 
 %% config setup 
 config = CameraConfig();
@@ -14,8 +14,6 @@ config.set('measurementsFileName','measurementsTest2.graph');
 rng(config.rngSeed);
 %% set up sensor - MANUAL
 sensorPose = zeros(6,nSteps);
-sensorPose(1,:) = -5;
-sensorPose(5,:) = linspace(pi/2,pi/2,nSteps);
 
 %% set up object
 objPtsRelative = {[0 0 0]',[1 -1 1]',[1 1 1]'};
@@ -23,7 +21,7 @@ objPts = objPtsRelative;
 
 % pose is set in R3xSO3
 objPose = zeros(6,nSteps); % initialises 3 poses
-objPose(1,:) = linspace(0,5,nSteps);
+objPose(1,:) = linspace(5,7,nSteps);
 objPose(2,:) = linspace(0,2,nSteps); % moves in y direction
 objPose(6,:) = linspace(0,pi/4,nSteps); % slight rotation about z axis to expose different points
 
@@ -35,15 +33,9 @@ for j=1:size(objPts,2)
         % apply object pose on the points, each column is a time step
         objPts{j}(:,i) = RelativeToAbsolutePositionR3xso3(objPose(:,i),objPtsRelative{j}(:,1));
     end
-%     plot3(objPts{j}(1,:),objPts{j}(2,:),objPts{j}(3,:),'b.');
     plot3(objPts{j}(1,:),objPts{j}(2,:),objPts{j}(3,:),'k');
 end
 
-% iPose = sensorPose(:,1);
-% plotiCamera = plotCamera('Location',iPose(1:3),'Orientation',rot(-iPose(4:6))); %LHS invert pose
-% plotiCamera.Opacity = 0.1;
-% plotiCamera.Size = 0.1;
-% plotiCamera.Color = [1 0 0];
 
 %% create ground truth and measurements
 groundTruthVertices = {};
@@ -170,6 +162,6 @@ xlabel('x')
 ylabel('y')
 zlabel('z')
 hold on
-plotGraphFile(config,groundTruthCell,[0 0 1]);
+plotGraphFile(config,groundTruthCell,'b');
 resultsCell = graphFileToCell(config,'resultsTest2.graph');
-plotGraphFile(config,resultsCell,[1 0 0])
+plotGraphFile(config,resultsCell,'r')
