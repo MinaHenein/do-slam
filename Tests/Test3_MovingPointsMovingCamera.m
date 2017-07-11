@@ -3,7 +3,7 @@
 clear all
 close all
 
-nSteps = 2;
+nSteps = 3;
 
 %% config setup 
 config = CameraConfig();
@@ -26,24 +26,25 @@ end
 
 %% set up object
 objPtsRelative = {[0 0 0]',[1 -1 1]',[1 1 1]'};
-objPts = objPtsRelative;
 
-% pose is set in R3xSO3
-objPose = zeros(6,nSteps); % initialises 3 poses
-objPose(1,:) = linspace(5,7,nSteps);
-objPose(2,:) = linspace(0,2,nSteps); % moves in y direction
-objPose(6,:) = linspace(0,pi/4,nSteps); % slight rotation about z axis to expose different points
+% applies relative motion - rotation of pi/6 radians per time step about z
+% axis and pi/4 radians about y axis with linear velocity of x = 1
+objectPose = [5 0 0 0 0 0]'; % moved 5 forward on x axis
+for i=2:nSteps
+    rotationMatrix = eul2rot([pi/6 -pi/24 0]);
+    objectRelativePose = [1; 0; 0; arot(rotationMatrix)];
+    objectPose(:,i) = RelativeToAbsolutePoseR3xso3(objectPose(:,i-1),objectRelativePose);
+end
+
+objectPts = objPtsRelative;
 
 figure()
 hold on;
 % axis equal;
-for j=1:size(objPts,2)
-    for i=1:nSteps
-        % apply object pose on the points, each column is a time step
-        objPts{j}(:,i) = RelativeToAbsolutePositionR3xso3(objPose(:,i),objPtsRelative{j}(:,1));
-    end
+for j=1:size(objectPts,2)
+    objectPts{j} = RelativeToAbsolutePositionR3xso3(objectPose,repmat(objectPts{j},1,nSteps));
 %     plot3(objPts{j}(1,:),objPts{j}(2,:),objPts{j}(3,:),'b.');
-    plot3(objPts{j}(1,:),objPts{j}(2,:),objPts{j}(3,:),'k');
+    plot3(objectPts{j}(1,:),objectPts{j}(2,:),objectPts{j}(3,:),'k');
 end
 
 % iPose = sensorPose(:,1);
@@ -68,12 +69,12 @@ for i=1:nSteps
 end
 
 for i=1:nSteps
-    for j=1:size(objPts,2)
+    for j=1:size(objectPts,2)
         % create vertex for point location
         currentVertex = struct();
         currentVertex.label = config.pointVertexLabel;
         currentVertex.index = vertexCount;
-        currentVertex.value = objPts{j}(:,i);
+        currentVertex.value = objectPts{j}(:,i);
         groundTruthVertices{i,j+1} = currentVertex;
         vertexCount = vertexCount+1;
     end
@@ -92,12 +93,12 @@ for i=1:size(groundTruthVertices,1)
         currentEdge.covUT = covToUpperTriVec(currentEdge.cov);
         groundTruthEdges{i,1} = currentEdge;
     end
-    for j=1:size(objPts,2)
+    for j=1:size(objectPts,2)
         currentEdge = struct();
         currentEdge.index1 = groundTruthVertices{i,1}.index;
         currentEdge.index2 = groundTruthVertices{i,j+1}.index;
         currentEdge.label = config.posePointEdgeLabel;
-        currentEdge.value = AbsoluteToRelativePositionR3xso3(sensorPose(:,i),objPts{j}(:,i));
+        currentEdge.value = AbsoluteToRelativePositionR3xso3(sensorPose(:,i),objectPts{j}(:,i));
         currentEdge.std = config.stdPosePoint;
         currentEdge.cov = config.covPosePoint;
         currentEdge.covUT = covToUpperTriVec(currentEdge.cov);
@@ -106,7 +107,7 @@ for i=1:size(groundTruthVertices,1)
 end
 
 for i=2:nSteps
-    for j=1:size(objPts,2)
+    for j=1:size(objectPts,2)
         currentEdge = struct();
         currentEdge.index1 = groundTruthVertices{i-1,j+1}.index;
         currentEdge.index2 = groundTruthVertices{i,j+1}.index;
@@ -136,21 +137,21 @@ groundTruthVertices{size(groundTruthEdges,1),size(groundTruthEdges,2)} = []; % o
 [nRows, nColumns] = size(groundTruthEdges);
 for i=1:nRows
     for j=1:nColumns
-    if ~isempty(groundTruthVertices{i,j})
-        vertex = groundTruthVertices{i,j};
-        formatSpec = strcat('%s %d ',repmat(' %6.6f',1,numel(vertex.value)),'\n');
-        fprintf(groundTruthGraph, formatSpec, vertex.label, vertex.index, vertex.value);
-    end
-    if ~isempty(groundTruthEdges{i,j})
-        % print groundTruth Edge
-        edge = groundTruthEdges{i,j};
-        formatSpec = strcat('%s %d %d',repmat(' %.6f',1,numel(edge.value)),repmat(' %.6f',1,numel(edge.covUT)),'\n');
-        fprintf(groundTruthGraph, formatSpec, edge.label, edge.index1, edge.index2, edge.value, edge.covUT);
-        
-        % print Measurement edge
-        edge = measurementEdges{i,j};
-        fprintf(measurementGraph, formatSpec, edge.label, edge.index1, edge.index2, edge.value, edge.covUT);
-    end
+        if ~isempty(groundTruthVertices{i,j})
+            vertex = groundTruthVertices{i,j};
+            formatSpec = strcat('%s %d ',repmat(' %6.6f',1,numel(vertex.value)),'\n');
+            fprintf(groundTruthGraph, formatSpec, vertex.label, vertex.index, vertex.value);
+        end
+        if ~isempty(groundTruthEdges{i,j})
+            % print groundTruth Edge
+            edge = groundTruthEdges{i,j};
+            formatSpec = strcat('%s %d %d',repmat(' %.6f',1,numel(edge.value)),repmat(' %.6f',1,numel(edge.covUT)),'\n');
+            fprintf(groundTruthGraph, formatSpec, edge.label, edge.index1, edge.index2, edge.value, edge.covUT);
+
+            % print Measurement edge
+            edge = measurementEdges{i,j};
+            fprintf(measurementGraph, formatSpec, edge.label, edge.index1, edge.index2, edge.value, edge.covUT);
+        end
     end
 end
 
@@ -168,7 +169,14 @@ graphN  = solverEnd.graphs(end);
 graphN.saveGraphFile(config,'resultsTest3.graph');
 % 
 graphGT = Graph(config,groundTruthCell);
-results = errorAnalysis(config,graphGT,graphN)
+results = errorAnalysis(config,graphGT,graphN);
+fprintf('Chi Squared Error: %.4d \n',solverEnd.systems.chiSquaredError)
+fprintf('Absolute Trajectory Translation Error: %.4d \n',results.ATE_translation_error)
+fprintf('Absolute Trajectory Rotation Error: %.4d \n',results.ATE_rotation_error)
+fprintf('Absolute Structure Points Error: %d \n',results.ASE_translation_error);
+fprintf('All to All Relative Pose Squared Translation Error: %.4d \n',results.AARPE_squared_translation_error)
+fprintf('All to All Relative Pose Squared Rotation Error: %.4d \n',results.AARPE_squared_rotation_error)
+fprintf('All to All Relative Point Squared Translation Error: %.4d \n',results.AARPTE_squared_translation_error)
 
 %% plot graph files
 % h = figure; 
@@ -179,4 +187,10 @@ zlabel('z')
 hold on
 plotGraphFile(config,groundTruthCell,[0 0 1]);
 resultsCell = graphFileToCell(config,'resultsTest3.graph');
-plotGraphFile(config,resultsCell,[1 0 0])
+plotGraph(config,graphN,[1 0 0]);
+
+figure
+subplot(1,2,1)
+spy(solverEnd.systems(end).A)
+subplot(1,2,2)
+spy(solverEnd.systems(end).H)

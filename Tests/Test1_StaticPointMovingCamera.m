@@ -23,16 +23,15 @@ sensorPose = zeros(6,nSteps);
 % applies relative motion - constant velocity in forward (x) axis and rotation about z axis
 for i=2:nSteps
     rotationMatrix = eul2rot([pi/12 0 0]);
-    orientationMatrix = rot(sensorPose(4:6,i));
-    relativeSensorPose = [1; 0; 0; arot(orientationMatrix*rotationMatrix)];
+    relativeSensorPose = [1; 0; 0; arot(rotationMatrix)];
     sensorPose(:,i) = RelativeToAbsolutePoseR3xso3(sensorPose(:,i-1),relativeSensorPose);
 end
 
 %% set up object
-objPts = {[0 0 0]',[1 -1 1]',[1 1 1]'};
+objectPts = {[0 0 0]',[1 -1 1]',[1 1 1]'};
 objPose = repmat([5, 0, 0, 0, 0, 0]',1,3);
-objPts = cell2mat(objPts);
-objPts = RelativeToAbsolutePositionR3xso3(objPose,objPts);
+objectPts = cell2mat(objectPts);
+objectPts = RelativeToAbsolutePositionR3xso3(objPose,objectPts);
 
 %% create ground truth and measurements
 groundTruthVertices = {};
@@ -49,12 +48,12 @@ for i=1:nSteps
     vertexCount = vertexCount+1;
 end
 
-for j=1:size(objPts,2)
+for j=1:size(objectPts,2)
     % create vertex for point location
     currentVertex = struct();
     currentVertex.label = config.pointVertexLabel;
     currentVertex.index = vertexCount;
-    currentVertex.value = objPts(:,j);
+    currentVertex.value = objectPts(:,j);
     groundTruthVertices{end+1} = currentVertex;
     vertexCount = vertexCount+1;
 end
@@ -73,12 +72,12 @@ for i=2:size(sensorPose,2)
 end
 
 for i=1:size(sensorPose,2)
-    for j=1:size(objPts,2)
+    for j=1:size(objectPts,2)
         currentEdge = struct();
         currentEdge.index1 = i;
         currentEdge.index2 = j+3;
         currentEdge.label = config.posePointEdgeLabel;
-        currentEdge.value = AbsoluteToRelativePositionR3xso3(sensorPose(:,i),objPts(:,j));
+        currentEdge.value = AbsoluteToRelativePositionR3xso3(sensorPose(:,i),objectPts(:,j));
         currentEdge.std = config.stdPosePoint;
         currentEdge.cov = config.covPosePoint;
         currentEdge.covUT = covToUpperTriVec(currentEdge.cov);
@@ -119,6 +118,28 @@ end
 
 fclose(measurementGraph);
 
+%% check vertices
+checkVertices = {};
+checkVertices{1} = groundTruthVertices{1};
+for i=2:nSteps
+    checkVertex = struct();
+    checkVertex.value = RelativeToAbsolutePoseR3xso3(checkVertices{i-1}.value,groundTruthEdges{i-1}.value);
+    checkVertices{i} = checkVertex;
+    if norm(checkVertices{i}.value - groundTruthVertices{i}.value) > 1e-15
+        error('Reconstructed vertices and original vertices do not match.')
+    end
+end
+
+for i=1:nSteps
+    for j=1:size(objectPts,2)
+        checkVertex = struct();
+        checkVertex.value = RelativeToAbsolutePositionR3xso3(checkVertices{i}.value,groundTruthEdges{3*i+j-1}.value);
+        if norm(groundTruthVertices{nSteps+j}.value - checkVertex.value) > 1e-15
+            error('Reconstructed vertices and original vertices do not match.')
+        end
+    end
+end
+
 %% solver
 groundTruthCell  = graphFileToCell(config,config.groundTruthFileName);
 measurementsCell = graphFileToCell(config,config.measurementsFileName);
@@ -131,6 +152,13 @@ graphN.saveGraphFile(config,'resultsTest1.graph');
 
 graphGT = Graph(config,groundTruthCell);
 results = errorAnalysis(config,graphGT,graphN);
+fprintf('Chi Squared Error: %.4d \n',solverEnd.systems.chiSquaredError)
+fprintf('Absolute Trajectory Translation Error: %.4d \n',results.ATE_translation_error)
+fprintf('Absolute Trajectory Rotation Error: %.4d \n',results.ATE_rotation_error)
+fprintf('Absolute Structure Points Error: %d \n',results.ASE_translation_error);
+fprintf('All to All Relative Pose Squared Translation Error: %.4d \n',results.AARPE_squared_translation_error)
+fprintf('All to All Relative Pose Squared Rotation Error: %.4d \n',results.AARPE_squared_rotation_error)
+fprintf('All to All Relative Point Squared Translation Error: %.4d \n',results.AARPTE_squared_translation_error)
 
 %% plot graph files
 h = figure; 
@@ -139,7 +167,13 @@ xlabel('x')
 ylabel('y')
 zlabel('z')
 hold on
-plotGraphFile(config,groundTruthCell,'blue');
 % resultsCell = graphFileToCell(config,'resultsTest1.graph');
 % plotGraph(config,resultsCell,[0 0 1])
 plotGraph(config,graphN,'red');
+plotGraphFile(config,groundTruthCell,'blue');
+
+figure
+subplot(1,2,1)
+spy(solverEnd.systems(end).A)
+subplot(1,2,2)
+spy(solverEnd.systems(end).H)

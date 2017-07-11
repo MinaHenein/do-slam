@@ -3,7 +3,7 @@
 clear all
 close all
 
-nSteps = 2;
+nSteps = 3;
 
 %% config setup 
 config = CameraConfig();
@@ -16,26 +16,27 @@ rng(config.rngSeed);
 sensorPose = zeros(6,nSteps);
 
 %% set up object
-objPtsRelative = {[0 0 0]',[1 -1 1]',[1 1 1]'};
-objPts = objPtsRelative;
+objectPtsRelative = {[0 0 0]',[1 -1 1]',[1 1 1]'};
 
-% pose is set in R3xSO3
-objPose = zeros(6,nSteps); % initialises 3 poses
-objPose(1,:) = linspace(5,7,nSteps);
-objPose(2,:) = linspace(0,2,nSteps); % moves in y direction
-objPose(6,:) = linspace(0,pi/4,nSteps); % slight rotation about z axis to expose different points
+% applies relative motion - rotation of pi/6 radians per time step about z
+% axis and pi/4 radians about y axis with linear velocity of x = 1
+objectPose = [5 0 0 0 0 0]'; % moved 5 forward on x axis
+for i=2:nSteps
+    rotationMatrix = eul2rot([pi/6 -pi/24 0]);
+    objectRelativePose = [1; 0; 0; arot(rotationMatrix)];
+    objectPose(:,i) = RelativeToAbsolutePoseR3xso3(objectPose(:,i-1),objectRelativePose);
+end
+
+objectPts = objectPtsRelative;
 
 figure()
 hold on;
 % axis equal;
-for j=1:size(objPts,2)
-    for i=1:nSteps
-        % apply object pose on the points, each column is a time step
-        objPts{j}(:,i) = RelativeToAbsolutePositionR3xso3(objPose(:,i),objPtsRelative{j}(:,1));
-    end
-    plot3(objPts{j}(1,:),objPts{j}(2,:),objPts{j}(3,:),'k');
+for j=1:size(objectPts,2)
+    objectPts{j} = RelativeToAbsolutePositionR3xso3(objectPose,repmat(objectPts{j},1,nSteps));
+%     plot3(objectPts{j}(1,:),objectPts{j}(2,:),objectPts{j}(3,:),'b.');
+    plot3(objectPts{j}(1,:),objectPts{j}(2,:),objectPts{j}(3,:),'k');
 end
-
 
 %% create ground truth and measurements
 groundTruthVertices = {};
@@ -53,12 +54,12 @@ for i=1:nSteps
 end
 
 for i=1:nSteps
-    for j=1:size(objPts,2)
+    for j=1:size(objectPts,2)
         % create vertex for point location
         currentVertex = struct();
         currentVertex.label = config.pointVertexLabel;
         currentVertex.index = vertexCount;
-        currentVertex.value = objPts{j}(:,i);
+        currentVertex.value = objectPts{j}(:,i);
         groundTruthVertices{i,j+1} = currentVertex;
         vertexCount = vertexCount+1;
     end
@@ -77,12 +78,12 @@ for i=1:size(groundTruthVertices,1)
         currentEdge.covUT = covToUpperTriVec(currentEdge.cov);
         groundTruthEdges{i,1} = currentEdge;
     end
-    for j=1:size(objPts,2)
+    for j=1:size(objectPts,2)
         currentEdge = struct();
         currentEdge.index1 = groundTruthVertices{i,1}.index;
         currentEdge.index2 = groundTruthVertices{i,j+1}.index;
         currentEdge.label = config.posePointEdgeLabel;
-        currentEdge.value = AbsoluteToRelativePositionR3xso3(sensorPose(:,i),objPts{j}(:,i));
+        currentEdge.value = AbsoluteToRelativePositionR3xso3(sensorPose(:,i),objectPts{j}(:,i));
         currentEdge.std = config.stdPosePoint;
         currentEdge.cov = config.covPosePoint;
         currentEdge.covUT = covToUpperTriVec(currentEdge.cov);
@@ -91,7 +92,7 @@ for i=1:size(groundTruthVertices,1)
 end
 
 for i=2:nSteps
-    for j=1:size(objPts,2)
+    for j=1:size(objectPts,2)
         currentEdge = struct();
         currentEdge.index1 = groundTruthVertices{i-1,j+1}.index;
         currentEdge.index2 = groundTruthVertices{i,j+1}.index;
@@ -153,8 +154,15 @@ graphN  = solverEnd.graphs(end);
 graphN.saveGraphFile(config,'resultsTest2.graph');
 % 
 graphGT = Graph(config,groundTruthCell);
-results = errorAnalysis(config,graphGT,graphN)
-% 
+results = errorAnalysis(config,graphGT,graphN);
+fprintf('Chi Squared Error: %.4d \n',solverEnd.systems.chiSquaredError)
+fprintf('Absolute Trajectory Translation Error: %.4d \n',results.ATE_translation_error)
+fprintf('Absolute Trajectory Rotation Error: %.4d \n',results.ATE_rotation_error)
+fprintf('Absolute Structure Points Error: %d \n',results.ASE_translation_error);
+fprintf('All to All Relative Pose Squared Translation Error: %.4d \n',results.AARPE_squared_translation_error)
+fprintf('All to All Relative Pose Squared Rotation Error: %.4d \n',results.AARPE_squared_rotation_error)
+fprintf('All to All Relative Point Squared Translation Error: %.4d \n',results.AARPTE_squared_translation_error)
+
 %% plot graph files
 % h = figure; 
 axis equal;
@@ -164,4 +172,10 @@ zlabel('z')
 hold on
 plotGraphFile(config,groundTruthCell,'b');
 resultsCell = graphFileToCell(config,'resultsTest2.graph');
-plotGraphFile(config,resultsCell,'r')
+plotGraph(config,graphN,'r');
+
+figure
+subplot(1,2,1)
+spy(solverEnd.systems(end).A)
+subplot(1,2,2)
+spy(solverEnd.systems(end).H)
