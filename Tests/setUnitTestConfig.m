@@ -36,7 +36,7 @@ config.set('stdPosePrior' ,[0.005,0.005,0.005,orientation(1),orientation(2),orie
 config.set('stdPointPrior',[0.01,0.01,0.01]');
 
 % set odometry error
-rot = eul2rot([pi/90,pi/90,pi/90]); % 1 degree position error
+rot = eul2rot([pi/90,pi/90,pi/90]); % 2 degree position error
 orientation = arot(rot);
 config.set('stdPosePose'  ,[0.01,0.01,0.01,orientation']');
 

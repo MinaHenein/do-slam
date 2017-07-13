@@ -1,21 +1,22 @@
 %--------------------------------------------------------------------------
-% Author: Montiel Abello - montiel.abello@gmail.com - 23/05/17
+% Author: Montiel Abello - montiel.abello@gmail.com - 23/05/17, Yash Vyas -
+% yjvyas@gmail.com - 30/05/2017
 % Contributors:
 %--------------------------------------------------------------------------
 
 function generateMeasurements(self,config)
-%GENERATEMEASUREMENTS simulates measurements and creates ground truth and
-%measurements graph files
-
+%GENERATEMEASUREMENTSOCCLUSION very similar to generateMeasurements for the
+%SimulatedEnvironmentSensor class, but includes extraction of mesh points
+%for use.
 %% 1. Initialise variables
 % load frequently accessed variables from config
-graphFileFolderPath = strcat(config.folderPath,config.sep,'Data',config.sep,config.graphFileFolderName);
+graphFileFolderPath = strcat(config.folderPath,config.sep,'GraphFiles',config.sep,config.graphFileFolderName);
 if ~exist(graphFileFolderPath,'dir')
     mkdir(graphFileFolderPath)
 end
-gtFileID = fopen(strcat(config.folderPath,config.sep,'Data',...
+gtFileID = fopen(strcat(config.folderPath,config.sep,'GraphFiles',...
                  config.sep,config.graphFileFolderName,config.sep,config.groundTruthFileName),'w');
-mFileID  = fopen(strcat(config.folderPath,config.sep,'Data',...
+mFileID  = fopen(strcat(config.folderPath,config.sep,'GraphFiles',...
                  config.sep,config.graphFileFolderName,config.sep,config.measurementsFileName),'w');
 t      = config.t;
 nSteps = numel(t);
@@ -23,8 +24,6 @@ nSteps = numel(t);
 % indexing variables
 vertexCount         = 0;
 cameraVertexIndexes = zeros(1,nSteps);
-self.pointVisibility     = zeros(self.nPoints,nSteps);
-self.objectVisibility    = zeros(self.nObjects,nSteps);
 
 %% 2. Loop over timestep, simulate observations, write to graph file
 for i = 1:nSteps
@@ -69,12 +68,16 @@ for i = 1:nSteps
         writeEdge(label,index1,index2,valueMeas,covariance,mFileID);
     end
     
-    %point observations
+    %point observations with occlusion
+%     meshes = self.generateMeshes(self,t(i));
     for j = 1:self.nPoints
         jPoint = self.get('points',j);
-        [jPointVisible,jPointRelative] = self.pointVisible(jPoint,t(i));
+        if isempty(self.pointVisibility)
+            error('Visibility must be set first.');
+        end
+        jPointVisible = self.pointVisibility(j,i);
+        jPointRelative = self.pointObservationRelative(j,i);
         if jPointVisible
-            self.pointVisibility(j,i) = 1;
             %check if point observed before
             if isempty(jPoint.get('vertexIndex'))
                 vertexCount = vertexCount + 1;

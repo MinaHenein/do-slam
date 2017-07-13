@@ -34,6 +34,7 @@ classdef SimulatedEnvironmentSensor < Sensor
     properties(GetAccess='protected', SetAccess='protected')
         pointVisibility
         objectVisibility
+        pointObservationRelative
     end
     
     properties(Dependent)
@@ -102,6 +103,7 @@ classdef SimulatedEnvironmentSensor < Sensor
         self = addEnvironment(self,environment)
         % point visibility
         [visibility,relativePoint] = pointVisible(self,point,t)
+        self = setVisibility(self, config, environment);
         % Measurements
         generateMeasurements(self,config)
     end

@@ -10,7 +10,7 @@ config = CameraConfig();
 config = setUnitTestConfig(config);
 config.set('groundTruthFileName' ,'groundTruthTest3.graph');
 config.set('measurementsFileName','measurementsTest3.graph');
-
+config.set('stdPointPoint',[0.01 0.01 0.01]');
 rng(config.rngSeed);
 %% set up sensor - MANUAL
 sensorPose = zeros(6,nSteps);

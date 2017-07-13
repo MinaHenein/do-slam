@@ -1,6 +1,5 @@
 %--------------------------------------------------------------------------
-% Author: Montiel Abello - montiel.abello@gmail.com - 23/05/17, Yash Vyas -
-% yjvyas@gmail.com - 30/06/2017
+% Author: Yash Vyas - yjvyas@gmail.com - 30/06/2017
 % Contributors:
 %--------------------------------------------------------------------------
 

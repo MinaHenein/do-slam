@@ -11,7 +11,7 @@ classdef SimulatedEnvironmentOcclusionSensor < SimulatedEnvironmentSensor
     
     %% 1. Properties
     properties(GetAccess='protected', SetAccess='protected')
-        pointObservationRelative        
+%         pointObservationRelative        
     end
     
     %% 2. Methods
@@ -22,7 +22,7 @@ classdef SimulatedEnvironmentOcclusionSensor < SimulatedEnvironmentSensor
         [visibility,relativePoint] = pointVisibleOcclusion(self,point,meshes,t)
         self = setVisibility(self,config,environment)
         % generate measurements with occlusion
-        generateMeasurements(self,config)
+%         generateMeasurements(self,config)
         meshes = generateMeshes(self,environment,t)
     end
     
