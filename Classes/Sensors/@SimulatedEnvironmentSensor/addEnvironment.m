@@ -6,7 +6,7 @@ function self = addEnvironment(self,environment)
     points(environment.nEnvironmentPoints) = Point();
     %loop over environmentPoints, create Points
     for i = 1:environment.nEnvironmentPoints
-        points(i) = Point(environment.get('environmentPoints',i));
+        points(i) = self.PointfromEnvironmentPoint(environment.get('environmentPoints',i));
     end
 
     %loop over environmentPrimitives, create objects

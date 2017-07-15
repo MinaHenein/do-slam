@@ -18,19 +18,6 @@ classdef Point < ArrayGetSet
     
     
     %% 2. Methods
-    % Constructor
-    methods(Access = public) %set to private later??
-        function self = Point(environmentPoint)
-            switch nargin
-                case 0 %preallocate
-                otherwise
-                    self.index         = environmentPoint.get('index');
-                    self.trajectory    = environmentPoint.get('trajectory');
-                    self.objectIndexes = environmentPoint.get('primitiveIndexes');
-            end
-        end
-        
-    end
     
     % Getter & Setter
     methods(Access = public) %set to protected later??
