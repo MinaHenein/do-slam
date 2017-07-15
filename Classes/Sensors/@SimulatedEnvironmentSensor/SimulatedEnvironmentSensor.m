@@ -110,6 +110,7 @@ classdef SimulatedEnvironmentSensor < Sensor
     
     methods(Static, Access=public)
         object = RBOfromEP(EP_Default)
+        object = GEO_PlanefromRectangle(rectangle)
     end
     
 end

@@ -19,20 +19,7 @@ classdef GEO_Plane < GeometricEntityObject
     end
     
     
-    %% 2. Methods   
-    % Constructor
-    methods(Access = public)
-        function self = GEO_Plane(rectangle)
-            switch nargin
-                case 0
-                otherwise
-                    self.index        = rectangle.get('index');
-                    self.pointIndexes = rectangle.get('pointIndexes');
-                    self.rectangleTrajectory = rectangle.get('trajectory');                      
-            end
-        end
-    end
-    
+    %% 2. Methods    
     % Getter & Setter
     methods(Access = public) %set to protected later??
         function out = getSwitch(self,property,varargin)
