@@ -68,8 +68,7 @@ for i = 1:nSteps
         writeEdge(label,index1,index2,valueMeas,covariance,mFileID);
     end
     
-    %point observations with occlusion
-%     meshes = self.generateMeshes(self,t(i));
+    %point observations
     for j = 1:self.nPoints
         jPoint = self.get('points',j);
         if isempty(self.pointVisibility)

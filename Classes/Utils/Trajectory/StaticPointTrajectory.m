@@ -24,7 +24,7 @@ classdef StaticPointTrajectory < PointTrajectory
             switch nargin
                 case 0 %allow preallocation
                 otherwise
-                    if ~strcmp(class(point),'GP_Point')
+                    if ~isa(point,'GP_Point')
                         point = GP_Point(point,varargin{:});
                     end
                     self.GP_Point = point;

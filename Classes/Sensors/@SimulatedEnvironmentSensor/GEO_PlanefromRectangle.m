@@ -1,6 +1,6 @@
 %--------------------------------------------------------------------------
 % Author: Montiel Abello - montiel.abello@gmail.com - 23/05/17
-% Contributors:
+% Contributors: Yash Vyas - yjvyas@gmail.com - 15/07/18
 %--------------------------------------------------------------------------
 
 function object = GEO_PlanefromRectangle(rectangle)

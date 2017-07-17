@@ -1,6 +1,6 @@
 %--------------------------------------------------------------------------
-% Author: Montiel Abello - montiel.abello@gmail.com - 23/05/17, Yash Vyas - yjvyas@gmail.com - 29/06/2017
-% Contributors:
+% Author: Montiel Abello - montiel.abello@gmail.com - 23/05/17
+% Contributors: Yash Vyas - yjvyas@gmail.com - 29/06/2017
 %--------------------------------------------------------------------------
 
 function self = setVisibility(self,config)
@@ -10,7 +10,7 @@ t      = config.t;
 nSteps = numel(t);
 self.pointVisibility     = zeros(self.nPoints,nSteps);
 self.objectVisibility    = zeros(self.nObjects,nSteps);
-self.pointObservationRelative = GP_Point.empty();
+self.pointObservationRelative = GP_Point.empty(self.nPoints,nSteps);
 
 for i = 1:nSteps
     for j = 1:self.nPoints

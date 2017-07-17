@@ -68,6 +68,22 @@ classdef Environment < ArrayGetSet
     methods(Access = public)
         % Default - any primitive formed from relative positions of points
         % it contains
+        function self = addStaticPoints(self,positionsAbsolute)
+            nPoints = size(positionsAbsolute,2);
+            
+            %initialise points
+            pointIndexes   = self.nEnvironmentPoints + 1:self.nEnvironmentPoints + nPoints;
+            points(nPoints) = EnvironmentPoint(); % preallocate
+            
+            for i=1:nPoints
+                trajectory = StaticPointTrajectory(positionsAbsolute(:,i));
+                points(i) = EnvironmentPoint(pointIndexes(i),trajectory);
+            end
+            
+            %add to self
+            self.environmentPoints = [self.environmentPoints points];
+        end
+        
         function self = addPrimitive(self,positionsRelative,parameterisation,trajectory)
             nPoints = size(positionsRelative,2);
             
