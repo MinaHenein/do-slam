@@ -27,7 +27,8 @@ for i=2:nSteps
     rotationMatrix = eul2rot([pi/12 0 0]);
     orientationMatrix = rot(sensorPose(4:6,i));
     relativeSensorPose = [1; 0; 0; arot(orientationMatrix*rotationMatrix)];
-    sensorPose(:,i) = RelativeToAbsolutePoseR3xso3(sensorPose(:,i-1),relativeSensorPose);
+    sensorPose(:,i) = RelativeToAbsolutePoseR3xso3(sensorPose(:,i-1),...
+        relativeSensorPose);
 end
 
 %% set up object
@@ -45,12 +46,9 @@ end
 
 objectPts = objPtsRelative;
 
-% figure()
-% hold on;
-% axis equal;
 for j=1:size(objectPts,2)
-    objectPts{j} = RelativeToAbsolutePositionR3xso3(objectPose,repmat(objectPts{j},1,nSteps));
-    %plot3(objectPts{j}(1,:),objectPts{j}(2,:),objectPts{j}(3,:),'k');
+    objectPts{j} = RelativeToAbsolutePositionR3xso3(objectPose,...
+        repmat(objectPts{j},1,nSteps));
 end
 
 %% create ground truth and measurements
@@ -87,7 +85,8 @@ for i=1:size(groundTruthVertices,1)
         currentEdge.index1 = groundTruthVertices{i-1,1}.index;
         currentEdge.index2 = groundTruthVertices{i,1}.index;
         currentEdge.label = config.posePoseEdgeLabel;
-        currentEdge.value = AbsoluteToRelativePoseR3xso3(sensorPose(:,i-1),sensorPose(:,i));
+        currentEdge.value = AbsoluteToRelativePoseR3xso3(sensorPose(:,i-1),...
+            sensorPose(:,i));
         currentEdge.std = config.stdPosePose;
         currentEdge.cov = config.covPosePose;
         currentEdge.covUT = covToUpperTriVec(currentEdge.cov);
@@ -98,7 +97,8 @@ for i=1:size(groundTruthVertices,1)
         currentEdge.index1 = groundTruthVertices{i,1}.index;
         currentEdge.index2 = groundTruthVertices{i,j+1}.index;
         currentEdge.label = config.posePointEdgeLabel;
-        currentEdge.value = AbsoluteToRelativePositionR3xso3(sensorPose(:,i),objectPts{j}(:,i));
+        currentEdge.value = AbsoluteToRelativePositionR3xso3(sensorPose(:,i),...
+            objectPts{j}(:,i));
         currentEdge.std = config.stdPosePoint;
         currentEdge.cov = config.covPosePoint;
         currentEdge.covUT = covToUpperTriVec(currentEdge.cov);
@@ -126,43 +126,57 @@ end
 
 measurementEdges = groundTruthEdges; % copies grouthTruth to add noise
 for i=1:numel(measurementEdges) % add noise on measurements
-    if ~isempty(measurementEdges{i})
-        noise = normrnd(measurementEdges{i}.value,measurementEdges{i}.std);
+    if strcmp(config.noiseModel,'Gaussian')
+        if ~isempty(measurementEdges{i})
+            noise = normrnd(measurementEdges{i}.value,measurementEdges{i}.std);
+        elseif strcmp(config.noiseModel,'Off')
+            noise = measurementEdges{i}.value;
+        end
         measurementEdges{i}.value = noise;
     end
 end
+
+
     
 groundTruthGraph = fopen(strcat(config.folderPath,config.sep,'Data',...
     config.sep,config.graphFileFolderName,config.sep,config.groundTruthFileName),'w');
 measurementGraph = fopen(strcat(config.folderPath,config.sep,'Data',...
     config.sep,config.graphFileFolderName,config.sep,config.measurementsFileName),'w');
 
-groundTruthVertices{size(groundTruthEdges,1),size(groundTruthEdges,2)} = []; % only done to avoid index error
+% only done to avoid index error
+groundTruthVertices{size(groundTruthEdges,1),size(groundTruthEdges,2)} = []; 
 [nRows, nColumns] = size(groundTruthEdges);
 for i=1:nRows
     for j=1:nColumns
         if ~isempty(groundTruthVertices{i,j})
             vertex = groundTruthVertices{i,j};
             formatSpec = strcat('%s %d ',repmat(' %6.6f',1,numel(vertex.value)),'\n');
-            fprintf(groundTruthGraph, formatSpec, vertex.label, vertex.index, vertex.value);
+            fprintf(groundTruthGraph, formatSpec, vertex.label, vertex.index,...
+                vertex.value);
         end
         if ~isempty(groundTruthEdges{i,j})
             % print groundTruth Edge
             edge = groundTruthEdges{i,j};
-            formatSpec = strcat('%s %d %d',repmat(' %.6f',1,numel(edge.value)),repmat(' %.6f',1,numel(edge.covUT)),'\n');
+            formatSpec = strcat('%s %d %d',repmat(' %.6f',1,numel(edge.value)),...
+                repmat(' %.6f',1,numel(edge.covUT)),'\n');
             if isfield(edge, 'index3')
-                formatSpec = strcat('%s %d %d %d',repmat(' %.6f',1,numel(edge.value)),repmat(' %.6f',1,numel(edge.covUT)),'\n');
-                fprintf(groundTruthGraph, formatSpec, edge.label, edge.index1, edge.index2, edge.index3, edge.value, edge.covUT);    
+                formatSpec = strcat('%s %d %d %d',repmat(' %.6f',1,numel(edge.value)),...
+                    repmat(' %.6f',1,numel(edge.covUT)),'\n');
+                fprintf(groundTruthGraph,formatSpec,edge.label,edge.index1,...
+                    edge.index2,edge.index3,edge.value,edge.covUT);    
             else
-                fprintf(groundTruthGraph, formatSpec, edge.label, edge.index1, edge.index2, edge.value, edge.covUT);
+                fprintf(groundTruthGraph,formatSpec,edge.label,edge.index1,...
+                    edge.index2,edge.value,edge.covUT);
             end
             
             % print Measurement edge
             edge = measurementEdges{i,j};
             if isfield(edge, 'index3')
-                fprintf(measurementGraph,formatSpec,edge.label,edge.index1,edge.index2,edge.index3,edge.value,edge.covUT);
+                fprintf(measurementGraph,formatSpec,edge.label,edge.index1,...
+                    edge.index2,edge.index3,edge.value,edge.covUT);
             else
-                fprintf(measurementGraph,formatSpec,edge.label,edge.index1,edge.index2,edge.value,edge.covUT);
+                fprintf(measurementGraph,formatSpec,edge.label,edge.index1,...
+                    edge.index2,edge.value,edge.covUT);
             end
         end
     end
@@ -187,9 +201,12 @@ fprintf('Chi Squared Error: %.4d \n',solverEnd.systems.chiSquaredError)
 fprintf('Absolute Trajectory Translation Error: %.4d \n',results.ATE_translation_error)
 fprintf('Absolute Trajectory Rotation Error: %.4d \n',results.ATE_rotation_error)
 fprintf('Absolute Structure Points Error: %d \n',results.ASE_translation_error);
-fprintf('All to All Relative Pose Squared Translation Error: %.4d \n',results.AARPE_squared_translation_error)
-fprintf('All to All Relative Pose Squared Rotation Error: %.4d \n',results.AARPE_squared_rotation_error)
-fprintf('All to All Relative Point Squared Translation Error: %.4d \n',results.AARPTE_squared_translation_error)
+fprintf('All to All Relative Pose Squared Translation Error: %.4d \n',...
+    results.AARPE_squared_translation_error)
+fprintf('All to All Relative Pose Squared Rotation Error: %.4d \n',...
+    results.AARPE_squared_rotation_error)
+fprintf('All to All Relative Point Squared Translation Error: %.4d \n',...
+    results.AARPTE_squared_translation_error)
 
 %% plot graph files
 % h = figure; 

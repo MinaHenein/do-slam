@@ -5,8 +5,8 @@ function config = setUnitTestConfig(config)
 % set properties of Config
 config.set('t',0.1);
 config.set('rngSeed',1);
-% config.set('noiseModel','Gaussian');
-config.set('noiseModel','Off');
+config.set('noiseModel','Gaussian');
+% config.set('noiseModel','Off');
 config.set('poseParameterisation','R3xso3');
 
 % temporarily changed function handles to public for setting
@@ -43,7 +43,7 @@ config.set('stdPosePose'  ,[0.01,0.01,0.01,orientation']');
 
 config.set('stdPosePoint' ,[0.1,0.1,0.1]');
 
-config.set('stdPoint3',0.01);
+config.set('stdPoint3',0.1);
 
 % velocity/motion estimation error - can change
 config.set('stdPointPoint',config.stdPosePoint*2);

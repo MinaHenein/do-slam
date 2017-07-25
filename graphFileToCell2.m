@@ -1,4 +1,4 @@
-function [graphCell] = graphFileToCell(config,fileName,varargin)
+function [graphCell] = graphFileToCell2(config,fileName,varargin)
 %GRAPHFILETOCELL Parses graph file into cell array
 %   This is largely for convenience. ie edge indexes are added here.
 %   In some cases however, additional edges are added to the graph - but
@@ -65,11 +65,11 @@ while ischar(tline)
 %             %store
 %             graphCell{end+1,1} = lineCell;
         case config.posePoseEdgeLabel
-            lineCell = {label,[],values(1),values(2),values(3:8)',values(9:29)};
+            lineCell = {label,[],[values(1),values(2)],values(3:8)',values(9:29)};
             %store
             graphCell{end+1,1} = lineCell;
         case config.posePointEdgeLabel
-            lineCell = {label,[],values(1),values(2),values(3:5)',values(6:11)};
+            lineCell = {label,[],[values(1),values(2)],values(3:5)',values(6:11)};
             %store
             graphCell{end+1,1} = lineCell;
 %         case config.pointPointRGBEdgeLabel
@@ -77,11 +77,11 @@ while ischar(tline)
 %             %store
 %             graphCell{end+1,1} = lineCell;
         case config.pointPointEdgeLabel
-            lineCell = {label,[],values(1),values(2),values(3:5)',values(6:11)};
+            lineCell = {label,[],[values(1),values(2)],values(3:5)',values(6:11)};
              %store
             graphCell{end+1,1} = lineCell;
         case config.point3EdgeLabel
-            lineCell = {label,[],values(1:3),[],values(4),values(5)};
+            lineCell = {label,[],[values(1),values(2),values(3)],values(4),values(5)};
              %store
             graphCell{end+1,1} = lineCell;
         case config.pointPlaneEdgeLabel 
@@ -94,7 +94,7 @@ while ischar(tline)
                     graphCell{end+1,1} = lineCell;
                 end
             end
-            lineCell = {label,[],values(1),values(2),values(3)',values(4)};
+            lineCell = {label,[],[values(1),values(2)],values(3)',values(4)};
             %store
             graphCell{end+1,1} = lineCell;
         case config.angleEdgeLabel

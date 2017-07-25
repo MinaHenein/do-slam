@@ -100,7 +100,6 @@ cameraTrajectory = RelativePoseTrajectory(robotTrajectory,config.cameraRelativeP
 sensor = SimulatedEnvironmentSensor();
 sensor.addEnvironment(environment);
 sensor.addCamera(config.fieldOfView,cameraTrajectory);
-sensor.nPoints
 sensor.setVisibility(config);
 
 %% 5. Generate Measurements & Save to Graph File

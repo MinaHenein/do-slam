@@ -77,6 +77,10 @@ for i = 1:nEdges
             type = 'point-point';
             value = edgesCell{i}{5};
             covariance = upperTriVecToCov(edgesCell{i}{6});
+        case config.point3EdgeLabel
+            type = 'point-3';
+            value = edgesCell{i}{5};
+            covariance = edgesCell{i}{6};
         case config.pointPlaneEdgeLabel
             type = 'point-plane';
             value = edgesCell{i}{5};

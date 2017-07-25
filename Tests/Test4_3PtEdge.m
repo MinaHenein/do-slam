@@ -127,11 +127,15 @@ end
 measurementEdges = groundTruthEdges; % copies grouthTruth to add noise
 for i=1:numel(measurementEdges) % add noise on measurements
     if ~isempty(measurementEdges{i})
-        noise = normrnd(measurementEdges{i}.value,measurementEdges{i}.std);
+        if strcmp(config.noiseModel,'Gaussian')
+            noise = normrnd(measurementEdges{i}.value,measurementEdges{i}.std);
+        elseif strcmp(config.noiseModel,'Off')
+            noise = measurementEdges{i}.value;
+        end
         measurementEdges{i}.value = noise;
     end
 end
-    
+
 groundTruthGraph = fopen(strcat(config.folderPath,config.sep,'Data',...
     config.sep,config.graphFileFolderName,config.sep,config.groundTruthFileName),'w');
 measurementGraph = fopen(strcat(config.folderPath,config.sep,'Data',...
