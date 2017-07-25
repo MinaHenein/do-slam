@@ -10,7 +10,7 @@ t      = config.t;
 nSteps = numel(t);
 self.pointVisibility     = zeros(self.nPoints,nSteps);
 self.objectVisibility    = zeros(self.nObjects,nSteps);
-self.pointObservationRelative = GP_Point.empty(self.nPoints,nSteps);
+self.pointObservationRelative = GP_Point();
 
 for i = 1:nSteps
     for j = 1:self.nPoints
