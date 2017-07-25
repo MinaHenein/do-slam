@@ -87,7 +87,11 @@ end
 
 measurementEdges = groundTruthEdges; % copies grouthTruth to add noise
 for i=1:size(measurementEdges,2) % add noise on measurements
-    noise = normrnd(measurementEdges{i}.value,measurementEdges{i}.std);
+    if strcmp(config.noiseModel,'Gaussian')
+        noise = normrnd(measurementEdges{i}.value,measurementEdges{i}.std);
+    elseif strcmp(config.noiseModel,'Off')
+        noise = measurementEdges{i}.value;
+    end
     measurementEdges{i}.value = noise;
 end
     

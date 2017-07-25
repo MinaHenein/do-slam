@@ -1,5 +1,5 @@
 %--------------------------------------------------------------------------
-% Author: Mina Henein - mina.henein@anu.edu.au - 30/06/17
+% Author: Yash - @anu.edu.au - 30/06/17
 % Contributors:
 %--------------------------------------------------------------------------
 % App1_StaticPointsMovingCamera

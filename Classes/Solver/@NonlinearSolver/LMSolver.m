@@ -78,10 +78,10 @@ while (~done)
     % to save graph files after every iteration -- added as a quick way to 
     % solve out of memory errors (re-run starting last graph file obtained 
     % until you reach a solution)
-    t = datetime('now');
-    secondStr = num2str(t.Second);
-    graph0.saveGraphFile(config,strcat('results_',num2str(t.Hour),...
-        '_',num2str(t.Minute),'_',secondStr(1:2),'.graph'))
+%     t = datetime('now');
+%     secondStr = num2str(t.Second);
+%     graph0.saveGraphFile(config,strcat('results_',num2str(t.Hour),...
+%         '_',num2str(t.Minute),'_',secondStr(1:2),'.graph'))
 end
 
 obj.solveTime = toc(timeStart);

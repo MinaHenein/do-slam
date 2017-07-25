@@ -5,8 +5,8 @@ function config = setUnitTestConfig(config)
 % set properties of Config
 config.set('t',0.1);
 config.set('rngSeed',1);
-config.set('noiseModel','Gaussian');
-% config.set('noiseModel','Off');
+% config.set('noiseModel','Gaussian');
+config.set('noiseModel','Off');
 config.set('poseParameterisation','R3xso3');
 
 % temporarily changed function handles to public for setting
@@ -24,13 +24,14 @@ config.set('posePoseEdgeLabel'   ,'EDGE_R3_SO3');
 config.set('posePointEdgeLabel'  ,'EDGE_3D');
 config.set('pointPlaneEdgeLabel' ,'EDGE_1D');
 config.set('pointPointEdgeLabel' ,'EDGE_DELTA_3D');
+config.set('point3EdgeLabel','EDGE_3POINTS')
 config.set('posePriorEdgeLabel','EDGE_6D');
 config.set('graphFileFolderName' ,'GraphFiles');
 
 % set pose prior
 rot = eul2rot([pi/180,pi/180,pi/180]); % 1 degree position error
 orientation = arot(rot);
-config.set('stdPosePrior' ,[0.005,0.005,0.005,orientation(1),orientation(2),orientation(3)]');
+config.set('stdPosePrior',[0.005,0.005,0.005,orientation(1),orientation(2),orientation(3)]');
 
 % set point prior error
 config.set('stdPointPrior',[0.01,0.01,0.01]');
@@ -41,6 +42,8 @@ orientation = arot(rot);
 config.set('stdPosePose'  ,[0.01,0.01,0.01,orientation']');
 
 config.set('stdPosePoint' ,[0.1,0.1,0.1]');
+
+config.set('stdPoint3',0.01);
 
 % velocity/motion estimation error - can change
 config.set('stdPointPoint',config.stdPosePoint*2);

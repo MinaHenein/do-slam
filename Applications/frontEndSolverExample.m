@@ -29,8 +29,8 @@ config = CameraConfig();
 % set properties of Config
 config.set('t',t);
 config.set('rngSeed',1);
-config.set('noiseModel','Gaussian');
-% config.set('noiseModel','Off');
+% config.set('noiseModel','Gaussian');
+config.set('noiseModel','Off');
 config.set('poseParameterisation','R3xso3');
 % config.set('poseParameterisation','logSE3');
 
@@ -100,6 +100,7 @@ cameraTrajectory = RelativePoseTrajectory(robotTrajectory,config.cameraRelativeP
 sensor = SimulatedEnvironmentSensor();
 sensor.addEnvironment(environment);
 sensor.addCamera(config.fieldOfView,cameraTrajectory);
+sensor.nPoints
 sensor.setVisibility(config);
 
 %% 5. Generate Measurements & Save to Graph File
@@ -123,7 +124,7 @@ graph0  = solverEnd.graphs(1);
 graphN  = solverEnd.graphs(end);
 fprintf('\nChi-squared error: %f\n',solverEnd.systems(end).chiSquaredError)
 %save results to graph file
-graphN.saveGraphFile(config,'results.graph');
+graphN.saveGraphFile(config,'resultsFrontEnd.graph');
 
 %% 8. Error analysis
 %load ground truth into graph, sort if required
