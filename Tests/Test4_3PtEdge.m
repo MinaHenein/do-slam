@@ -64,9 +64,6 @@ for i=1:nSteps
     currentVertex.index = vertexCount;
     groundTruthVertices{i,1} = currentVertex;
     vertexCount = vertexCount+1;
-end
-
-for i=1:nSteps
     for j=1:size(objectPts,2)
         % create vertex for point location
         currentVertex = struct();
@@ -106,23 +103,23 @@ for i=1:size(groundTruthVertices,1)
     end
 end
 
-for i=3:nSteps
-    for j=1:size(objectPts,2)
-        currentEdge = struct();
-        currentEdge.index1 = groundTruthVertices{i-2,j+1}.index;
-        currentEdge.index2 = groundTruthVertices{i-1,j+1}.index;
-        currentEdge.index3 = groundTruthVertices{i,j+1}.index;
-        currentEdge.label = config.point3EdgeLabel;
-        currentEdge.value = norm(groundTruthVertices{i,j+1}.value-...
-            groundTruthVertices{i-1,j+1}.value)-...
-            norm(groundTruthVertices{i-1,j+1}.value-...
-            groundTruthVertices{i-2,j+1}.value);
-        currentEdge.std = config.stdPoint3;
-        currentEdge.cov = config.covPoint3;
-        currentEdge.covUT = covToUpperTriVec(currentEdge.cov);
-        groundTruthEdges{i,j+4} = currentEdge; % add to end
-    end
-end
+% for i=3:nSteps
+%     for j=1:size(objectPts,2)
+%         currentEdge = struct();
+%         currentEdge.index1 = groundTruthVertices{i-2,j+1}.index;
+%         currentEdge.index2 = groundTruthVertices{i-1,j+1}.index;
+%         currentEdge.index3 = groundTruthVertices{i,j+1}.index;
+%         currentEdge.label = config.point3EdgeLabel;
+%         currentEdge.value = norm(groundTruthVertices{i,j+1}.value-...
+%             groundTruthVertices{i-1,j+1}.value)-...
+%             norm(groundTruthVertices{i-1,j+1}.value-...
+%             groundTruthVertices{i-2,j+1}.value);
+%         currentEdge.std = config.stdPoint3;
+%         currentEdge.cov = config.covPoint3;
+%         currentEdge.covUT = covToUpperTriVec(currentEdge.cov);
+%         groundTruthEdges{i,j+4} = currentEdge; % add to end
+%     end
+% end
 
 measurementEdges = groundTruthEdges; % copies grouthTruth to add noise
 for i=1:numel(measurementEdges) % add noise on measurements
@@ -142,7 +139,7 @@ measurementGraph = fopen(strcat(config.folderPath,config.sep,'Data',...
     config.sep,config.graphFileFolderName,config.sep,config.measurementsFileName),'w');
 
 % only done to avoid index error
-groundTruthVertices{size(groundTruthEdges,1),size(groundTruthEdges,2)} = []; 
+% groundTruthVertices{size(groundTruthEdges,1),size(groundTruthEdges,2)} = []; 
 [nRows, nColumns] = size(groundTruthEdges);
 for i=1:nRows
     for j=1:nColumns
