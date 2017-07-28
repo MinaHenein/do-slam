@@ -7,8 +7,8 @@ function [dataNoisy] = addGaussianNoise(config,mu,sigma,dataGT,varargin)
 
 % rng(config.rngSettings);
 
-switch config.noiseSwitch
-    case 'on'
+switch config.noiseModel
+    case 'Gaussian'
         mu = repmat(mu,1,size(dataGT,2));
         sigma = repmat(sigma,1,size(dataGT,2));
         noise = normrnd(mu,sigma,size(dataGT));
@@ -24,10 +24,10 @@ switch config.noiseSwitch
                 otherwise; error('wrong type')
             end
         end
-    case 'off'
+    case 'Off'
         dataNoisy = dataGT;
     otherwise
-        error('config.noiseSwitch must be "on" or "off')
+        error('config.noiseModel must be "Gaussian" or "Off"')
 
 
 

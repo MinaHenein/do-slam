@@ -31,7 +31,8 @@ classdef Config < ArrayGetSet
         stdPosePose
         stdPosePoint
         stdPointPoint
-        stdPoint3
+        std3Points
+        std2PointsVelocity
         stdPointPlane
         
         %R3xso3 or logSE3
@@ -85,6 +86,8 @@ classdef Config < ArrayGetSet
         posePointEdgeLabel
         pointPointEdgeLabel
         point3EdgeLabel
+        velocityVertexLabel
+        pointVelocityEdgeLabel
         pointPlaneEdgeLabel
         posePriorEdgeLabel
         angleVertexLabel
@@ -125,7 +128,8 @@ classdef Config < ArrayGetSet
         covPosePose
         covPosePoint
         covPointPoint
-        covPoint3
+        cov3Points
+        cov2PointsVelocity
         covPointPlane
     end
     
@@ -165,8 +169,11 @@ classdef Config < ArrayGetSet
         function covPointPoint = get.covPointPoint(obj)
             covPointPoint = stdToCovariance(obj.stdPointPoint);
         end
-        function covPoint3 = get.covPoint3(obj)
-            covPoint3 = stdToCovariance(obj.stdPoint3);
+        function cov3Points = get.cov3Points(obj)
+            cov3Points = stdToCovariance(obj.std3Points);
+        end
+        function cov2PointsVelocity = get.cov2PointsVelocity(obj)
+            cov2PointsVelocity = stdToCovariance(obj.std2PointsVelocity);
         end
         function covPointPlane = get.covPointPlane(obj)
             covPointPlane = stdToCovariance(obj.stdPointPlane);

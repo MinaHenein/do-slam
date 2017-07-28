@@ -75,16 +75,29 @@ for i = 1:nSteps
                 end
                 %construct pose-point edge
                 obj = obj.constructPosePointEdge(config,jRow);
-            case config.pointPointEdgeLabel
+            case config.pointPointEdgeLabel                
                 %edgeIndex
                 jRow{2} = obj.nEdges+1;
-                % construct point-point edge - both points should already exist
+                % construct point-point edge
                 obj = obj.constructPointPointEdge(config,jRow);
             case config.point3EdgeLabel
                 %edgeIndex
                 jRow{2} = obj.nEdges+1;
+                % construct 3-points edge 
+                obj = obj.construct3PointsEdge(config,jRow);
+            case config.pointVelocityEdgeLabel
+                %edge index
+                jRow{2} = obj.nEdges+1;
+                %create velocity vertex if it doesn't exist
+                if jRow{4} > obj.nVertices
+                    %find all point vertices connected to this velocity
+                    %vertex
+                    pointRows = iRows([measurementsCell{iRows,4}]==jRow{4});
+                    pointVertices = [measurementsCell{pointRows,3}]';
+                    obj = obj.constructVelocityVertex(config,jRow,pointVertices);
+                end
                 % construct point-point edge - both points should already exist
-                obj = obj.constructPoint3Edge(config,jRow);
+                obj = obj.construct2PointsVelocityEdge(config,jRow);
             case config.pointPlaneEdgeLabel
                 %edge index
                 jRow{2} = obj.nEdges+1;
@@ -106,7 +119,7 @@ for i = 1:nSteps
                 pointVertices = [measurementsCell{pointRows,3}]';
                 %remove plane vertex that doesn't exist
                 pointVertices(pointVertices>obj.nVertices) = [];
-                %adjust jRow - ocnstructor requires plane as output vertex
+                %adjust jRow - constructor requires plane as output vertex
                 jRow{4} = jRow{3};
                 obj = obj.constructPlaneVertex(config,jRow,pointVertices);
                 
