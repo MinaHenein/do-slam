@@ -35,6 +35,8 @@ classdef GEO_Plane < GeometricEntityObject
                     t = varargin{1};
                     parameters = self.computePlaneParameters(t);
                     out = parameters(4,:);
+                case 'static'
+                    out = self.rectangleTrajectory.get(property);
                 otherwise
                     out = self.(property);
             end

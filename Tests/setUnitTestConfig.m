@@ -47,6 +47,7 @@ config.set('stdPoint3',0.1);
 
 % velocity/motion estimation error - can change
 config.set('stdPointPoint',config.stdPosePoint*2);
+% config.set('stdPointPoint',[0.001 0.001 0.001]');
 
 config.set('stdPointPlane',0.001);
 % set properties of CameraConfig

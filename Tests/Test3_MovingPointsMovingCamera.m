@@ -66,9 +66,6 @@ for i=1:nSteps
     currentVertex.index = vertexCount;
     groundTruthVertices{i,1} = currentVertex;
     vertexCount = vertexCount+1;
-end
-
-for i=1:nSteps
     for j=1:size(objectPts,2)
         % create vertex for point location
         currentVertex = struct();
@@ -137,6 +134,8 @@ groundTruthGraph = fopen(strcat(config.folderPath,config.sep,'Data',...
 measurementGraph = fopen(strcat(config.folderPath,config.sep,'Data',...
     config.sep,config.graphFileFolderName,config.sep,config.measurementsFileName),'w');
 
+% only done to avoid index error - comment out if point-point edges are
+% deactivated
 groundTruthVertices{size(groundTruthEdges,1),size(groundTruthEdges,2)} = []; % only done to avoid index error
 [nRows, nColumns] = size(groundTruthEdges);
 for i=1:nRows

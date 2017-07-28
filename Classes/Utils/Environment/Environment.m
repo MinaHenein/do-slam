@@ -216,7 +216,9 @@ classdef Environment < ArrayGetSet
             %get point positions
             positions = self.environmentPoints(staticPointIndexes).get('R3Position',0);
             %plot positions
-            plot3(positions(1,:),positions(2,:),positions(3,:),'k.')
+            if ~isempty(positions)
+                plot3(positions(1,:),positions(2,:),positions(3,:),'k.')
+            end
             %plot primitives
 %             for i = 1:staticPrimitiveIndexes
 %                 self.environmentPrimitives(staticPrimitiveIndexes(i)).plot()
