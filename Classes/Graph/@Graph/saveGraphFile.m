@@ -18,6 +18,7 @@ for i = 1:obj.nVertices
         case 'plane';       vertexLabel = config.planeVertexLabel;
         case 'angle';       vertexLabel = config.angleVertexLabel;
         case 'distance';    vertexLabel = config.distanceVertexLabel;
+        case 'velocity'; vertexLabel = config.velocityVertexLabel;
         otherwise; error('type invalid')
     end
     vertexIndex = obj.vertices(i).index;
@@ -45,10 +46,15 @@ for i = 1:obj.nEdges
             verticesIn = obj.edges(i).iVertices(1);
             verticesOut = obj.edges(i).iVertices(2);
             edgeCovariance = covToUpperTriVec(obj.edges(i).covariance);           
-        case 'point-3'
+        case '3-points'
             edgeLabel = config.point3EdgeLabel;
             verticesIn = obj.edges(i).iVertices;
             verticesOut = [];
+            edgeCovariance = obj.edges(i).covariance;
+        case '2points-velocity'
+            edgeLabel = config.pointVelocityEdgeLabel;
+            verticesIn = obj.edges(i).iVertices(1:2);
+            verticesOut = obj.edges(i).iVertices(3);
             edgeCovariance = obj.edges(i).covariance;
         case 'point-plane'               
             edgeLabel = config.pointPlaneEdgeLabel;

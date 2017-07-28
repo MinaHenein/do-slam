@@ -2,20 +2,21 @@
 % Author: Mina Henein - mina.henein@anu.edu.au - 24/07/17
 % Contributors:
 %--------------------------------------------------------------------------
-% Test5_velocityVertex
+% Test5_velocityEdge
 
 %% general setup
 % run startup first
 clear all
 close all
 
+applyVelocityVertex = 1;
 nSteps = 3;
 
 %% config setup 
 config = CameraConfig();
 config = setUnitTestConfig(config);
-config.set('groundTruthFileName' ,'groundTruthTest4.graph');
-config.set('measurementsFileName','measurementsTest4.graph');
+config.set('groundTruthFileName' ,'groundTruthTest5.graph');
+config.set('measurementsFileName','measurementsTest5.graph');
 config.set('stdPointPoint',[0.01 0.01 0.01]');
 rng(config.rngSeed);
 %% set up sensor - MANUAL
@@ -57,6 +58,7 @@ groundTruthEdges = {};
 vertexCount = 1;
 
 for i=1:nSteps
+    rowCount = 0;
     % create vertex for odometry reading
     currentVertex = struct();
     currentVertex.label = config.poseVertexLabel;
@@ -64,20 +66,31 @@ for i=1:nSteps
     currentVertex.index = vertexCount;
     groundTruthVertices{i,1} = currentVertex;
     vertexCount = vertexCount+1;
-end
-
-for i=1:nSteps
+    rowCount = rowCount+1;
     for j=1:size(objectPts,2)
         % create vertex for point location
         currentVertex = struct();
         currentVertex.label = config.pointVertexLabel;
         currentVertex.index = vertexCount;
         currentVertex.value = objectPts{j}(:,i);
-        groundTruthVertices{i,j+1} = currentVertex;
+        groundTruthVertices{i,rowCount+1} = currentVertex;
         vertexCount = vertexCount+1;
-    end
+        rowCount = rowCount+1;
+        % velocity vertex
+        if i>=3
+            currentVertex = struct();
+            currentVertex.label = config.velocityVertexLabel;
+            currentVertex.index = vertexCount;
+            currentVertex.value = mean([norm(objectPts{j}(:,i)-objectPts{j}(:,i-1)),...
+                norm(objectPts{j}(:,i-1)-objectPts{j}(:,i-2))]);
+            groundTruthVertices{i,rowCount+1} = currentVertex;
+            vertexCount = vertexCount+1;
+            rowCount = rowCount+1;
+        end
+    end  
 end
 
+nVelocityVertices = 0;
 for i=1:size(groundTruthVertices,1)
     % ground Truth edges for odometry
     if i > 1
@@ -90,49 +103,67 @@ for i=1:size(groundTruthVertices,1)
         currentEdge.std = config.stdPosePose;
         currentEdge.cov = config.covPosePose;
         currentEdge.covUT = covToUpperTriVec(currentEdge.cov);
-        groundTruthEdges{i,1} = currentEdge;
+        groundTruthEdges{i,end+1} = currentEdge;
     end
     for j=1:size(objectPts,2)
         currentEdge = struct();
         currentEdge.index1 = groundTruthVertices{i,1}.index;
-        currentEdge.index2 = groundTruthVertices{i,j+1}.index;
+        currentEdge.index2 = groundTruthVertices{i,j+nVelocityVertices+1}.index;
         currentEdge.label = config.posePointEdgeLabel;
         currentEdge.value = AbsoluteToRelativePositionR3xso3(sensorPose(:,i),...
             objectPts{j}(:,i));
         currentEdge.std = config.stdPosePoint;
         currentEdge.cov = config.covPosePoint;
         currentEdge.covUT = covToUpperTriVec(currentEdge.cov);
-        groundTruthEdges{i,j+1} = currentEdge;
-    end
-end
-
-for i=3:nSteps
-    for j=1:size(objectPts,2)
-        currentEdge = struct();
-        currentEdge.index1 = groundTruthVertices{i-2,j+1}.index;
-        currentEdge.index2 = groundTruthVertices{i-1,j+1}.index;
-        currentEdge.index3 = groundTruthVertices{i,j+1}.index;
-        currentEdge.label = config.point3EdgeLabel;
-        currentEdge.value = norm(groundTruthVertices{i,j+1}.value-...
-            groundTruthVertices{i-1,j+1}.value)-...
-            norm(groundTruthVertices{i-1,j+1}.value-...
-            groundTruthVertices{i-2,j+1}.value);
-        currentEdge.std = config.stdPoint3;
-        currentEdge.cov = config.covPoint3;
-        currentEdge.covUT = covToUpperTriVec(currentEdge.cov);
-        groundTruthEdges{i,j+4} = currentEdge; % add to end
+        groundTruthEdges{i,end+1} = currentEdge;
+        if applyVelocityVertex
+            if i>= 3
+                % point @ time 1,2 - velocity
+                currentEdge = struct();
+                currentEdge.index1 = groundTruthVertices{i-2,j+1}.index;
+                currentEdge.index2 = groundTruthVertices{i-1,j+1}.index;
+                currentEdge.index3 = groundTruthVertices{i,i+j*2-2}.index;
+                currentEdge.label = config.pointVelocityEdgeLabel;
+                currentEdge.value = groundTruthVertices{i,i+j*2-2}.value-...
+                    norm(groundTruthVertices{i-1,j+1}.value-...
+                    groundTruthVertices{i-2,j+1}.value);
+                currentEdge.std = config.std2PointsVelocity;
+                currentEdge.cov = config.cov2PointsVelocity;
+                currentEdge.covUT = covToUpperTriVec(currentEdge.cov);
+                groundTruthEdges{i,end+1} = currentEdge;
+                % point @ time 2,3 - velocity
+                currentEdge = struct();
+                currentEdge.index1 = groundTruthVertices{i-1,j+1}.index;
+                currentEdge.index2 = groundTruthVertices{i,j+nVelocityVertices+1}.index;
+                currentEdge.index3 = groundTruthVertices{i,i+j*2-2}.index;
+                currentEdge.label = config.pointVelocityEdgeLabel;
+                currentEdge.value = groundTruthVertices{i,i+j*2-2}.value-...
+                    norm(groundTruthVertices{i,j+1}.value-...
+                    groundTruthVertices{i-1,j+1}.value);
+                currentEdge.std = config.std2PointsVelocity;
+                currentEdge.cov = config.cov2PointsVelocity;
+                currentEdge.covUT = covToUpperTriVec(currentEdge.cov);
+                groundTruthEdges{i,end+1} = currentEdge;
+                nVelocityVertices = nVelocityVertices+1;
+            end
+        end
     end
 end
 
 measurementEdges = groundTruthEdges; % copies grouthTruth to add noise
 for i=1:numel(measurementEdges) % add noise on measurements
     if ~isempty(measurementEdges{i})
-        if strcmp(config.noiseModel,'Gaussian')
-            noise = normrnd(measurementEdges{i}.value,measurementEdges{i}.std);
-        elseif strcmp(config.noiseModel,'Off')
-            noise = measurementEdges{i}.value;
+        valueEdge = measurementEdges{i}.value;
+        muEdge =  zeros(size(valueEdge,1),1);
+        sigmaEdge = measurementEdges{i}.std;
+        if strcmp(measurementEdges{i}.label,'EDGE_R3_SO3') || ...
+                strcmp(measurementEdges{i}.label,'EDGE_LOG_SE3')
+            measurementEdges{i}.value = ...
+                addGaussianNoise(config,muEdge,sigmaEdge,valueEdge,'pose');
+        else
+            measurementEdges{i}.value = ...
+                addGaussianNoise(config,muEdge,sigmaEdge,valueEdge);
         end
-        measurementEdges{i}.value = noise;
     end
 end
 
@@ -141,9 +172,7 @@ groundTruthGraph = fopen(strcat(config.folderPath,config.sep,'Data',...
 measurementGraph = fopen(strcat(config.folderPath,config.sep,'Data',...
     config.sep,config.graphFileFolderName,config.sep,config.measurementsFileName),'w');
 
-% only done to avoid index error
-groundTruthVertices{size(groundTruthEdges,1),size(groundTruthEdges,2)} = []; 
-[nRows, nColumns] = size(groundTruthEdges);
+[nRows, nColumns] = size(groundTruthVertices);
 for i=1:nRows
     for j=1:nColumns
         if ~isempty(groundTruthVertices{i,j})
@@ -152,6 +181,12 @@ for i=1:nRows
             fprintf(groundTruthGraph, formatSpec, vertex.label, vertex.index,...
                 vertex.value);
         end
+    end
+end
+
+[nRows, nColumns] = size(groundTruthEdges);
+for i=1:nRows
+    for j=1:nColumns        
         if ~isempty(groundTruthEdges{i,j})
             % print groundTruth Edge
             edge = groundTruthEdges{i,j};
@@ -166,7 +201,6 @@ for i=1:nRows
                 fprintf(groundTruthGraph,formatSpec,edge.label,edge.index1,...
                     edge.index2,edge.value,edge.covUT);
             end
-            
             % print Measurement edge
             edge = measurementEdges{i,j};
             if isfield(edge, 'index3')
@@ -179,7 +213,6 @@ for i=1:nRows
         end
     end
 end
-
 fclose(groundTruthGraph);
 fclose(measurementGraph);
 
@@ -191,7 +224,7 @@ solver = graph0.process(config,measurementsCell,groundTruthCell);
 solverEnd = solver(end);
 % 
 graphN  = solverEnd.graphs(end);
-graphN.saveGraphFile(config,'resultsTest4.graph');
+graphN.saveGraphFile(config,'resultsTest5.graph');
 % 
 graphGT = Graph(config,groundTruthCell);
 results = errorAnalysis(config,graphGT,graphN);
