@@ -170,14 +170,62 @@ for i = 1:nSteps
                         covariance = config.covPointPoint;
                         index1 = vertexIndexes(end);
                         index2 = vertexIndexes(end-1);
-                        valueGT = jPoint.get('R3Position',i)-jPoint.get('R3Position',i-1);
+                        valueGT = jPoint.get('R3Position',t(i))-jPoint.get('R3Position',t(i-1));
                         pointMotion = GP_Point(valueGT);
                         pointMotionNoisy = pointMotion.addNoise(config.noiseModel,zeros(size(config.stdPointPoint)),config.stdPointPoint); 
                         valueMeas = pointMotionNoisy.get('R3Position');
                         writeEdge(label,index1,index2,valueGT,covariance,gtFileID);
                         writeEdge(label,index1,index2,valueMeas,covariance,mFileID);
                     case 'point3Edge'
-                    case 'velocityVertex'
+                        if (i > 2) && (self.pointVisibility(j,i-2)) % checks for second condition - whether last two were observed
+                            index1 = vertexIndexes(end);
+                            index2 = vertexIndexes(end-1);
+                            index3 = vertexIndexes(end-2);
+                            label = config.point3EdgeLabel;
+                            valueGT = norm(jPoint.get('R3Position',t(i)) - jPoint.get('R3Position',t(i-1)))-...
+                                      norm(jPoint.get('R3Position',t(i-1)) - jPoint.get('R3Position',t(i-2)));
+                            covariance = config.cov3Points;
+                            point3Motion = GP_Point(valueGT);
+                            point3MotionNoisy = point3Motion.addNoise(config.noiseModel,zeros(size(config.std3Points)),config.std3Points);
+                            valueMeas = point3MotionNoisy.get('R3Position');
+                            writeEdge(label,[index1 index2],index3,valueGT,covariance,gtFileID);
+                            writeEdge(label,[index1 index2],index3,valueMeas,covariance,mFileID);
+                        end
+                    case 'velocity'
+                        if (i > 2) && (self.pointVisibility(j,i-2)) % checks for second condition
+                            % write velocity vertex
+                            vertexCount = vertexCount + 1;
+                            label = config.velocityVertexLabel;
+                            value = mean([norm(jPoint.get('R3Position',t(i))-jPoint.get('R3Position',t(i-1))),...
+                                            norm(jPoint.get('R3Position',t(i-1))-jPoint.get('R3Position',t(i-2)))]);
+                            writeVertex(label,vertexCount,value,gtFileID);
+                            
+                            % write velocity edges
+                            % point @ time 1,2 - velocity
+                
+                            index1 = vertexIndexes(end-2);
+                            index2 = vertexIndexes(end-1);
+                            index3 = vertexCount;
+                            label = config.pointVelocityEdgeLabel;
+                            valueGT = value-norm(jPoint.get('R3Position',t(i-1))-jPoint.get('R3Position',t(i-2)));
+                            velocityPoint = GP_Point(valueGT);
+                            velocityPointNoisy = velocityPoint.addNoise(config.noiseModel,zeros(size(config.std2PointsVelocity)),config.std2PointsVelocity);
+                            valueMeas = velocityPointNoisy.get('R3Position');
+                            writeEdge(label,[index1 index2],index3,valueGT,covariance,gtFileID);
+                            writeEdge(label,[index1 index2],index3,valueMeas,covariance,mFileID);
+                            
+                            % point @ time 2,3 - velocity
+                            index1 = vertexIndexes(end-1);
+                            index2 = vertexIndexes(end);
+                            index3 = vertexCount;
+                            label = config.pointVelocityEdgeLabel;
+                            valueGT = value-norm(jPoint.get('R3Position',t(i))-jPoint.get('R3Position',t(i-1)));
+                            velocityPoint = GP_Point(valueGT);
+                            velocityPointNoisy = velocityPoint.addNoise(config.noiseModel,zeros(size(config.std2PointsVelocity)),config.std2PointsVelocity);
+                            valueMeas = velocityPointNoisy.get('R3Position');
+                            writeEdge(label,[index1 index2],index3,valueGT,covariance,gtFileID);
+                            writeEdge(label,[index1 index2],index3,valueMeas,covariance,mFileID);
+                        end
                     case 'off'
                     otherwise
                         error('Point motion measurement type is unidentified.')

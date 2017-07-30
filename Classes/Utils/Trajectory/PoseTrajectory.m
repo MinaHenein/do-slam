@@ -83,7 +83,12 @@ classdef PoseTrajectory < Trajectory
             end
             
             %plot positions
-            plot3(poses(1,:),poses(2,:),poses(3,:),'k.')
+            if varargin{1}
+                color = varargin{1};
+            else
+                color = [0 0 0];
+            end
+            plot3(poses(1,:),poses(2,:),poses(3,:),'color',color,'LineStyle','-')
             
             %plot axes
             for i = 1:numel(t)

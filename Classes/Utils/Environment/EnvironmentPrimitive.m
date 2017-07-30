@@ -20,7 +20,14 @@ classdef EnvironmentPrimitive < ArrayGetSet & matlab.mixin.Heterogeneous
     % Get & Set
     methods(Access = public)
         function out = getSwitch(self,property,varargin)
-            out = self.(property); 
+            switch property
+                case {'GP_Pose','R3xso3Pose','logSE3Pose','R3xso3Position','logSE3Position','axisAngle','R'}
+                    out = self.trajectory.get(property,varargin{1});
+                case 'static'
+                    out = self.trajectory.get(property);
+                otherwise
+                    out = self.(property); 
+            end
         end
         
         function self = setSwitch(self,property,value,varargin)

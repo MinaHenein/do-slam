@@ -23,7 +23,7 @@ config.set('planeVertexLabel'    ,'VERTEX_PLANE_4D');
 config.set('posePoseEdgeLabel'   ,'EDGE_R3_SO3');
 config.set('posePointEdgeLabel'  ,'EDGE_3D');
 config.set('pointPlaneEdgeLabel' ,'EDGE_1D');
-config.set('pointPointEdgeLabel' ,'EDGE_DELTA_3D');
+config.set('pointPointEdgeLabel' ,'EDGE_2POINTS');
 config.set('point3EdgeLabel','EDGE_3POINTS')
 config.set('velocityVertexLabel','VERTEX_VELOCITY')
 config.set('pointVelocityEdgeLabel','EDGE_2POINTS_VELOCITY')
