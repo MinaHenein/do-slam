@@ -9,7 +9,7 @@
 clear all
 close all
 
-applyVelocityVertex = 1;
+applyVelocityVertex = 0;
 nSteps = 3;
 
 %% config setup 
@@ -77,15 +77,17 @@ for i=1:nSteps
         vertexCount = vertexCount+1;
         rowCount = rowCount+1;
         % velocity vertex
-        if i>=3
-            currentVertex = struct();
-            currentVertex.label = config.velocityVertexLabel;
-            currentVertex.index = vertexCount;
-            currentVertex.value = mean([norm(objectPts{j}(:,i)-objectPts{j}(:,i-1)),...
-                norm(objectPts{j}(:,i-1)-objectPts{j}(:,i-2))]);
-            groundTruthVertices{i,rowCount+1} = currentVertex;
-            vertexCount = vertexCount+1;
-            rowCount = rowCount+1;
+        if applyVelocityVertex
+            if i>=3
+                currentVertex = struct();
+                currentVertex.label = config.velocityVertexLabel;
+                currentVertex.index = vertexCount;
+                currentVertex.value = mean([norm(objectPts{j}(:,i)-objectPts{j}(:,i-1)),...
+                    norm(objectPts{j}(:,i-1)-objectPts{j}(:,i-2))]);
+                groundTruthVertices{i,rowCount+1} = currentVertex;
+                vertexCount = vertexCount+1;
+                rowCount = rowCount+1;
+            end
         end
     end  
 end

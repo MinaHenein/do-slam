@@ -39,13 +39,13 @@ config.set('stdPosePrior',[0.005,0.005,0.005,orientation(1),orientation(2),orien
 config.set('stdPointPrior',[0.01,0.01,0.01]');
 
 % set odometry error
-rot = eul2rot([pi/360,pi/360,pi/360]); % 5 degree position error
+rot = eul2rot([pi/36,pi/36,pi/36]); % 0.5 degree position error
 orientation = arot(rot);
-config.set('stdPosePose'  ,[0.04,0.04,0.04,orientation']');
+config.set('stdPosePose'  ,[0.4,0.4,0.4,orientation']');
 
-config.set('stdPosePoint' ,[0.04,0.04,0.04]');
+config.set('stdPosePoint' ,[0.4,0.4,0.4]');
 
-config.set('std3Points',0.01);
+config.set('std3Points',1);
 config.set('std2PointsVelocity',0.01);
 
 % velocity/motion estimation error - can change

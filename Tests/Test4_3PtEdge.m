@@ -190,10 +190,13 @@ fclose(measurementGraph);
 %% solver
 groundTruthCell  = graphFileToCell(config,config.groundTruthFileName);
 measurementsCell = graphFileToCell(config,config.measurementsFileName);
+timeStart = tic;
 graph0 = Graph();
 solver = graph0.process(config,measurementsCell,groundTruthCell);
 solverEnd = solver(end);
-% 
+totalTime = toc(timeStart);
+fprintf('\nTotal time solving: %f\n',totalTime)
+
 graphN  = solverEnd.graphs(end);
 graphN.saveGraphFile(config,'resultsTest4.graph');
 % 
