@@ -85,24 +85,24 @@ cameraTrajectory = RelativePoseTrajectory(robotTrajectory,config.cameraRelativeP
 sensor = SimulatedEnvironmentOcclusionSensor();
 sensor.addEnvironment(environment);
 sensor.addCamera(config.fieldOfView,cameraTrajectory);
-sensor.setVisibility(config,environment);
+sensor.setVisibility(config,environment); % don't have any way of testing this as of now
 % 
-% %% 5. Generate Measurements & Save to Graph File
-% sensor.generateMeasurements(config);
-% 
-% %% 6. Plot
-% figure
-% viewPoint = [-50,25];
-% axisLimits = [-1,15,-1,20,-1,10];
-% title('Environment')
-% axis equal
-% xlabel('x')
-% ylabel('y')
-% zlabel('z')
-% view(viewPoint)
-% axis(axisLimits)
-% hold on
-% staticTrajectory1.plot()
-% staticTrajectory2.plot()
-% cameraTrajectory.plot(t)
-% environment.plot(t)
+%% 5. Generate Measurements & Save to Graph File
+sensor.generateMeasurements(config);
+
+%% 6. Plot
+figure
+viewPoint = [-50,25];
+axisLimits = [-1,15,-1,20,-1,10];
+title('Environment')
+axis equal
+xlabel('x')
+ylabel('y')
+zlabel('z')
+view(viewPoint)
+axis(axisLimits)
+hold on
+staticTrajectory1.plot()
+staticTrajectory2.plot()
+cameraTrajectory.plot(t)
+environment.plot(t)

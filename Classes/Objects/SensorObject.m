@@ -13,12 +13,18 @@ classdef SensorObject < ArrayGetSet & matlab.mixin.Heterogeneous
         index
         pointIndexes
         vertexIndex
+        static
     end
     
     %% 2. Methods
     methods(Access = public)
         function out = getSwitch(self,property,varargin)
-            out = self.(property); 
+            switch property
+                case 'static'
+                    out = self.trajectory.get(property);
+                otherwise
+                    out = self.(property);
+            end
         end
         
         function self = setSwitch(self,property,value,varargin)

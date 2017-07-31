@@ -18,6 +18,8 @@ function self = addEnvironment(self,environment)
             case 'EP_Default'
                 objects(i) = self.RBOfromEP(environment.get('environmentPrimitives',i)); % runs special internal function for rigid body
                 % that creates from Environment Primitives
+            case 'EnvironmentPrimitive'
+                objects(i) = self.RBOfromEP(environment.get('environmentPrimitives',i));
             otherwise
                 error('Error: object conversion for %s not yet implemented',class(environment.get('environmentPrimitives',i)))
         end

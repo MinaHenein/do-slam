@@ -38,6 +38,10 @@ classdef Config < ArrayGetSet
         %R3xso3 or logSE3
         poseParameterisation
         
+        % measurement type for point motion - can be point2Edge, point3Edge,
+        % or velocity - ONLY affects the pre-measurements file stage.
+        pointMotionMeasurement
+        
         % function handles moved to public temporarily
         
         %% TODO: both shouldnt be here!!

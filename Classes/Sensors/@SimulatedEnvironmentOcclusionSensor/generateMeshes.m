@@ -23,25 +23,26 @@ for i=1:self.nObjects
 end
 
 visibility = zeros(size(meshes));
-for p=1:size(meshes,1)
-    for i=[1 4 7] % all 3 points in the row representation
-        S2xRRelativePosition = R3_S2xR(meshRelative(p,i:i+2));
+validRows = ones(size(meshes,1),1);
+for p=1:validRows
+    for j=[1 4 7] % all 3 points in the row representation
+        S2xRRelativePosition = R3_S2xR(meshRelative(p,j:j+2));
         % check this meshTriangle points for FoV - saves in long run
         if (S2xRRelativePosition(1) >= self.fieldOfView(1)) && (S2xRRelativePosition(1) <= self.fieldOfView(2)) &&...
         (S2xRRelativePosition(2) >= self.fieldOfView(3)) && (S2xRRelativePosition(2) <= self.fieldOfView(4)) &&...   
         (S2xRRelativePosition(3) >= self.fieldOfView(5)) && (S2xRRelativePosition(3) <= self.fieldOfView(6))
-            visibility(p,i) = 1;
+            visibility(p,j) = 1;
         else
-            visibility(p,i) = 0;
+            visibility(p,j) = 0;
         end
     end
-    if ~any(visibility(p,:))
-        continue
+    if any(visibility(p,:))
+        validRows(p,1) = 1;
     else
-        meshes = [meshes(:,p-1); meshes(:,p+1:end)];
+        validRows(p,1) = 0;
     end
 end
-    
-    
+
+meshes = meshes(find(validRows==1),:);
 end
 

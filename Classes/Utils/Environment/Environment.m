@@ -97,7 +97,7 @@ classdef Environment < ArrayGetSet
             end
             
             %construct primitive
-            primitive = EP_Default();
+            primitive = EnvironmentPrimitive();
             primitive.set('trajectory',trajectory);
             
             %pair primitive and points
@@ -216,7 +216,9 @@ classdef Environment < ArrayGetSet
             %get point positions
             positions = self.environmentPoints(staticPointIndexes).get('R3Position',0);
             %plot positions
-            plot3(positions(1,:),positions(2,:),positions(3,:),'k.')
+            if ~isempty(positions)
+                plot3(positions(1,:),positions(2,:),positions(3,:),'k.')
+            end
             %plot primitives
 %             for i = 1:staticPrimitiveIndexes
 %                 self.environmentPrimitives(staticPrimitiveIndexes(i)).plot()
@@ -237,7 +239,7 @@ classdef Environment < ArrayGetSet
                 end
                 %plot primitives
                 h2 = {};
-                for p = 1:dynamicPrimitiveIndexes
+                for p = dynamicPrimitiveIndexes
                     if isa(self.get('environmentPrimitives',p),'EP_Default')
                         meshPoints = self.get('environmentPrimitives',p).get('meshPointsAbsolute',t(i)).get('R3Position');
                         meshLinks = self.get('environmentPrimitives',p).get('meshLinks');

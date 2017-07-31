@@ -51,9 +51,6 @@ for i=1:nSteps
     currentVertex.index = vertexCount;
     groundTruthVertices{i,1} = currentVertex;
     vertexCount = vertexCount+1;
-end
-
-for i=1:nSteps
     for j=1:size(objectPts,2)
         % create vertex for point location
         currentVertex = struct();
@@ -122,25 +119,27 @@ groundTruthGraph = fopen(strcat(config.folderPath,config.sep,'Data',...
 measurementGraph = fopen(strcat(config.folderPath,config.sep,'Data',...
     config.sep,config.graphFileFolderName,config.sep,config.measurementsFileName),'w');
 
+% only done to avoid index error - comment out if point-point edges are
+% deactivated
 groundTruthVertices{size(groundTruthEdges,1),size(groundTruthEdges,2)} = []; % only done to avoid index error
 [nRows, nColumns] = size(groundTruthEdges);
 for i=1:nRows
     for j=1:nColumns
-    if ~isempty(groundTruthVertices{i,j})
-        vertex = groundTruthVertices{i,j};
-        formatSpec = strcat('%s %d ',repmat(' %6.6f',1,numel(vertex.value)),'\n');
-        fprintf(groundTruthGraph, formatSpec, vertex.label, vertex.index, vertex.value);
-    end
-    if ~isempty(groundTruthEdges{i,j})
-        % print groundTruth Edge
-        edge = groundTruthEdges{i,j};
-        formatSpec = strcat('%s %d %d',repmat(' %.6f',1,numel(edge.value)),repmat(' %.6f',1,numel(edge.covUT)),'\n');
-        fprintf(groundTruthGraph, formatSpec, edge.label, edge.index1, edge.index2, edge.value, edge.covUT);
-        
-        % print Measurement edge
-        edge = measurementEdges{i,j};
-        fprintf(measurementGraph, formatSpec, edge.label, edge.index1, edge.index2, edge.value, edge.covUT);
-    end
+        if ~isempty(groundTruthVertices{i,j})
+            vertex = groundTruthVertices{i,j};
+            formatSpec = strcat('%s %d ',repmat(' %6.6f',1,numel(vertex.value)),'\n');
+            fprintf(groundTruthGraph, formatSpec, vertex.label, vertex.index, vertex.value);
+        end
+        if ~isempty(groundTruthEdges{i,j})
+            % print groundTruth Edge
+            edge = groundTruthEdges{i,j};
+            formatSpec = strcat('%s %d %d',repmat(' %.6f',1,numel(edge.value)),repmat(' %.6f',1,numel(edge.covUT)),'\n');
+            fprintf(groundTruthGraph, formatSpec, edge.label, edge.index1, edge.index2, edge.value, edge.covUT);
+
+            % print Measurement edge
+            edge = measurementEdges{i,j};
+            fprintf(measurementGraph, formatSpec, edge.label, edge.index1, edge.index2, edge.value, edge.covUT);
+        end
     end
 end
 
