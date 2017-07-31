@@ -1,4 +1,4 @@
-function [obj] = constructVelocityVertex(obj,config,edgeRow,pointVertices)
+function [obj] = constructVelocityVertex_v2(obj,config,edgeRow,pointVertices)
 %CONSTRUCTVELOCITYVERTEX constructs vertex representing velocity. Velocity
 %is initialised by extracting velocity information from the same points at 
 %different time steps used to initialise the velocity vertex. 
@@ -15,11 +15,11 @@ edgeCovariance = edgeRow{6};
 %% 2. compute plane parameters
 pointPositions = cell2mat({obj.vertices(pointVertices).value});
 nPoints = size(pointPositions,2); 
-velocities = zeros(nPoints-1,1);
+velocities = zeros(3,nPoints-1);
 for i=2:nPoints
-velocities(i-1,1) = norm(pointPositions(:,i)-pointPositions(:,i-1));
+velocities(:,i-1) = pointPositions(:,i)-pointPositions(:,i-1);
 end
-velocity = mean(velocities);
+velocity = mean(velocities,2);
 %% 3. vertex properties
 value = velocity;
 covariance = []; %not using this property yet

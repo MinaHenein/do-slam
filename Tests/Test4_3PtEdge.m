@@ -3,6 +3,7 @@
 % Contributors:
 %--------------------------------------------------------------------------
 % Test4_3PtEdge
+% g(l11,l12,l13) = || l13-l12 || - || l12-l11 ||
 
 %% general setup
 % run startup first

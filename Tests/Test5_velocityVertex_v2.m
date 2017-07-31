@@ -3,6 +3,8 @@
 % Contributors:
 %--------------------------------------------------------------------------
 % Test5_velocityEdge
+% g(l11,l12,v1) = || v1 - (l12-l11) ||
+
 
 %% general setup
 % run startup first
@@ -77,19 +79,22 @@ for i=1:nSteps
         vertexCount = vertexCount+1;
         rowCount = rowCount+1;
         % velocity vertex
-        if i>=3
-            currentVertex = struct();
-            currentVertex.label = config.velocityVertexLabel;
-            currentVertex.index = vertexCount;
-            currentVertex.value = mean([norm(objectPts{j}(:,i)-objectPts{j}(:,i-1)),...
-                norm(objectPts{j}(:,i-1)-objectPts{j}(:,i-2))]);
-            groundTruthVertices{i,rowCount+1} = currentVertex;
-            vertexCount = vertexCount+1;
-            rowCount = rowCount+1;
+        if applyVelocityVertex
+            if i>=3
+                currentVertex = struct();
+                currentVertex.label = config.velocityVertexLabel;
+                currentVertex.index = vertexCount;
+                currentVertex.value = mean([objectPts{j}(:,i)-objectPts{j}(:,i-1),...
+                    objectPts{j}(:,i-1)-objectPts{j}(:,i-2)],2);
+                groundTruthVertices{i,rowCount+1} = currentVertex;
+                vertexCount = vertexCount+1;
+                rowCount = rowCount+1;
+            end
         end
     end  
 end
 
+nVelocityVertices = 0;
 for i=1:size(groundTruthVertices,1)
     % ground Truth edges for odometry
     if i > 1
@@ -107,7 +112,7 @@ for i=1:size(groundTruthVertices,1)
     for j=1:size(objectPts,2)
         currentEdge = struct();
         currentEdge.index1 = groundTruthVertices{i,1}.index;
-        currentEdge.index2 = groundTruthVertices{i,j+1}.index;
+        currentEdge.index2 = groundTruthVertices{i,j+nVelocityVertices+1}.index;
         currentEdge.label = config.posePointEdgeLabel;
         currentEdge.value = AbsoluteToRelativePositionR3xso3(sensorPose(:,i),...
             objectPts{j}(:,i));
@@ -117,19 +122,33 @@ for i=1:size(groundTruthVertices,1)
         groundTruthEdges{i,end+1} = currentEdge;
         if applyVelocityVertex
             if i>= 3
+                % point @ time 1,2 - velocity
                 currentEdge = struct();
                 currentEdge.index1 = groundTruthVertices{i-2,j+1}.index;
                 currentEdge.index2 = groundTruthVertices{i-1,j+1}.index;
                 currentEdge.index3 = groundTruthVertices{i,i+j*2-2}.index;
                 currentEdge.label = config.pointVelocityEdgeLabel;
-                currentEdge.value = groundTruthVertices{i,i+j*2-2}.value-...
-                    norm(groundTruthVertices{i-1,j+1}.value-...
-                    groundTruthVertices{i-2,j+1}.value);
+                currentEdge.value = norm(groundTruthVertices{i,i+j*2-2}.value-...
+                    (groundTruthVertices{i-1,j+1}.value-...
+                    groundTruthVertices{i-2,j+1}.value));
                 currentEdge.std = config.std2PointsVelocity;
                 currentEdge.cov = config.cov2PointsVelocity;
                 currentEdge.covUT = covToUpperTriVec(currentEdge.cov);
                 groundTruthEdges{i,end+1} = currentEdge;
-                
+                % point @ time 2,3 - velocity
+                currentEdge = struct();
+                currentEdge.index1 = groundTruthVertices{i-1,j+1}.index;
+                currentEdge.index2 = groundTruthVertices{i,j+nVelocityVertices+1}.index;
+                currentEdge.index3 = groundTruthVertices{i,i+j*2-2}.index;
+                currentEdge.label = config.pointVelocityEdgeLabel;
+                currentEdge.value = norm(groundTruthVertices{i,i+j*2-2}.value-...
+                    (groundTruthVertices{i,j+1}.value-...
+                    groundTruthVertices{i-1,j+1}.value));
+                currentEdge.std = config.std2PointsVelocity;
+                currentEdge.cov = config.cov2PointsVelocity;
+                currentEdge.covUT = covToUpperTriVec(currentEdge.cov);
+                groundTruthEdges{i,end+1} = currentEdge;
+                nVelocityVertices = nVelocityVertices+1;
             end
         end
     end
@@ -204,9 +223,12 @@ fclose(measurementGraph);
 %% solver
 groundTruthCell  = graphFileToCell(config,config.groundTruthFileName);
 measurementsCell = graphFileToCell(config,config.measurementsFileName);
+timeStart = tic;
 graph0 = Graph();
 solver = graph0.process(config,measurementsCell,groundTruthCell);
 solverEnd = solver(end);
+totalTime = toc(timeStart);
+fprintf('\nTotal time solving: %f\n',totalTime)
 % 
 graphN  = solverEnd.graphs(end);
 graphN.saveGraphFile(config,'resultsTest5.graph');
@@ -232,11 +254,15 @@ ylabel('y')
 zlabel('z')
 hold on
 plotGraphFile(config,groundTruthCell,[0 0 1]);
-resultsCell = graphFileToCell(config,'resultsTest3.graph');
+resultsCell = graphFileToCell(config,'resultsTest5.graph');
 plotGraph(config,graphN,[1 0 0]);
 
 figure
-subplot(1,2,1)
+subplot(2,2,1)
 spy(solverEnd.systems(end).A)
-subplot(1,2,2)
+subplot(2,2,2)
 spy(solverEnd.systems(end).H)
+subplot(2,2,3)
+spy(solverEnd.systems(end).covariance)
+subplot(2,2,4)
+spy(solverEnd.systems(end).covSqrtInv)

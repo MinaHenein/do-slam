@@ -46,7 +46,7 @@ config.set('stdPosePose'  ,[0.4,0.4,0.4,orientation']');
 config.set('stdPosePoint' ,[0.4,0.4,0.4]');
 
 config.set('std3Points',1);
-config.set('std2PointsVelocity',0.01);
+config.set('std2PointsVelocity',1);
 
 % velocity/motion estimation error - can change
 config.set('stdPointPoint',config.stdPosePoint*2);
