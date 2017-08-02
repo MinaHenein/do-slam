@@ -84,7 +84,7 @@ for i = 1:nSteps
                 %edgeIndex
                 jRow{2} = obj.nEdges+1;
                 % construct 3-points edge 
-                obj = obj.construct3PointsEdge(config,jRow);
+                obj = obj.construct3PointsEdge_v2(config,jRow);
             case config.pointVelocityEdgeLabel
                 %edge index
                 jRow{2} = obj.nEdges+1;
@@ -94,10 +94,10 @@ for i = 1:nSteps
                     %vertex
                     pointRows = iRows([measurementsCell{iRows,4}]==jRow{4});
                     pointVertices = [measurementsCell{pointRows,3}]';
-                    obj = obj.constructVelocityVertex(config,jRow,pointVertices);
+                    obj = obj.constructVelocityVertex_v2(config,jRow,unique(pointVertices));
                 end
                 % construct point-point edge - both points should already exist
-                obj = obj.construct2PointsVelocityEdge(config,jRow);
+                obj = obj.construct2PointsVelocityEdge_v2(config,jRow);
             case config.pointPlaneEdgeLabel
                 %edge index
                 jRow{2} = obj.nEdges+1;

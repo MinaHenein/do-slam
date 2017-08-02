@@ -2,22 +2,22 @@
 % Author: Mina Henein - mina.henein@anu.edu.au - 24/07/17
 % Contributors:
 %--------------------------------------------------------------------------
-% Test5_velocityEdge
-% g(l11,l12,v1) = v1 - || (l12-l11) ||
+% Test4_3PtEdge
+% g(l11,l12,l13) = || l13-l12 - (l12-l11) ||
 
 %% general setup
 % run startup first
 clear all
 close all
 
-applyVelocityVertex = 1;
+apply3PtEdges = 1;
 nSteps = 3;
 
 %% config setup 
 config = CameraConfig();
 config = setUnitTestConfig(config);
-config.set('groundTruthFileName' ,'groundTruthTest5.graph');
-config.set('measurementsFileName','measurementsTest5.graph');
+config.set('groundTruthFileName' ,'groundTruthTest4.graph');
+config.set('measurementsFileName','measurementsTest4.graph');
 config.set('stdPointPoint',[0.01 0.01 0.01]');
 rng(config.rngSeed);
 %% set up sensor - MANUAL
@@ -59,7 +59,6 @@ groundTruthEdges = {};
 vertexCount = 1;
 
 for i=1:nSteps
-    rowCount = 0;
     % create vertex for odometry reading
     currentVertex = struct();
     currentVertex.label = config.poseVertexLabel;
@@ -67,33 +66,17 @@ for i=1:nSteps
     currentVertex.index = vertexCount;
     groundTruthVertices{i,1} = currentVertex;
     vertexCount = vertexCount+1;
-    rowCount = rowCount+1;
     for j=1:size(objectPts,2)
         % create vertex for point location
         currentVertex = struct();
         currentVertex.label = config.pointVertexLabel;
         currentVertex.index = vertexCount;
         currentVertex.value = objectPts{j}(:,i);
-        groundTruthVertices{i,rowCount+1} = currentVertex;
+        groundTruthVertices{i,j+1} = currentVertex;
         vertexCount = vertexCount+1;
-        rowCount = rowCount+1;
-        % velocity vertex
-        if applyVelocityVertex
-            if i>=3
-                currentVertex = struct();
-                currentVertex.label = config.velocityVertexLabel;
-                currentVertex.index = vertexCount;
-                currentVertex.value = mean([norm(objectPts{j}(:,i)-objectPts{j}(:,i-1)),...
-                    norm(objectPts{j}(:,i-1)-objectPts{j}(:,i-2))]);
-                groundTruthVertices{i,rowCount+1} = currentVertex;
-                vertexCount = vertexCount+1;
-                rowCount = rowCount+1;
-            end
-        end
-    end  
+    end
 end
 
-nVelocityVertices = 0;
 for i=1:size(groundTruthVertices,1)
     % ground Truth edges for odometry
     if i > 1
@@ -111,7 +94,7 @@ for i=1:size(groundTruthVertices,1)
     for j=1:size(objectPts,2)
         currentEdge = struct();
         currentEdge.index1 = groundTruthVertices{i,1}.index;
-        currentEdge.index2 = groundTruthVertices{i,j+nVelocityVertices+1}.index;
+        currentEdge.index2 = groundTruthVertices{i,j+1}.index;
         currentEdge.label = config.posePointEdgeLabel;
         currentEdge.value = AbsoluteToRelativePositionR3xso3(sensorPose(:,i),...
             objectPts{j}(:,i));
@@ -119,35 +102,21 @@ for i=1:size(groundTruthVertices,1)
         currentEdge.cov = config.covPosePoint;
         currentEdge.covUT = covToUpperTriVec(currentEdge.cov);
         groundTruthEdges{i,end+1} = currentEdge;
-        if applyVelocityVertex
+        if apply3PtEdges
             if i>= 3
-                % point @ time 1,2 - velocity
                 currentEdge = struct();
                 currentEdge.index1 = groundTruthVertices{i-2,j+1}.index;
                 currentEdge.index2 = groundTruthVertices{i-1,j+1}.index;
-                currentEdge.index3 = groundTruthVertices{i,i+j*2-2}.index;
-                currentEdge.label = config.pointVelocityEdgeLabel;
-                currentEdge.value = groundTruthVertices{i,i+j*2-2}.value-...
-                    norm(groundTruthVertices{i-1,j+1}.value-...
-                    groundTruthVertices{i-2,j+1}.value);
-                currentEdge.std = config.std2PointsVelocity;
-                currentEdge.cov = config.cov2PointsVelocity;
+                currentEdge.index3 = groundTruthVertices{i,j+1}.index;
+                currentEdge.label = config.point3EdgeLabel;
+                currentEdge.value = norm(groundTruthVertices{i,j+1}.value-...
+                    groundTruthVertices{i-1,j+1}.value -...
+                    (groundTruthVertices{i-1,j+1}.value-...
+                    groundTruthVertices{i-2,j+1}.value));
+                currentEdge.std = config.std3Points;
+                currentEdge.cov = config.cov3Points;
                 currentEdge.covUT = covToUpperTriVec(currentEdge.cov);
-                groundTruthEdges{i,end+1} = currentEdge;
-                % point @ time 2,3 - velocity
-                currentEdge = struct();
-                currentEdge.index1 = groundTruthVertices{i-1,j+1}.index;
-                currentEdge.index2 = groundTruthVertices{i,j+nVelocityVertices+1}.index;
-                currentEdge.index3 = groundTruthVertices{i,i+j*2-2}.index;
-                currentEdge.label = config.pointVelocityEdgeLabel;
-                currentEdge.value = groundTruthVertices{i,i+j*2-2}.value-...
-                    norm(groundTruthVertices{i,j+1}.value-...
-                    groundTruthVertices{i-1,j+1}.value);
-                currentEdge.std = config.std2PointsVelocity;
-                currentEdge.cov = config.cov2PointsVelocity;
-                currentEdge.covUT = covToUpperTriVec(currentEdge.cov);
-                groundTruthEdges{i,end+1} = currentEdge;
-                nVelocityVertices = nVelocityVertices+1;
+                groundTruthEdges{i,end+1} = currentEdge; % add to end
             end
         end
     end
@@ -228,9 +197,9 @@ solver = graph0.process(config,measurementsCell,groundTruthCell);
 solverEnd = solver(end);
 totalTime = toc(timeStart);
 fprintf('\nTotal time solving: %f\n',totalTime)
-% 
+
 graphN  = solverEnd.graphs(end);
-graphN.saveGraphFile(config,'resultsTest5.graph');
+graphN.saveGraphFile(config,'resultsTest4.graph');
 % 
 graphGT = Graph(config,groundTruthCell);
 results = errorAnalysis(config,graphGT,graphN);
@@ -253,11 +222,15 @@ ylabel('y')
 zlabel('z')
 hold on
 plotGraphFile(config,groundTruthCell,[0 0 1]);
-resultsCell = graphFileToCell(config,'resultsTest5.graph');
+resultsCell = graphFileToCell(config,'resultsTest3.graph');
 plotGraph(config,graphN,[1 0 0]);
 
 figure
-subplot(1,2,1)
+subplot(2,2,1)
 spy(solverEnd.systems(end).A)
-subplot(1,2,2)
+subplot(2,2,2)
 spy(solverEnd.systems(end).H)
+subplot(2,2,3)
+spy(solverEnd.systems(end).covariance)
+subplot(2,2,4)
+spy(solverEnd.systems(end).covSqrtInv)
