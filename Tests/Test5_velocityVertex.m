@@ -7,7 +7,7 @@
 
 %% general setup
 % run startup first
-clear all
+% clear all
 close all
 
 applyVelocityVertex = 1;
@@ -18,8 +18,13 @@ config = CameraConfig();
 config = setUnitTestConfig(config);
 config.set('groundTruthFileName' ,'groundTruthTest5.graph');
 config.set('measurementsFileName','measurementsTest5.graph');
-config.set('stdPointPoint',[0.01 0.01 0.01]');
 rng(config.rngSeed);
+config.set('motionModel','constantSpeed');
+if strcmp(config.motionModel,'constantSpeed')
+    config.set('std2PointsVelocity',0.1);
+elseif strcmp(config.motionModel,'constantVelocity')
+    config.set('std2PointsVelocity',[0.1,0.1,0.1]');
+end
 %% set up sensor - MANUAL
 sensorPose = zeros(6,nSteps);
 
@@ -40,7 +45,7 @@ objPtsRelative = {[0 0 0]',[1 -1 1]',[1 1 1]'};
 % axis and pi/4 radians about y axis with linear velocity of x = 1
 objectPose = [5 0 0 0 0 0]'; % moved 5 forward on x axis
 for i=2:nSteps
-    rotationMatrix = eul2rot([pi/6 -pi/4 0]);
+    rotationMatrix = eul2rot([0 0 0]);
     objectRelativePose = [1; 0; 0; arot(rotationMatrix)];
     objectPose(:,i) = RelativeToAbsolutePoseR3xso3(objectPose(:,i-1),...
         objectRelativePose);

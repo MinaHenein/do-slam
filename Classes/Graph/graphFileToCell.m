@@ -56,7 +56,11 @@ while ischar(tline)
             graphCell{end+1,1} = lineCell;
         case config.velocityVertexLabel
             noVertices = 0;
-            lineCell = {label,values(1),values(2)'};
+            if strcmp(config.motionModel,'constantSpeed')
+                lineCell = {label,values(1),values(2)'};
+            elseif strcmp(config.motionModel,'constantVelocity')
+                lineCell = {label,values(1),values(2:4)'};
+            end
             %store
             graphCell{end+1,1} = lineCell;
 %         case config.angleVertexLabel 
@@ -86,11 +90,19 @@ while ischar(tline)
              %store
             graphCell{end+1,1} = lineCell;
         case config.point3EdgeLabel
-            lineCell = {label,[],values(1:3),[],values(4),values(5)};
-             %store
+            if strcmp(config.motionModel,'constantSpeed') 
+                lineCell = {label,[],values(1:3),[],values(4),values(5)};
+            elseif strcmp(config.motionModel,'constantVelocity') 
+                lineCell = {label,[],values(1:3),[],values(4:6)',values(7:12)};
+            end
+            %store
             graphCell{end+1,1} = lineCell;
         case config.pointVelocityEdgeLabel
-            lineCell = {label,[],values(1:2),values(3),values(4),values(5)};
+            if strcmp(config.motionModel,'constantSpeed')
+                lineCell = {label,[],values(1:2),values(3),values(4),values(5)};
+            elseif strcmp(config.motionModel,'constantVelocity')
+                lineCell = {label,[],values(1:2),values(3),values(4:6)',values(7:12)'};
+            end
              %store
             graphCell{end+1,1} = lineCell;
         case config.pointPlaneEdgeLabel 

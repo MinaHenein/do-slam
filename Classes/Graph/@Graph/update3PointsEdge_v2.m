@@ -9,10 +9,10 @@ iPointVertices = iVertices(logicalPointVertices);
 
 %% 2. compute edge value & jacobians
 pointPositions = cell2mat({obj.vertices(iPointVertices).value});
-value = norm(pointPositions(1:3,3)-pointPositions(1:3,2)-...
-            (pointPositions(1:3,2)-pointPositions(1:3,1)));
-jacobian1 = (sign(pointPositions(1:3,1)-2*pointPositions(1:3,2)+pointPositions(1:3,3)))';
-jacobian2 = (-2*sign(pointPositions(1:3,1)-2*pointPositions(1:3,2)+pointPositions(1:3,3)))';
+value = pointPositions(1:3,3)-pointPositions(1:3,2)-...
+            (pointPositions(1:3,2)-pointPositions(1:3,1));
+jacobian1 = eye(3);
+jacobian2 = -2*eye(3);
 jacobian3 = jacobian1;
 jacobians   = {jacobian1,jacobian2,jacobian3};
 

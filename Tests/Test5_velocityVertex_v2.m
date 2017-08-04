@@ -3,12 +3,12 @@
 % Contributors:
 %--------------------------------------------------------------------------
 % Test5_velocityEdge
-% g(l11,l12,v1) = || v1 - (l12-l11) ||
+% g(l11,l12,v1) =  v1 - (l12-l11)
 
 
 %% general setup
 % run startup first
-clear all
+% clear all
 close all
 
 applyVelocityVertex = 1;
@@ -17,10 +17,15 @@ nSteps = 3;
 %% config setup 
 config = CameraConfig();
 config = setUnitTestConfig(config);
-config.set('groundTruthFileName' ,'groundTruthTest5.graph');
-config.set('measurementsFileName','measurementsTest5.graph');
-config.set('stdPointPoint',[0.01 0.01 0.01]');
+config.set('groundTruthFileName' ,'groundTruthTest5v2.graph');
+config.set('measurementsFileName','measurementsTest5v2.graph');
 rng(config.rngSeed);
+config.set('motionModel','constantVelocity');
+if strcmp(config.motionModel,'constantSpeed')
+    config.set('std2PointsVelocity',0.1);
+elseif strcmp(config.motionModel,'constantVelocity')
+    config.set('std2PointsVelocity',[0.1,0.1,0.1]');
+end
 %% set up sensor - MANUAL
 sensorPose = zeros(6,nSteps);
 
@@ -128,9 +133,9 @@ for i=1:size(groundTruthVertices,1)
                 currentEdge.index2 = groundTruthVertices{i-1,j+1}.index;
                 currentEdge.index3 = groundTruthVertices{i,i+j*2-2}.index;
                 currentEdge.label = config.pointVelocityEdgeLabel;
-                currentEdge.value = norm(groundTruthVertices{i,i+j*2-2}.value-...
+                currentEdge.value = groundTruthVertices{i,i+j*2-2}.value-...
                     (groundTruthVertices{i-1,j+1}.value-...
-                    groundTruthVertices{i-2,j+1}.value));
+                    groundTruthVertices{i-2,j+1}.value);
                 currentEdge.std = config.std2PointsVelocity;
                 currentEdge.cov = config.cov2PointsVelocity;
                 currentEdge.covUT = covToUpperTriVec(currentEdge.cov);
@@ -141,9 +146,9 @@ for i=1:size(groundTruthVertices,1)
                 currentEdge.index2 = groundTruthVertices{i,j+nVelocityVertices+1}.index;
                 currentEdge.index3 = groundTruthVertices{i,i+j*2-2}.index;
                 currentEdge.label = config.pointVelocityEdgeLabel;
-                currentEdge.value = norm(groundTruthVertices{i,i+j*2-2}.value-...
+                currentEdge.value = groundTruthVertices{i,i+j*2-2}.value-...
                     (groundTruthVertices{i,j+1}.value-...
-                    groundTruthVertices{i-1,j+1}.value));
+                    groundTruthVertices{i-1,j+1}.value);
                 currentEdge.std = config.std2PointsVelocity;
                 currentEdge.cov = config.cov2PointsVelocity;
                 currentEdge.covUT = covToUpperTriVec(currentEdge.cov);
@@ -231,10 +236,11 @@ totalTime = toc(timeStart);
 fprintf('\nTotal time solving: %f\n',totalTime)
 % 
 graphN  = solverEnd.graphs(end);
-graphN.saveGraphFile(config,'resultsTest5.graph');
+graphN.saveGraphFile(config,'resultsTest5v2.graph');
 % 
 graphGT = Graph(config,groundTruthCell);
 results = errorAnalysis(config,graphGT,graphN);
+results1MED = results;
 fprintf('Chi Squared Error: %.4d \n',solverEnd.systems.chiSquaredError)
 fprintf('Absolute Trajectory Translation Error: %.4d \n',results.ATE_translation_error)
 fprintf('Absolute Trajectory Rotation Error: %.4d \n',results.ATE_rotation_error)
@@ -254,7 +260,7 @@ ylabel('y')
 zlabel('z')
 hold on
 plotGraphFile(config,groundTruthCell,[0 0 1]);
-resultsCell = graphFileToCell(config,'resultsTest5.graph');
+resultsCell = graphFileToCell(config,'resultsTest5v2.graph');
 plotGraph(config,graphN,[1 0 0]);
 
 figure

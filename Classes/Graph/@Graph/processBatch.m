@@ -84,7 +84,13 @@ for i = 1:nSteps
                 %edgeIndex
                 jRow{2} = obj.nEdges+1;
                 % construct 3-points edge 
-                obj = obj.construct3PointsEdge_v2(config,jRow);
+                if strcmp(config.motionModel,'constantSpeed')
+                    obj = obj.construct3PointsEdge(config,jRow);
+                elseif strcmp(config.motionModel,'constantVelocity')
+                    obj = obj.construct3PointsEdge_v2(config,jRow);
+                else
+                    error('Motion model not implemented');
+                end
             case config.pointVelocityEdgeLabel
                 %edge index
                 jRow{2} = obj.nEdges+1;
@@ -94,10 +100,22 @@ for i = 1:nSteps
                     %vertex
                     pointRows = iRows([measurementsCell{iRows,4}]==jRow{4});
                     pointVertices = [measurementsCell{pointRows,3}]';
-                    obj = obj.constructVelocityVertex_v2(config,jRow,unique(pointVertices));
+                    if strcmp(config.motionModel,'constantSpeed')
+                        obj = obj.constructVelocityVertex(config,jRow,unique(pointVertices));
+                    elseif strcmp(config.motionModel,'constantVelocity')
+                        obj = obj.constructVelocityVertex_v2(config,jRow,unique(pointVertices));
+                    else
+                        error('Motion model not implemented');
+                    end
                 end
                 % construct point-point edge - both points should already exist
-                obj = obj.construct2PointsVelocityEdge_v2(config,jRow);
+                if strcmp(config.motionModel,'constantSpeed')
+                    obj = obj.construct2PointsVelocityEdge(config,jRow);
+                elseif strcmp(config.motionModel,'constantVelocity')
+                    obj = obj.construct2PointsVelocityEdge_v2(config,jRow);
+                else
+                    error('Motion model not implemented');
+                end
             case config.pointPlaneEdgeLabel
                 %edge index
                 jRow{2} = obj.nEdges+1;

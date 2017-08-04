@@ -25,6 +25,9 @@ classdef Config < ArrayGetSet
         % noise model
         noiseModel
         
+        % motion model
+        motionModel
+        
         %measurement std dev
         stdPosePrior
         stdPointPrior

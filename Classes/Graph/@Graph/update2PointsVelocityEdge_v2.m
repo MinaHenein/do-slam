@@ -12,9 +12,9 @@ iVelocityVertex = iVertices(logicalVelocityVertex);
 %% 2. compute edge value & jacobians
 pointPositions = cell2mat({obj.vertices(iPointVertices).value});
 velocity = obj.vertices(iVelocityVertex).value;
-value = norm(velocity - (pointPositions(1:3,2)-pointPositions(1:3,1)));
-jacobian1 = (sign(pointPositions(1:3,1)-pointPositions(1:3,2)+velocity))';
-jacobian2 = (-sign(pointPositions(1:3,1)-pointPositions(1:3,2)+velocity))';
+value = velocity - (pointPositions(1:3,2)-pointPositions(1:3,1));
+jacobian1 = eye(3);
+jacobian2 = -eye(3);
 jacobian3 = jacobian1;
 jacobians   = {jacobian1,jacobian2,jacobian3};
 

@@ -14,9 +14,21 @@ for i = 1:obj.nEdges
         case 'point-point'
             edgeUpdater = @updatePointPointEdge;
         case '3-points'
-            edgeUpdater = @update3PointsEdge;
+            if strcmp(config.motionModel,'constantSpeed')
+                edgeUpdater = @update3PointsEdge;
+            elseif strcmp(config.motionModel,'constantVelocity')
+                edgeUpdater = @update3PointsEdge_v2;
+            else
+                error('Motion model not implemented');
+            end
         case '2points-velocity'
-            edgeUpdater = @update2PointsVelocityEdge;
+            if strcmp(config.motionModel,'constantSpeed')
+                edgeUpdater = @update2PointsVelocityEdge;
+            elseif strcmp(config.motionModel,'constantVelocity')
+                edgeUpdater = @update2PointsVelocityEdge_v2;
+            else
+                error('Motion model not implemented');
+            end
         case 'point-plane'
             edgeUpdater = @updatePointPlaneEdge;
         case 'point-rectangle'

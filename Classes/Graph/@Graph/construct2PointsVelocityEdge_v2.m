@@ -1,4 +1,4 @@
-function [obj] = construct2PointsVelocityEdge(obj,config,edgeRow)
+function [obj] = construct2PointsVelocityEdge_v2(obj,config,edgeRow)
 %CONSTRUCTPOINTVELOCITYEDGE constructs edge representing measurement of
 %difference between two points and their respective velocity vertex
 
