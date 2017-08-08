@@ -24,7 +24,7 @@ config.set('motionModel','constantVelocity');
 if strcmp(config.motionModel,'constantSpeed')
     config.set('std2PointsVelocity',0.1);
 elseif strcmp(config.motionModel,'constantVelocity')
-    config.set('std2PointsVelocity',[0.1,0.1,0.1]');
+    config.set('std2PointsVelocity',[1,1,1]');
 end
 %% set up sensor - MANUAL
 sensorPose = zeros(6,nSteps);
@@ -240,7 +240,7 @@ graphN.saveGraphFile(config,'resultsTest5v2.graph');
 % 
 graphGT = Graph(config,groundTruthCell);
 results = errorAnalysis(config,graphGT,graphN);
-results1MED = results;
+results2HIGH = results;
 fprintf('Chi Squared Error: %.4d \n',solverEnd.systems.chiSquaredError)
 fprintf('Absolute Trajectory Translation Error: %.4d \n',results.ATE_translation_error)
 fprintf('Absolute Trajectory Rotation Error: %.4d \n',results.ATE_rotation_error)

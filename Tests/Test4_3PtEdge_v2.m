@@ -23,7 +23,7 @@ config.set('motionModel','constantVelocity');
 if strcmp(config.motionModel,'constantSpeed')
     config.set('std3Points',0.01);
 elseif strcmp(config.motionModel,'constantVelocity')
-    config.set('std3Points',[0.01,0.01,0.01]');
+    config.set('std3Points',[1,1,1]');
 end
 %% set up sensor - MANUAL
 sensorPose = zeros(6,nSteps);
@@ -208,6 +208,7 @@ graphN.saveGraphFile(config,'resultsTest4v2.graph');
 % 
 graphGT = Graph(config,groundTruthCell);
 results = errorAnalysis(config,graphGT,graphN);
+results2HIGH = results;
 fprintf('Chi Squared Error: %.4d \n',solverEnd.systems.chiSquaredError)
 fprintf('Absolute Trajectory Translation Error: %.4d \n',results.ATE_translation_error)
 fprintf('Absolute Trajectory Rotation Error: %.4d \n',results.ATE_rotation_error)
