@@ -24,6 +24,8 @@ switch obj.edges(iEdge).type
         residual = measurement - obj.edges(iEdge).value;
     case 'point-point'
         residual = measurement - obj.edges(iEdge).value;
+    case {'point-pointSE3','point-pointSE3_Mina'}
+        residual = measurement - obj.edges(iEdge).value;
     case '3-points'
         residual = measurement - obj.edges(iEdge).value;
     case '2points-velocity'

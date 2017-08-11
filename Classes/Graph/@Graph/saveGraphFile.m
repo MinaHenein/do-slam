@@ -46,6 +46,11 @@ for i = 1:obj.nEdges
             verticesIn = obj.edges(i).iVertices(1);
             verticesOut = obj.edges(i).iVertices(2);
             edgeCovariance = covToUpperTriVec(obj.edges(i).covariance);           
+        case 'point-pointSE3'
+            edgeLabel = config.pointPointEdgeSE3Label;
+            verticesIn = obj.edges(i).iVertices(1);
+            verticesOut = obj.edges(i).iVertices(2);
+            edgeCovariance = covToUpperTriVec(obj.edges(i).covariance);
         case '3-points'
             edgeLabel = config.point3EdgeLabel;
             verticesIn = obj.edges(i).iVertices;

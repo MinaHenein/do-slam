@@ -80,6 +80,14 @@ for i = 1:nEdges
             type = 'point-point';
             value = edgesCell{i}{5};
             covariance = upperTriVecToCov(edgesCell{i}{6});
+        case config.pointPointEdgeSE3Label
+            if strcmp(config.motionModel,'constantSE3Rob')
+                type = 'point-pointSE3';
+            elseif strcmp(config.motionModel,'constantSE3Mina')
+                type = 'point-pointSE3_Mina';
+            end
+            value = edgesCell{i}{5};
+            covariance = upperTriVecToCov(edgesCell{i}{6});
         case config.point3EdgeLabel
             type = '3-points';
             value = edgesCell{i}{5};

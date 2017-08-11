@@ -80,6 +80,16 @@ for i = 1:nSteps
                 jRow{2} = obj.nEdges+1;
                 % construct point-point edge
                 obj = obj.constructPointPointEdge(config,jRow);
+            case config.pointPointEdgeSE3Label                
+                %edgeIndex
+                jRow{2} = obj.nEdges+1;
+                % construct point-point-SE3 edge
+                if strcmp(config.motionModel,'constantSE3Rob')
+                    obj = obj.constructPointPointEdgeSE3(config,jRow);
+                elseif strcmp(config.motionModel,'constantSE3Mina')
+                    obj = obj.constructPointPointEdgeSE3_Mina(config,jRow);
+                end
+                obj = obj.constructPointPointEdgeSE3(config,jRow);
             case config.point3EdgeLabel
                 %edgeIndex
                 jRow{2} = obj.nEdges+1;

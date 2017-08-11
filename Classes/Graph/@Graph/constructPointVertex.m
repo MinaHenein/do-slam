@@ -22,7 +22,7 @@ pose = obj.vertices(poseVertex).value;
 positionRelative = edgeValue;
 switch config.cameraPointParameterisation
     case 'euclidean'
-        positionAbsolute = config.relativeToAbsolutePointHandle(pose,positionRelative);
+          positionAbsolute = config.relativeToAbsolutePointHandle(pose,positionRelative);
 %         positionAbsolute = RelativeToAbsolutePosition(pose,positionRelative);
 %         positionAbsolute = RelativePoint2AbsolutePoint3D(pose,positionRelative);
     otherwise
