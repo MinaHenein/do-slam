@@ -127,7 +127,7 @@ for i=1:size(groundTruthVertices,1)
     end
 end
 
-measurementEdges = groundTruthEdges; % copies grouthTruth to add noise
+measurementEdges = groundTruthEdges; % copies groundTruth to add noise
 for i=1:numel(measurementEdges) % add noise on measurements
     if ~isempty(measurementEdges{i})
         valueEdge = measurementEdges{i}.value;

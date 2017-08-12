@@ -7,6 +7,7 @@ config.set('rngSeed',1);
 config.set('rngSeed',1);
 config.set('noiseModel','Gaussian');
 % config.set('noiseModel','Off');
+config.set('motionModel','constantSpeed');
 config.set('poseParameterisation','R3xso3');
 
 % temporarily changed function handles to public for setting

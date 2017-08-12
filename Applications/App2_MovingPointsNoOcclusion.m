@@ -16,7 +16,8 @@ t  = linspace(t0,tN,nSteps);
 config = CameraConfig();
 setAppConfig(config); % copy same settings for error Analysis
 config.set('t',t);
-config.set('pointMotionMeasurement','off');
+config.set('pointMotionMeasurement','point3Edge');
+% config.set('noiseModel','Off');
 config.set('groundTruthFileName','app2_groundTruth.graph');
 config.set('measurementsFileName','app2_measurements.graph');
 
