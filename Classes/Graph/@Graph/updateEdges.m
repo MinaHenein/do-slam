@@ -13,6 +13,10 @@ for i = 1:obj.nEdges
             edgeUpdater = @updatePosePointEdge;
         case 'point-point'
             edgeUpdater = @updatePointPointEdge;
+        case 'point-pointSE3'
+            edgeUpdater = @updatePointPointEdgeSE3;
+        case 'point-pointSE3_Mina'
+            edgeUpdater = @updatePointPointEdgeSE3_Mina;
         case '3-points'
             if strcmp(config.motionModel,'constantSpeed')
                 edgeUpdater = @update3PointsEdge;

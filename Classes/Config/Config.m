@@ -28,6 +28,9 @@ classdef Config < ArrayGetSet
         % motion model
         motionModel
         
+        % if motionModel is constantSE3Motion
+        constantSE3Motion
+        
         %measurement std dev
         stdPosePrior
         stdPointPrior
@@ -37,6 +40,7 @@ classdef Config < ArrayGetSet
         std3Points
         std2PointsVelocity
         stdPointPlane
+        std2PointsSE3
         
         %R3xso3 or logSE3
         poseParameterisation
@@ -91,6 +95,7 @@ classdef Config < ArrayGetSet
         point3EdgeLabel
         velocityVertexLabel
         pointVelocityEdgeLabel
+        pointPointEdgeSE3Label
         pointPlaneEdgeLabel
         posePriorEdgeLabel
         angleVertexLabel
@@ -133,6 +138,7 @@ classdef Config < ArrayGetSet
         covPointPoint
         cov3Points
         cov2PointsVelocity
+        cov2PointsSE3
         covPointPlane
     end
     
@@ -180,6 +186,9 @@ classdef Config < ArrayGetSet
         end
         function cov2PointsVelocity = get.cov2PointsVelocity(obj)
             cov2PointsVelocity = stdToCovariance(obj.std2PointsVelocity);
+        end
+        function cov2PointsSE3 = get.cov2PointsSE3(obj)
+            cov2PointsSE3 = stdToCovariance(obj.std2PointsSE3);
         end
         function covPointPlane = get.covPointPlane(obj)
             covPointPlane = stdToCovariance(obj.stdPointPlane);

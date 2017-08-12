@@ -41,7 +41,12 @@ while ischar(tline)
             graphCell{end+1,1} = lineCell;
         case config.pointVertexLabel
             noVertices = 0;
-            lineCell = {label,values(1),values(2:4)'};
+            if strcmp(config.motionModel,'constantSE3Rob')||...
+                    strcmp(config.motionModel,'constantSE3Mina')
+                lineCell = {label,values(1),values(2:5)'};
+            else
+                lineCell = {label,values(1),values(2:4)'};
+            end
             %store
             graphCell{end+1,1} = lineCell;
 %         case config.pointRGBVertexLabel
@@ -78,7 +83,12 @@ while ischar(tline)
             %store
             graphCell{end+1,1} = lineCell;
         case config.posePointEdgeLabel
-            lineCell = {label,[],values(1),values(2),values(3:5)',values(6:11)};
+            if strcmp(config.motionModel,'constantSE3Rob')||...
+                    strcmp(config.motionModel,'constantSE3Mina')
+                lineCell = {label,[],values(1),values(2),values(3:6)',values(7:16)};
+            else
+                lineCell = {label,[],values(1),values(2),values(3:5)',values(6:11)};
+            end
             %store
             graphCell{end+1,1} = lineCell;
 %         case config.pointPointRGBEdgeLabel
@@ -87,6 +97,10 @@ while ischar(tline)
 %             graphCell{end+1,1} = lineCell;
         case config.pointPointEdgeLabel
             lineCell = {label,[],values(1),values(2),values(3:5)',values(6:11)};
+             %store
+            graphCell{end+1,1} = lineCell;
+        case config.pointPointEdgeSE3Label
+            lineCell = {label,[],values(1),values(2),values(3:6)',values(7:16)};
              %store
             graphCell{end+1,1} = lineCell;
         case config.point3EdgeLabel

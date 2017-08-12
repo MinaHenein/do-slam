@@ -1,31 +1,27 @@
 %--------------------------------------------------------------------------
-% Author: Mina Henein - mina.henein@anu.edu.au - 24/07/17
+% Author: Mina Henein - mina.henein@anu.edu.au - 10/08/17
 % Contributors:
 %--------------------------------------------------------------------------
-% Test5_velocityEdge
-% g(l11,l12,v1) =  v1 - (l12-l11)
-
+% Test6_2PtsEdgeSE3_Rob
+% l^i_k = (_kH_k+1)^-1 * l^i_k+1
 
 %% general setup
 % run startup first
 % clear all
 close all
 
-applyVelocityVertex = 1;
+apply2PtsEdgeSE3 = 1;
 nSteps = 3;
 
 %% config setup 
 config = CameraConfig();
+config.set('groundTruthFileName' ,'groundTruthTest6.graph');
+config.set('measurementsFileName','measurementsTest6.graph');
+config.set('motionModel','constantSE3Rob');
+config.set('std2PointsSE3', [0.1,0.1,0.1,0.01]');
 config = setUnitTestConfig(config);
-config.set('groundTruthFileName' ,'groundTruthTest5v2.graph');
-config.set('measurementsFileName','measurementsTest5v2.graph');
 rng(config.rngSeed);
-config.set('motionModel','constantVelocity');
-if strcmp(config.motionModel,'constantSpeed')
-    config.set('std2PointsVelocity',0.1);
-elseif strcmp(config.motionModel,'constantVelocity')
-    config.set('std2PointsVelocity',[1,1,1]');
-end
+
 %% set up sensor - MANUAL
 sensorPose = zeros(6,nSteps);
 
@@ -40,14 +36,21 @@ for i=2:nSteps
 end
 
 %% set up object
-objPtsRelative = {[0 0 0]',[1 -1 1]',[1 1 1]'};
+objPtsRelative = {[0 1 0]',[1 -1 1]',[1 1 1]'};
 
 % applies relative motion - rotation of pi/6 radians per time step about z
-% axis and pi/4 radians about y axis with linear velocity of x = 1
-objectPose = [5 0 0 0 0 0]'; % moved 5 forward on x axis
+% axis and -pi/4 radians about y axis with linear translation of x = 1 and
+% y = 2
+objectPose = [5 0 0 0 0 0]'; % initial object pose - moved 5 forward on x axis
+rotationMatrix = rot([pi/6;-pi/4;0]);
+translationVector = [1;2;0];
+objectRelativePose = [translationVector; arot(rotationMatrix)];
+constantSE3ObjectMotion = [rotationMatrix, translationVector; 0 0 0 1];
+if strcmp(config.motionModel,'constantSE3Rob')
+config.set('constantSE3Motion',constantSE3ObjectMotion);
+end
+
 for i=2:nSteps
-    rotationMatrix = eul2rot([0 0 0]);
-    objectRelativePose = [1; 0; 0; arot(rotationMatrix)];
     objectPose(:,i) = RelativeToAbsolutePoseR3xso3(objectPose(:,i-1),...
         objectRelativePose);
 end
@@ -79,27 +82,13 @@ for i=1:nSteps
         currentVertex = struct();
         currentVertex.label = config.pointVertexLabel;
         currentVertex.index = vertexCount;
-        currentVertex.value = objectPts{j}(:,i);
+        currentVertex.value = [objectPts{j}(:,i);1];
         groundTruthVertices{i,rowCount+1} = currentVertex;
         vertexCount = vertexCount+1;
         rowCount = rowCount+1;
-        % velocity vertex
-        if applyVelocityVertex
-            if i>=3
-                currentVertex = struct();
-                currentVertex.label = config.velocityVertexLabel;
-                currentVertex.index = vertexCount;
-                currentVertex.value = mean([objectPts{j}(:,i)-objectPts{j}(:,i-1),...
-                    objectPts{j}(:,i-1)-objectPts{j}(:,i-2)],2);
-                groundTruthVertices{i,rowCount+1} = currentVertex;
-                vertexCount = vertexCount+1;
-                rowCount = rowCount+1;
-            end
-        end
     end  
 end
 
-nVelocityVertices = 0;
 for i=1:size(groundTruthVertices,1)
     % ground Truth edges for odometry
     if i > 1
@@ -117,43 +106,27 @@ for i=1:size(groundTruthVertices,1)
     for j=1:size(objectPts,2)
         currentEdge = struct();
         currentEdge.index1 = groundTruthVertices{i,1}.index;
-        currentEdge.index2 = groundTruthVertices{i,j+nVelocityVertices+1}.index;
+        currentEdge.index2 = groundTruthVertices{i,j+1}.index;
         currentEdge.label = config.posePointEdgeLabel;
-        currentEdge.value = AbsoluteToRelativePositionR3xso3(sensorPose(:,i),...
+        value = AbsoluteToRelativePositionR3xso3(sensorPose(:,i),...
             objectPts{j}(:,i));
+        currentEdge.value = [value;1];
         currentEdge.std = config.stdPosePoint;
         currentEdge.cov = config.covPosePoint;
         currentEdge.covUT = covToUpperTriVec(currentEdge.cov);
         groundTruthEdges{i,end+1} = currentEdge;
-        if applyVelocityVertex
-            if i>= 3
-                % point @ time 1,2 - velocity
-                currentEdge = struct();
-                currentEdge.index1 = groundTruthVertices{i-2,j+1}.index;
-                currentEdge.index2 = groundTruthVertices{i-1,j+1}.index;
-                currentEdge.index3 = groundTruthVertices{i,i+j*2-2}.index;
-                currentEdge.label = config.pointVelocityEdgeLabel;
-                currentEdge.value = groundTruthVertices{i,i+j*2-2}.value-...
-                    (groundTruthVertices{i-1,j+1}.value-...
-                    groundTruthVertices{i-2,j+1}.value);
-                currentEdge.std = config.std2PointsVelocity;
-                currentEdge.cov = config.cov2PointsVelocity;
-                currentEdge.covUT = covToUpperTriVec(currentEdge.cov);
-                groundTruthEdges{i,end+1} = currentEdge;
-                % point @ time 2,3 - velocity
+         if apply2PtsEdgeSE3
+            if i>= 2
                 currentEdge = struct();
                 currentEdge.index1 = groundTruthVertices{i-1,j+1}.index;
-                currentEdge.index2 = groundTruthVertices{i,j+nVelocityVertices+1}.index;
-                currentEdge.index3 = groundTruthVertices{i,i+j*2-2}.index;
-                currentEdge.label = config.pointVelocityEdgeLabel;
-                currentEdge.value = groundTruthVertices{i,i+j*2-2}.value-...
-                    (groundTruthVertices{i,j+1}.value-...
-                    groundTruthVertices{i-1,j+1}.value);
-                currentEdge.std = config.std2PointsVelocity;
-                currentEdge.cov = config.cov2PointsVelocity;
+                currentEdge.index2 = groundTruthVertices{i,j+1}.index;
+                currentEdge.label = config.pointPointEdgeSE3Label;
+                currentEdge.value = [groundTruthVertices{i-1,j+1}.value]-...
+                    constantSE3ObjectMotion\[groundTruthVertices{i,j+1}.value];
+                currentEdge.std = config.std2PointsSE3;
+                currentEdge.cov = config.cov2PointsSE3;
                 currentEdge.covUT = covToUpperTriVec(currentEdge.cov);
                 groundTruthEdges{i,end+1} = currentEdge;
-                nVelocityVertices = nVelocityVertices+1;
             end
         end
     end
@@ -236,7 +209,7 @@ totalTime = toc(timeStart);
 fprintf('\nTotal time solving: %f\n',totalTime)
 % 
 graphN  = solverEnd.graphs(end);
-graphN.saveGraphFile(config,'resultsTest5v2.graph');
+graphN.saveGraphFile(config,'resultsTest6.graph');
 % 
 graphGT = Graph(config,groundTruthCell);
 results = errorAnalysis(config,graphGT,graphN);
@@ -260,7 +233,6 @@ ylabel('y')
 zlabel('z')
 hold on
 plotGraphFile(config,groundTruthCell,[0 0 1]);
-resultsCell = graphFileToCell(config,'resultsTest5v2.graph');
 plotGraph(config,graphN,[1 0 0]);
 
 figure
