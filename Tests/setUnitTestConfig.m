@@ -5,8 +5,8 @@ function config = setUnitTestConfig(config)
 % set properties of Config
 config.set('t',0.1);
 config.set('rngSeed',1);
-config.set('noiseModel','Gaussian');
-% config.set('noiseModel','Off');
+% config.set('noiseModel','Gaussian');
+config.set('noiseModel','Off');
 config.set('poseParameterisation','R3xso3');
 
 % temporarily changed function handles to public for setting
@@ -49,10 +49,10 @@ else
 end
 
 % set odometry error
-orientation = [pi/36;pi/36;pi/36]; % 0.5 degree position error
-config.set('stdPosePose'  ,[0.4,0.4,0.4,orientation']');
+orientation = [pi/360;pi/360;pi/360]; % 0.5 degree position error
+config.set('stdPosePose'  ,[0.04,0.04,0.04,orientation']');
 if strcmp(config.motionModel,'constantSE3Rob') || strcmp(config.motionModel,'constantSE3Mina')
-    config.set('stdPosePoint' ,[0.4,0.4,0.4,0.01]');
+    config.set('stdPosePoint' ,[0.04,0.04,0.04,0.01]');
 else 
     config.set('stdPosePoint' ,[0.4,0.4,0.4]');
 end
