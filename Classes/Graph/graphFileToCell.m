@@ -42,7 +42,8 @@ while ischar(tline)
         case config.pointVertexLabel
             noVertices = 0;
             if strcmp(config.motionModel,'constantSE3Rob')||...
-                    strcmp(config.motionModel,'constantSE3Mina')
+                    strcmp(config.motionModel,'constantSE3Mina')||...
+                    strcmp(config.motionModel,'constantSE3')
                 lineCell = {label,values(1),values(2:5)'};
             else
                 lineCell = {label,values(1),values(2:4)'};
@@ -68,6 +69,11 @@ while ischar(tline)
             end
             %store
             graphCell{end+1,1} = lineCell;
+        case config.SE3MotionVertexLabel
+            noVertices = 0;
+            lineCell = {label,values(1),values(2:7)'};
+            %store
+            graphCell{end+1,1} = lineCell;
 %         case config.angleVertexLabel 
 %             noVertices = 0;
 %             lineCell = {label,values(1),values(2)'};
@@ -84,7 +90,8 @@ while ischar(tline)
             graphCell{end+1,1} = lineCell;
         case config.posePointEdgeLabel
             if strcmp(config.motionModel,'constantSE3Rob')||...
-                    strcmp(config.motionModel,'constantSE3Mina')
+                    strcmp(config.motionModel,'constantSE3Mina')||...
+                    strcmp(config.motionModel,'constantSE3')
                 lineCell = {label,[],values(1),values(2),values(3:6)',values(7:16)};
             else
                 lineCell = {label,[],values(1),values(2),values(3:5)',values(6:11)};
@@ -118,6 +125,10 @@ while ischar(tline)
                 lineCell = {label,[],values(1:2),values(3),values(4:6)',values(7:12)'};
             end
              %store
+            graphCell{end+1,1} = lineCell;
+        case config.pointSE3MotionEdgeLabel
+            lineCell = {label,[],values(1:2),values(3),values(4:7)',values(8:17)'};
+            %store
             graphCell{end+1,1} = lineCell;
         case config.pointPlaneEdgeLabel 
             %need to add plane prior edge if first time plane vertex seen

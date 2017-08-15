@@ -5,15 +5,17 @@ function config = setUnitTestConfig(config)
 % set properties of Config
 config.set('t',0.1);
 config.set('rngSeed',1);
-% config.set('noiseModel','Gaussian');
-config.set('noiseModel','Off');
+config.set('noiseModel','Gaussian');
+% config.set('noiseModel','Off');
 config.set('poseParameterisation','R3xso3');
 
 % temporarily changed function handles to public for setting
 
 config.absoluteToRelativePoseHandle = @AbsoluteToRelativePoseR3xso3;
 config.relativeToAbsolutePoseHandle = @RelativeToAbsolutePoseR3xso3;
-if strcmp(config.motionModel,'constantSE3Rob') || strcmp(config.motionModel,'constantSE3Mina')
+if strcmp(config.motionModel,'constantSE3Rob') ||...
+        strcmp(config.motionModel,'constantSE3Mina') ||...
+        strcmp(config.motionModel,'constantSE3')
     config.absoluteToRelativePointHandle = @AbsoluteToRelativePositionR3xso3Normalised;
     config.relativeToAbsolutePointHandle = @RelativeToAbsolutePositionR3xso3Normalised;
 else
@@ -34,6 +36,8 @@ config.set('pointPointEdgeSE3Label','EDGE_2POINTS_SE3')
 config.set('point3EdgeLabel','EDGE_3POINTS')
 config.set('velocityVertexLabel','VERTEX_VELOCITY')
 config.set('pointVelocityEdgeLabel','EDGE_2POINTS_VELOCITY')
+config.set('SE3MotionVertexLabel','VERTEX_SE3Motion')
+config.set('pointSE3MotionEdgeLabel','EDGE_2POINTS_SE3Motion')
 config.set('posePriorEdgeLabel','EDGE_6D');
 config.set('graphFileFolderName' ,'GraphFiles');
 
@@ -42,7 +46,9 @@ orientation = [pi/180;pi/180;pi/180]; % 1 degree position error
 config.set('stdPosePrior',[0.005;0.005;0.005;orientation]);
 
 % set point prior error
-if strcmp(config.motionModel,'constantSE3Rob') || strcmp(config.motionModel,'constantSE3Mina')
+if strcmp(config.motionModel,'constantSE3Rob') ||...
+        strcmp(config.motionModel,'constantSE3Mina') ||...
+        strcmp(config.motionModel,'constantSE3')
     config.set('stdPointPrior',[0.01,0.01,0.01,0.01]');
 else 
     config.set('stdPointPrior',[0.01,0.01,0.01]');
@@ -51,7 +57,9 @@ end
 % set odometry error
 orientation = [pi/360;pi/360;pi/360]; % 0.5 degree position error
 config.set('stdPosePose'  ,[0.04,0.04,0.04,orientation']');
-if strcmp(config.motionModel,'constantSE3Rob') || strcmp(config.motionModel,'constantSE3Mina')
+if strcmp(config.motionModel,'constantSE3Rob') ||...
+        strcmp(config.motionModel,'constantSE3Mina') ||...
+        strcmp(config.motionModel,'constantSE3')
     config.set('stdPosePoint' ,[0.04,0.04,0.04,0.01]');
 else 
     config.set('stdPosePoint' ,[0.4,0.4,0.4]');
@@ -69,7 +77,9 @@ config.set('cameraRelativePose',GP_Pose([0,0,0,0,0,-pi/8]'));
 % set properties of solverConfig
 %   dimensions
 config.set('dimPose',6);
-if strcmp(config.motionModel,'constantSE3Rob')|| strcmp(config.motionModel,'constantSE3Mina')
+if strcmp(config.motionModel,'constantSE3Rob') ||...
+        strcmp(config.motionModel,'constantSE3Mina') ||...
+        strcmp(config.motionModel,'constantSE3')
     config.set('dimPoint',4);
 else 
     config.set('dimPoint',3);
