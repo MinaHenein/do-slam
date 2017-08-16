@@ -16,11 +16,11 @@ config.set('motionModel','constantSpeed'); % default due to values - change thes
 % config.set('stdPointPoint',[0.01 0.01 0.01]');
 
 % point 3 edge
-config.set('pointMotionMeasurement','point3Edge');
+% config.set('pointMotionMeasurement','point3Edge');
 
 %     % speed version
-    config.set('motionModel','constantSpeed')
-    config.set('std3Points',0.01);
+%     config.set('motionModel','constantSpeed')
+%     config.set('std3Points',0.01);
 
     % velocity version
 %     config.set('motionModel','constantVelocity');
@@ -35,8 +35,8 @@ config.set('pointMotionMeasurement','velocity')
 %     config.set('std2PointsVelocity',0.01);
 
 %     % velocity version
-%     config.set('motionModel','constantVelocity')
-%     config.set('std2PointsVelocity',[0.01 0.01 0.01]');
+    config.set('motionModel','constantVelocity')
+    config.set('std2PointsVelocity',[0.01 0.01 0.01]');
 
 
 

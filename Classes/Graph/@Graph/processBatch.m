@@ -126,6 +126,13 @@ for i = 1:nSteps
                 else
                     error('Motion model not implemented');
                 end
+            case config.pointSE3MotionEdgeLabel
+                %edge index
+                jRow{2} = obj.nEdges+1;
+                %create velocity vertex if it doesn't exist
+                if jRow{4} > obj.nVertices
+                    obj = obj.constructSE3MotionVertex(config,jRow);
+                end    
             case config.pointPlaneEdgeLabel
                 %edge index
                 jRow{2} = obj.nEdges+1;

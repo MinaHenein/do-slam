@@ -18,7 +18,7 @@ config = CameraConfig();
 config = setUnitTestConfig(config);
 config.set('groundTruthFileName' ,'groundTruthTest5a.graph');
 config.set('measurementsFileName','measurementsTest5a.graph');
-% config.set('noiseModel','Off');
+config.set('noiseModel','Off');
 rng(config.rngSeed);
 config.set('motionModel','constantSpeed');
 if strcmp(config.motionModel,'constantSpeed')
@@ -179,6 +179,7 @@ if strcmp(config.noiseModel,'Gaussian')
     end
 end
 
+%% write files
 groundTruthGraph = fopen(strcat(config.folderPath,config.sep,'Data',...
     config.sep,config.graphFileFolderName,config.sep,config.groundTruthFileName),'w');
 measurementGraph = fopen(strcat(config.folderPath,config.sep,'Data',...

@@ -10,7 +10,7 @@
 % clear all
 close all
 
-apply2PtsEdgeSE3 = 1;
+apply2PtsEdgeSE3 = 0;
 nSteps = 3;
 
 %% config setup 
@@ -29,7 +29,7 @@ sensorPose = zeros(6,nSteps);
 % applies relative motion - linear velocity in forward (x) axis and 
 % constant rotation about z axis
 for i=2:nSteps
-    rotationMatrix = eul2rot([pi/12 0 0]);
+    rotationMatrix = rot([pi/12 0 0]');
     orientationMatrix = rot(sensorPose(4:6,i));
     relativeSensorPose = [1; 0; 0; arot(orientationMatrix*rotationMatrix)];
     sensorPose(:,i) = RelativeToAbsolutePoseR3xso3(sensorPose(:,i-1),...

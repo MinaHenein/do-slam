@@ -18,7 +18,7 @@ config = CameraConfig();
 config = setUnitTestConfig(config);
 config.set('groundTruthFileName' ,'groundTruthTest4b.graph');
 config.set('measurementsFileName','measurementsTest4b.graph');
-% config.set('noiseModel','Off');
+config.set('noiseModel','Off');
 rng(config.rngSeed);
 config.set('motionModel','constantVelocity');
 if strcmp(config.motionModel,'constantSpeed')

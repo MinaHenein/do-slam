@@ -18,7 +18,7 @@ config = CameraConfig();
 config.set('groundTruthFileName' ,'groundTruthTest7.graph');
 config.set('measurementsFileName','measurementsTest7.graph');
 config.set('motionModel','constantSE3Mina');
-config.set('std2PointsSE3', [0.01,0.01,0.01,0.01]');
+config.set('std2PointsSE3', [0.1,0.1,0.1,0.01]');
 config = setUnitTestConfig(config);
 rng(config.rngSeed);
 
@@ -28,7 +28,7 @@ sensorPose = zeros(6,nSteps);
 % applies relative motion - linear velocity in forward (x) axis and 
 % constant rotation about z axis
 for i=2:nSteps
-    rotationMatrix = eul2rot([pi/12 0 0]);
+    rotationMatrix = rot([pi/12 0 0]');
     orientationMatrix = rot(sensorPose(4:6,i));
     relativeSensorPose = [1; 0; 0; arot(orientationMatrix*rotationMatrix)];
     sensorPose(:,i) = RelativeToAbsolutePoseR3xso3(sensorPose(:,i-1),...
@@ -38,6 +38,7 @@ end
 %% set up object
 setGlobalObjPtsRelative({[0 1 0]',[1 -1 1]',[1 1 1]'});
 objPtsRelative = getGlobalObjPtsRelative;
+nPoints = size(objPtsRelative,2);
 
 % applies relative motion - rotation of pi/6 radians per time step about z
 % axis and -pi/4 radians about y axis with linear translation of x = 1 and
@@ -90,6 +91,9 @@ for i=1:nSteps
     end  
 end
 
+objPtsAtTime = [];
+points = cell2mat(objectPts);
+            
 for i=1:size(groundTruthVertices,1)
     % ground Truth edges for odometry
     if i > 1
@@ -104,6 +108,11 @@ for i=1:size(groundTruthVertices,1)
         currentEdge.covUT = covToUpperTriVec(currentEdge.cov);
         groundTruthEdges{i,end+1} = currentEdge;
     end
+    if apply2PtsEdgeSE3
+        for k=1:nSteps
+            objPtsAtTime = [objPtsAtTime, points(:,i+(k-1)*nPoints)];
+        end
+    end
     for j=1:size(objectPts,2)
         currentEdge = struct();
         currentEdge.index1 = groundTruthVertices{i,1}.index;
@@ -116,16 +125,21 @@ for i=1:size(groundTruthVertices,1)
         currentEdge.cov = config.covPosePoint;
         currentEdge.covUT = covToUpperTriVec(currentEdge.cov);
         groundTruthEdges{i,end+1} = currentEdge;
-         if apply2PtsEdgeSE3
-            if i>= 2
+    end
+end
+
+if apply2PtsEdgeSE3
+    if i== size(groundTruthVertices,1)
+        for j=1:size(objectPts,2)
+            for l= 1:i-1
                 currentEdge = struct();
-                currentEdge.index1 = groundTruthVertices{i-1,j+1}.index;
-                currentEdge.index2 = groundTruthVertices{i,j+1}.index;
+                currentEdge.index1 = groundTruthVertices{l,j+1}.index;
+                currentEdge.index2 = groundTruthVertices{l+1,j+1}.index;
                 currentEdge.label = config.pointPointEdgeSE3Label;
-                T = vectors2TransformationMatrix(groundTruthVertices{i,j+1}.value,...
-                    objPtsRelative{1,i});
-                currentEdge.value = [groundTruthVertices{i-1,j+1}.value]-...
-                    T*inv(constantSE3ObjectMotion)*inv(T)*[groundTruthVertices{i,j+1}.value];
+                [rotM,t] = Kabsch(cell2mat(objPtsRelative),objPtsAtTime(:,mapping(l+1,nPoints)));
+                T = [rotM t; 0 0 0 1];
+                currentEdge.value = [groundTruthVertices{l,j+1}.value]-...
+                    T*inv(config.constantSE3Motion)*inv(T)*[groundTruthVertices{l+1,j+1}.value];
                 currentEdge.std = config.std2PointsSE3;
                 currentEdge.cov = config.cov2PointsSE3;
                 currentEdge.covUT = covToUpperTriVec(currentEdge.cov);

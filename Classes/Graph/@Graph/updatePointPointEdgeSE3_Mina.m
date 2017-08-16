@@ -11,19 +11,30 @@ assert(strcmp(obj.vertices(point2Vertex).type,'point'))
 %% 2. compute edge value & jacobians
 objPtsRelative = getGlobalObjPtsRelative;
 
-if (point1Vertex==2 && point2Vertex==6) || (point1Vertex==6 && point2Vertex==10)
-    a = objPtsRelative{1,1};
-    disp('HARD CODED!! SHOULD CHANGE')
-elseif (point1Vertex==3 && point2Vertex==7) || (point1Vertex==7 && point2Vertex==11)
-    a = objPtsRelative{1,2};
-    disp('HARD CODED!! SHOULD CHANGE')
-elseif (point1Vertex==4 && point2Vertex==8) || (point1Vertex==8 && point2Vertex==12)
-    a = objPtsRelative{1,3};
-    disp('HARD CODED!! SHOULD CHANGE')
+nSteps = 0;
+objPtsAtTime = [];
+timeStep = 0;
+for i=1:obj.nVertices
+    if strcmp(obj.vertices(i).type,'pose')
+       nSteps = nSteps+1;
+       nPointsPerStep = 0;
+       if obj.vertices(i).index < point2Vertex
+        timeStep = timeStep +1;
+       end
+    end
+    if strcmp(obj.vertices(i).type,'point')
+        nPointsPerStep = nPointsPerStep +1;
+        objPtsAtTime = [objPtsAtTime, obj.vertices(i).value];
+    end
 end
 
-T = vectors2TransformationMatrix(obj.vertices(point2Vertex).value, a);
-       
+for i=1:size(objPtsAtTime,2)
+    objPtsAtTime(:,i) = objPtsAtTime(:,i)/objPtsAtTime(end,i); 
+end
+
+[rotM,t] = Kabsch(cell2mat(objPtsRelative),objPtsAtTime(1:3,mapping(timeStep,nPointsPerStep)));
+T = [rotM t; 0 0 0 1];
+
 value = obj.vertices(point1Vertex).value -...
     T*inv(config.constantSE3Motion)*inv(T)*obj.vertices(point2Vertex).value;
 jacobian1 = eye(4);
