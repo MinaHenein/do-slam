@@ -18,7 +18,7 @@ config = CameraConfig();
 config = setUnitTestConfig(config);
 config.set('groundTruthFileName' ,'groundTruthTest5b.graph');
 config.set('measurementsFileName','measurementsTest5b.graph');
-% config.set('noiseModel','Off')
+config.set('noiseModel','Off')
 rng(config.rngSeed);
 config.set('motionModel','constantVelocity');
 if strcmp(config.motionModel,'constantSpeed')
@@ -147,7 +147,7 @@ for i=1:size(groundTruthVertices,1)
                 currentEdge.index3 = groundTruthVertices{i,i+j*2-2}.index;
                 currentEdge.label = config.pointVelocityEdgeLabel;
                 currentEdge.value = groundTruthVertices{i,i+j*2-2}.value-...
-                    (groundTruthVertices{i,j+1}.value-...
+                    (groundTruthVertices{i,j+nVelocityVertices+1}.value-...
                     groundTruthVertices{i-1,j+1}.value);
                 currentEdge.std = config.std2PointsVelocity;
                 currentEdge.cov = config.cov2PointsVelocity;

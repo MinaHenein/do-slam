@@ -65,7 +65,7 @@ while ischar(tline)
             if strcmp(config.motionModel,'constantSpeed')
                 lineCell = {label,values(1),values(2)'};
             elseif strcmp(config.motionModel,'constantVelocity')
-                lineCell = {label,values(1),values(2:4)'};
+                lineCell = {label,values(1),values(1:3)'};
             end
             %store
             graphCell{end+1,1} = lineCell;

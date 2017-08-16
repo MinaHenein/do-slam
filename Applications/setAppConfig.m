@@ -8,7 +8,6 @@ config.set('rngSeed',1);
 config.set('noiseModel','Gaussian');
 % config.set('noiseModel','Off');
 config.set('poseParameterisation','R3xso3');
-config.set('motionModel','constantSpeed'); % default due to values - change these in the application file itself
 
 %% select type of motion model - comment out the correct lines
 % % 2 point edge
@@ -31,12 +30,12 @@ config.set('motionModel','constantSpeed'); % default due to values - change thes
 config.set('pointMotionMeasurement','velocity')
 
     % speed version
-%     config.set('motionModel','constantSpeed')
-%     config.set('std2PointsVelocity',0.01);
+    config.set('motionModel','constantSpeed')
+    config.set('std2PointsVelocity',0.01);
 
 %     % velocity version
-    config.set('motionModel','constantVelocity')
-    config.set('std2PointsVelocity',[0.01 0.01 0.01]');
+%     config.set('motionModel','constantVelocity')
+%     config.set('std2PointsVelocity',[0.01 0.01 0.01]');
 
 
 
