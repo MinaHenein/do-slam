@@ -7,15 +7,47 @@ config.set('rngSeed',1);
 config.set('rngSeed',1);
 config.set('noiseModel','Gaussian');
 % config.set('noiseModel','Off');
-config.set('motionModel','constantSpeed');
 config.set('poseParameterisation','R3xso3');
+config.set('motionModel','constantSpeed'); % default due to values - change these in the application file itself
 
+%% select type of motion model - comment out the correct lines
+% % 2 point edge
+% config.set('pointMotionMeasurement','point2Edge')
+% config.set('stdPointPoint',[0.01 0.01 0.01]');
+
+% point 3 edge
+config.set('pointMotionMeasurement','point3Edge');
+
+%     % speed version
+    config.set('motionModel','constantSpeed')
+    config.set('std3Points',0.01);
+
+    % velocity version
+%     config.set('motionModel','constantVelocity');
+%     config.set('std3Points',[0.01 0.01 0.01]');
+
+    
+% 2 point velocity vertex
+config.set('pointMotionMeasurement','velocity')
+
+    % speed version
+%     config.set('motionModel','constantSpeed')
+%     config.set('std2PointsVelocity',0.01);
+
+%     % velocity version
+%     config.set('motionModel','constantVelocity')
+%     config.set('std2PointsVelocity',[0.01 0.01 0.01]');
+
+
+
+%% pose handles
 % temporarily changed function handles to public for setting
 config.absoluteToRelativePoseHandle = @AbsoluteToRelativePoseR3xso3;
 config.absoluteToRelativePointHandle = @AbsoluteToRelativePositionR3xso3;
 config.relativeToAbsolutePoseHandle = @RelativeToAbsolutePoseR3xso3;
 config.relativeToAbsolutePointHandle = @RelativeToAbsolutePositionR3xso3;
 
+%% other settings
 config.set('cameraPointParameterisation','euclidean');
 config.set('cameraControlInput','relativePose');
 config.set('poseVertexLabel'     ,'VERTEX_POSE_R3_SO3');
@@ -44,15 +76,8 @@ rot = eul2rot([pi/360,pi/360,pi/360]); % 5 degree position error
 orientation = arot(rot);
 config.set('stdPosePose'  ,[0.04,0.04,0.04,orientation']');
 
+% measurement errors
 config.set('stdPosePoint' ,[0.04,0.04,0.04]');
-
-config.set('std3Points',0.01);
-config.set('std2PointsVelocity',0.01);
-
-% velocity/motion estimation error - can change
-% config.set('stdPointPoint',config.stdPosePoint*2);
-config.set('stdPointPoint',[0.01 0.01 0.01]');
-
 config.set('stdPointPlane',0.001);
 % set properties of CameraConfig
 config.set('fieldOfView',[-pi/3,pi/3,-pi/6,pi/6,1,10]); %az,el,r limits

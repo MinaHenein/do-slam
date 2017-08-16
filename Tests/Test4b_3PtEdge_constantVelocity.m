@@ -2,29 +2,29 @@
 % Author: Mina Henein - mina.henein@anu.edu.au - 24/07/17
 % Contributors:
 %--------------------------------------------------------------------------
-% Test5_velocityEdge
-% g(l11,l12,v1) =  v1 - (l12-l11)
-
+% Test4b_3PtEdge with constant Velocity
+% g(l11,l12,l13) =  l13-l12 - (l12-l11)
 
 %% general setup
 % run startup first
 % clear all
-close all
+% close all
 
-applyVelocityVertex = 1;
+apply3PtEdges = 1;
 nSteps = 3;
 
 %% config setup 
 config = CameraConfig();
 config = setUnitTestConfig(config);
-config.set('groundTruthFileName' ,'groundTruthTest5v2.graph');
-config.set('measurementsFileName','measurementsTest5v2.graph');
+config.set('groundTruthFileName' ,'groundTruthTest4b.graph');
+config.set('measurementsFileName','measurementsTest4b.graph');
+% config.set('noiseModel','Off');
 rng(config.rngSeed);
 config.set('motionModel','constantVelocity');
 if strcmp(config.motionModel,'constantSpeed')
-    config.set('std2PointsVelocity',0.1);
+    config.set('std3Points',0.1);
 elseif strcmp(config.motionModel,'constantVelocity')
-    config.set('std2PointsVelocity',[1,1,1]');
+    config.set('std3Points',[0.1,0.1,0.1]');
 end
 %% set up sensor - MANUAL
 sensorPose = zeros(6,nSteps);
@@ -47,7 +47,7 @@ objPtsRelative = {[0 0 0]',[1 -1 1]',[1 1 1]'};
 objectPose = [5 0 0 0 0 0]'; % moved 5 forward on x axis
 for i=2:nSteps
     rotationMatrix = eul2rot([0 0 0]);
-    objectRelativePose = [1; 0; 0; arot(rotationMatrix)];
+    objectRelativePose = [1; 0.3; 0; arot(rotationMatrix)];
     objectPose(:,i) = RelativeToAbsolutePoseR3xso3(objectPose(:,i-1),...
         objectRelativePose);
 end
@@ -65,7 +65,6 @@ groundTruthEdges = {};
 vertexCount = 1;
 
 for i=1:nSteps
-    rowCount = 0;
     % create vertex for odometry reading
     currentVertex = struct();
     currentVertex.label = config.poseVertexLabel;
@@ -73,33 +72,17 @@ for i=1:nSteps
     currentVertex.index = vertexCount;
     groundTruthVertices{i,1} = currentVertex;
     vertexCount = vertexCount+1;
-    rowCount = rowCount+1;
     for j=1:size(objectPts,2)
         % create vertex for point location
         currentVertex = struct();
         currentVertex.label = config.pointVertexLabel;
         currentVertex.index = vertexCount;
         currentVertex.value = objectPts{j}(:,i);
-        groundTruthVertices{i,rowCount+1} = currentVertex;
+        groundTruthVertices{i,j+1} = currentVertex;
         vertexCount = vertexCount+1;
-        rowCount = rowCount+1;
-        % velocity vertex
-        if applyVelocityVertex
-            if i>=3
-                currentVertex = struct();
-                currentVertex.label = config.velocityVertexLabel;
-                currentVertex.index = vertexCount;
-                currentVertex.value = mean([objectPts{j}(:,i)-objectPts{j}(:,i-1),...
-                    objectPts{j}(:,i-1)-objectPts{j}(:,i-2)],2);
-                groundTruthVertices{i,rowCount+1} = currentVertex;
-                vertexCount = vertexCount+1;
-                rowCount = rowCount+1;
-            end
-        end
-    end  
+    end
 end
 
-nVelocityVertices = 0;
 for i=1:size(groundTruthVertices,1)
     % ground Truth edges for odometry
     if i > 1
@@ -117,7 +100,7 @@ for i=1:size(groundTruthVertices,1)
     for j=1:size(objectPts,2)
         currentEdge = struct();
         currentEdge.index1 = groundTruthVertices{i,1}.index;
-        currentEdge.index2 = groundTruthVertices{i,j+nVelocityVertices+1}.index;
+        currentEdge.index2 = groundTruthVertices{i,j+1}.index;
         currentEdge.label = config.posePointEdgeLabel;
         currentEdge.value = AbsoluteToRelativePositionR3xso3(sensorPose(:,i),...
             objectPts{j}(:,i));
@@ -125,53 +108,41 @@ for i=1:size(groundTruthVertices,1)
         currentEdge.cov = config.covPosePoint;
         currentEdge.covUT = covToUpperTriVec(currentEdge.cov);
         groundTruthEdges{i,end+1} = currentEdge;
-        if applyVelocityVertex
+        if apply3PtEdges
             if i>= 3
-                % point @ time 1,2 - velocity
                 currentEdge = struct();
                 currentEdge.index1 = groundTruthVertices{i-2,j+1}.index;
                 currentEdge.index2 = groundTruthVertices{i-1,j+1}.index;
-                currentEdge.index3 = groundTruthVertices{i,i+j*2-2}.index;
-                currentEdge.label = config.pointVelocityEdgeLabel;
-                currentEdge.value = groundTruthVertices{i,i+j*2-2}.value-...
+                currentEdge.index3 = groundTruthVertices{i,j+1}.index;
+                currentEdge.label = config.point3EdgeLabel;
+                currentEdge.value = groundTruthVertices{i,j+1}.value-...
+                    groundTruthVertices{i-1,j+1}.value -...
                     (groundTruthVertices{i-1,j+1}.value-...
                     groundTruthVertices{i-2,j+1}.value);
-                currentEdge.std = config.std2PointsVelocity;
-                currentEdge.cov = config.cov2PointsVelocity;
+                currentEdge.std = config.std3Points;
+                currentEdge.cov = config.cov3Points;
                 currentEdge.covUT = covToUpperTriVec(currentEdge.cov);
-                groundTruthEdges{i,end+1} = currentEdge;
-                % point @ time 2,3 - velocity
-                currentEdge = struct();
-                currentEdge.index1 = groundTruthVertices{i-1,j+1}.index;
-                currentEdge.index2 = groundTruthVertices{i,j+nVelocityVertices+1}.index;
-                currentEdge.index3 = groundTruthVertices{i,i+j*2-2}.index;
-                currentEdge.label = config.pointVelocityEdgeLabel;
-                currentEdge.value = groundTruthVertices{i,i+j*2-2}.value-...
-                    (groundTruthVertices{i,j+1}.value-...
-                    groundTruthVertices{i-1,j+1}.value);
-                currentEdge.std = config.std2PointsVelocity;
-                currentEdge.cov = config.cov2PointsVelocity;
-                currentEdge.covUT = covToUpperTriVec(currentEdge.cov);
-                groundTruthEdges{i,end+1} = currentEdge;
-                nVelocityVertices = nVelocityVertices+1;
+                groundTruthEdges{i,end+1} = currentEdge; % add to end
             end
         end
     end
 end
 
-measurementEdges = groundTruthEdges; % copies grouthTruth to add noise
-for i=1:numel(measurementEdges) % add noise on measurements
-    if ~isempty(measurementEdges{i})
-        valueEdge = measurementEdges{i}.value;
-        muEdge =  zeros(size(valueEdge,1),1);
-        sigmaEdge = measurementEdges{i}.std;
-        if strcmp(measurementEdges{i}.label,'EDGE_R3_SO3') || ...
-                strcmp(measurementEdges{i}.label,'EDGE_LOG_SE3')
-            measurementEdges{i}.value = ...
-                addGaussianNoise(config,muEdge,sigmaEdge,valueEdge,'pose');
-        else
-            measurementEdges{i}.value = ...
-                addGaussianNoise(config,muEdge,sigmaEdge,valueEdge);
+measurementEdges = groundTruthEdges; % copies groundTruth to add noise
+if strcmp(config.noiseModel,'Gaussian')
+    for i=1:numel(measurementEdges) % add noise on measurements
+        if ~isempty(measurementEdges{i})
+            valueEdge = measurementEdges{i}.value;
+            muEdge =  zeros(size(valueEdge,1),1);
+            sigmaEdge = measurementEdges{i}.std;
+            if strcmp(measurementEdges{i}.label,'EDGE_R3_SO3') || ...
+                    strcmp(measurementEdges{i}.label,'EDGE_LOG_SE3')
+                measurementEdges{i}.value = ...
+                    addGaussianNoise(config,muEdge,sigmaEdge,valueEdge,'pose');
+            else
+                measurementEdges{i}.value = ...
+                    addGaussianNoise(config,muEdge,sigmaEdge,valueEdge);
+            end
         end
     end
 end
@@ -234,9 +205,9 @@ solver = graph0.process(config,measurementsCell,groundTruthCell);
 solverEnd = solver(end);
 totalTime = toc(timeStart);
 fprintf('\nTotal time solving: %f\n',totalTime)
-% 
+
 graphN  = solverEnd.graphs(end);
-graphN.saveGraphFile(config,'resultsTest5v2.graph');
+graphN.saveGraphFile(config,'resultsTest4b.graph');
 % 
 graphGT = Graph(config,groundTruthCell);
 results = errorAnalysis(config,graphGT,graphN);
@@ -255,20 +226,21 @@ fprintf('All to All Relative Point Squared Translation Error: %.4d \n',...
 %% plot graph files
 % h = figure; 
 axis equal;
+view([-54 33])
 xlabel('x')
 ylabel('y')
 zlabel('z')
 hold on
 plotGraphFile(config,groundTruthCell,[0 0 1]);
-resultsCell = graphFileToCell(config,'resultsTest5v2.graph');
+resultsCell = graphFileToCell(config,'resultsTest4b.graph');
 plotGraph(config,graphN,[1 0 0]);
 
-figure
-subplot(2,2,1)
-spy(solverEnd.systems(end).A)
-subplot(2,2,2)
-spy(solverEnd.systems(end).H)
-subplot(2,2,3)
-spy(solverEnd.systems(end).covariance)
-subplot(2,2,4)
-spy(solverEnd.systems(end).covSqrtInv)
+% figure
+% subplot(2,2,1)
+% spy(solverEnd.systems(end).A)
+% subplot(2,2,2)
+% spy(solverEnd.systems(end).H)
+% subplot(2,2,3)
+% spy(solverEnd.systems(end).covariance)
+% subplot(2,2,4)
+% spy(solverEnd.systems(end).covSqrtInv)

@@ -157,9 +157,6 @@ classdef Config < ArrayGetSet
         end
         
         function self = setSwitch(self,property,value)
-            switch property
-                case 'pointMotionMeasurement'
-                    if any(strcmp(value,
             self.(property) = value;
         end
     end

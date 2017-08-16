@@ -13,35 +13,51 @@ nSteps = 3;
 %% config setup 
 config = CameraConfig();
 config = setUnitTestConfig(config);
-config.set('groundTruthFileName' ,'groundTruthTest2.graph');
-config.set('measurementsFileName','measurementsTest2.graph');
-
+% config.set('noiseModel','Off');
+config.set('groundTruthFileName' ,'groundTruthTest3.graph');
+config.set('measurementsFileName','measurementsTest3.graph');
+config.set('stdPointPoint',[0.1 0.1 0.1]');
 rng(config.rngSeed);
 %% set up sensor - MANUAL
 sensorPose = zeros(6,nSteps);
 
+% applies relative motion - linear velocity in forward (x) axis and 
+%constant rotation about z axis
+for i=2:nSteps
+    rotationMatrix = eul2rot([pi/12 0 0]);
+    orientationMatrix = rot(sensorPose(4:6,i));
+    relativeSensorPose = [1; 0; 0; arot(orientationMatrix*rotationMatrix)];
+    sensorPose(:,i) = RelativeToAbsolutePoseR3xso3(sensorPose(:,i-1),relativeSensorPose);
+end
+
 %% set up object
-objectPtsRelative = {[0 0 0]',[1 -1 1]',[1 1 1]'};
+objPtsRelative = {[0 0 0]',[1 -1 1]',[1 1 1]'};
 
 % applies relative motion - rotation of pi/6 radians per time step about z
 % axis and pi/4 radians about y axis with linear velocity of x = 1
 objectPose = [5 0 0 0 0 0]'; % moved 5 forward on x axis
 for i=2:nSteps
-    rotationMatrix = eul2rot([pi/6 -pi/24 0]);
-    objectRelativePose = [1; 0; 0; arot(rotationMatrix)];
+    rotationMatrix = eul2rot([0 0 0]);
+    objectRelativePose = [1; 0.3; 0; arot(rotationMatrix)];
     objectPose(:,i) = RelativeToAbsolutePoseR3xso3(objectPose(:,i-1),objectRelativePose);
 end
 
-objectPts = objectPtsRelative;
+objectPts = objPtsRelative;
 
 figure()
 hold on;
 % axis equal;
 for j=1:size(objectPts,2)
     objectPts{j} = RelativeToAbsolutePositionR3xso3(objectPose,repmat(objectPts{j},1,nSteps));
-%     plot3(objectPts{j}(1,:),objectPts{j}(2,:),objectPts{j}(3,:),'b.');
+%     plot3(objPts{j}(1,:),objPts{j}(2,:),objPts{j}(3,:),'b.');
     plot3(objectPts{j}(1,:),objectPts{j}(2,:),objectPts{j}(3,:),'k');
 end
+
+% iPose = sensorPose(:,1);
+% plotiCamera = plotCamera('Location',iPose(1:3),'Orientation',rot(-iPose(4:6))); %LHS invert pose
+% plotiCamera.Opacity = 0.1;
+% plotiCamera.Size = 0.1;
+% plotiCamera.Color = [1 0 0];
 
 %% create ground truth and measurements
 groundTruthVertices = {};
@@ -108,14 +124,12 @@ for i=2:nSteps
 end
 
 measurementEdges = groundTruthEdges; % copies grouthTruth to add noise
-for i=1:numel(measurementEdges) % add noise on measurements
-    if ~isempty(measurementEdges{i})
-        if strcmp(config.noiseModel,'Gaussian')
+if strcmp(config.noiseModel,'Gaussian')
+    for i=1:numel(measurementEdges) % add noise on measurements
+        if ~isempty(measurementEdges{i})
             noise = normrnd(measurementEdges{i}.value,measurementEdges{i}.std);
-        elseif strcmp(config.noiseModel,'Off')
-            noise = measurementEdges{i}.value;
+            measurementEdges{i}.value = noise;
         end
-        measurementEdges{i}.value = noise;
     end
 end
     
@@ -159,7 +173,7 @@ solver = graph0.process(config,measurementsCell,groundTruthCell);
 solverEnd = solver(end);
 % 
 graphN  = solverEnd.graphs(end);
-graphN.saveGraphFile(config,'resultsTest2.graph');
+graphN.saveGraphFile(config,'resultsTest3.graph');
 % 
 graphGT = Graph(config,groundTruthCell);
 results = errorAnalysis(config,graphGT,graphN);
@@ -174,16 +188,18 @@ fprintf('All to All Relative Point Squared Translation Error: %.4d \n',results.A
 %% plot graph files
 % h = figure; 
 axis equal;
+view([-54 33])
 xlabel('x')
 ylabel('y')
 zlabel('z')
 hold on
-plotGraphFile(config,groundTruthCell,'b');
-resultsCell = graphFileToCell(config,'resultsTest2.graph');
-plotGraph(config,graphN,'r');
+plotGraphFile(config,groundTruthCell,[0 0 1]);
+resultsCell = graphFileToCell(config,'resultsTest3.graph');
+plotGraph(config,graphN,[1 0 0]);
 
-figure
-subplot(1,2,1)
-spy(solverEnd.systems(end).A)
-subplot(1,2,2)
-spy(solverEnd.systems(end).H)
+% plot matrix
+% figure
+% subplot(1,2,1)
+% spy(solverEnd.systems(end).A)
+% subplot(1,2,2)
+% spy(solverEnd.systems(end).H)

@@ -15,11 +15,12 @@ nSteps = 3;
 
 %% config setup 
 config = CameraConfig();
+config = setUnitTestConfig(config);
 config.set('groundTruthFileName' ,'groundTruthTest6.graph');
 config.set('measurementsFileName','measurementsTest6.graph');
 config.set('motionModel','constantSE3Rob');
 config.set('std2PointsSE3', [0.1,0.1,0.1,0.01]');
-config = setUnitTestConfig(config);
+% config.set('noiseModel','Off');
 rng(config.rngSeed);
 
 %% set up sensor - MANUAL
@@ -133,18 +134,20 @@ for i=1:size(groundTruthVertices,1)
 end
 
 measurementEdges = groundTruthEdges; % copies grouthTruth to add noise
-for i=1:numel(measurementEdges) % add noise on measurements
-    if ~isempty(measurementEdges{i})
-        valueEdge = measurementEdges{i}.value;
-        muEdge =  zeros(size(valueEdge,1),1);
-        sigmaEdge = measurementEdges{i}.std;
-        if strcmp(measurementEdges{i}.label,'EDGE_R3_SO3') || ...
-                strcmp(measurementEdges{i}.label,'EDGE_LOG_SE3')
-            measurementEdges{i}.value = ...
-                addGaussianNoise(config,muEdge,sigmaEdge,valueEdge,'pose');
-        else
-            measurementEdges{i}.value = ...
-                addGaussianNoise(config,muEdge,sigmaEdge,valueEdge);
+if strcmp(config.noiseModel,'Gaussian')
+    for i=1:numel(measurementEdges) % add noise on measurements
+        if ~isempty(measurementEdges{i})
+            valueEdge = measurementEdges{i}.value;
+            muEdge =  zeros(size(valueEdge,1),1);
+            sigmaEdge = measurementEdges{i}.std;
+            if strcmp(measurementEdges{i}.label,'EDGE_R3_SO3') || ...
+                    strcmp(measurementEdges{i}.label,'EDGE_LOG_SE3')
+                measurementEdges{i}.value = ...
+                    addGaussianNoise(config,muEdge,sigmaEdge,valueEdge,'pose');
+            else
+                measurementEdges{i}.value = ...
+                    addGaussianNoise(config,muEdge,sigmaEdge,valueEdge);
+            end
         end
     end
 end

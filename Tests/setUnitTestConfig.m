@@ -43,13 +43,13 @@ config.set('stdPosePrior',[0.005;0.005;0.005;orientation]);
 
 % set point prior error
 if strcmp(config.motionModel,'constantSE3Rob') || strcmp(config.motionModel,'constantSE3Mina')
-    config.set('stdPointPrior',[0.01,0.01,0.01,0.01]');
+    config.set('stdPointPrior',[0.1,0.1,0.1,0.01]');
 else 
-    config.set('stdPointPrior',[0.01,0.01,0.01]');
+    config.set('stdPointPrior',[0.1,0.1,0.1]');
 end
 
 % set odometry error
-orientation = [pi/36;pi/36;pi/36]; % 0.5 degree position error
+orientation = [pi/36;pi/36;pi/36]; % 10 degree position error
 config.set('stdPosePose'  ,[0.4,0.4,0.4,orientation']');
 if strcmp(config.motionModel,'constantSE3Rob') || strcmp(config.motionModel,'constantSE3Mina')
     config.set('stdPosePoint' ,[0.4,0.4,0.4,0.01]');
@@ -57,10 +57,6 @@ else
     config.set('stdPosePoint' ,[0.4,0.4,0.4]');
 end
 
-
-% velocity/motion estimation error - can change
-config.set('stdPointPoint',config.stdPosePoint*2);
-% config.set('stdPointPoint',[0.001 0.001 0.001]');
 
 config.set('stdPointPlane',0.001);
 % set properties of CameraConfig

@@ -3,6 +3,8 @@
 % Contributors:
 %--------------------------------------------------------------------------
 
+% a copy of test 3, but without 2 point edges implemented
+
 %% general setup
 % run startup first
 clear all
@@ -13,9 +15,10 @@ nSteps = 3;
 %% config setup 
 config = CameraConfig();
 config = setUnitTestConfig(config);
+% config.set('noiseModel','Off');
 config.set('groundTruthFileName' ,'groundTruthTest3.graph');
 config.set('measurementsFileName','measurementsTest3.graph');
-config.set('stdPointPoint',[0.01 0.01 0.01]');
+config.set('stdPointPoint',[0.1 0.1 0.1]');
 rng(config.rngSeed);
 %% set up sensor - MANUAL
 sensorPose = zeros(6,nSteps);
@@ -36,8 +39,8 @@ objPtsRelative = {[0 0 0]',[1 -1 1]',[1 1 1]'};
 % axis and pi/4 radians about y axis with linear velocity of x = 1
 objectPose = [5 0 0 0 0 0]'; % moved 5 forward on x axis
 for i=2:nSteps
-    rotationMatrix = eul2rot([pi/6 -pi/24 0]);
-    objectRelativePose = [1; 0; 0; arot(rotationMatrix)];
+    rotationMatrix = eul2rot([0 0 0]);
+    objectRelativePose = [1; 0.3; 0; arot(rotationMatrix)];
     objectPose(:,i) = RelativeToAbsolutePoseR3xso3(objectPose(:,i-1),objectRelativePose);
 end
 
@@ -108,29 +111,27 @@ for i=1:size(groundTruthVertices,1)
     end
 end
 
-for i=2:nSteps
-    for j=1:size(objectPts,2)
-        currentEdge = struct();
-        currentEdge.index1 = groundTruthVertices{i-1,j+1}.index;
-        currentEdge.index2 = groundTruthVertices{i,j+1}.index;
-        currentEdge.label = config.pointPointEdgeLabel;
-        currentEdge.value = groundTruthVertices{i-1,j+1}.value-groundTruthVertices{i,j+1}.value;
-        currentEdge.std = config.stdPointPoint;
-        currentEdge.cov = config.covPointPoint;
-        currentEdge.covUT = covToUpperTriVec(currentEdge.cov);
-        groundTruthEdges{i,j+4} = currentEdge; % add to end
-    end
-end
+% for i=2:nSteps
+%     for j=1:size(objectPts,2)
+%         currentEdge = struct();
+%         currentEdge.index1 = groundTruthVertices{i-1,j+1}.index;
+%         currentEdge.index2 = groundTruthVertices{i,j+1}.index;
+%         currentEdge.label = config.pointPointEdgeLabel;
+%         currentEdge.value = groundTruthVertices{i-1,j+1}.value-groundTruthVertices{i,j+1}.value;
+%         currentEdge.std = config.stdPointPoint;
+%         currentEdge.cov = config.covPointPoint;
+%         currentEdge.covUT = covToUpperTriVec(currentEdge.cov);
+%         groundTruthEdges{i,j+4} = currentEdge; % add to end
+%     end
+% end
 
 measurementEdges = groundTruthEdges; % copies grouthTruth to add noise
-for i=1:numel(measurementEdges) % add noise on measurements
-    if ~isempty(measurementEdges{i})
-        if strcmp(config.noiseModel,'Gaussian')
+if strcmp(config.noiseModel,'Gaussian')
+    for i=1:numel(measurementEdges) % add noise on measurements
+        if ~isempty(measurementEdges{i})
             noise = normrnd(measurementEdges{i}.value,measurementEdges{i}.std);
-        elseif strcmp(config.noiseModel,'Off')
-            noise = measurementEdges{i}.value;
+            measurementEdges{i}.value = noise;
         end
-        measurementEdges{i}.value = noise;
     end
 end
     
@@ -141,7 +142,7 @@ measurementGraph = fopen(strcat(config.folderPath,config.sep,'Data',...
 
 % only done to avoid index error - comment out if point-point edges are
 % deactivated
-groundTruthVertices{size(groundTruthEdges,1),size(groundTruthEdges,2)} = []; % only done to avoid index error
+% groundTruthVertices{size(groundTruthEdges,1),size(groundTruthEdges,2)} = []; % only done to avoid index error
 [nRows, nColumns] = size(groundTruthEdges);
 for i=1:nRows
     for j=1:nColumns
@@ -189,6 +190,7 @@ fprintf('All to All Relative Point Squared Translation Error: %.4d \n',results.A
 %% plot graph files
 % h = figure; 
 axis equal;
+view([-54 33])
 xlabel('x')
 ylabel('y')
 zlabel('z')
@@ -197,8 +199,9 @@ plotGraphFile(config,groundTruthCell,[0 0 1]);
 resultsCell = graphFileToCell(config,'resultsTest3.graph');
 plotGraph(config,graphN,[1 0 0]);
 
-figure
-subplot(1,2,1)
-spy(solverEnd.systems(end).A)
-subplot(1,2,2)
-spy(solverEnd.systems(end).H)
+% plot matrix
+% figure
+% subplot(1,2,1)
+% spy(solverEnd.systems(end).A)
+% subplot(1,2,2)
+% spy(solverEnd.systems(end).H)
