@@ -2,7 +2,7 @@
 % Author: Mina Henein - mina.henein@anu.edu.au - 10/08/17
 % Contributors:
 %--------------------------------------------------------------------------
-% Test8_SE3MotionVertex
+% Test8_SE3MotionVertex_HomogeneousCoordinates
 % l^i_k = (_kH_k+1)^-1 * l^i_k+1
 
 %% general setup
@@ -226,11 +226,10 @@ totalTime = toc(timeStart);
 fprintf('\nTotal time solving: %f\n',totalTime)
 % 
 graphN  = solverEnd.graphs(end);
-graphN.saveGraphFile(config,'resultsTest6.graph');
+graphN.saveGraphFile(config,'resultsTest8.graph');
 % 
 graphGT = Graph(config,groundTruthCell);
 results = errorAnalysis(config,graphGT,graphN);
-results2HIGH = results;
 fprintf('Chi Squared Error: %.4d \n',solverEnd.systems.chiSquaredError)
 fprintf('Absolute Trajectory Translation Error: %.4d \n',results.ATE_translation_error)
 fprintf('Absolute Trajectory Rotation Error: %.4d \n',results.ATE_rotation_error)

@@ -12,7 +12,15 @@ dof = length(SE3Motion);
 Eps = eye(dof)*eps_2;
 
 SE3MotionTransformationMatrix = [rot(SE3Motion(4:6)) SE3Motion(1:3); 0 0 0 1];
-edgeValue = point1 - SE3MotionTransformationMatrix\point2;
+
+if size(point1,1)==3
+    edgeValue = point1 - ...
+        (SE3MotionTransformationMatrix(1:3,1:3)'*point2 - ...
+         (SE3MotionTransformationMatrix(1:3,1:3)'*SE3MotionTransformationMatrix(1:3,4)));
+elseif size(point1,1)==4
+    edgeValue = point1 - SE3MotionTransformationMatrix\point2;
+end
+
 d = edgeValue;
 
 J = zeros(length(edgeValue),length(SE3Motion));
@@ -21,7 +29,16 @@ for j=1:dof
     perturbedSE3Motion = config.relativeToAbsolutePoseHandle(SE3Motion,Eps(:,j)); 
     perturbedSE3MotionTransformationMatrix = ...
         [rot(perturbedSE3Motion(4:6)) perturbedSE3Motion(1:3);0 0 0 1];
+    
+    if size(point1,1)==3
+    d1 = point1 - ...
+        (perturbedSE3MotionTransformationMatrix(1:3,1:3)'*point2 - ...
+         (perturbedSE3MotionTransformationMatrix(1:3,1:3)'*...
+         perturbedSE3MotionTransformationMatrix(1:3,4)));
+    elseif size(point1,1)==4
     d1 = point1 - perturbedSE3MotionTransformationMatrix\point2;
+    end
+    
     J(:,j) = (d1-d)/(eps_2);
 end
 

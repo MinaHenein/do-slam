@@ -27,8 +27,10 @@ for i=1:obj.nVertices
     end
 end
 
-for i=1:size(objPtsAtTime,2)
-    objPtsAtTime(:,i) = objPtsAtTime(:,i)/objPtsAtTime(end,i); 
+if config.dimPoint==4
+    for i=1:size(objPtsAtTime,2)
+        objPtsAtTime(:,i) = objPtsAtTime(:,i)/objPtsAtTime(end,i); 
+    end
 end
 
 for i=2:nSteps

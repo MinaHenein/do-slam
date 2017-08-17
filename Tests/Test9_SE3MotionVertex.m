@@ -15,10 +15,10 @@ nSteps = 3;
 
 %% config setup 
 config = CameraConfig();
-config.set('groundTruthFileName' ,'groundTruthTest8.graph');
-config.set('measurementsFileName','measurementsTest8.graph');
-config.set('motionModel','constantSE3');
-config.set('std2PointsSE3Motion', [0.001,0.001,0.001,0.001]');
+config.set('groundTruthFileName' ,'groundTruthTest9.graph');
+config.set('measurementsFileName','measurementsTest9.graph');
+config.set('motionModel','constantSE3Motion');
+config.set('std2PointsSE3Motion', [0.1,0.1,0.1]');
 config = setUnitTestConfig(config);
 rng(config.rngSeed);
 
@@ -80,7 +80,7 @@ for i=1:nSteps
         currentVertex = struct();
         currentVertex.label = config.pointVertexLabel;
         currentVertex.index = vertexCount;
-        currentVertex.value = [objectPts{j}(:,i);1];
+        currentVertex.value = objectPts{j}(:,i);
         groundTruthVertices{i,rowCount+1} = currentVertex;
         vertexCount = vertexCount+1;
         rowCount = rowCount+1;
@@ -120,9 +120,8 @@ for i=1:size(groundTruthVertices,1)
         currentEdge.index1 = groundTruthVertices{i,1}.index;
         currentEdge.index2 = groundTruthVertices{i,j+1}.index;
         currentEdge.label = config.posePointEdgeLabel;
-        value = AbsoluteToRelativePositionR3xso3Normalised(sensorPose(:,i),...
-            objectPts{j}(:,i);1]);
-        currentEdge.value = [value;1];
+        currentEdge.value = AbsoluteToRelativePositionR3xso3(sensorPose(:,i),...
+            objectPts{j}(:,i));
         currentEdge.std = config.stdPosePoint;
         currentEdge.cov = config.covPosePoint;
         currentEdge.covUT = covToUpperTriVec(currentEdge.cov);
@@ -140,7 +139,9 @@ if apply2PtsSE3Motion
                 currentEdge.index3 = groundTruthVertices{end,end}.index;
                 currentEdge.label = config.pointSE3MotionEdgeLabel;
                 currentEdge.value = groundTruthVertices{l,j+1}.value -...
-                    constantSE3ObjectMotion\groundTruthVertices{l+1,j+1}.value;
+                    (constantSE3ObjectMotion(1:3,1:3)'*...
+                    groundTruthVertices{l+1,j+1}.value -...
+                    constantSE3ObjectMotion(1:3,1:3)'*constantSE3ObjectMotion(1:3,4));
                 currentEdge.std = config.std2PointsSE3Motion;
                 currentEdge.cov = config.cov2PointsSE3Motion;
                 currentEdge.covUT = covToUpperTriVec(currentEdge.cov);
@@ -227,11 +228,10 @@ totalTime = toc(timeStart);
 fprintf('\nTotal time solving: %f\n',totalTime)
 % 
 graphN  = solverEnd.graphs(end);
-graphN.saveGraphFile(config,'resultsTest6.graph');
+graphN.saveGraphFile(config,'resultsTest9.graph');
 % 
 graphGT = Graph(config,groundTruthCell);
 results = errorAnalysis(config,graphGT,graphN);
-results2HIGH = results;
 fprintf('Chi Squared Error: %.4d \n',solverEnd.systems.chiSquaredError)
 fprintf('Absolute Trajectory Translation Error: %.4d \n',results.ATE_translation_error)
 fprintf('Absolute Trajectory Rotation Error: %.4d \n',results.ATE_rotation_error)

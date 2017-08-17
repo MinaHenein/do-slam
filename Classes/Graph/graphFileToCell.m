@@ -127,7 +127,11 @@ while ischar(tline)
              %store
             graphCell{end+1,1} = lineCell;
         case config.pointSE3MotionEdgeLabel
-            lineCell = {label,[],values(1:2),values(3),values(4:7)',values(8:17)'};
+            if strcmp(config.motionModel,'constantSE3')
+                lineCell = {label,[],values(1:2),values(3),values(4:7)',values(8:17)'};
+            elseif strcmp(config.motionModel,'constantSE3Motion')
+                lineCell = {label,[],values(1:2),values(3),values(4:6)',values(7:12)'};
+            end
             %store
             graphCell{end+1,1} = lineCell;
         case config.pointPlaneEdgeLabel 

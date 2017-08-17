@@ -132,7 +132,7 @@ for i = 1:nSteps
                 if jRow{4} > obj.nVertices
                     obj = obj.constructSE3MotionVertex(config,jRow);
                 end
-                 obj = obj.construct2PointsSE3MotionEdge(config,jRow);
+                obj = obj.construct2PointsSE3MotionEdge(config,jRow);
             case config.pointPlaneEdgeLabel
                 %edge index
                 jRow{2} = obj.nEdges+1;

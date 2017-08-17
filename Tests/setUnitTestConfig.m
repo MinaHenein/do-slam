@@ -51,7 +51,7 @@ if strcmp(config.motionModel,'constantSE3Rob') ||...
         strcmp(config.motionModel,'constantSE3')
     config.set('stdPointPrior',[0.01,0.01,0.01,0.01]');
 else 
-    config.set('stdPointPrior',[0.1,0.1,0.1]');
+    config.set('stdPointPrior',[0.01,0.01,0.01]');
 end
 
 % set odometry error
