@@ -18,7 +18,7 @@ config = CameraConfig();
 config.set('groundTruthFileName' ,'groundTruthTest8.graph');
 config.set('measurementsFileName','measurementsTest8.graph');
 config.set('motionModel','constantSE3');
-config.set('std2PointsSE3Motion', [0.001,0.001,0.001,0.01]');
+config.set('std2PointsSE3Motion', [0.1,0.1,0.1,0.001]');
 config = setUnitTestConfig(config);
 rng(config.rngSeed);
 
@@ -120,9 +120,8 @@ for i=1:size(groundTruthVertices,1)
         currentEdge.index1 = groundTruthVertices{i,1}.index;
         currentEdge.index2 = groundTruthVertices{i,j+1}.index;
         currentEdge.label = config.posePointEdgeLabel;
-        value = AbsoluteToRelativePositionR3xso3(sensorPose(:,i),...
-            objectPts{j}(:,i));
-        currentEdge.value = [value;1];
+        currentEdge.value = AbsoluteToRelativePositionR3xso3Normalised(sensorPose(:,i),...
+            [objectPts{j}(:,i);1]);
         currentEdge.std = config.stdPosePoint;
         currentEdge.cov = config.covPosePoint;
         currentEdge.covUT = covToUpperTriVec(currentEdge.cov);
@@ -139,8 +138,8 @@ if apply2PtsSE3Motion
                 currentEdge.index2 = groundTruthVertices{l+1,j+1}.index;
                 currentEdge.index3 = groundTruthVertices{end,end}.index;
                 currentEdge.label = config.pointSE3MotionEdgeLabel;
-                currentEdge.value = [groundTruthVertices{l,j+1}.value]-...
-                    constantSE3ObjectMotion\[groundTruthVertices{l+1,j+1}.value];
+                currentEdge.value = groundTruthVertices{l,j+1}.value -...
+                    constantSE3ObjectMotion\groundTruthVertices{l+1,j+1}.value;
                 currentEdge.std = config.std2PointsSE3Motion;
                 currentEdge.cov = config.cov2PointsSE3Motion;
                 currentEdge.covUT = covToUpperTriVec(currentEdge.cov);

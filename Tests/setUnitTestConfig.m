@@ -14,7 +14,7 @@ config.set('poseParameterisation','R3xso3');
 config.absoluteToRelativePoseHandle = @AbsoluteToRelativePoseR3xso3;
 config.relativeToAbsolutePoseHandle = @RelativeToAbsolutePoseR3xso3;
 if strcmp(config.motionModel,'constantSE3Rob') ||...
-        strcmp(config.motionModel,'constantSE3Mina') ||...
+        strcmp(config.motionModel,'constantSE3Mina')||...
         strcmp(config.motionModel,'constantSE3')
     config.absoluteToRelativePointHandle = @AbsoluteToRelativePositionR3xso3Normalised;
     config.relativeToAbsolutePointHandle = @RelativeToAbsolutePositionR3xso3Normalised;
@@ -47,7 +47,7 @@ config.set('stdPosePrior',[0.005;0.005;0.005;orientation]);
 
 % set point prior error
 if strcmp(config.motionModel,'constantSE3Rob') ||...
-        strcmp(config.motionModel,'constantSE3Mina') ||...
+        strcmp(config.motionModel,'constantSE3Mina')||...
         strcmp(config.motionModel,'constantSE3')
     config.set('stdPointPrior',[0.01,0.01,0.01,0.01]');
 else 
@@ -55,12 +55,12 @@ else
 end
 
 % set odometry error
-orientation = [pi/360;pi/360;pi/360]; % 0.5 degree position error
-config.set('stdPosePose'  ,[0.04,0.04,0.04,orientation']');
+orientation = [pi/36;pi/36;pi/36]; % 0.5 degree position error
+config.set('stdPosePose'  ,[0.4,0.4,0.4,orientation']');
 if strcmp(config.motionModel,'constantSE3Rob') ||...
-        strcmp(config.motionModel,'constantSE3Mina') ||...
+        strcmp(config.motionModel,'constantSE3Mina')||...
         strcmp(config.motionModel,'constantSE3')
-    config.set('stdPosePoint' ,[0.04,0.04,0.04,0.01]');
+    config.set('stdPosePoint' ,[0.4,0.4,0.4,0.01]');
 else 
     config.set('stdPosePoint' ,[0.4,0.4,0.4]');
 end
@@ -75,7 +75,7 @@ config.set('cameraRelativePose',GP_Pose([0,0,0,0,0,-pi/8]'));
 config.set('dimPose',6);
 if strcmp(config.motionModel,'constantSE3Rob') ||...
         strcmp(config.motionModel,'constantSE3Mina') ||...
-        strcmp(config.motionModel,'constantSE3')
+        strcmp(config.motionModel,'constantSE3') 
     config.set('dimPoint',4);
 else 
     config.set('dimPoint',3);

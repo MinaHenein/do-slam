@@ -32,6 +32,9 @@ for i = 1:nVertices
         case config.velocityVertexLabel
             type = 'velocity';
             value = verticesCell{i}{3};
+        case config.SE3MotionVertexLabel
+            type = 'SE3Motion';
+            value = verticesCell{i}{3};    
         case config.planeVertexLabel
             type = 'plane';
             value = verticesCell{i}{3};
@@ -96,6 +99,10 @@ for i = 1:nEdges
             type = '2points-velocity';
             value = edgesCell{i}{5};
             covariance = edgesCell{i}{6};
+        case config.pointSE3MotionEdgeLabel
+            type = '2points-SE3Motion';
+            value = edgesCell{i}{5};
+            covariance = edgesCell{i}{6};    
         case config.pointPlaneEdgeLabel
             type = 'point-plane';
             value = edgesCell{i}{5};

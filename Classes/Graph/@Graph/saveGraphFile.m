@@ -18,7 +18,8 @@ for i = 1:obj.nVertices
         case 'plane';       vertexLabel = config.planeVertexLabel;
         case 'angle';       vertexLabel = config.angleVertexLabel;
         case 'distance';    vertexLabel = config.distanceVertexLabel;
-        case 'velocity'; vertexLabel = config.velocityVertexLabel;
+        case 'velocity';    vertexLabel = config.velocityVertexLabel;
+        case 'SE3Motion';   vertexLabel = config.SE3MotionVertexLabel;
         otherwise; error('type invalid')
     end
     vertexIndex = obj.vertices(i).index;
@@ -58,6 +59,11 @@ for i = 1:obj.nEdges
             edgeCovariance = obj.edges(i).covariance;
         case '2points-velocity'
             edgeLabel = config.pointVelocityEdgeLabel;
+            verticesIn = obj.edges(i).iVertices(1:2);
+            verticesOut = obj.edges(i).iVertices(3);
+            edgeCovariance = obj.edges(i).covariance;
+        case '2points-SE3Motion'
+            edgeLabel = config.pointSE3MotionEdgeLabel;
             verticesIn = obj.edges(i).iVertices(1:2);
             verticesOut = obj.edges(i).iVertices(3);
             edgeCovariance = obj.edges(i).covariance;

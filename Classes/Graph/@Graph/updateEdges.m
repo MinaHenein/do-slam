@@ -33,6 +33,8 @@ for i = 1:obj.nEdges
             else
                 error('Motion model not implemented');
             end
+        case '2points-SE3Motion'
+            edgeUpdater = @update2PointsSE3MotionEdge;
         case 'point-plane'
             edgeUpdater = @updatePointPlaneEdge;
         case 'point-rectangle'

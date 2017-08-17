@@ -89,7 +89,6 @@ for i = 1:nSteps
                 elseif strcmp(config.motionModel,'constantSE3Mina')
                     obj = obj.constructPointPointEdgeSE3_Mina(config,jRow);
                 end
-                obj = obj.constructPointPointEdgeSE3(config,jRow);
             case config.point3EdgeLabel
                 %edgeIndex
                 jRow{2} = obj.nEdges+1;
@@ -132,7 +131,8 @@ for i = 1:nSteps
                 %create velocity vertex if it doesn't exist
                 if jRow{4} > obj.nVertices
                     obj = obj.constructSE3MotionVertex(config,jRow);
-                end    
+                end
+                 obj = obj.construct2PointsSE3MotionEdge(config,jRow);
             case config.pointPlaneEdgeLabel
                 %edge index
                 jRow{2} = obj.nEdges+1;
