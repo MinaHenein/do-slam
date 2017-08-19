@@ -166,8 +166,44 @@ classdef Environment < ArrayGetSet
             %pair primitive and points
             self.addPrimitiveAndPoints(ellipsoidPrimitive,ellipsoidPoints);
         end
-    end
     
+        function self = addCube(self,dim,parameterisation,trajectory)
+            d = [-dim, dim];
+            [x, y, z] = meshgrid(d,d,d);
+            corners = [x(:),y(:),z(:);zeros(1,3)]';
+            corners = corners +0.00001*rand(size(corners));
+%             tetrahedra = delaunay(corners(1,:),corners(2,:),corners(3,:));
+            tetrahedra = delaunayn(corners');
+            links = [tetrahedra(:,[1 2 3]); tetrahedra(:,[1 2 4]); tetrahedra(:,[1 3 4]); tetrahedra(:, [2 3 4])];
+            links = sort(links, 2);
+            links = unique(links, 'rows');
+            
+            % create points along cube
+            points = corners; % only corners for testing purposes
+            nPoints = size(points,2);
+            
+            %initialise points
+            cubePoints(nPoints) = EnvironmentPoint();
+            for i=1:nPoints
+                iRelativePoint = GP_Point(points(:,i),parameterisation);
+                cubePoints(i).set('trajectory',RelativePointTrajectory(trajectory,iRelativePoint));
+            end
+
+            meshPoints = GP_Point.empty();
+            for i=1:size(corners,2)
+                meshPoints(i) = GP_Point(corners(:,i));
+            end
+            
+            %initialise EP_Default primitive
+            cubePrimitive = EP_Default();
+            cubePrimitive.set('trajectory',trajectory);
+            cubePrimitive.set('meshPoints',meshPoints);
+            cubePrimitive.set('meshLinks',links);
+            
+            %pair primitive and points
+            self.addPrimitiveAndPoints(cubePrimitive,cubePoints);
+        end
+    end
     
     % Add primitive & points
     %   adds primitive and points to environment

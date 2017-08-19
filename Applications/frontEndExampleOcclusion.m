@@ -60,7 +60,8 @@ end
 environment = Environment();
 environment.addRectangle([10,15],100,'mixed',staticTrajectory1);
 environment.addRectangle([8,6],50,'mixed',staticTrajectory2);
-environment.addEllipsoid([1 1 2],10,'R3',dynamicTrajectory);
+% environment.addEllipsoid([1 1 2],10,'R3',dynamicTrajectory);
+environment.addCube(1, 'R3',dynamicTrajectory);
 
 %% 3. Plot
 % figure
@@ -105,4 +106,4 @@ hold on
 staticTrajectory1.plot()
 staticTrajectory2.plot()
 cameraTrajectory.plot(t)
-environment.plot(t)
+environment.plot([3])

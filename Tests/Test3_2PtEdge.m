@@ -53,6 +53,12 @@ for j=1:size(objectPts,2)
     plot3(objectPts{j}(1,:),objectPts{j}(2,:),objectPts{j}(3,:),'k');
 end
 
+for j=1:size(objectPts,2)
+    if ((objectPts{j}(:,3)-objectPts{j}(:,2))-(objectPts{j}(:,2)-objectPts{j}(:,1)))<1e-14
+        display(['Point ',int2str(j),' velocity is linear.']);
+    end
+end
+
 % iPose = sensorPose(:,1);
 % plotiCamera = plotCamera('Location',iPose(1:3),'Orientation',rot(-iPose(4:6))); %LHS invert pose
 % plotiCamera.Opacity = 0.1;
