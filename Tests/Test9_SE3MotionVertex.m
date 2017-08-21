@@ -49,7 +49,7 @@ objectRelativePose = [translationVector; arot(rotationMatrix)];
 constantSE3ObjectMotion = [rotationMatrix, translationVector; 0 0 0 1];
 
 for i=2:nSteps
-    objectPose(:,i) = RelativeToAbsolutePoseR3xso3GloabalFrame(objectPose(:,i-1),...
+    objectPose(:,i) = RelativeToAbsolutePoseR3xso3GlobalFrame(objectPose(:,i-1),...
         objectRelativePose);
 end
 
@@ -232,6 +232,7 @@ graphN.saveGraphFile(config,'resultsTest9.graph');
 % 
 graphGT = Graph(config,groundTruthCell);
 results = errorAnalysis(config,graphGT,graphN);
+results2HIGH = results;
 fprintf('Chi Squared Error: %.4d \n',solverEnd.systems.chiSquaredError)
 fprintf('Absolute Trajectory Translation Error: %.4d \n',results.ATE_translation_error)
 fprintf('Absolute Trajectory Rotation Error: %.4d \n',results.ATE_rotation_error)
