@@ -248,7 +248,7 @@ for i = 1:nSteps
                             writeEdge(edgeLabel,[index1 index2],index3,valueGT2_3,covariance,gtFileID);
                             writeEdge(edgeLabel,[index1 index2],index3,valueMeas2_3,covariance,mFileID);
                         end
-                    case 'off'
+                    case 'Off'
                     otherwise
                         error('Point motion measurement type is unidentified.')
                 end

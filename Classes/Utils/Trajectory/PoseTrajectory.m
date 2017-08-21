@@ -83,7 +83,7 @@ classdef PoseTrajectory < Trajectory
             end
             
             %plot positions
-            if varargin{1}
+            if size(varargin,2) > 0
                 color = varargin{1};
             else
                 color = [0 0 0];

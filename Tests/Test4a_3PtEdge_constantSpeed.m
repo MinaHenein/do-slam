@@ -20,7 +20,7 @@ config.set('groundTruthFileName' ,'groundTruthTest4a.graph');
 config.set('measurementsFileName','measurementsTest4a.graph');
 rng(config.rngSeed);
 config.set('motionModel','constantSpeed');
-config.set('noiseModel','Off');
+% config.set('noiseModel','Off');
 if strcmp(config.motionModel,'constantSpeed')
     config.set('std3Points',0.1);
 elseif strcmp(config.motionModel,'constantVelocity')
@@ -57,6 +57,12 @@ objectPts = objPtsRelative;
 for j=1:size(objectPts,2)
     objectPts{j} = RelativeToAbsolutePositionR3xso3(objectPose,...
         repmat(objectPts{j},1,nSteps));
+end
+
+for j=1:size(objectPts,2)
+    if (norm(objectPts{j}(:,3)-objectPts{j}(:,2))-norm(objectPts{j}(:,2)-objectPts{j}(:,1)))<1e-14
+        display(['Point ',int2str(j),' speed is linear.']);
+    end
 end
 
 %% create ground truth and measurements

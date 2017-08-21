@@ -16,9 +16,8 @@ t  = linspace(t0,tN,nSteps);
 config = CameraConfig();
 setAppConfig(config); % copy same settings for error Analysis
 config.set('t',t);
-config.set('pointMotionMeasurement','point2Edge');
-config.set('groundTruthFileName','app2_groundTruth.graph');
-config.set('measurementsFileName','app2_measurements.graph');
+config.set('groundTruthFileName','app3_groundTruth.graph');
+config.set('measurementsFileName','app3_measurements.graph');
 
 %% 2. Generate Environment
 if config.rngSeed
@@ -94,7 +93,7 @@ graph0  = solverEnd.graphs(1);
 graphN  = solverEnd.graphs(end);
 fprintf('\nChi-squared error: %f\n',solverEnd.systems(end).chiSquaredError)
 %save results to graph file
-graphN.saveGraphFile(config,'app1_results.graph');
+graphN.saveGraphFile(config,'app3_results.graph');
 
 %% 8. Error analysis
 %load ground truth into graph, sort if required
@@ -126,5 +125,5 @@ view([-50,25])
 %plot groundtruth
 plotGraphFile(config,groundTruthCell,[0 0 1]);
 %plot results
-resultsCell = graphFileToCell(config,'app1_results.graph');
+resultsCell = graphFileToCell(config,'app3_results.graph');
 plotGraphFile(config,resultsCell,[1 0 0])

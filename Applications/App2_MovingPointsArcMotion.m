@@ -17,7 +17,7 @@ config = CameraConfig();
 setAppConfig(config); % copy same settings for error Analysis
 config.set('t',t);
 % set motion model in setAppConfig function
-config.set('noiseModel','Off');
+% config.set('noiseModel','Off');
 config.set('groundTruthFileName','app2_groundTruth.graph');
 config.set('measurementsFileName','app2_measurements.graph');
 

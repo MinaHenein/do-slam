@@ -18,7 +18,7 @@ config = CameraConfig();
 config = setUnitTestConfig(config);
 config.set('groundTruthFileName' ,'groundTruthTest5b.graph');
 config.set('measurementsFileName','measurementsTest5b.graph');
-config.set('noiseModel','Off')
+% config.set('noiseModel','Off')
 rng(config.rngSeed);
 config.set('motionModel','constantVelocity');
 if strcmp(config.motionModel,'constantSpeed')
@@ -57,6 +57,12 @@ objectPts = objPtsRelative;
 for j=1:size(objectPts,2)
     objectPts{j} = RelativeToAbsolutePositionR3xso3(objectPose,...
         repmat(objectPts{j},1,nSteps));
+end
+
+for j=1:size(objectPts,2)
+    if ((objectPts{j}(:,3)-objectPts{j}(:,2))-(objectPts{j}(:,2)-objectPts{j}(:,1)))<1e-14
+        display(['Point ',int2str(j),' velocity is linear.']);
+    end
 end
 
 %% create ground truth and measurements
