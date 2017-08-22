@@ -4,13 +4,13 @@ y = [results1LOW.ATE_translation_error,results1LOW.ATE_rotation_error,...
     results1MED.ATE_rotation_error,results1MED.ASE_translation_error;...
     results1HIGH.ATE_translation_error,results1HIGH.ATE_rotation_error,...
     results1HIGH.ASE_translation_error];
-x = [0.01, 0.1, 1];
+x = [0.001, 0.01, 0.1];
 close all
 semilogx(x,y,'-*','linewidth',2)
 ax = gca;
 ax.XTickLabel = x;
 set(gcf,'color','w');
-xlabel('std for 2-points-velocity edge')
+xlabel('std for 2-points-SE3Motion edge')
 ylabel('error values - low noise levels')
 legend('ATE','ARE','ASE')
 
@@ -26,6 +26,6 @@ semilogx(x,y,'-*','linewidth',2)
 ax = gca;
 ax.XTickLabel = x;
 set(gcf,'color','w');
-xlabel('std for 2-points-velocity edge')
+xlabel('std for 2-points-SE3Motion edge')
 ylabel('error values - high noise levels')
 legend('ATE','ARE','ASE')

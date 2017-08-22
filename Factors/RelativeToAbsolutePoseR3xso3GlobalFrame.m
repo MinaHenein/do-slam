@@ -3,7 +3,7 @@
 % Contributors:
 %--------------------------------------------------------------------------
 
-function posesAbsolute = RelativeToAbsolutePoseR3xso3GloabalFrame(posesOldFrame, posesRelative)
+function posesAbsolute = RelativeToAbsolutePoseR3xso3GlobalFrame(posesOldFrame, posesRelative)
 %% converts poses from relative coords to absolute
 % inputs
     %poseOldFrame  = matrix of pose column vectors of old reference frame
