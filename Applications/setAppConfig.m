@@ -16,29 +16,26 @@ config.set('poseParameterisation','R3xso3');
 % config.set('stdPointPoint',[0.01 0.01 0.01]');
 
 % point 3 edge
-config.set('pointMotionMeasurement','point3Edge');
+% config.set('pointMotionMeasurement','point3Edge');
 
 %     % speed version
-    config.set('motionModel','constantSpeed')
-    config.set('std3Points',0.01);
+%     config.set('motionModel','constantSpeed')
+%     config.set('std3Points',0.01);
 
     % velocity version
 %     config.set('motionModel','constantVelocity');
 %     config.set('std3Points',[0.01 0.01 0.01]');
 
-    
 % 2 point velocity vertex
-% config.set('pointMotionMeasurement','velocity')
+config.set('pointMotionMeasurement','velocity')
 
     % speed version
 %     config.set('motionModel','constantSpeed')
 %     config.set('std2PointsVelocity',0.01);
 
 %     % velocity version
-%     config.set('motionModel','constantVelocity')
-%     config.set('std2PointsVelocity',[0.01 0.01 0.01]');
-
-
+    config.set('motionModel','constantVelocity')
+    config.set('std2PointsVelocity',[0.01 0.01 0.01]');
 
 %% pose handles
 % temporarily changed function handles to public for setting
@@ -80,7 +77,7 @@ config.set('stdPosePose'  ,[0.04,0.04,0.04,orientation']');
 config.set('stdPosePoint' ,[0.04,0.04,0.04]');
 config.set('stdPointPlane',0.001);
 % set properties of CameraConfig
-config.set('fieldOfView',[-pi/3,pi/3,-pi/6,pi/6,1,10]); %az,el,r limits
+config.set('fieldOfView',[-pi/3,pi/3,-pi/6,pi/6,1,40]); %az,el,r limits
 config.set('cameraRelativePose',GP_Pose([0,0,0,0,0,-pi/8]'));
 % set properties of solverConfig
 %   dimensions

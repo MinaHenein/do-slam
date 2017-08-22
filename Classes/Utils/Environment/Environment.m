@@ -172,8 +172,8 @@ classdef Environment < ArrayGetSet
             [x, y, z] = meshgrid(d,d,d);
             corners = [x(:),y(:),z(:);zeros(1,3)]';
             corners = corners +0.00001*rand(size(corners));
-%             tetrahedra = delaunay(corners(1,:),corners(2,:),corners(3,:));
-            tetrahedra = delaunayn(corners');
+            tetrahedra = delaunay(corners(1,:),corners(2,:),corners(3,:));
+%             tetrahedra = delaunayn(corners');
             links = [tetrahedra(:,[1 2 3]); tetrahedra(:,[1 2 4]); tetrahedra(:,[1 3 4]); tetrahedra(:, [2 3 4])];
             links = sort(links, 2);
             links = unique(links, 'rows');

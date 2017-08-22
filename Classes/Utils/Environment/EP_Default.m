@@ -34,7 +34,7 @@ classdef EP_Default < EnvironmentPrimitive
                     t = varargin{1};
                     objectPose = self.get('GP_Pose',t);
                     pointsAbsolute = self.meshPoints.RelativeToAbsolutePoint(objectPose);
-                    out = pointsAbsolute;                    
+                    out = pointsAbsolute;
                 case 'meshRelative'
                     pointsRelative = self.meshPoints.get('R3Position');
                     links = self.meshLinks;

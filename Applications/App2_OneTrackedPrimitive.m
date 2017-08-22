@@ -1,5 +1,5 @@
 %--------------------------------------------------------------------------
-% Author: Yash Vyas
+% Author: Yash Vyas - yjvyas@gmail.com - 03/07/2017
 % Contributors:
 %--------------------------------------------------------------------------
 % frontEndSolverExample
@@ -14,22 +14,24 @@ tN = 10;
 t  = linspace(t0,tN,nSteps);
 
 config = CameraConfig();
-setAppConfig(config); % copy same settings for error Analysis
+config = setAppConfig(config); % copy same settings for error Analysis
 config.set('t',t);
-config.set('groundTruthFileName','app3_groundTruth.graph');
-config.set('measurementsFileName','app3_measurements.graph');
+% set motion model in setAppConfig function
+% config.set('noiseModel','Off');
+config.set('groundTruthFileName','app2_groundTruth.graph');
+config.set('measurementsFileName','app2_measurements.graph');
 
 %% 2. Generate Environment
 if config.rngSeed
     rng(config.rngSeed); 
 end
 
-robotWaypoints = [0:2:tN; 0 10 15 20 15 10; 0 0 0 0 0 0; 0 0 1 2 4 2];
-primitiveWaypoints = [0:2:tN; 10 20 25 20 10 5; 0 0 0 0 0 0; 0 2 1 3 5 2];
+robotWaypoints = [0:2:tN; 0 10 15 20 15 10; 0 0 5 10 15 15; 0 0 1 2 4 2];
+primitiveWaypoints = [0:2:tN; 10 20 25 20 10 5; 0 0 10 15 15 15; 0 2 1 3 5 2];
 
 % construct trajectories
-robotTrajectory = PositionModelPoseTrajectory(robotWaypoints,'R3','linearinterp');
-primitiveTrajectory = PositionModelPoseTrajectory(primitiveWaypoints,'R3','linearinterp');
+robotTrajectory = PositionModelPoseTrajectory(robotWaypoints,'R3','smoothingspline');
+primitiveTrajectory = PositionModelPoseTrajectory(primitiveWaypoints,'R3','smoothingspline');
 robotPose = GP_Pose([5 0 0 0 0 0]);
 % robotTrajectory = RelativePoseTrajectory(primitiveTrajectory,robotPose);
 % primitive2Trajectory = PositionModelPoseTrajectory(primitiveWaypoints-1,'R3','smoothingspline');
@@ -57,20 +59,20 @@ sensor.setVisibility(config);
 % figure
 % spy(sensor.get('pointVisibility'));
 %% 4. Plot Environment
-figure
-% viewPoint = [-50,25];
-% axisLimits = [-10,50,-10,40,-1,10];
-title('Environment')
-axis equal
-xlabel('x')
-ylabel('y')
-zlabel('z')
-% view(viewPoint)
-% axis(axisLimits)
-hold on
-primitiveTrajectory.plot(t,[0 0 0])
-cameraTrajectory.plot(t,[0 1 1])
-environment.plot(t)
+% figure
+% % viewPoint = [-50,25];
+% % axisLimits = [-10,50,-10,40,-1,10];
+% title('Environment')
+% axis equal
+% xlabel('x')
+% ylabel('y')
+% zlabel('z')
+% % view(viewPoint)
+% % axis(axisLimits)
+% hold on
+% primitiveTrajectory.plot(t,[0 0 0])
+% cameraTrajectory.plot(t,[0 1 1])
+% environment.plot(t)
 
 %% 5. Generate Measurements & Save to Graph File
 sensor.generateMeasurements(config);
@@ -79,7 +81,10 @@ sensor.generateMeasurements(config);
 groundTruthCell  = graphFileToCell(config,config.groundTruthFileName);
 measurementsCell = graphFileToCell(config,config.measurementsFileName);
 
-%% 7. Solve
+%% 7. Manual recreation of vertices
+initialCell = recreateInitialVertexes(config,measurementsCell,groundTruthCell);
+
+%% 8. Solve
 %no constraints
 timeStart = tic;
 graph0 = Graph();
@@ -93,9 +98,9 @@ graph0  = solverEnd.graphs(1);
 graphN  = solverEnd.graphs(end);
 fprintf('\nChi-squared error: %f\n',solverEnd.systems(end).chiSquaredError)
 %save results to graph file
-graphN.saveGraphFile(config,'app3_results.graph');
+graphN.saveGraphFile(config,'app1_results.graph');
 
-%% 8. Error analysis
+%% 9. Error analysis
 %load ground truth into graph, sort if required
 graphGT = Graph(config,groundTruthCell);
 results = errorAnalysis(config,graphGT,graphN);
@@ -107,8 +112,8 @@ fprintf('All to All Relative Pose Squared Translation Error: %.4d \n',results.AA
 fprintf('All to All Relative Pose Squared Rotation Error: %.4d \n',results.AARPE_squared_rotation_error)
 fprintf('All to All Relative Point Squared Translation Error: %.4d \n',results.AARPTE_squared_translation_error)
 
-%% 9. Plot
-    %% 9.1 Plot intial, final and ground-truth solutions
+%% 10. Plot
+    %% 10.1 Plot intial, final and ground-truth solutions
 %no constraints
 figure
 subplot(1,2,1)
@@ -125,5 +130,5 @@ view([-50,25])
 %plot groundtruth
 plotGraphFile(config,groundTruthCell,[0 0 1]);
 %plot results
-resultsCell = graphFileToCell(config,'app3_results.graph');
+resultsCell = graphFileToCell(config,'app1_results.graph');
 plotGraphFile(config,resultsCell,[1 0 0])

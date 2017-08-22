@@ -202,33 +202,18 @@ for i = 1:nSteps
                             % edges
                             vertexCount = vertexCount + 1;
                             
-                            
                             % look at constraint motion Model and implement
                             % vertex and edge
                             if strcmp(config.motionModel,'constantSpeed')
                                 value = mean([norm(jPoint.get('R3Position',t(i))-jPoint.get('R3Position',t(i-1))),...
                                               norm(jPoint.get('R3Position',t(i-1))-jPoint.get('R3Position',t(i-2)))]);
                                 valueGT1_2 = value-norm(jPoint.get('R3Position',t(i-1))-jPoint.get('R3Position',t(i-2)));
-                                velocityPoint1_2 = GP_Point(valueGT1_2);
-                                velocityPointNoisy = velocityPoint1_2.addNoise(config.noiseModel,zeros(size(config.std2PointsVelocity)),config.std2PointsVelocity);
-                                valueMeas1_2 = velocityPointNoisy.get('R3Position');
-                                
                                 valueGT2_3 = value-norm(jPoint.get('R3Position',t(i))-jPoint.get('R3Position',t(i-1)));
-                                velocityPoint2_3 = GP_Point(valueGT2_3);
-                                velocityPointNoisy = velocityPoint2_3.addNoise(config.noiseModel,zeros(size(config.std2PointsVelocity)),config.std2PointsVelocity);
-                                valueMeas2_3 = velocityPointNoisy.get('R3Position');
                             elseif strcmp(config.motionModel,'constantVelocity')
                                 value = mean([jPoint.get('R3Position',t(i))-jPoint.get('R3Position',t(i-1)),...
                                               jPoint.get('R3Position',t(i-1))-jPoint.get('R3Position',t(i-2))]);
                                 valueGT1_2 = value-(jPoint.get('R3Position',t(i-1))-jPoint.get('R3Position',t(i-2)));
-                                velocityPoint1_2 = GP_Point(valueGT1_2);
-                                velocityPointNoisy = velocityPoint1_2.addNoise(config.noiseModel,zeros(size(config.std2PointsVelocity)),config.std2PointsVelocity);
-                                valueMeas1_2 = velocityPointNoisy.get('R3Position');
-                                
                                 valueGT2_3 = value-(jPoint.get('R3Position',t(i))-jPoint.get('R3Position',t(i-1)));
-                                velocityPoint2_3 = GP_Point(valueGT2_3);
-                                velocityPointNoisy = velocityPoint2_3.addNoise(config.noiseModel,zeros(size(config.std2PointsVelocity)),config.std2PointsVelocity);
-                                valueMeas2_3 = velocityPointNoisy.get('R3Position');
                             end
                             
                             writeVertex(config.velocityVertexLabel,vertexCount,value,gtFileID);
@@ -238,6 +223,10 @@ for i = 1:nSteps
                             index1 = vertexIndexes(end-2);
                             index2 = vertexIndexes(end-1);
                             index3 = vertexCount;
+                            velocityEdge1_2 = GP_Point(valueGT1_2).addNoise(config.noiseModel,zeros(size(config.std2PointsVelocity)),config.std2PointsVelocity);
+                            valueMeas1_2 = velocityEdge1_2.get('R3Position');
+                            velocityEdge2_3 = GP_Point(valueGT2_3).addNoise(config.noiseModel,zeros(size(config.std2PointsVelocity)),config.std2PointsVelocity);
+                            valueMeas2_3 = velocityEdge2_3.get('R3Position');
                             writeEdge(edgeLabel,[index1 index2],index3,valueGT1_2,covariance,gtFileID);
                             writeEdge(edgeLabel,[index1 index2],index3,valueMeas1_2,covariance,mFileID);
                             
