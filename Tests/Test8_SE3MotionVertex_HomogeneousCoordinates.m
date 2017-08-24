@@ -49,7 +49,7 @@ objectRelativePose = [translationVector; arot(rotationMatrix)];
 constantSE3ObjectMotion = [rotationMatrix, translationVector; 0 0 0 1];
 
 for i=2:nSteps
-    objectPose(:,i) = RelativeToAbsolutePoseR3xso3GloabalFrame(objectPose(:,i-1),...
+    objectPose(:,i) = RelativeToAbsolutePoseR3xso3GlobalFrame(objectPose(:,i-1),...
         objectRelativePose);
 end
 
