@@ -44,35 +44,35 @@ environment.addEllipsoid([1 2 2],12,'R3',primitive2Trajectory);
 cameraTrajectory = RelativePoseTrajectory(robotTrajectory,config.cameraRelativePose);
 
 % standard sensor
-sensor = SimulatedEnvironmentSensor();
-sensor.addEnvironment(environment);
-sensor.addCamera(config.fieldOfView,cameraTrajectory);
-sensor.setVisibility(config);
-
-% occlusion sensor
-% sensor = SimulatedEnvironmentOcclusionSensor();
+% sensor = SimulatedEnvironmentSensor();
 % sensor.addEnvironment(environment);
 % sensor.addCamera(config.fieldOfView,cameraTrajectory);
-% sensor.setVisibility(config,environment);
+% sensor.setVisibility(config);
 
-% figure
-% spy(sensor.get('pointVisibility'));
+% occlusion sensor
+sensor = SimulatedEnvironmentOcclusionSensor();
+sensor.addEnvironment(environment);
+sensor.addCamera(config.fieldOfView,cameraTrajectory);
+sensor.setVisibility(config,environment);
+
+figure
+spy(sensor.get('pointVisibility'));
 %% 4. Plot Environment
-% figure
-% viewPoint = [-35,35];
-% axisLimits = [-5,50,-5,20,-5,5];
-% % title('Environment')
-% axis equal
-% xlabel('x')
-% ylabel('y')
-% zlabel('z')
-% view(viewPoint)
-% axis(axisLimits)
-% hold on
-% primitive1Trajectory.plot(t,[0 0 0])
-% primitive2Trajectory.plot(t,[0 0 0])
-% cameraTrajectory.plot(t,[0 1 1])
-% environment.plot(t)
+figure
+viewPoint = [-35,35];
+axisLimits = [-5,50,-5,20,-5,5];
+% title('Environment')
+axis equal
+xlabel('x')
+ylabel('y')
+zlabel('z')
+view(viewPoint)
+axis(axisLimits)
+hold on
+primitive1Trajectory.plot(t,[0 0 0])
+primitive2Trajectory.plot(t,[0 0 0])
+cameraTrajectory.plot(t,[0 1 1])
+environment.plot(t)
 
 %% 5. Generate Measurements & Save to Graph File
 sensor.generateMeasurements(config);
@@ -104,13 +104,13 @@ graphN.saveGraphFile(config,'app3_results.graph');
 %load ground truth into graph, sort if required
 graphGT = Graph(config,groundTruthCell);
 results = errorAnalysis(config,graphGT,graphN);
-fprintf('Chi Squared Error: %.4d \n',solverEnd.systems.chiSquaredError)
-fprintf('Absolute Trajectory Translation Error: %.4d \n',results.ATE_translation_error)
-fprintf('Absolute Trajectory Rotation Error: %.4d \n',results.ATE_rotation_error)
-fprintf('Absolute Structure Points Error: %d \n',results.ASE_translation_error);
-fprintf('All to All Relative Pose Squared Translation Error: %.4d \n',results.AARPE_squared_translation_error)
-fprintf('All to All Relative Pose Squared Rotation Error: %.4d \n',results.AARPE_squared_rotation_error)
-fprintf('All to All Relative Point Squared Translation Error: %.4d \n',results.AARPTE_squared_translation_error)
+% fprintf('Chi Squared Error: %.4d \n',solverEnd.systems.chiSquaredError)
+% fprintf('Absolute Trajectory Translation Error: %.4d \n',results.ATE_translation_error)
+% fprintf('Absolute Trajectory Rotation Error: %.4d \n',results.ATE_rotation_error)
+% fprintf('Absolute Structure Points Error: %d \n',results.ASE_translation_error);
+% fprintf('All to All Relative Pose Squared Translation Error: %.4d \n',results.AARPE_squared_translation_error)
+% fprintf('All to All Relative Pose Squared Rotation Error: %.4d \n',results.AARPE_squared_rotation_error)
+% fprintf('All to All Relative Point Squared Translation Error: %.4d \n',results.AARPTE_squared_translation_error)
 
 %% 10. Plot
     %% 10.1 Plot intial, final and ground-truth solutions

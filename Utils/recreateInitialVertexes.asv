@@ -131,7 +131,7 @@ poses = [];
 points = [];
 points2 = [];
 
-extraPoints = (size(initialCell,2)>1);
+ex
 for i=1:size(initialCell,1)
     switch initialCell{i,1}{1}
         case config.poseVertexLabel
@@ -139,14 +139,12 @@ for i=1:size(initialCell,1)
         case config.pointVertexLabel
             points = [points, initialCell{i,1}{3}];
     end
-    if (extraPoints) && ~isempty(initialCell{i,2}) && strcmp(initialCell{i,2}{1},config.pointVertexLabel)
+    if ((size(initialCell,2)>1) && ~isempty(initialCell{i,2}) && strcmp(initialCell{i,2}{1},config.pointVertexLabel))
         points2 = [points2, initialCell{i,2}{3}];
     end
 end
 
 %% 4.1 Plot poses
-figure()
-plotGraphFile(config,groundTruthCell,[0 0 1]);
 hold on
 
 graphColour = [1 0 0];
@@ -169,15 +167,12 @@ end
 
 %% 4.2 Plot points
 plotPoints = plot3(points(1,:),points(2,:),points(3,:),'.');
-set(plotPoints,'Color',graphColour)
-set(plotPoints,'MarkerSize',3)
-% set(plotPoints,'MarkerSize',8)
-if extraPoints
-    plotPoints2 = plot3(points2(1,:),points2(2,:),points2(3,:),'.');
-    set(plotPoints2,'Color',[0 1 0]);
-    set(plotPoints2,'MarkerSize',3);
+if ~isempty(points2)
+    plotPoints2 = plot3(points2(1,:),points2(2,:),points2(3,:),'g.');
 end
-
+set(plotPoints,'MarkerEdgeColor',graphColour)
+% set(plotPoints,'MarkerSize',3)
+set(plotPoints,'MarkerSize',8)
 xlabel('x')
 ylabel('y')
 zlabel('z')

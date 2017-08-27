@@ -17,7 +17,7 @@ config = CameraConfig();
 config = setAppConfig(config); % copy same settings for error Analysis
 config.set('t',t);
 % set motion model in setAppConfig function
-% config.set('noiseModel','Off');
+config.set('noiseModel','Off');
 config.set('groundTruthFileName','app2_groundTruth.graph');
 config.set('measurementsFileName','app2_measurements.graph');
 
@@ -32,32 +32,23 @@ primitiveWaypoints = [0:2:tN; 10 20 25 20 10 5; 0 0 10 15 15 15; 0 2 1 3 5 2];
 % construct trajectories
 robotTrajectory = PositionModelPoseTrajectory(robotWaypoints,'R3','smoothingspline');
 primitiveTrajectory = PositionModelPoseTrajectory(primitiveWaypoints,'R3','smoothingspline');
-robotPose = GP_Pose([5 0 0 0 0 0]);
-% robotTrajectory = RelativePoseTrajectory(primitiveTrajectory,robotPose);
-% primitive2Trajectory = PositionModelPoseTrajectory(primitiveWaypoints-1,'R3','smoothingspline');
 
 environment = Environment();
 environment.addEllipsoid([1 1 2],12,'R3',primitiveTrajectory);
-% environment.addEllipsoid([1 1.2 2],12,'R3',primitive2Trajectory);
-% environment.addPrimitive(3*rand(3,50)-1.5,'R3',primitiveTrajectory);
+environment.addStaticPoints([30*ones(1,50); 20*rand(2,50)]);
+environment.addStaticPoints([20*rand(1,50); 20*ones(1,50); 20*rand(1,50)]);
 
 %% 3. Initialise Sensor
 cameraTrajectory = RelativePoseTrajectory(robotTrajectory,config.cameraRelativePose);
 
-% standard sensor
-sensor = SimulatedEnvironmentSensor();
+% occlusion sensor
+sensor = SimulatedEnvironmentOcclusionSensor();
 sensor.addEnvironment(environment);
 sensor.addCamera(config.fieldOfView,cameraTrajectory);
-sensor.setVisibility(config);
+sensor.setVisibility(config,environment);
 
-% occlusion sensor
-% sensor = SimulatedEnvironmentOcclusionSensor();
-% sensor.addEnvironment(environment);
-% sensor.addCamera(config.fieldOfView,cameraTrajectory);
-% sensor.setVisibility(config,environment);
-
-% figure
-% spy(sensor.get('pointVisibility'));
+figure
+spy(sensor.get('pointVisibility'));
 
 %% 4. Plot Environment
 % figure
@@ -83,7 +74,12 @@ groundTruthCell  = graphFileToCell(config,config.groundTruthFileName);
 measurementsCell = graphFileToCell(config,config.measurementsFileName);
 
 %% 7. Manual recreation of vertices
-initialCell = recreateInitialVertexes(config,measurementsCell,groundTruthCell);
+[initialCell1, initialCell2] = recreateInitialVertexes(config,measurementsCell,groundTruthCell);
+
+initialGraph1 = Graph().graphFileToGraph(config,initialCell1);
+initialGraph2 = Graph().graphFileToGraph(config,initialCell2);
+initialGraph1.saveGraphFile(config,'app4_initial1.graph');
+initialGraph2.saveGraphFile(config,'app4_initial2.graph');
 
 %% 8. Solve
 %no constraints
@@ -97,21 +93,18 @@ fprintf('\nTotal time solving: %f\n',totalTime)
 %get desired graphs & systems
 graph0  = solverEnd.graphs(1);
 graphN  = solverEnd.graphs(end);
-fprintf('\nChi-squared error: %f\n',solverEnd.systems(end).chiSquaredError)
 %save results to graph file
-graphN.saveGraphFile(config,'app1_results.graph');
+graphN.saveGraphFile(config,'app4_results.graph');
 
 %% 9. Error analysis
 %load ground truth into graph, sort if required
 graphGT = Graph(config,groundTruthCell);
+fprintf('Initial 1 error: \n');
+resultsInitial1 = errorAnalysis(config,graphGT,initialGraph1);
+fprintf('Initial 2 error: \n');
+resultsInitial2 = errorAnalysis(config,graphGT,initialGraph2);
+fprintf('Results error: \n');
 results = errorAnalysis(config,graphGT,graphN);
-% fprintf('Chi Squared Error: %.4d \n',solverEnd.systems.chiSquaredError)
-% fprintf('Absolute Trajectory Translation Error: %.4d \n',results.ATE_translation_error)
-% fprintf('Absolute Trajectory Rotation Error: %.4d \n',results.ATE_rotation_error)
-% fprintf('Absolute Structure Points Error: %d \n',results.ASE_translation_error);
-% fprintf('All to All Relative Pose Squared Translation Error: %.4d \n',results.AARPE_squared_translation_error)
-% fprintf('All to All Relative Pose Squared Rotation Error: %.4d \n',results.AARPE_squared_rotation_error)
-% fprintf('All to All Relative Point Squared Translation Error: %.4d \n',results.AARPTE_squared_translation_error)
 
 %% 10. Plot
     %% 10.1 Plot intial, final and ground-truth solutions
@@ -131,5 +124,5 @@ view([-50,25])
 %plot groundtruth
 plotGraphFile(config,groundTruthCell,[0 0 1]);
 %plot results
-resultsCell = graphFileToCell(config,'app1_results.graph');
+resultsCell = graphFileToCell(config,'app4_results.graph');
 plotGraphFile(config,resultsCell,[1 0 0])

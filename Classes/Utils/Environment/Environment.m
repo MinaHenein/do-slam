@@ -104,6 +104,28 @@ classdef Environment < ArrayGetSet
             self.addPrimitiveAndPoints(primitive,points);
         end
         
+        function self = addEP_Default(self,positionsRelative,parameterisation,trajectory)
+            % same as addPrimitive but has functionality to set an
+            % independent mesh
+            nPoints = size(positionsRelative,2);
+            
+            %initialise points
+            points(nPoints) = EnvironmentPoint();
+            for i = 1:nPoints
+                iRelativePoint = GP_Point(positionsRelative(:,i),parameterisation);
+                % trajectory of each point is represented with position
+                % relative to primitive trajectory
+                points(i).set('trajectory',RelativePointTrajectory(trajectory,iRelativePoint));
+            end
+            
+            %construct primitive
+            primitive = EP_Default();
+            primitive.set('trajectory',trajectory);
+            
+            %pair primitive and points
+            self.addPrimitiveAndPoints(primitive,points);
+        end
+        
         % Rectangle
         function self = addRectangle(self,sideLengths,nPoints,distribution,rectangleTrajectory)
             
@@ -265,14 +287,6 @@ classdef Environment < ArrayGetSet
         function plotDynamic(self,dynamicPointIndexes,dynamicPrimitiveIndexes,t)
             nSteps = numel(t);
             for i = 1:nSteps
-                nPoints     = numel(dynamicPointIndexes);
-                nPrimitives = numel(dynamicPrimitiveIndexes);
-                %get point positions
-                positions = self.environmentPoints(dynamicPointIndexes).get('R3Position',t(i));
-                %plot positions
-                if positions
-                    h1 = plot3(positions(1,:),positions(2,:),positions(3,:),'k.');
-                end
                 %plot primitives
                 h2 = {};
                 for p = dynamicPrimitiveIndexes
@@ -282,7 +296,15 @@ classdef Environment < ArrayGetSet
                         h2{end+1} = trimesh(meshLinks,meshPoints(1,:)',meshPoints(2,:)',meshPoints(3,:)','edgecolor','y');                
                     end
                 end
-
+                
+                nPoints     = numel(dynamicPointIndexes);
+                nPrimitives = numel(dynamicPrimitiveIndexes);
+                %get point positions
+                positions = self.environmentPoints(dynamicPointIndexes).get('R3Position',t(i));
+                %plot positions
+                if positions
+                    h1 = plot3(positions(1,:),positions(2,:),positions(3,:),'k.');
+                end
                 %draw current timestep, delete
                 drawnow
                 pause(0)

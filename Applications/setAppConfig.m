@@ -16,26 +16,26 @@ config.set('poseParameterisation','R3xso3');
 % config.set('stdPointPoint',[0.01 0.01 0.01]');
 
 % point 3 edge
-% config.set('pointMotionMeasurement','point3Edge');
+config.set('pointMotionMeasurement','point3Edge');
 
 %     % speed version
 %     config.set('motionModel','constantSpeed')
 %     config.set('std3Points',0.01);
 
     % velocity version
-%     config.set('motionModel','constantVelocity');
-%     config.set('std3Points',[0.01 0.01 0.01]');
+    config.set('motionModel','constantVelocity');
+    config.set('std3Points',[0.01 0.01 0.01]');
 
 % 2 point velocity vertex
-config.set('pointMotionMeasurement','velocity')
+% config.set('pointMotionMeasurement','velocity')
 
     % speed version
 %     config.set('motionModel','constantSpeed')
 %     config.set('std2PointsVelocity',0.01);
 
 %     % velocity version
-    config.set('motionModel','constantVelocity')
-    config.set('std2PointsVelocity',[0.01 0.01 0.01]');
+%     config.set('motionModel','constantVelocity')
+%     config.set('std2PointsVelocity',[0.01 0.01 0.01]');
 
 %% pose handles
 % temporarily changed function handles to public for setting

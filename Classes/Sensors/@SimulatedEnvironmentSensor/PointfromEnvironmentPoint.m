@@ -9,7 +9,9 @@ function point = PointfromEnvironmentPoint(environmentPoint)
 point = Point();
 point.set('index',environmentPoint.get('index'));
 point.set('trajectory',environmentPoint.get('trajectory'));
-point.set('objectIndexes',environmentPoint.get('primitiveIndexes'));
+if ~isempty(environmentPoint.get('primitiveIndexes'))
+    point.set('objectIndexes',environmentPoint.get('primitiveIndexes'));
+end
 
 end
 

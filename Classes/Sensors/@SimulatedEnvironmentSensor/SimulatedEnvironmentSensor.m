@@ -86,7 +86,12 @@ classdef SimulatedEnvironmentSensor < Sensor
     
     % Constructor
     methods(Access = public)
-        function self = SimulatedEnvironmentSensor()
+        function self = SimulatedEnvironmentSensor(varargin)
+            switch nargin
+                case 1
+                    self.fieldOfView = varagin{1};
+                otherwise
+            end
         end
     end
      

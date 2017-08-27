@@ -6,7 +6,7 @@ function meshes = generateMeshes(self,environment,t)
 %GENERATEMESHES takes the original sensor environment and generates the 
 %meshes for the relevant objects within the camera FoV, in relative coordinate
 
-currentSensorPose = self.get('GP_Pose',t);
+currentSensorPose = self.get('trajectory').get('GP_Pose',t);
 meshes = [];
 for i=1:self.nObjects
     % calculations are done in SE3
@@ -14,7 +14,7 @@ for i=1:self.nObjects
     meshRelative = [];
     if isa(environmentPrimitive,'EP_Default')
         meshPointsAbsolute = environmentPrimitive.get('meshPointsAbsolute',t);
-        meshRelative = meshPointsAbsolute.RelativeToAbsolutePoint(currentSensorPose);
+        meshRelative = meshPointsAbsolute.AbsoluteToRelativePoint(currentSensorPose);
         pointsRelative = meshRelative.get('R3Position');
         links = environmentPrimitive.get('meshLinks');
         meshRelative = [pointsRelative(:,links(:,1))' pointsRelative(:,links(:,2))' pointsRelative(:,links(:,3))'];

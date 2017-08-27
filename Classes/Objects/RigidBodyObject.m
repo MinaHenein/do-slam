@@ -18,7 +18,12 @@ classdef RigidBodyObject < SensorObject
     %% 2. Methods
     methods
         function out = getSwitch(self,property,varargin)
-            out = self.(property); 
+            switch property
+                case 'R3xso3Pose'
+                    out = self.trajectory.get('R3xso3Pose',varargin{1});
+                otherwise
+                    out = self.(property); 
+            end
         end
         
         function self = setSwitch(self,property,value,varargin)
