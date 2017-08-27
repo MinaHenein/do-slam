@@ -1,5 +1,5 @@
 %--------------------------------------------------------------------------
-% Author: Yash Vyas - yjvyas@gmail.com - 03/07/2017
+% Author: Yash Vyas - yjvyas@gmail.com - 26/08/2017
 % Contributors:
 %--------------------------------------------------------------------------
 % frontEndSolverExample
@@ -17,9 +17,9 @@ config = CameraConfig();
 config = setAppConfig(config); % copy same settings for error Analysis
 config.set('t',t);
 % set motion model in setAppConfig function
-config.set('noiseModel','Off');
-config.set('groundTruthFileName','app2_groundTruth.graph');
-config.set('measurementsFileName','app2_measurements.graph');
+% config.set('noiseModel','Off');
+config.set('groundTruthFileName','app4_groundTruth.graph');
+config.set('measurementsFileName','app4_measurements.graph');
 
 %% 2. Generate Environment
 if config.rngSeed

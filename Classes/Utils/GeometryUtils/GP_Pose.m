@@ -1,6 +1,6 @@
 %--------------------------------------------------------------------------
 % Author: Montiel Abello - montiel.abello@gmail.com - 23/05/17
-% Contributors:
+% Contributors: Yash Vyas - yjvyas@gmail.com - 27/08/17
 %--------------------------------------------------------------------------
 
 classdef GP_Pose < GeometricPrimitive
@@ -48,6 +48,9 @@ classdef GP_Pose < GeometricPrimitive
                     value = self.R3xso3Pose;
                 case 'logSE3Pose'
                     value = R3xso3_LogSE3(self.R3xso3Pose);
+                case 'expSE3Pose'
+                    logSE3Pose = R3xso3_LogSE3(self.R3xso3Pose);
+                    value = ExpSE3(logSE3Pose);
                 case 'R3xso3Position'
                     value = self.R3xso3Pose(1:3);
                 case 'logSE3Position'

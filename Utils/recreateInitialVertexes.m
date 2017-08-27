@@ -96,7 +96,7 @@ initialCell2 = initialCell1;
 if size(initialCell,2)==2
     for i=1:size(initialCell,1) % creates second cell array with different spanning tree for initialisation
         if ~isempty(initialCell{i,2})
-            initialCell{i,1} = initialCell{i,2};
+            initialCell2{i,1} = initialCell{i,2};
         end
     end
 end
