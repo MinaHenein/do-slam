@@ -1,13 +1,19 @@
-i=19;
+for i= 17:23
 rectified=0;
-display =1;
+display =0;
 
 I1 = imread(strcat('/home/mina/Pictures/',num2str(i),'.jpg'));
-[points1,label1] = extractLabelLandmarks(I1,12,35);
+[turtlebotID, points1,label1] = extractLabelLandmarks(I1,12,35);
 if(size(label1,1)<6)
     disp('Image needs rectification')
     rectified=1;
-    I = imread('/home/mina/Pictures/matlab.jpg');
+    prompt = 'User input : 1 or 2 ';
+    id = input(prompt);
+    if id ==1
+        I = imread('/home/mina/Pictures/matlab1.jpg');
+    elseif id ==2
+        I = imread('/home/mina/Pictures/matlab2.jpg');
+    end
     if(size(I1,1)~=size(I,1) || size(I1,2)~=size(I,2))
         I1=imcrop(I1,[round((size(I1,2)-size(I,2))/2) round((size(I1,1)-size(I,1))/2)...
             size(I,2)-1 size(I,1)-1]);
@@ -18,11 +24,13 @@ if(size(label1,1)<6)
     set(h,'AlphaData',0.5);
     I1=double(I1);
     [I2,H]=frontoparallel(I1);
-    [points2,label2] = extractLabelLandmarks(I2,12,60);
+    [turtlebotID,points2,label2] = extractLabelLandmarks(I2,12,60);
 end
 
-if size(label2,1)< size(label1,1)
+if rectified
+    if size(label2,1)< size(label1,1)
     rectified=0;
+    end
 end
 
 if display
@@ -58,4 +66,5 @@ if display
     end
     
     
+end
 end
