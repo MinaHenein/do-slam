@@ -1,8 +1,8 @@
 %--------------------------------------------------------------------------
-% Author: Mina Henein - mina.henein@anu.edu.au - 10/08/17
+% Author: Mina Henein - mina.henein@anu.edu.au - 01/09/17
 % Contributors:
 %--------------------------------------------------------------------------
-% Test9_SE3MotionVertex
+% Test10_SE3MotionVertex
 % l^i_k = (_kH_k+1)^-1 * l^i_k+1
 
 %% general setup
@@ -15,9 +15,9 @@ nSteps = 3;
 
 %% config setup 
 config = CameraConfig();
-config.set('groundTruthFileName' ,'groundTruthTest9.graph');
-config.set('measurementsFileName','measurementsTest9.graph');
-config.set('motionModel','constantSE3Motion');
+config.set('groundTruthFileName' ,'groundTruthTest10.graph');
+config.set('measurementsFileName','measurementsTest10.graph');
+config.set('motionModel','constantSE3MotionDA');
 config.set('std2PointsSE3Motion', [0.1,0.1,0.1]');
 config = setUnitTestConfig(config);
 rng(config.rngSeed);
@@ -87,20 +87,6 @@ for i=1:nSteps
     end  
 end
 
-% SE3Motion vertex -- placed as last vertex
-if apply2PtsSE3Motion
-    if i==nSteps
-        currentVertex = struct();
-        currentVertex.label = config.SE3MotionVertexLabel;
-        currentVertex.index = vertexCount;
-        currentVertex.value = [constantSE3ObjectMotion(1:3,4);...
-            arot(constantSE3ObjectMotion(1:3,1:3))];
-        groundTruthVertices{i,rowCount+1} = currentVertex;
-        vertexCount = vertexCount+1;
-        rowCount = rowCount+1;
-    end
-end
-
 for i=1:size(groundTruthVertices,1)
     % ground Truth edges for odometry
     if i > 1
@@ -136,15 +122,7 @@ if apply2PtsSE3Motion
                 currentEdge = struct();
                 currentEdge.index1 = groundTruthVertices{l,j+1}.index;
                 currentEdge.index2 = groundTruthVertices{l+1,j+1}.index;
-                currentEdge.index3 = groundTruthVertices{end,end}.index;
-                currentEdge.label = config.pointSE3MotionEdgeLabel;
-                currentEdge.value = groundTruthVertices{l,j+1}.value -...
-                    (constantSE3ObjectMotion(1:3,1:3)'*...
-                    groundTruthVertices{l+1,j+1}.value -...
-                    constantSE3ObjectMotion(1:3,1:3)'*constantSE3ObjectMotion(1:3,4));
-                currentEdge.std = config.std2PointsSE3Motion;
-                currentEdge.cov = config.cov2PointsSE3Motion;
-                currentEdge.covUT = covToUpperTriVec(currentEdge.cov);
+                currentEdge.label = config.pointDataAssociationLabel;
                 groundTruthEdges{i,end+1} = currentEdge;
             end
         end
@@ -154,16 +132,19 @@ end
 measurementEdges = groundTruthEdges; % copies grouthTruth to add noise
 for i=1:numel(measurementEdges) % add noise on measurements
     if ~isempty(measurementEdges{i})
-        valueEdge = measurementEdges{i}.value;
-        muEdge =  zeros(size(valueEdge,1),1);
-        sigmaEdge = measurementEdges{i}.std;
-        if strcmp(measurementEdges{i}.label,'EDGE_R3_SO3') || ...
-                strcmp(measurementEdges{i}.label,'EDGE_LOG_SE3')
-            measurementEdges{i}.value = ...
-                addGaussianNoise(config,muEdge,sigmaEdge,valueEdge,'pose');
+        if isfield(measurementEdges{i},'value')
+            valueEdge = measurementEdges{i}.value;
+            muEdge =  zeros(size(valueEdge,1),1);
+            sigmaEdge = measurementEdges{i}.std;
+            if strcmp(measurementEdges{i}.label,'EDGE_R3_SO3') || ...
+                    strcmp(measurementEdges{i}.label,'EDGE_LOG_SE3')
+                measurementEdges{i}.value = ...
+                    addGaussianNoise(config,muEdge,sigmaEdge,valueEdge,'pose');
+            else
+                measurementEdges{i}.value = ...
+                    addGaussianNoise(config,muEdge,sigmaEdge,valueEdge);
+            end
         else
-            measurementEdges{i}.value = ...
-                addGaussianNoise(config,muEdge,sigmaEdge,valueEdge);
         end
     end
 end
@@ -191,25 +172,37 @@ for i=1:nRows
         if ~isempty(groundTruthEdges{i,j})
             % print groundTruth Edge
             edge = groundTruthEdges{i,j};
-            formatSpec = strcat('%s %d %d',repmat(' %.6f',1,numel(edge.value)),...
-                repmat(' %.6f',1,numel(edge.covUT)),'\n');
-            if isfield(edge, 'index3')
-                formatSpec = strcat('%s %d %d %d',repmat(' %.6f',1,numel(edge.value)),...
+            if isfield( edge,'value')
+                formatSpec = strcat('%s %d %d',repmat(' %.6f',1,numel(edge.value)),...
                     repmat(' %.6f',1,numel(edge.covUT)),'\n');
-                fprintf(groundTruthGraph,formatSpec,edge.label,edge.index1,...
-                    edge.index2,edge.index3,edge.value,edge.covUT);    
+                if isfield(edge, 'index3')
+                    formatSpec = strcat('%s %d %d %d',repmat(' %.6f',1,numel(edge.value)),...
+                        repmat(' %.6f',1,numel(edge.covUT)),'\n');
+                    fprintf(groundTruthGraph,formatSpec,edge.label,edge.index1,...
+                        edge.index2,edge.index3,edge.value,edge.covUT);
+                else
+                    fprintf(groundTruthGraph,formatSpec,edge.label,edge.index1,...
+                        edge.index2,edge.value,edge.covUT);
+                end
             else
+                formatSpec = '%s %d %d \n';
                 fprintf(groundTruthGraph,formatSpec,edge.label,edge.index1,...
-                    edge.index2,edge.value,edge.covUT);
+                        edge.index2);
             end
             % print Measurement edge
             edge = measurementEdges{i,j};
+            if isfield(edge,'value')
             if isfield(edge, 'index3')
                 fprintf(measurementGraph,formatSpec,edge.label,edge.index1,...
                     edge.index2,edge.index3,edge.value,edge.covUT);
             else
                 fprintf(measurementGraph,formatSpec,edge.label,edge.index1,...
                     edge.index2,edge.value,edge.covUT);
+            end
+            else
+                formatSpec = '%s %d %d \n';
+                fprintf(measurementGraph,formatSpec,edge.label,edge.index1,...
+                        edge.index2);
             end
         end
     end
@@ -218,6 +211,8 @@ fclose(groundTruthGraph);
 fclose(measurementGraph);
 
 %% solver
+writeDataAssociationVerticesEdges(config,constantSE3ObjectMotion)
+
 groundTruthCell  = graphFileToCell(config,config.groundTruthFileName);
 measurementsCell = graphFileToCell(config,config.measurementsFileName);
 timeStart = tic;
@@ -228,7 +223,7 @@ totalTime = toc(timeStart);
 fprintf('\nTotal time solving: %f\n',totalTime)
 % 
 graphN  = solverEnd.graphs(end);
-graphN.saveGraphFile(config,'resultsTest9.graph');
+graphN.saveGraphFile(config,'resultsTest10.graph');
 % 
 graphGT = Graph(config,groundTruthCell);
 results = errorAnalysis(config,graphGT,graphN);

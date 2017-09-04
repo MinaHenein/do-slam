@@ -165,6 +165,14 @@ for i = 1:nSteps
                 % write edge between points if point was visible in
                 % previous step
                 switch config.pointMotionMeasurement
+                    case 'point2DataAssociation'
+                        label = config.point2DataAssociationEdgeLabel;
+                        covariance = [];
+                        index1 = vertexIndexes(end);
+                        index2 = vertexIndexes(end-1);
+                        value = [];
+                        writeEdge(label,index1,index2,value,covariance,gtFileID);
+                        writeEdge(label,index1,index2,value,covariance,mFileID);
                     case 'point2Edge'
                         label = config.pointPointEdgeLabel;
                         covariance = config.covPointPoint;

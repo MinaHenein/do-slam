@@ -6,8 +6,7 @@ imshow(I);
 hold on
 plotsiftframe(points)
 hold off
-imH = size(I,1);
-imW = size(I,2);
+
 points(1,:) = round(points(1,:));
 points(2,:) = round(points(2,:));
 rightColor = -ones(size(points,2),1);
@@ -18,6 +17,9 @@ rightLeftPixels = shiftPixels;
 upDownPixels = shiftPixels;
 rightLeft = 0;
 upDown = 0;
+
+imH = size(I,1);
+imW = size(I,2);
 
 for j=1:size(points,2)
     right = I(points(2,j),min(points(1,j)+rightLeftPixels,imW),:);

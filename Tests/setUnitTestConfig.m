@@ -38,6 +38,7 @@ config.set('velocityVertexLabel','VERTEX_VELOCITY')
 config.set('pointVelocityEdgeLabel','EDGE_2POINTS_VELOCITY')
 config.set('SE3MotionVertexLabel','VERTEX_SE3Motion')
 config.set('pointSE3MotionEdgeLabel','EDGE_2POINTS_SE3Motion')
+config.set('pointDataAssociationLabel','2POINTS_DataAssociation')
 config.set('posePriorEdgeLabel','EDGE_6D');
 config.set('graphFileFolderName' ,'GraphFiles');
 
