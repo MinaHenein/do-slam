@@ -30,6 +30,10 @@ classdef GP_Pose < GeometricPrimitive
                             self.R3xso3Pose = pose;
                         case 'logSE3'
                             self.R3xso3Pose = LogSE3_Rxt(pose);
+                        case 'SE3'
+                            R3xso3Pose(1:3,1) = P(1:3,4);
+                            R3xso3Pose(4:6,1) = pose(4:6,1);
+                            self.R3xso3Pose = R3xso3Pose;
                         otherwise
                             error('Error: invalid parameterisation')
                     end
@@ -56,6 +60,10 @@ classdef GP_Pose < GeometricPrimitive
                 case 'logSE3Position'
                     value = R3xso3_LogSE3(self.R3xso3Pose);
                     value = value(1:3);
+                case 'SE3'
+                    R = rot(self.R3xso3Pose(4:6,1));
+                    t = self.R3xso3Pose(1:3,1);
+                    value = [R t; 0 0 0 1];
                 case 'axisAngle'
                     value = self.R3xso3Pose(4:6);
                 case 'R'
@@ -83,6 +91,10 @@ classdef GP_Pose < GeometricPrimitive
                     self.R3xso3Pose = [self.R3xso3Pose(1:3); value];
                 case 'R'
                     self.R3xso3Pose = [self.R3xso3Pose(1:3); arot(value)];
+                case 'SE3'
+                    R3xso3Pose(1:3,1) = value(1:3,4);
+                    R3xso3Pose(4:6,1) = value(4:6,1);
+                    self.R3xso3Pose = R3xso3Pose;
                 otherwise 
                     error('Error: invalid property')
             end

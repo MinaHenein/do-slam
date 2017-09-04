@@ -16,15 +16,15 @@ config.set('poseParameterisation','R3xso3');
 % config.set('stdPointPoint',[0.01 0.01 0.01]');
 
 % point 3 edge
-config.set('pointMotionMeasurement','point3Edge');
+% config.set('pointMotionMeasurement','point3Edge');
 
 %     % speed version
 %     config.set('motionModel','constantSpeed')
 %     config.set('std3Points',0.01);
 
     % velocity version
-    config.set('motionModel','constantVelocity');
-    config.set('std3Points',[0.01 0.01 0.01]');
+%     config.set('motionModel','constantVelocity');
+%     config.set('std3Points',[0.01 0.01 0.01]');
 
 % 2 point velocity vertex
 % config.set('pointMotionMeasurement','velocity')
@@ -36,6 +36,11 @@ config.set('pointMotionMeasurement','point3Edge');
 %     % velocity version
 %     config.set('motionModel','constantVelocity')
 %     config.set('std2PointsVelocity',[0.01 0.01 0.01]');
+
+% SE3 Motion
+config.set('pointMotionMeasurement','point2DataAssociation');
+config.set('motionModel','constantSE3');
+config.set('dimPoint',4);
 
 %% pose handles
 % temporarily changed function handles to public for setting
@@ -54,9 +59,12 @@ config.set('posePoseEdgeLabel'   ,'EDGE_R3_SO3');
 config.set('posePointEdgeLabel'  ,'EDGE_3D');
 config.set('pointPlaneEdgeLabel' ,'EDGE_1D');
 config.set('pointPointEdgeLabel' ,'EDGE_2POINTS');
-config.set('point3EdgeLabel','EDGE_3POINTS')
-config.set('velocityVertexLabel','VERTEX_VELOCITY')
-config.set('pointVelocityEdgeLabel','EDGE_2POINTS_VELOCITY')
+config.set('point2DataAssociationEdgeLabel','2POINTS_DataAssociation');
+config.set('point3EdgeLabel','EDGE_3POINTS');
+config.set('velocityVertexLabel','VERTEX_VELOCITY');
+config.set('pointVelocityEdgeLabel','EDGE_2POINTS_VELOCITY');
+config.set('SE3MotionVertexLabel','VERTEX_SE3Motion');
+config.set('pointSE3MotionEdgeLabel','EDGE_2POINTS_SE3Motion');
 config.set('posePriorEdgeLabel','EDGE_6D');
 config.set('graphFileFolderName' ,'GraphFiles');
 

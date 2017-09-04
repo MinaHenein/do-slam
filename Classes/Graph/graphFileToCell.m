@@ -4,7 +4,7 @@ function [graphCell] = graphFileToCell(config,fileName,varargin)
 %   In some cases however, additional edges are added to the graph - but
 %   these are specific to the solution method and are not required in the 
 %   graph file: eg prior on the pose, edge n'n-1=0 constraining plane
-%   normals to be unit vectors
+%   normals to be unit vectors.
 
 %open file
 if ispc
