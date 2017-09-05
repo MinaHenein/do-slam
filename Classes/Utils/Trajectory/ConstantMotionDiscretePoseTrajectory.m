@@ -15,6 +15,9 @@ classdef ConstantMotionDiscretePoseTrajectory < DiscretePoseTrajectory
     properties(Hidden) % inherited from DiscretePoseTrajectory
     end
     
+    properties(Dependent)
+    end
+    
     %% 2. Methods
     % Constructor
     methods(Access = public)

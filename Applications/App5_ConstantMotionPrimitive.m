@@ -22,7 +22,7 @@ config.set('groundTruthFileName','app5_groundTruth.graph');
 config.set('measurementsFileName','app5_measurements.graph');
 
 % SE3 Motion
-config.set('pointMotionMeasurement','point2dataAssociation');
+config.set('pointMotionMeasurement','point2DataAssociation');
 config.set('motionModel','constantSE3');
 config.set('dimPoint',4);
 
@@ -38,6 +38,7 @@ primitiveMotion_R3xso3 = [1.5; 0; 0; arot(eul2rot([0.09,0,0.01]))];
 % construct trajectories
 robotTrajectory = PositionModelPoseTrajectory(robotWaypoints,'R3','smoothingspline');
 primitiveTrajectory = ConstantMotionDiscretePoseTrajectory(t,primitiveInitialPose_R3xso3,primitiveMotion_R3xso3,'R3xso3');
+constantSE3ObjectMotion = primitiveTrajectory.RelativePoseGlobalFrameSE3(t(1),t(2));
 
 environment = Environment();
 environment.addEllipsoid([1 1 2],12,'R3',primitiveTrajectory);
@@ -78,13 +79,14 @@ environment.plot(t)
 
 %% 5. Generate Measurements & Save to Graph File
 sensor.generateMeasurements(config);
+writeDataAssociationVerticesEdges(config,constantSE3ObjectMotion)
 
 %% 6. load graph files
 groundTruthCell  = graphFileToCell(config,config.groundTruthFileName);
 measurementsCell = graphFileToCell(config,config.measurementsFileName);
 
 %% 7. Manual recreation of vertices
-initialCell = recreateInitialVertexes(config,measurementsCell,groundTruthCell);
+% initialCell = recreateInitialVertexes(config,measurementsCell,groundTruthCell);
 
 %% 8. Solve
 %no constraints
@@ -100,7 +102,7 @@ graph0  = solverEnd.graphs(1);
 graphN  = solverEnd.graphs(end);
 fprintf('\nChi-squared error: %f\n',solverEnd.systems(end).chiSquaredError)
 %save results to graph file
-graphN.saveGraphFile(config,'app1_results.graph');
+graphN.saveGraphFile(config,'app5_results.graph');
 
 %% 9. Error analysis
 %load ground truth into graph, sort if required
@@ -132,5 +134,5 @@ view([-50,25])
 %plot groundtruth
 plotGraphFile(config,groundTruthCell,[0 0 1]);
 %plot results
-resultsCell = graphFileToCell(config,'app1_results.graph');
+resultsCell = graphFileToCell(config,'app5_results.graph');
 plotGraphFile(config,resultsCell,[1 0 0])

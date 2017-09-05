@@ -166,7 +166,7 @@ for i = 1:nSteps
                 % previous step
                 switch config.pointMotionMeasurement
                     case 'point2DataAssociation'
-                        label = config.point2DataAssociationEdgeLabel;
+                        label = config.pointDataAssociationLabel;
                         covariance = [];
                         index1 = vertexIndexes(end);
                         index2 = vertexIndexes(end-1);

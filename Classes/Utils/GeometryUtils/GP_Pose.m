@@ -152,6 +152,12 @@ classdef GP_Pose < GeometricPrimitive
                 error('Error: inconsistent sizes')
             end
         end
+        
+        function out = RelativePoseGlobalFrameSE3(self,poseRelative)
+            poseAbsoluteSE3 = self.get('SE3');
+            poseRelativeSE3 = poseRelative.get('SE3');
+            out = poseAbsoluteSE3*poseRelativeSE3*invSE3(poseAbsoluteSE3); 
+        end
     end
     
     % Add Noise

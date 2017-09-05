@@ -93,7 +93,6 @@ classdef Config < ArrayGetSet
         posePoseEdgeLabel
         posePointEdgeLabel
         pointPointEdgeLabel
-        point2DataAssociationEdgeLabel
         point3EdgeLabel
         velocityVertexLabel
         SE3MotionVertexLabel
