@@ -1,8 +1,26 @@
 function writeDataAssociationVerticesEdges(config,constantSE3ObjectMotion)
 
 GTFileName = config.groundTruthFileName;
-fileID = fopen(strcat(config.folderPath,config.sep,'Data',...
-    config.sep,config.graphFileFolderName,config.sep,GTFileName),'r');
+filepath = strcat(config.folderPath,config.sep,'Data',...
+    config.sep,config.graphFileFolderName,config.sep,GTFileName);
+fileID = fopen(filepath,'r');
+Data = textscan(fileID, '%s', 'delimiter', '\n', 'whitespace', '');
+CStr = Data{1};
+fclose(fileID);
+IndexC = strfind(CStr, 'DataAssociation');
+% find first line with a DataAssociation entry
+Index = find(~cellfun('isempty', IndexC));
+IndexOriginal = find(cellfun('isempty',IndexC));
+DataNew = Data{1}([IndexOriginal; Index]); % new data with resorted vertexes
+
+% rewrite file with  new indexes
+fileID = fopen(filepath,'w');
+for i=1:numel(DataNew)
+    fprintf(fileID,[DataNew{i} '\n']);
+end
+fclose(fileID);
+
+fileID = fopen(filepath,'r');
 Data = textscan(fileID, '%s', 'delimiter', '\n', 'whitespace', '');
 CStr = Data{1};
 fclose(fileID);
@@ -13,8 +31,7 @@ nLinesAdded = 0;
 
 for j=1:length(Index)
     % get line of Index
-    fileID = fopen(strcat(config.folderPath,config.sep,'Data',...
-        config.sep,config.graphFileFolderName,config.sep,GTFileName),'r');
+    fileID = fopen(filepath,'r');
     line = textscan(fileID,'%s',1,'delimiter','\n','headerlines',Index(j)+nLinesAdded-1);
     splitLine = strsplit(cell2mat(line{1,1}),' ');
     index1 = str2double(splitLine{1,2});
@@ -32,8 +49,7 @@ for j=1:length(Index)
     vertex1Value = splitLine1(1,3:5)';
     fclose(fileID);
     
-    fileID = fopen(strcat(config.folderPath,config.sep,'Data',...
-        config.sep,config.graphFileFolderName,config.sep,GTFileName),'r');
+    fileID = fopen(filepath,'r');
     line2 = textscan(fileID, '%s', 1, 'delimiter', '\n', 'headerlines', index2-1);
     line2 = cell2mat(line2{1,1});
     if ~strcmp(line2(1:length('VERTEX_POINT_3D')),'VERTEX_POINT_3D')
@@ -144,11 +160,31 @@ for j=1:length(Index)
 end
 
 MeasurementsFileName = config.measurementsFileName;
-fileID = fopen(strcat(config.folderPath,config.sep,'Data',...
-    config.sep,config.graphFileFolderName,config.sep,MeasurementsFileName),'r');
+filepath = strcat(config.folderPath,config.sep,'Data',...
+    config.sep,config.graphFileFolderName,config.sep,MeasurementsFileName);
+fileID = fopen(filepath,'r');
 Data = textscan(fileID, '%s', 'delimiter', '\n', 'whitespace', '');
 CStr = Data{1};
 fclose(fileID);
+IndexC = strfind(CStr, 'DataAssociation');
+% find first line with a DataAssociation entry
+Index = find(~cellfun('isempty', IndexC));
+
+IndexOriginal = find(cellfun('isempty',IndexC));
+DataNew = Data{1}([IndexOriginal; Index]); % new data with resorted vertexes
+
+% rewrite file with  new indexes
+fileID = fopen(filepath,'w');
+for i=1:numel(DataNew)
+    fprintf(fileID,[DataNew{i} '\n']);
+end
+fclose(fileID);
+
+fileID = fopen(filepath,'r');
+Data = textscan(fileID, '%s', 'delimiter', '\n', 'whitespace', '');
+CStr = Data{1};
+fclose(fileID);
+
 IndexC = strfind(CStr, 'DataAssociation');
 % find first line with a DataAssociation entry
 Index = find(~cellfun('isempty', IndexC));

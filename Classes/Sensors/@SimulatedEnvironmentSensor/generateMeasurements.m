@@ -80,7 +80,7 @@ for i = 1:nSteps
         covariance = config.covPosePose;
         index1 = cameraVertexIndexes(i-1);
         index2 = cameraVertexIndexes(i);
-        writeEdge(label,index1,index2,valueGT,covariance,gtFileID);
+%         writeEdge(label,index1,index2,valueGT,covariance,gtFileID);
         writeEdge(label,index1,index2,valueMeas,covariance,mFileID);
     end
     
@@ -118,7 +118,7 @@ for i = 1:nSteps
             covariance = config.covPosePoint;
             index1 = cameraVertexIndexes(i);
             index2 = jPoint.get('vertexIndex');
-            writeEdge(label,index1,index2,valueGT,covariance,gtFileID);
+%             writeEdge(label,index1,index2,valueGT,covariance,gtFileID);
             writeEdge(label,index1,index2,valueMeas,covariance,mFileID);
         end
     end
@@ -158,7 +158,7 @@ for i = 1:nSteps
             covariance = config.covPosePoint;
             index1 = cameraVertexIndexes(i);
             index2 = vertexIndexes(end);
-            writeEdge(label,index1,index2,valueGT,covariance,gtFileID);
+%             writeEdge(label,index1,index2,valueGT,covariance,gtFileID);
             writeEdge(label,index1,index2,valueMeas,covariance,mFileID);
             
             if (i > 1) && (self.pointVisibility(j,i-1))
@@ -168,11 +168,11 @@ for i = 1:nSteps
                     case 'point2DataAssociation'
                         label = config.pointDataAssociationLabel;
                         covariance = [];
-                        index1 = vertexIndexes(end);
-                        index2 = vertexIndexes(end-1);
+                        index1 = vertexIndexes(end-1);
+                        index2 = vertexIndexes(end);
                         value = [];
-                        writeEdge(label,index1,index2,value,covariance,gtFileID);
-                        writeEdge(label,index1,index2,value,covariance,mFileID);
+                        fprintf(gtFileID,'%s %d %d\n',label,index1,index2);
+                        fprintf(mFileID,'%s %d %d\n',label,index1,index2);
                     case 'point2Edge'
                         label = config.pointPointEdgeLabel;
                         covariance = config.covPointPoint;

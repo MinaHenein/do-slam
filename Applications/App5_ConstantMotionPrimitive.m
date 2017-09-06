@@ -23,7 +23,8 @@ config.set('measurementsFileName','app5_measurements.graph');
 
 % SE3 Motion
 config.set('pointMotionMeasurement','point2DataAssociation');
-config.set('motionModel','constantSE3');
+config.set('motionModel','constantSE3MotionDA');
+config.set('std2PointsSE3Motion', [0.1,0.1,0.1]');
 config.set('dimPoint',4);
 
 %% 2. Generate Environment
@@ -79,7 +80,8 @@ environment.plot(t)
 
 %% 5. Generate Measurements & Save to Graph File
 sensor.generateMeasurements(config);
-writeDataAssociationVerticesEdges(config,constantSE3ObjectMotion)
+config.set('constantSE3Motion',constantSE3ObjectMotion);
+writeDataAssociationVerticesEdges(config,constantSE3ObjectMotion);
 
 %% 6. load graph files
 groundTruthCell  = graphFileToCell(config,config.groundTruthFileName);
