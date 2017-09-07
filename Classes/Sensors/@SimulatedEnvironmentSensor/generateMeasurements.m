@@ -168,8 +168,8 @@ for i = 1:nSteps
                     case 'point2DataAssociation'
                         label = config.pointDataAssociationLabel;
                         covariance = [];
-                        index1 = vertexIndexes(end);
-                        index2 = vertexIndexes(end-1);
+                        index1 = vertexIndexes(end-1);
+                        index2 = vertexIndexes(end);
                         value = [];
                         writeEdge(label,index1,index2,value,covariance,gtFileID);
                         writeEdge(label,index1,index2,value,covariance,mFileID);
