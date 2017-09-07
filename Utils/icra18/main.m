@@ -13,11 +13,15 @@
     % $ rosrun depth_extraction extract_depth_images.py
     
 % III- in a different terminal
-    % $ roscore
+    % $ roscore 
     % $ rosbag play <rosbag_name.bag>
 
 % IV-
 rgbImagesPath =  '/home/mina/Downloads/icra18/images/rgb/';
 depthImagesPath =  '/home/mina/Downloads//icra18/images/depth/';
-[pointsMeasurements,pointsLabels,pointsTurtlebotID] = ...
-    extract3DPoints(rgbImagesPath,depthImagesPath);
+K_Cam = [526.37013657, 0.00000000  , 313.68782938;
+         0.00000000  , 526.37013657, 259.01834898;
+         0.00000000  , 0.00000000  , 1.00000000 ];
+     
+[pointsMeasurements,pointsLabels,pointsTurtlebotID,pointsCameras] = ...
+    manualLandmarkExtraction(rgbImagesPath,depthImagesPath, K_Cam);

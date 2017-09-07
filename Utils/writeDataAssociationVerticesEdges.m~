@@ -151,8 +151,8 @@ for j=1:1:length(Index)
         
         fileID = fopen(filepath,'r');
         Data = textscan(fileID,'%s','delimiter','\n','whitespace',' ');
-        Str = Data{1};
-        IndexC = strfind(Str, strcat({'EDGE_2POINTS_SE3Motion'},{' '},...
+        CStr = Data{1};
+        IndexC = strfind(CStr, strcat({'EDGE_2POINTS_SE3Motion'},{' '},...
             {num2str(edge.index1)},{' '},{num2str(edge.index2)},{' '},...
             {num2str(edge.index3)},{' '}));
         fclose(fileID);
@@ -162,8 +162,7 @@ for j=1:1:length(Index)
             edge.label,edge.index1,edge.index2,edge.index3,edge.value',...
             edge.covUT));
         end
-        % delete 1 line with 2POINTS_DataAssociation
-        CStr(Index(j)+nLinesAdded) = [];
+        %CStr(Index(j)+nLinesAdded) = [];
         nLinesAdded = nLinesAdded-1;
     end
     % Save the file again

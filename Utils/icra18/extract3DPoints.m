@@ -14,6 +14,7 @@ K_Cam = [526.37013657, 0.00000000, 313.68782938;
 for i=1:nImages
     
     I1 = imread(strcat(rgbImagesPath,num2str(i),'.jpg'));
+    I1 = I1(size(I1,1)/2:end,:,:); 
     siftThreshold = 12;
     shiftPixels = 35;
     [turtlebotID1, points1,label1] = extractLabelLandmarks(I1,siftThreshold,shiftPixels);
