@@ -4,7 +4,6 @@ function config = setAppConfig(config)
 
 % set properties of Config
 config.set('rngSeed',1);
-config.set('rngSeed',1);
 config.set('noiseModel','Gaussian');
 % config.set('noiseModel','Off');
 config.set('poseParameterisation','R3xso3');

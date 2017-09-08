@@ -17,12 +17,12 @@ config = CameraConfig();
 config = setAppConfig(config); % copy same settings for error Analysis
 config.set('t',t);
 % set motion model in setAppConfig function
-% config.set('noiseModel','Off');
+config.set('noiseModel','Off');
 config.set('groundTruthFileName','app7_groundTruth.graph');
 config.set('measurementsFileName','app7_measurements.graph');
 
 % SE3 Motion
-config.set('pointMotionMeasurement','point2dataAssociation');
+config.set('pointMotionMeasurement','point2DataAssociation');
 config.set('motionModel','constantSE3');
 config.set('dimPoint',4);
 
@@ -39,6 +39,7 @@ primitiveMotion_R3xso3 = [1.5; 0; 0; arot(eul2rot([0.1,0,0.01]))];
 % construct trajectories
 robotTrajectory = PositionModelPoseTrajectory(robotWaypoints,'R3','smoothingspline');
 primitiveTrajectory = ConstantMotionDiscretePoseTrajectory(t,primitiveInitialPose_R3xso3,primitiveMotion_R3xso3,'R3xso3');
+constantSE3ObjectMotion = primitiveTrajectory.RelativePoseGlobalFrameSE3(t(1),t(2));
 
 environment = Environment();
 environment.addEllipsoid([1 1 2],12,'R3',primitiveTrajectory);
@@ -81,6 +82,8 @@ environment.plot(t(end))
 
 %% 5. Generate Measurements & Save to Graph File
 sensor.generateMeasurements(config);
+config.set('constantSE3Motion',constantSE3ObjectMotion);
+writeDataAssociationVerticesEdges(config,constantSE3ObjectMotion);
 
 %% 6. load graph files
 groundTruthCell  = graphFileToCell(config,config.groundTruthFileName);
