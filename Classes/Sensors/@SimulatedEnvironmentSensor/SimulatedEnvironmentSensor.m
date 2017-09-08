@@ -107,10 +107,11 @@ classdef SimulatedEnvironmentSensor < Sensor
     methods(Access = public)
         self = addEnvironment(self,environment)
         % point visibility
-        [visibility,relativePoint] = pointVisible(self,point,t)
+        [visibility,relativePoint] = pointVisible(self,point,t);
         self = setVisibility(self, config, environment);
         % Measurements
-        generateMeasurements(self,config)
+        generateMeasurements(self,config);
+        varargout  = plot(self,t,varargin);
     end
     
     methods(Static, Access=public)

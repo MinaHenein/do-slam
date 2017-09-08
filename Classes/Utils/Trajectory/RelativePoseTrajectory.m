@@ -40,6 +40,8 @@ classdef RelativePoseTrajectory < PoseTrajectory
                     value         = pose.get(property);
                 case 'static'
                     value = self.referenceTrajectory.get('static');
+                case {'referenceTrajectory','relativePose'}
+                    value = self.(property);
                 otherwise 
                     error('Error: invalid property')
             end
