@@ -170,9 +170,10 @@ for i = 1:nSteps
                         covariance = [];
                         index1 = vertexIndexes(end-1);
                         index2 = vertexIndexes(end);
+                        object = jPoint.get('objectIndexes');
                         value = [];
-                        fprintf(gtFileID,'%s %d %d\n',label,index1,index2);
-                        fprintf(mFileID,'%s %d %d\n',label,index1,index2);
+                        fprintf(gtFileID,'%s %d %d %d\n',label,index1,index2,object(1));
+                        fprintf(mFileID,'%s %d %d %d\n',label,index1,index2,object(1));
                     case 'point2Edge'
                         label = config.pointPointEdgeLabel;
                         covariance = config.covPointPoint;

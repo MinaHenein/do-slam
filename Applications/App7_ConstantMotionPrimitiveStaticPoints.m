@@ -80,13 +80,13 @@ grid on
 primitiveTrajectory.plot(t,[0 0 0],'axesOFF')
 cameraTrajectory.plot(t,[0 1 1],'axesOFF')
 frames = sensor.plot(t,environment);
-implay(frames);
+% implay(frames);
 
     %% 4.a output video
-v = VideoWriter('Data/Videos/App7_sensor_environment.mp4','MPEG-4');
-open(v)
-writeVideo(v,frames);
-close(v)
+% v = VideoWriter('Data/Videos/App7_sensor_environment.mp4','MPEG-4');
+% open(v)
+% writeVideo(v,frames);
+% close(v)
 
 %% 5. Generate Measurements & Save to Graph File
 sensor.generateMeasurements(config);

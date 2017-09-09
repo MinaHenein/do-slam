@@ -36,6 +36,8 @@ primitive2Motion_R3xso3 = [1; 0; 0; arot(eul2rot([-0.01,-0.005,0]))];
 robotTrajectory = PositionModelPoseTrajectory(robotWaypoints,'R3','smoothingspline');
 primitive1Trajectory = ConstantMotionDiscretePoseTrajectory(t,primitive1InitialPose_R3xso3,primitive1Motion_R3xso3,'R3xso3');
 primitive2Trajectory = ConstantMotionDiscretePoseTrajectory(t,primitive2InitialPose_R3xso3,primitive2Motion_R3xso3,'R3xso3');
+constantSE3ObjectMotion(:,:,1) = primitive1Trajectory.RelativePoseGlobalFrameSE3(t(1),t(2));
+constantSE3ObjectMotion(:,:,2) = primitive2Trajectory.RelativePoseGlobalFrameSE3(t(1),t(2));
 
 environment = Environment();
 environment.addEllipsoid([1 1 2],12,'R3',primitive1Trajectory);
@@ -62,29 +64,39 @@ spy(sensor.get('pointVisibility'));
 %% 4. Plot Environment
 figure
 viewPoint = [-35,35];
-% axisLimits = [-5,50,-5,20,-5,5];
+axisLimits = [-5,60,-10,10,-5,10];
 % title('Environment')
 axis equal
 xlabel('x')
 ylabel('y')
 zlabel('z')
 view(viewPoint)
-% axis(axisLimits)
+axis(axisLimits)
 hold on
-primitive1Trajectory.plot(t,[0 0 0])
-primitive2Trajectory.plot(t,[0 0 0])
-cameraTrajectory.plot(t,[0 1 1])
-environment.plot(t)
+grid on
+primitive1Trajectory.plot(t,[0 0 0],'axesOFF')
+primitive2Trajectory.plot(t,[0 0 0],'axesOFF')
+cameraTrajectory.plot(t,[0 0 1],'axesOFF')
+frames = sensor.plot(t,environment);
+implay(frames);
+
+    %% 4.a output video
+% v = VideoWriter('Data/Videos/App6_sensor_environment.mp4','MPEG-4');
+% open(v)
+% writeVideo(v,frames);
+% close(v)
 
 %% 5. Generate Measurements & Save to Graph File
 sensor.generateMeasurements(config);
+config.set('constantSE3Motion',constantSE3ObjectMotion);
+writeDataAssociationVerticesEdges(config,constantSE3ObjectMotion);
 
 %% 6. load graph files
 groundTruthCell  = graphFileToCell(config,config.groundTruthFileName);
 measurementsCell = graphFileToCell(config,config.measurementsFileName);
 
 %% 7. Manually recreate vertexes
-initialCell = recreateInitialVertexes(config,measurementsCell,groundTruthCell);
+% initialCell = recreateInitialVertexes(config,measurementsCell,groundTruthCell);
 
 %% 8. Solve
 %no constraints
