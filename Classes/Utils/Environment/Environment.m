@@ -251,8 +251,9 @@ classdef Environment < ArrayGetSet
 
     % plot
     methods(Access = public)
-        function plot(self,t)
+        function varargout = plot(self,t)
             %identify dynamic points and dynamic primitives
+            fig = gcf;
             staticPointLogical      = self.get('environmentPoints').get('static');
             staticPrimitiveLogical  = self.get('environmentPrimitives').get('static');
             dynamicPointLogical     = ~staticPointLogical;
@@ -263,6 +264,12 @@ classdef Environment < ArrayGetSet
             dynamicPrimitiveIndexes = find(dynamicPrimitiveLogical);
             self.plotStatic(staticPointIndexes,staticPrimitiveIndexes)
             self.plotDynamic(dynamicPointIndexes,dynamicPrimitiveIndexes,t)
+            switch nargout
+                case 0
+                    varargout = {[]};
+                case 1
+                    varargout{1} = fig;
+            end
         end
     end
     
@@ -287,24 +294,22 @@ classdef Environment < ArrayGetSet
         function plotDynamic(self,dynamicPointIndexes,dynamicPrimitiveIndexes,t)
             nSteps = numel(t);
             for i = 1:nSteps
-                %plot primitives
-                h2 = {};
-                for p = dynamicPrimitiveIndexes
-                    if isa(self.get('environmentPrimitives',p),'EP_Default')
-                        meshPoints = self.get('environmentPrimitives',p).get('meshPointsAbsolute',t(i)).get('R3Position');
-                        meshLinks = self.get('environmentPrimitives',p).get('meshLinks');
-                        h2{end+1} = trimesh(meshLinks,meshPoints(1,:)',meshPoints(2,:)',meshPoints(3,:)','edgecolor','y');                
-                    end
-                end
-                
                 nPoints     = numel(dynamicPointIndexes);
                 nPrimitives = numel(dynamicPrimitiveIndexes);
                 %get point positions
                 positions = self.environmentPoints(dynamicPointIndexes).get('R3Position',t(i));
-                %plot positions
                 if positions
                     h1 = plot3(positions(1,:),positions(2,:),positions(3,:),'k.');
                 end
+                
+                %plot primitives
+                h2 = {};
+                for p = dynamicPrimitiveIndexes
+                    if isa(self.get('environmentPrimitives',p),'EP_Default')
+                        h2{end+1} = self.get('environmentPrimitives',p).plot(t(i));               
+                    end
+                end
+                
                 %draw current timestep, delete
                 drawnow
                 pause(0)

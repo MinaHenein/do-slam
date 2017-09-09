@@ -54,6 +54,15 @@ classdef EP_Default < EnvironmentPrimitive
         	self.(property) = value;
         end
         
+        function handle = plot(self,t,varargin) %plots the primitive, provides the figure object handle
+            meshPoints = self.get('meshPointsAbsolute',t).get('R3Position');
+            meshLinks = self.get('meshLinks');
+            edgecolor = 'b';
+            if numel(varargin)>0
+                edgecolor = varargin{1};
+            end
+            handle = trimesh(meshLinks,meshPoints(1,:)',meshPoints(2,:)',meshPoints(3,:)','edgecolor',edgecolor); 
+        end
     end
     
 end

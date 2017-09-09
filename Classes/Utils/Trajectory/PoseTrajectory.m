@@ -96,13 +96,23 @@ classdef PoseTrajectory < Trajectory
             else
                 color = [0 0 0];
             end
-            plot3(poses(1,:),poses(2,:),poses(3,:),'color',color,'LineStyle','-')
+            
+            if size(varargin,2) > 1
+                switch varargin{2}
+                    case 'axesON'
+                        for i = 1:numel(t)
+                            scale = 0.5;
+                            plotCoordinates(poses(1:3,i),scale*rot(poses(4:6,i)))
+                        end
+                    case 'axesOFF'
+                    otherwise
+                        error('Plot coordinates specification not defined properly. Use axesON or axesOFF');
+                end
+            end
+                
+            plot3(poses(1,:),poses(2,:),poses(3,:),'color',color,'LineStyle','-.')
             
             %plot axes
-            for i = 1:numel(t)
-                scale = 0.5;
-                plotCoordinates(poses(1:3,i),scale*rot(poses(4:6,i)))
-            end
         end
     end
     

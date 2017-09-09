@@ -1,5 +1,5 @@
 
-function plotCoordinates(o, R) 
+function varargout = plotCoordinates(o, R) 
 % plots coordinates at origin o and rotated with R
 
 quiver3( o(1), o(2), o(3), R(1,1), R(2,1), R(3,1), 'r');hold on
