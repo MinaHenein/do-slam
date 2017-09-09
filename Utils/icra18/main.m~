@@ -6,7 +6,7 @@
     % $ rostopic echo /mobile_base/sensors/imu_data >> imu.txt
     % $ rosbag play <rosbag_name.bag>
     
-% II- run the matlab script writeOdomMeas.m
+% II- run the matlab script 
 writeOdomMeas()
 filePath = '/home/mina/workspace/src/Git/do-slam/Utils/icra18/odometryMeasGraphFile.txt';
 modifyOdometryFile(filePath,51)
@@ -22,7 +22,7 @@ modifyOdometryFile(filePath,51)
     % $ rosbag play <rosbag_name.bag>
 
 % IV-
-%% GT & Measurements Graph Files
+%% GT File
 n = 51;
 VICONFilePath = '/home/mina/Downloads/icra18/VICON/';
 writeVICONGroundtruth(VICONFilePath,'robot.txt')

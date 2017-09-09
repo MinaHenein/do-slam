@@ -1,5 +1,6 @@
-odomFileID = fopen('odom.txt');
-imuFileID = fopen('imu.txt');
+filePath = '/home/mina/Downloads/icra18/';
+odomFileID = fopen(strcat(filePath,'odom.txt'));
+imuFileID = fopen(strcat(filePath,'imu.txt'));
 odomLine = fgetl(odomFileID);
 imuLine = fgetl(imuFileID);
 timeStamped = 0;
@@ -16,7 +17,7 @@ while ischar(odomLine)
         if pose1ID == 1
             firstTime = time;
             timeStamped = 1;
-        elseif time-previousTime > 5
+        elseif time-previousTime >= 0
             timeStamped = 1;
         end
     end
@@ -57,11 +58,12 @@ while ischar(odomLine)
         end
         odomMeas = [vx*dt,vy*dt,vz*dt,wx*dt,wy*dt,wz*dt];
         odomMeasCov =  covariance;
-        fid1 = fopen('/home/mina/Downloads/odometryMeasGraphFile.txt','a');
-        fprintf(fid1,'%6f %s %d %d %6f %6f %6f %6f %6f %6f %6f %6f %6f %6f %6f %6f %6f %6f %6f %6f %6f %6f %6f %6f %6f %6f %6f %6f %6f %6f %6f',...
-            time,'EDGE_LOG_SE3',pose1ID,pose2ID,odomMeas,odomMeasCov);
-        fprintf(fid1,'\n');
-        fclose(fid1);
+        filePath = '/home/mina/workspace/src/Git/do-slam/Utils/icra18/';
+        fID = fopen(strcat(filePath,'odometryMeasGraphFile.txt'),'a');
+        format = strcat('%6f %s %d %d ',repmat(' %6f',1,27));
+        fprintf(fID,format,time,'EDGE_LOG_SE3',pose1ID,pose2ID,odomMeas,odomMeasCov);
+        fprintf(fID,'\n');
+        fclose(fID);
         pose1ID = pose1ID + 1;
         previousTime = time;
         timeStamped = 0;

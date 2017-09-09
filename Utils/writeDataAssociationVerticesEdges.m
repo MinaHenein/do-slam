@@ -49,6 +49,7 @@ for j=1:1:length(Index)
     splitLine = strsplit(cell2mat(line{1,1}),' ');
     index1 = str2double(splitLine{1,2});
     index2 = str2double(splitLine{1,3});
+    object = str2double(splitLine{1,4});
     fclose(fileID);
     % get value for vertices that will constitute new edge
     fileID = fopen(filepath,'r');
@@ -99,8 +100,13 @@ for j=1:1:length(Index)
                 vertex = struct();
                 vertex.label = config.SE3MotionVertexLabel;
                 vertex.index = newVertexID;
-                vertex.value = [constantSE3ObjectMotion(1:3,4);...
-                    arot(constantSE3ObjectMotion(1:3,1:3))];
+                if numel(size(constantSE3ObjectMotion)) > 2
+                    objectSE3Motion = constantSE3ObjectMotion(:,:,object); 
+                else
+                    objectSE3Motion = constantSE3ObjectMotion;
+                end
+                vertex.value = [objectSE3Motion(1:3,4);...
+                    arot(objectSE3Motion(1:3,1:3))];
                 
                 edge = struct();
                 edge.index1 = index1;
@@ -108,9 +114,9 @@ for j=1:1:length(Index)
                 edge.index3 = newVertexID;
                 edge.label = config.pointSE3MotionEdgeLabel;
                 edge.value = vertex1Value -...
-                    (constantSE3ObjectMotion(1:3,1:3)'*...
+                    (objectSE3Motion(1:3,1:3)'*...
                     vertex2Value -...
-                    constantSE3ObjectMotion(1:3,1:3)'*constantSE3ObjectMotion(1:3,4));
+                    objectSE3Motion(1:3,1:3)'*objectSE3Motion(1:3,4));
                 edge.std = config.std2PointsSE3Motion;
                 edge.cov = config.cov2PointsSE3Motion;
                 edge.covUT = covToUpperTriVec(edge.cov); 

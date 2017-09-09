@@ -17,7 +17,7 @@ config = CameraConfig();
 config = setAppConfig(config); % copy same settings for error Analysis
 config.set('t',t);
 % set motion model in setAppConfig function
-% config.set('noiseModel','Off');
+%config.set('noiseModel','Off');
 config.set('groundTruthFileName','app5_groundTruth.graph');
 config.set('measurementsFileName','app5_measurements.graph');
 
@@ -25,7 +25,6 @@ config.set('measurementsFileName','app5_measurements.graph');
 config.set('pointMotionMeasurement','point2DataAssociation');
 config.set('motionModel','constantSE3MotionDA');
 config.set('std2PointsSE3Motion', [0.1,0.1,0.1]');
-config.set('dimPoint',4);
 
 %% 2. Generate Environment
 if config.rngSeed
