@@ -51,21 +51,26 @@ figure
 spy(sensor.get('pointVisibility'));
 
 %% 4. Plot Environment
-% figure
-% % viewPoint = [-50,25];
-% % axisLimits = [-10,50,-10,40,-1,10];
-% title('Environment')
-% axis equal
-% xlabel('x')
-% ylabel('y')
-% zlabel('z')
-% % view(viewPoint)
-% % axis(axisLimits)
-% hold on
-% primitiveTrajectory.plot(t,[0 0 0])
-% cameraTrajectory.plot(t,[0 1 1])
-% environment.plot(t)
+figure
+hold on
+grid on
+axis equal
+viewPoint = [-50,25];
+axisLimits = [-10,30,-10,20,-5,20];
+axis equal
+xlabel('x')
+ylabel('y')
+zlabel('z')
+view(viewPoint)
+axis(axisLimits)
+primitiveTrajectory.plot(t,[0 0 0],'axesOFF')
+cameraTrajectory.plot(t,[0 1 1],'axesOFF')
+frames = sensor.plot(t,environment);
+implay(frames);
 
+    %% 4.a output video
+    % add code here for that
+    
 %% 5. Generate Measurements & Save to Graph File
 sensor.generateMeasurements(config);
 

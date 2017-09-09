@@ -8,16 +8,17 @@ clear all
 
 %% 1. Config
 % time
-nSteps = 51;
+nSteps = 121;
 t0 = 0;
-tN = 10;
+tN = 120;
+dt = (tN-t0)/(nSteps-1);
 t  = linspace(t0,tN,nSteps);
 
 config = CameraConfig();
 config = setAppConfig(config); % copy same settings for error Analysis
 config.set('t',t);
 % set motion model in setAppConfig function
-% config.set('noiseModel','Off');
+config.set('noiseModel','Off');
 config.set('groundTruthFileName','app5_groundTruth.graph');
 config.set('measurementsFileName','app5_measurements.graph');
 
@@ -32,51 +33,63 @@ if config.rngSeed
     rng(config.rngSeed); 
 end
 
-robotWaypoints = [0:2:tN; 0 10 15 20 15 10; 0 0 5 10 15 15; 0 0 1 2 4 2];
+% construct primitive trajectory
 primitiveInitialPose_R3xso3 = [10 0 0 0 0 0]';
-primitiveMotion_R3xso3 = [1.5; 0; 0; arot(eul2rot([0.09,0,0.01]))];
-
-% construct trajectories
-robotTrajectory = PositionModelPoseTrajectory(robotWaypoints,'R3','smoothingspline');
+primitiveMotion_R3xso3 = [1.5*dt; 0; 0; arot(eul2rot([0.05*dt,0,0.005*dt]))];
 primitiveTrajectory = ConstantMotionDiscretePoseTrajectory(t,primitiveInitialPose_R3xso3,primitiveMotion_R3xso3,'R3xso3');
-constantSE3ObjectMotion = primitiveTrajectory.RelativePoseGlobalFrameSE3(t(1),t(2));
+
+% construct  robot trajectories
+sampleTimes = t(1:floor(numel(t)/5):tN+1);
+sampleWaypoints = primitiveTrajectory.get('R3xso3Pose',sampleTimes);
+robotWaypoints = [linspace(0,tN+3,numel(sampleTimes)+1); 0 sampleWaypoints(1,:); 0 (sampleWaypoints(2,:)+0.1); 0 (sampleWaypoints(3,:)-0.1)];
+robotTrajectory = PositionModelPoseTrajectory(robotWaypoints,'R3','smoothingspline');
+
+constantSE3ObjectMotion = primitiveTrajectory.RelativePoseGlobalFrameSE3(t(1),t(2))
 
 environment = Environment();
-environment.addEllipsoid([1 1 2],12,'R3',primitiveTrajectory);
+environment.addEllipsoid([5 2 3],8,'R3',primitiveTrajectory);
 
 %% 3. Initialise Sensor
 cameraTrajectory = RelativePoseTrajectory(robotTrajectory,config.cameraRelativePose);
 
 % standard sensor
-sensor = SimulatedEnvironmentSensor();
-sensor.addEnvironment(environment);
-sensor.addCamera(config.fieldOfView,cameraTrajectory);
-sensor.setVisibility(config);
-
-% occlusion sensor
-% sensor = SimulatedEnvironmentOcclusionSensor();
+% sensor = SimulatedEnvironmentSensor();
 % sensor.addEnvironment(environment);
 % sensor.addCamera(config.fieldOfView,cameraTrajectory);
-% sensor.setVisibility(config,environment);
+% sensor.setVisibility(config);
 
-% figure
-% spy(sensor.get('pointVisibility'));
+% occlusion sensor
+sensor = SimulatedEnvironmentOcclusionSensor();
+sensor.addEnvironment(environment);
+sensor.addCamera(config.fieldOfView,cameraTrajectory);
+sensor.setVisibility(config,environment);
+
+figure
+spy(sensor.get('pointVisibility'));
 
 %% 4. Plot Environment
 figure
+hold on
+grid on
+axis equal
 viewPoint = [-50,25];
-axisLimits = [-20,60,-10,50,-1,10];
-title('Environment')
+axisLimits = [-20,50,-10,70,-5,25];
 axis equal
 xlabel('x')
 ylabel('y')
 zlabel('z')
 view(viewPoint)
 axis(axisLimits)
-hold on
 primitiveTrajectory.plot(t,[0 0 0],'axesOFF')
 cameraTrajectory.plot(t,[0 1 1],'axesOFF')
 frames = sensor.plot(t,environment);
+% implay(frames);
+
+%% 4.a output video
+v = VideoWriter('Data/Videos/App5_sensor_environment.mp4','MPEG-4');
+open(v)
+writeVideo(v,frames);
+close(v)
 
 %% 5. Generate Measurements & Save to Graph File
 sensor.generateMeasurements(config);

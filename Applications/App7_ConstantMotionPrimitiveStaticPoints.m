@@ -8,9 +8,10 @@ clear all
 
 %% 1. Config
 % time
-nSteps = 51;
+nSteps = 121;
 t0 = 0;
-tN = 10;
+tN = 120;
+dt = (tN-t0)/(nSteps-1);
 t  = linspace(t0,tN,nSteps);
 
 config = CameraConfig();
@@ -31,10 +32,9 @@ if config.rngSeed
     rng(config.rngSeed); 
 end
 
-robotWaypoints = [0:2:tN; 0 10 15 20 15 10; 0 0 5 10 15 15; 0 0 1 2 4 2];
-primitiveWaypoints = [0:2:tN; 10 20 25 20 10 5; 0 0 10 15 15 15; 0 2 1 3 5 2];
-primitiveInitialPose_R3xso3 = [10 0 0 0 0 0]';
-primitiveMotion_R3xso3 = [1.5; 0; 0; arot(eul2rot([0.1,0,0.01]))];
+robotWaypoints = [linspace(0,tN,6); 0 10 15 20 15 10; 0 0 5 10 15 15; 0 0 1 2 4 2];
+primitiveInitialPose_R3xso3 = [10 0 3 0 0 0]';
+primitiveMotion_R3xso3 = [0.6*dt; 0; 0; arot(eul2rot([0.035*dt,0,0.001*dt]))];
 
 % construct trajectories
 robotTrajectory = PositionModelPoseTrajectory(robotWaypoints,'R3','smoothingspline');
@@ -67,19 +67,26 @@ sensor.setVisibility(config,environment);
 %% 4. Plot Environment
 figure
 viewPoint = [-50,25];
-% axisLimits = [-10,50,-10,40,-1,10];
+axisLimits = [-10,30,-10,40,-5,20];
 title('Sensed Environment')
 axis equal
 xlabel('x (m)')
 ylabel('y (m)')
 zlabel('z (m)')
 view(viewPoint)
-% axis(axisLimits)
+axis(axisLimits)
 hold on
+grid on
 primitiveTrajectory.plot(t,[0 0 0],'axesOFF')
-% cameraTrajectory.plot(t,[0 1 1])
-% environment.plot(t(end))
+cameraTrajectory.plot(t,[0 1 1],'axesOFF')
 frames = sensor.plot(t,environment);
+implay(frames);
+
+    %% 4.a output video
+v = VideoWriter('Data/Videos/App7_sensor_environment.mp4','MPEG-4');
+open(v)
+writeVideo(v,frames);
+close(v)
 
 %% 5. Generate Measurements & Save to Graph File
 sensor.generateMeasurements(config);
