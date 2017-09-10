@@ -114,7 +114,7 @@ graph0  = solverEnd.graphs(1);
 graphN  = solverEnd.graphs(end);
 fprintf('\nChi-squared error: %f\n',solverEnd.systems(end).chiSquaredError)
 %save results to graph file
-graphN.saveGraphFile(config,'app1_results.graph');
+graphN.saveGraphFile(config,'app7_results.graph');
 
 %% 9. Error analysis
 %load ground truth into graph, sort if required
@@ -146,5 +146,5 @@ view([-50,25])
 %plot groundtruth
 plotGraphFile(config,groundTruthCell,[0 0 1]);
 %plot results
-resultsCell = graphFileToCell(config,'app1_results.graph');
+resultsCell = graphFileToCell(config,'app7_results.graph');
 plotGraphFile(config,resultsCell,[1 0 0])

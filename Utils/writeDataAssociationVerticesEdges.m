@@ -1,5 +1,7 @@
 function writeDataAssociationVerticesEdges(config,constantSE3ObjectMotion)
 
+nObjects = size(constantSE3ObjectMotion,2);
+
 GTFileName = config.groundTruthFileName;
 filepath = strcat(config.folderPath,config.sep,'Data',...
     config.sep,config.graphFileFolderName,config.sep,GTFileName);
@@ -17,6 +19,36 @@ for i=1:numel(DataNew)
     fprintf(fileID,[DataNew{i} '\n']);
 end
 fclose(fileID);
+% re-order data association entries by object
+fileID = fopen(filepath,'r');
+Data = textscan(fileID, '%s', 'delimiter', '\n', 'whitespace', '');
+CStr = Data{1};
+fclose(fileID);
+IndexC = strfind(CStr, 'DataAssociation');
+Index = find(~cellfun('isempty', IndexC));
+DataAssociation = CStr(Index);
+tempFilePath = '/home/mina/workspace/src/Git/do-slam/temp.txt';
+tempFileID = fopen(tempFilePath,'w');
+for i=1:numel(DataAssociation)
+    fprintf(tempFileID,[DataAssociation{i} '\n']);
+end
+fclose(tempFileID);
+tempFileID = fopen(tempFilePath,'r');
+a = textscan(tempFileID,'%s %d %d %d','delimiter',' ');
+b = cell2mat(a(2:end));
+fclose(tempFileID);
+c = sortrows(b,3);
+CStr(Index) = [];
+fileID = fopen(filepath, 'w');
+fprintf(fileID, '%s\n', CStr{:});
+fclose(fileID);
+fileID = fopen(filepath,'a');
+for i=1:size(c,1)
+    fprintf(fileID,'%s %d %d %d \n','2POINTS_DataAssociation',...
+        c(i,1),c(i,2),c(i,3));
+end
+fclose(fileID);
+delete /home/mina/workspace/src/Git/do-slam/temp.txt;
 
 fileID = fopen(filepath,'r');
 Data = textscan(fileID,'%s','delimiter','\n','whitespace',' ');
@@ -39,10 +71,22 @@ while ischar(line)
 end
 fclose(fileID);
 
-nSE3MotionVertices = 0;
+SE3ObjectMotion = zeros(4,4,nObjects);
+for i=1:nObjects
+SE3ObjectMotion(:,:,i) = [rot(constantSE3ObjectMotion(4:6,i)),...
+    constantSE3ObjectMotion(1:3,i); 0 0 0 1]; 
+end
+constantSE3ObjectMotion = SE3ObjectMotion;
 
+nSE3MotionVertices = 0;
+isNewSE3Vertex = 0;
+object = 0;
+lastObject = 0;
 for j=1:1:length(Index)
     Edges = {};
+    if j > 1
+        lastObject = object;
+    end
     % get line of Index
     fileID = fopen(filepath,'r');
     line = textscan(fileID,'%s',1,'delimiter','\n','headerlines',Index(j)+nLinesAdded-1);
@@ -76,25 +120,15 @@ for j=1:1:length(Index)
     vertex2Value = splitLine2(1,3:5)';
     fclose(fileID);
     
-    isNewSE3Vertex = 0;
-    IndexC = strfind(CStr,'VERTEX_SE3Motion');
-    SE3MotionIndex = find(~cellfun('isempty',IndexC),1);
-    if isempty(SE3MotionIndex)
+    if nSE3MotionVertices == 0
         isNewSE3Vertex = 1;
-        nSE3MotionVertices = nSE3MotionVertices+1;
-        newVertexID = nVertices+1;
-    else
-        fileID = fopen(filepath,'r');
-        line = textscan(fileID, '%s', 1, 'delimiter', '\n', 'headerlines',...
-            SE3MotionIndex-1);
-        line = cell2mat(line{1,1});
-        if ~strcmp(line(1:length('VERTEX_SE3Motion')),'VERTEX_SE3Motion')
-            error('vertex is not SE3 motion veretx');
-        end
-        splitLine = str2double(strsplit(line,' '));
-        lastSE3VertexValue = splitLine(1,3:8)';
-        fclose(fileID);
+        newVertexID = nVertices +1;
     end
+    if j > 1 && nObjects > 1 && object~=lastObject
+        isNewSE3Vertex = 1;
+        newVertexID = newVertexID+1;
+    end
+    
     % get motion model and replace line accordingly
     if ~isempty(Index(j)+nLinesAdded)
         switch config.motionModel
@@ -125,7 +159,6 @@ for j=1:1:length(Index)
             case 'constantSE3' % to be done
             case 'constantSE3Motion' % to be done
         end
-        
         if  isNewSE3Vertex
             % Shift all lines below vertices 1 line below to allow space for 
             % new vertex in the right place
@@ -140,21 +173,12 @@ for j=1:1:length(Index)
             for i= nLines-1:-1:nVertices+1
                 CStr(i+1) = CStr(i);
             end
-        end
-        if ~isempty(SE3MotionIndex)
-            relative = AbsoluteToRelativePoseR3xso3(lastSE3VertexValue,vertex.value);
-            if norm(relative(1:3)) > 0.01 && rad2deg(norm(relative(4:6))) > 1
-                isNewSE3Vertex=1;
-                nSE3MotionVertices = nSE3MotionVertices+1;
-                newVertexID = nVertices+nSE3MotionVertices;
-            end
-        end
-        if isNewSE3Vertex
             CStr(newVertexID) = cellstr(sprintf('%s %d %f %f %f %f %f %f',...
             vertex.label,vertex.index,vertex.value'));
             % if new line added before 2POINTS_DataAssociation, incerment
             % nLinesAdded to be able to delete the correct line afterwards
             nLinesAdded = nLinesAdded+1;
+            nSE3MotionVertices = nSE3MotionVertices +1;
         end
         
         fileID = fopen(filepath,'r');
@@ -173,6 +197,7 @@ for j=1:1:length(Index)
         % delete 1 line with 2POINTS_DataAssociation
         CStr(Index(j)+nLinesAdded) = [];
         nLinesAdded = nLinesAdded-1;
+        isNewSE3Vertex = 0;
     end
     % Save the file again
     fileID = fopen(strcat(config.folderPath,config.sep,'Data',...

@@ -46,7 +46,8 @@ rotationMatrix = rot([pi/6;-pi/4;0]);
 translationVector = [1;2;0];
 objectRelativePose = [translationVector; arot(rotationMatrix)];
 %SE3 motion constant in world frame
-constantSE3ObjectMotion = [rotationMatrix, translationVector; 0 0 0 1];
+%constantSE3ObjectMotion = [rotationMatrix, translationVector; 0 0 0 1];
+constantSE3ObjectMotion = objectRelativePose;
 
 for i=2:nSteps
     objectPose(:,i) = RelativeToAbsolutePoseR3xso3GlobalFrame(objectPose(:,i-1),...
