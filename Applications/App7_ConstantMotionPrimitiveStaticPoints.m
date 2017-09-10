@@ -8,7 +8,7 @@ clear all
 
 %% 1. Config
 % time
-nSteps = 121;
+nSteps = 601;
 t0 = 0;
 tN = 120;
 dt = (tN-t0)/(nSteps-1);

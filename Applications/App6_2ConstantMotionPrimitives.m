@@ -8,9 +8,10 @@ clear all
 
 %% 1. Config
 % time
-nSteps = 51;
+nSteps = 121;
 t0 = 0;
-tN = 10;
+tN = 120;
+dt = (tN-t0)/(nSteps-1);
 t  = linspace(t0,tN,nSteps);
 
 config = CameraConfig();
@@ -25,12 +26,12 @@ if config.rngSeed
     rng(config.rngSeed); 
 end
 
-robotWaypoints = [0:2:tN; 0 10 15 25 35 45; 0 2 0 -2 0 0.5; 0 0 1 2 4 2];
-primitive1InitialPose_R3xso3 = [10 -5 0 0 0 0]';
-primitive1Motion_R3xso3 = [1; 0; 0; arot(eul2rot([0.01,0,0]))];
+robotWaypoints = [linspace(0,tN,9); 0 0 25 25 0 0 -25 -25 0; 0 25 25 0 0 25 25 0 0; 1.5*ones(1,9)];
+primitive1InitialPose_R3xso3 = [-2.5 12.5 0.8 0 0 pi/2]';
+primitive1Motion_R3xso3 = [1*dt; 0; 0; arot(eul2rot([0.1*dt,0,0]))];
 
-primitive2InitialPose_R3xso3 = [10 5 0 0 0 0]';
-primitive2Motion_R3xso3 = [1; 0; 0; arot(eul2rot([-0.01,-0.005,0]))];
+primitive2InitialPose_R3xso3 = [2.5 12.5 0.8 0 0 -pi/2]';
+primitive2Motion_R3xso3 = [-1*dt; 0; 0; arot(eul2rot([-0.1*dt,0,0]))];
 
 % construct trajectories
 robotTrajectory = PositionModelPoseTrajectory(robotWaypoints,'R3','smoothingspline');
@@ -40,9 +41,8 @@ constantSE3ObjectMotion(:,:,1) = primitive1Trajectory.RelativePoseGlobalFrameSE3
 constantSE3ObjectMotion(:,:,2) = primitive2Trajectory.RelativePoseGlobalFrameSE3(t(1),t(2));
 
 environment = Environment();
-environment.addEllipsoid([1 1 2],12,'R3',primitive1Trajectory);
-environment.addEllipsoid([1 2 2],12,'R3',primitive2Trajectory);
-% environment.addPrimitive(3*rand(3,50)-1.5,'R3',primitiveTrajectory);
+environment.addEllipsoid([0.5 0.5 0.8],8,'R3',primitive1Trajectory);
+environment.addEllipsoid([0.5 0.5 0.8],8,'R3',primitive2Trajectory);
 
 %% 3. Initialise Sensor
 cameraTrajectory = RelativePoseTrajectory(robotTrajectory,config.cameraRelativePose);
@@ -64,21 +64,21 @@ spy(sensor.get('pointVisibility'));
 %% 4. Plot Environment
 figure
 viewPoint = [-35,35];
-axisLimits = [-5,60,-10,10,-5,10];
+% axisLimits = [-5,60,-10,10,-5,10];
 % title('Environment')
 axis equal
 xlabel('x')
 ylabel('y')
 zlabel('z')
 view(viewPoint)
-axis(axisLimits)
+% axis(axisLimits)
 hold on
 grid on
 primitive1Trajectory.plot(t,[0 0 0],'axesOFF')
 primitive2Trajectory.plot(t,[0 0 0],'axesOFF')
 cameraTrajectory.plot(t,[0 0 1],'axesOFF')
 frames = sensor.plot(t,environment);
-implay(frames);
+% implay(frames);
 
     %% 4.a output video
 % v = VideoWriter('Data/Videos/App6_sensor_environment.mp4','MPEG-4');
