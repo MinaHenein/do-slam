@@ -38,8 +38,7 @@ config.set('poseParameterisation','R3xso3');
 
 % SE3 Motion
 config.set('pointMotionMeasurement','point2DataAssociation');
-config.set('motionModel','constantSE3');
-config.set('dimPoint',4);
+config.set('motionModel','constantSE3MotionDA');
 
 %% pose handles
 % temporarily changed function handles to public for setting

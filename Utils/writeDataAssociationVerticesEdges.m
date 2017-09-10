@@ -49,7 +49,9 @@ for j=1:1:length(Index)
     splitLine = strsplit(cell2mat(line{1,1}),' ');
     index1 = str2double(splitLine{1,2});
     index2 = str2double(splitLine{1,3});
-    object = str2double(splitLine{1,4});
+    if numel(size(constantSE3ObjectMotion)) > 2
+        object = str2double(splitLine{1,4});
+    end
     fclose(fileID);
     % get value for vertices that will constitute new edge
     fileID = fopen(filepath,'r');
