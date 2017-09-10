@@ -16,16 +16,11 @@ t  = linspace(t0,tN,nSteps);
 
 config = CameraConfig();
 config = setAppConfig(config); % copy same settings for error Analysis
+config.set('std2PointsSE3Motion', [0.1,0.1,0.1]');
 config.set('t',t);
 % set motion model in setAppConfig function
-config.set('noiseModel','Off');
 config.set('groundTruthFileName','app7_groundTruth.graph');
 config.set('measurementsFileName','app7_measurements.graph');
-
-% SE3 Motion
-config.set('pointMotionMeasurement','point2DataAssociation');
-config.set('motionModel','constantSE3');
-config.set('dimPoint',4);
 
 %% 2. Generate Environment
 if config.rngSeed
@@ -39,7 +34,9 @@ primitiveMotion_R3xso3 = [0.6*dt; 0; 0; arot(eul2rot([0.035*dt,0,0.001*dt]))];
 % construct trajectories
 robotTrajectory = PositionModelPoseTrajectory(robotWaypoints,'R3','smoothingspline');
 primitiveTrajectory = ConstantMotionDiscretePoseTrajectory(t,primitiveInitialPose_R3xso3,primitiveMotion_R3xso3,'R3xso3');
-constantSE3ObjectMotion = primitiveTrajectory.RelativePoseGlobalFrameSE3(t(1),t(2));
+constantSE3Object1Motion = primitiveTrajectory.RelativePoseGlobalFrameSE3(t(1),t(2));
+constantSE3ObjectMotion = [constantSE3Object1Motion(1:3,4);...
+    arot(constantSE3Object1Motion(1:3,1:3))];
 
 environment = Environment();
 environment.addEllipsoid([1 1 2],12,'R3',primitiveTrajectory);
