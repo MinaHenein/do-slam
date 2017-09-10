@@ -16,6 +16,7 @@ t  = linspace(t0,tN,nSteps);
 
 config = CameraConfig();
 setAppConfig(config); % copy same settings for error Analysis
+config.set('std2PointsSE3Motion', [0.1,0.1,0.1]');
 config.set('t',t);
 % config.set('noiseModel','Off');
 config.set('groundTruthFileName','app6_groundTruth.graph');
@@ -37,8 +38,11 @@ primitive2Motion_R3xso3 = [-1*dt; 0; 0; arot(eul2rot([-0.1*dt,0,0]))];
 robotTrajectory = PositionModelPoseTrajectory(robotWaypoints,'R3','smoothingspline');
 primitive1Trajectory = ConstantMotionDiscretePoseTrajectory(t,primitive1InitialPose_R3xso3,primitive1Motion_R3xso3,'R3xso3');
 primitive2Trajectory = ConstantMotionDiscretePoseTrajectory(t,primitive2InitialPose_R3xso3,primitive2Motion_R3xso3,'R3xso3');
-constantSE3ObjectMotion(:,:,1) = primitive1Trajectory.RelativePoseGlobalFrameSE3(t(1),t(2));
-constantSE3ObjectMotion(:,:,2) = primitive2Trajectory.RelativePoseGlobalFrameSE3(t(1),t(2));
+constantSE3Object1Motion = primitive1Trajectory.RelativePoseGlobalFrameSE3(t(1),t(2));
+constantSE3Object2Motion = primitive2Trajectory.RelativePoseGlobalFrameSE3(t(1),t(2));
+constantSE3ObjectMotion = [[constantSE3Object1Motion(1:3,4);...
+    arot(constantSE3Object1Motion(1:3,1:3))],...
+    [constantSE3Object2Motion(1:3,4);arot(constantSE3Object2Motion(1:3,1:3))]];
 
 environment = Environment();
 environment.addEllipsoid([0.5 0.5 0.8],8,'R3',primitive1Trajectory);
@@ -112,7 +116,7 @@ graph0  = solverEnd.graphs(1);
 graphN  = solverEnd.graphs(end);
 fprintf('\nChi-squared error: %f\n',solverEnd.systems(end).chiSquaredError)
 %save results to graph file
-graphN.saveGraphFile(config,'app3_results.graph');
+graphN.saveGraphFile(config,'app6_results.graph');
 
 %% 9. Error analysis
 %load ground truth into graph, sort if required
@@ -144,5 +148,5 @@ view([-50,25])
 %plot groundtruth
 plotGraphFile(config,groundTruthCell,[0 0 1]);
 %plot results
-resultsCell = graphFileToCell(config,'app3_results.graph');
+resultsCell = graphFileToCell(config,'app6_results.graph');
 plotGraphFile(config,resultsCell,[1 0 0])
