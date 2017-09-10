@@ -16,18 +16,25 @@ t  = linspace(t0,tN,nSteps);
 
 config = CameraConfig();
 setAppConfig(config); % copy same settings for error Analysis
-config.set('std2PointsSE3Motion', [0.1,0.1,0.1]');
 config.set('t',t);
 % config.set('noiseModel','Off');
 config.set('groundTruthFileName','app6_groundTruth.graph');
 config.set('measurementsFileName','app6_measurements.graph');
+
+% SE3 Motion
+config.set('pointMotionMeasurement','point2DataAssociation');
+config.set('motionModel','constantSE3MotionDA');
+config.set('std2PointsSE3Motion', [0.1,0.1,0.1]');
 
 %% 2. Generate Environment
 if config.rngSeed
     rng(config.rngSeed); 
 end
 
-robotWaypoints = [linspace(0,tN,9); 0 0 25 25 0 0 -25 -25 0; 0 25 25 0 0 25 25 0 0; 1.5*ones(1,9)];
+robotWaypoints = [linspace(0,tN,17); ...
+    0 0    0  12.5 25 25    25 12.5 0 0     0   -12.5 -25 -25   -25 -12.5 0; ...
+    0 12.5 25 25   25 12.5  0  0    0 12.5  25   25    25 12.5   0   0    0; ...
+    1.5*ones(1,17)];
 primitive1InitialPose_R3xso3 = [-2.5 12.5 0.8 0 0 pi/2]';
 primitive1Motion_R3xso3 = [1*dt; 0; 0; arot(eul2rot([0.1*dt,0,0]))];
 
@@ -68,14 +75,14 @@ spy(sensor.get('pointVisibility'));
 %% 4. Plot Environment
 figure
 viewPoint = [-35,35];
-% axisLimits = [-5,60,-10,10,-5,10];
+axisLimits = [-30,30,-5,30,-2,2];
 % title('Environment')
 axis equal
 xlabel('x')
 ylabel('y')
 zlabel('z')
 view(viewPoint)
-% axis(axisLimits)
+axis(axisLimits)
 hold on
 grid on
 primitive1Trajectory.plot(t,[0 0 0],'axesOFF')
