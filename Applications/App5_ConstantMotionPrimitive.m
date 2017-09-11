@@ -8,7 +8,7 @@ clear all
 
 %% 1. Config
 % time
-nSteps = 121;
+nSteps = 601;
 t0 = 0;
 tN = 120;
 dt = (tN-t0)/(nSteps-1);
@@ -17,7 +17,7 @@ t  = linspace(t0,tN,nSteps);
 config = CameraConfig();
 config = setAppConfig(config); % copy same settings for error Analysis
 config.set('t',t);
-%config.set('noiseModel','Off');
+config.set('noiseModel','Off');
 config.set('groundTruthFileName','app5_groundTruth.graph');
 config.set('measurementsFileName','app5_measurements.graph');
 
@@ -37,12 +37,12 @@ primitiveMotion_R3xso3 = [1.5*dt; 0; 0; arot(eul2rot([0.05*dt,0,0.005*dt]))];
 primitiveTrajectory = ConstantMotionDiscretePoseTrajectory(t,primitiveInitialPose_R3xso3,primitiveMotion_R3xso3,'R3xso3');
 
 % construct  robot trajectories
-sampleTimes = t(1:floor(numel(t)/5):tN+1);
+sampleTimes = t(1:floor(numel(t)/5):numel(t));
 sampleWaypoints = primitiveTrajectory.get('R3xso3Pose',sampleTimes);
 robotWaypoints = [linspace(0,tN+3,numel(sampleTimes)+1); 0 sampleWaypoints(1,:); 0 (sampleWaypoints(2,:)+0.1); 0 (sampleWaypoints(3,:)-0.1)];
 robotTrajectory = PositionModelPoseTrajectory(robotWaypoints,'R3','smoothingspline');
 
-constantSE3ObjectMotion = primitiveTrajectory.RelativePoseGlobalFrameSE3(t(1),t(2));
+constantSE3ObjectMotion = primitiveTrajectory.RelativePoseGlobalFrameR3xso3(t(1),t(2));
 
 environment = Environment();
 environment.addEllipsoid([5 2 3],8,'R3',primitiveTrajectory);
@@ -66,28 +66,28 @@ figure
 spy(sensor.get('pointVisibility'));
 
 %% 4. Plot Environment
-figure
-hold on
-grid on
-axis equal
-viewPoint = [-50,25];
-axisLimits = [-20,50,-10,70,-5,25];
-axis equal
-xlabel('x')
-ylabel('y')
-zlabel('z')
-view(viewPoint)
-axis(axisLimits)
-primitiveTrajectory.plot(t,[0 0 0],'axesOFF')
-cameraTrajectory.plot(t,[0 1 1],'axesOFF')
-frames = sensor.plot(t,environment);
+% figure
+% hold on
+% grid on
+% axis equal
+% viewPoint = [-50,25];
+% axisLimits = [-20,50,-10,70,-5,25];
+% axis equal
+% xlabel('x (m)')
+% ylabel('y (m)')
+% zlabel('z (m)')
+% view(viewPoint)
+% axis(axisLimits)
+% primitiveTrajectory.plot(t,[0 0 0],'axesOFF')
+% cameraTrajectory.plot(t,[0 1 1],'axesOFF')
+% frames = sensor.plot(t,environment);
 % implay(frames);
 
 %% 4.a output video
-v = VideoWriter('Data/Videos/App5_sensor_environment.mp4','MPEG-4');
-open(v)
-writeVideo(v,frames);
-close(v)
+% v = VideoWriter('Data/Videos/App5_sensor_environment.mp4','MPEG-4');
+% open(v)
+% writeVideo(v,frames);
+% close(v)
 
 %% 5. Generate Measurements & Save to Graph File
 sensor.generateMeasurements(config);
@@ -139,10 +139,11 @@ subplot(1,2,2)
 spy(solverEnd.systems(end).H)
 
 h = figure; 
-xlabel('x')
-ylabel('y')
-zlabel('z')
+xlabel('x (m)')
+ylabel('y (m)')
+zlabel('z (m)')
 hold on
+grid on
 view([-50,25])
 %plot groundtruth
 plotGraphFile(config,groundTruthCell,[0 0 1]);
