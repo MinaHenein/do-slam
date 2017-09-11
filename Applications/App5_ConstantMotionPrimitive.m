@@ -33,7 +33,7 @@ if config.rngSeed
 end
 
 % construct primitive trajectory
-primitiveInitialPose_R3xso3 = [10 0 0 0 0 0]';
+primitiveInitialPose_R3xso3 = [10 0 0 0 0 -pi/3]';
 primitiveMotion_R3xso3 = [1.5*dt; 0; 0; arot(eul2rot([0.05*dt,0,0.005*dt]))];
 primitiveTrajectory = ConstantMotionDiscretePoseTrajectory(t,primitiveInitialPose_R3xso3,primitiveMotion_R3xso3,'R3xso3');
 
