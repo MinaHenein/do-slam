@@ -61,7 +61,7 @@ while ischar(odomLine)
         filePath = '/home/mina/workspace/src/Git/do-slam/Utils/icra18/';
         fID = fopen(strcat(filePath,'odometryMeasGraphFile.txt'),'a');
         format = strcat('%6f %s %d %d ',repmat(' %6f',1,27));
-        fprintf(fID,format,time,'EDGE_LOG_SE3',pose1ID,pose2ID,odomMeas,odomMeasCov);
+        fprintf(fID,format,time,'EDGE_R3_SO3',pose1ID,pose2ID,odomMeas,odomMeasCov);
         fprintf(fID,'\n');
         fclose(fID);
         pose1ID = pose1ID + 1;

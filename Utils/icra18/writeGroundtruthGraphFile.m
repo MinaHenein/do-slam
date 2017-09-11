@@ -31,6 +31,8 @@ for i = 1:28
     line = textscan(fid,'%s',1,'delimiter','\n','headerlines',camID-1);
     splitLine = strsplit(cell2mat(line{1,1}),' ');
     pose = str2double(splitLine(3:end));
+    pose(1) = pose(1)-0.1;
+    pose(3) = 0.31;
     fclose(fid);
     
     if(isempty(cameraVertexID))
@@ -40,8 +42,8 @@ for i = 1:28
         cameraVertexID = [cameraVertexID; camID, vertexID];
         vertexID = vertexID + 1;
     end
-    fid = fopen(strcat(filePath,'GT_GraphFile.graph'),'a');
-    fprintf(fid,'%s %d %6f %6f %6f %6f %6f %6f','VERTEX_POSE_LOG_SE3',...
+    fid = fopen(strcat(filePath,'icra18GT_GraphFile.graph'),'a');
+    fprintf(fid,'%s %d %6f %6f %6f %6f %6f %6f','VERTEX_POSE_R3_SO3',...
         cameraVertexID(cameraVertexID(:,1)==camID,2),pose);
     fprintf(fid,'\n');
     fclose(fid);
@@ -70,7 +72,7 @@ for i = 1:28
         % static point with label 5 should be written only once
         if isempty(pointsSeenSoFar) && pointLabel~=5
             pointsSeenSoFar = [pointsSeenSoFar, pointID];
-            fid = fopen(strcat(filePath,'GT_GraphFile.graph'),'a');
+            fid = fopen(strcat(filePath,'icra18GT_GraphFile.graph'),'a');
             fprintf(fid,'%s %d %6f %6f %6f','VERTEX_POINT_3D',...
                 pointVertexID(pointVertexID(:,1)==pointID,2),...
                 unique3DPoints(2:end,pointID)');
@@ -78,7 +80,7 @@ for i = 1:28
             fclose(fid);
         elseif ~any(pointsSeenSoFar == pointID) && pointLabel~=5
             pointsSeenSoFar = [pointsSeenSoFar, pointID];
-            fid = fopen(strcat(filePath,'GT_GraphFile.graph'),'a');
+            fid = fopen(strcat(filePath,'icra18GT_GraphFile.graph'),'a');
             fprintf(fid,'%s %d %6f %6f %6f','VERTEX_POINT_3D',...
                 pointVertexID(pointVertexID(:,1)==pointID,2),...
                 unique3DPoints(2:end,pointID)');
@@ -88,7 +90,7 @@ for i = 1:28
             idx = find(unique3DPoints(1,:)==pointLabel);
             if ~staticPointWritten
                 pointsSeenSoFar = [pointsSeenSoFar, pointID];
-                fid = fopen(strcat(filePath,'GT_GraphFile.graph'),'a');
+                fid = fopen(strcat(filePath,'icra18GT_GraphFile.graph'),'a');
                 fprintf(fid,'%s %d %6f %6f %6f','VERTEX_POINT_3D',...
                     pointVertexID(pointVertexID(:,1)==pointID,2),...
                     unique3DPoints(2:end,idx(1))');
@@ -116,7 +118,7 @@ for j =1:size(uniqueLabels,1)
     for k=1:length(idx)-1
         point1VertexID = labels(idx(k),2);
         point2VertexID = labels(idx(k+1),2);
-        fid = fopen(strcat(filePath,'GT_GraphFile.graph'),'a');
+        fid = fopen(strcat(filePath,'icra18GT_GraphFile.graph'),'a');
         fprintf(fid,'%s %d %d %d','2POINTS_DataAssociation',point1VertexID,...
             point2VertexID, objID);
         fprintf(fid,'\n');

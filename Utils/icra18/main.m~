@@ -56,7 +56,7 @@ writeMeasurementsGraphFile(filePath)
 config = CameraConfig();
 setAppConfig(config); % copy same settings for error Analysis
 config.set('std2PointsSE3Motion', [0.1,0.1,0.1]');
-config.set('pointMotionMeasurement','Off')
+% config.set('pointMotionMeasurement','Off')
 config.set('groundTruthFileName','icra18GT_GraphFile.graph');
 config.set('measurementsFileName','icra18Measurement_GraphFile.graph');
 

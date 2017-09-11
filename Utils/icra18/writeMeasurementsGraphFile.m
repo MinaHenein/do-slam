@@ -50,7 +50,7 @@ for i = 1:28
         pointID = camerasLabelsPoints(row(j),3);
         assert(~isempty(cameraVertexID(cameraVertexID(:,1)==camID,2)))
         assert(~isempty(pointVertexID(pointVertexID(:,1)==pointID,2)))
-        fid = fopen(strcat(filePath,'Measurement_GraphFile.graph'),'a');
+        fid = fopen(strcat(filePath,'icra18Measurement_GraphFile.graph'),'a');
         fprintf(fid,'%s %d %d %6f %6f %6f %6f %6f %6f %6f %6f %6f','EDGE_3D',...
             cameraVertexID(cameraVertexID(:,1)==camID,2),...
             pointVertexID(pointVertexID(:,1)==pointID,2),pointMeas, pointMeasCov);
@@ -70,9 +70,9 @@ for i = 1:28
         odometryMeasCov = h(line,7:end);
         assert(~isempty(cameraVertexID(cameraVertexID(:,1)==pose1ID,2)))
         assert(~isempty(cameraVertexID(cameraVertexID(:,1)==pose2ID,2)))
-        fid = fopen(strcat(filePath,'Measurement_GraphFile.graph'),'a');
+        fid = fopen(strcat(filePath,'icra18Measurement_GraphFile.graph'),'a');
         format =  strcat('%s %d %d',repmat(' %6f',1,6),repmat(' %6f',1,21));
-        fprintf(fid,format,'EDGE_LOG_SE3',...
+        fprintf(fid,format,'EDGE_R3_SO3',...
             cameraVertexID(cameraVertexID(:,1)==pose1ID,2),...
             cameraVertexID(cameraVertexID(:,1)==pose2ID,2),...
             odometryMeas,odometryMeasCov);
@@ -97,7 +97,7 @@ for j =1:size(uniqueLabels,1)
     for k=1:length(idx)-1
         point1VertexID = labels(idx(k),2);
         point2VertexID = labels(idx(k+1),2);
-        fid = fopen(strcat(filePath,'Measurement_GraphFile.graph'),'a');
+        fid = fopen(strcat(filePath,'icra18Measurement_GraphFile.graph'),'a');
         fprintf(fid,'%s %d %d %d','2POINTS_DataAssociation',point1VertexID,...
             point2VertexID, objID);
         fprintf(fid,'\n');

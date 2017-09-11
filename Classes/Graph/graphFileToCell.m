@@ -124,7 +124,8 @@ while ischar(tline)
         case config.pointSE3MotionEdgeLabel
             if strcmp(config.motionModel,'constantSE3')
                 lineCell = {label,[],values(1:2),values(3),values(4:7)',values(8:17)'};
-            elseif strcmp(config.motionModel,'constantSE3Motion')
+            elseif strcmp(config.motionModel,'constantSE3Motion') || ...
+                    strcmp(config.motionModel,'constantSE3MotionDA')
                 lineCell = {label,[],values(1:2),values(3),values(4:6)',values(7:12)'};
             end
             %store
