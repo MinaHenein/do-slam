@@ -8,7 +8,7 @@ clear all
 
 %% 1. Config
 % time
-nSteps = 121;
+nSteps = 601;
 t0 = 0;
 tN = 120;
 dt = (tN-t0)/(nSteps-1);
@@ -45,11 +45,9 @@ primitive2Motion_R3xso3 = [-1*dt; 0; 0; arot(eul2rot([-0.1*dt,0,0]))];
 robotTrajectory = PositionModelPoseTrajectory(robotWaypoints,'R3','smoothingspline');
 primitive1Trajectory = ConstantMotionDiscretePoseTrajectory(t,primitive1InitialPose_R3xso3,primitive1Motion_R3xso3,'R3xso3');
 primitive2Trajectory = ConstantMotionDiscretePoseTrajectory(t,primitive2InitialPose_R3xso3,primitive2Motion_R3xso3,'R3xso3');
-constantSE3Object1Motion = primitive1Trajectory.RelativePoseGlobalFrameSE3(t(1),t(2));
-constantSE3Object2Motion = primitive2Trajectory.RelativePoseGlobalFrameSE3(t(1),t(2));
-constantSE3ObjectMotion = [[constantSE3Object1Motion(1:3,4);...
-    arot(constantSE3Object1Motion(1:3,1:3))],...
-    [constantSE3Object2Motion(1:3,4);arot(constantSE3Object2Motion(1:3,1:3))]];
+constantSE3ObjectMotion = [];
+constantSE3ObjectMotion(:,1) = primitive1Trajectory.RelativePoseGlobalFrameR3xso3(t(1),t(2));
+constantSE3ObjectMotion = primitive2Trajectory.RelativePoseGlobalFrameR3xso3(t(1),t(2));
 
 environment = Environment();
 environment.addEllipsoid([0.5 0.5 0.8],8,'R3',primitive1Trajectory);
@@ -78,9 +76,9 @@ viewPoint = [-35,35];
 axisLimits = [-30,30,-5,30,-2,2];
 % title('Environment')
 axis equal
-xlabel('x')
-ylabel('y')
-zlabel('z')
+xlabel('x (m)')
+ylabel('y (m)')
+zlabel('z (m)')
 view(viewPoint)
 axis(axisLimits)
 hold on
@@ -92,10 +90,10 @@ frames = sensor.plot(t,environment);
 % implay(frames);
 
     %% 4.a output video
-% v = VideoWriter('Data/Videos/App6_sensor_environment.mp4','MPEG-4');
-% open(v)
-% writeVideo(v,frames);
-% close(v)
+v = VideoWriter('Data/Videos/App6_sensor_environment.mp4','MPEG-4');
+open(v)
+writeVideo(v,frames);
+close(v)
 
 %% 5. Generate Measurements & Save to Graph File
 sensor.generateMeasurements(config);
@@ -147,9 +145,9 @@ subplot(1,2,2)
 spy(solverEnd.systems(end).H)
 
 h = figure; 
-xlabel('x')
-ylabel('y')
-zlabel('z')
+xlabel('x (m)')
+ylabel('y (m)')
+zlabel('z (m)')
 hold on
 view([-50,25])
 %plot groundtruth

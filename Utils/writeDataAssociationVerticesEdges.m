@@ -27,7 +27,7 @@ fclose(fileID);
 IndexC = strfind(CStr, 'DataAssociation');
 Index = find(~cellfun('isempty', IndexC));
 DataAssociation = CStr(Index);
-tempFilePath = '/home/mina/workspace/src/Git/do-slam/temp.txt';
+tempFilePath = 'Data/Temp/rearrangeVertices.txt';
 tempFileID = fopen(tempFilePath,'w');
 for i=1:numel(DataAssociation)
     fprintf(tempFileID,[DataAssociation{i} '\n']);
@@ -48,7 +48,7 @@ for i=1:size(c,1)
         c(i,1),c(i,2),c(i,3));
 end
 fclose(fileID);
-delete /home/mina/workspace/src/Git/do-slam/temp.txt;
+delete /Data/Temp/rearrangeVertices.txt;
 
 fileID = fopen(filepath,'r');
 Data = textscan(fileID,'%s','delimiter','\n','whitespace',' ');

@@ -34,9 +34,7 @@ primitiveMotion_R3xso3 = [0.6*dt; 0; 0; arot(eul2rot([0.035*dt,0,0.001*dt]))];
 % construct trajectories
 robotTrajectory = PositionModelPoseTrajectory(robotWaypoints,'R3','smoothingspline');
 primitiveTrajectory = ConstantMotionDiscretePoseTrajectory(t,primitiveInitialPose_R3xso3,primitiveMotion_R3xso3,'R3xso3');
-constantSE3Object1Motion = primitiveTrajectory.RelativePoseGlobalFrameSE3(t(1),t(2));
-constantSE3ObjectMotion = [constantSE3Object1Motion(1:3,4);...
-    arot(constantSE3Object1Motion(1:3,1:3))];
+constantSE3ObjectMotion = primitiveTrajectory.RelativePoseGlobalFrameR3xso3(t(1),t(2));
 
 environment = Environment();
 environment.addEllipsoid([1 1 2],12,'R3',primitiveTrajectory);

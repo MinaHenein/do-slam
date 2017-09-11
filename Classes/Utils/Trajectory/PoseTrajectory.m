@@ -75,6 +75,16 @@ classdef PoseTrajectory < Trajectory
             relativePose = pose2.AbsoluteToRelativePose(pose1);
             value = pose1.RelativePoseGlobalFrameSE3(relativePose);
         end
+        
+        function value = RelativePoseGlobalFrameLogSE3(self,varargin)
+            relativePoseGlobalFrameSE3 = self.RelativePoseGlobalFrameSE3(varargin{1},varargin{2});
+            value = LogSE3(relativePoseGlobalFrameSE3);
+        end
+        
+        function value = RelativePoseGlobalFrameR3xso3(self,varargin)
+            relativePoseGlobalFrameSE3 = self.RelativePoseGlobalFrameSE3(varargin{1},varargin{2});
+            value = [relativePoseGlobalFrameSE3(1:3,4); arot(relativePoseGlobalFrameSE3(1:3,1:3))];
+        end
     end
     
     % Plotting
