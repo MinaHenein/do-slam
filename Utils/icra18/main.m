@@ -34,6 +34,7 @@ save('synchronisedData','synchronisedData');
 
 % V- write odometry measurements
 writeOdomMeas(odomMeas, imuMeas, synchronisedData)
+% writeOdomMeas2() % obtained from GT data + noise
 
 % VI-
 %% GT & Measurements Graph Files
@@ -70,17 +71,16 @@ writeMeasurementsGraphFile(filePath)
 config = CameraConfig();
 setAppConfig(config); % copy same settings for error Analysis
 config.set('std2PointsSE3Motion', [0.1,0.1,0.1]');
-config.set('pointMotionMeasurement','Off')
-config.set('groundTruthFileName','icra18GT_GraphFile.graph');
-config.set('measurementsFileName','icra18Measurement_GraphFile.graph');
+config.set('groundTruthFileName','icra18GT_GraphFile2.graph');
+config.set('measurementsFileName','icra18Measurement_GraphFile2.graph');
 
-% obj1FilePath = '/home/mina/workspace/src/Git/do-slam/Utils/icra18/obj1Groundtruth.txt';
-% constantSE3Object1Motion = getSE3MotionVertexValue(obj1FilePath);
-% obj2FilePath = '/home/mina/workspace/src/Git/do-slam/Utils/icra18/obj2Groundtruth.txt';
-% constantSE3Object2Motion = getSE3MotionVertexValue(obj2FilePath);
-% constantSE3ObjectMotion = [constantSE3Object1Motion,...
-%     constantSE3Object2Motion];
-% writeDataAssociationVerticesEdges(config,constantSE3ObjectMotion);
+obj1FilePath = '/home/mina/workspace/src/Git/do-slam/Utils/icra18/obj1Groundtruth.txt';
+constantSE3Object1Motion = getSE3MotionVertexValue(obj1FilePath);
+obj2FilePath = '/home/mina/workspace/src/Git/do-slam/Utils/icra18/obj2Groundtruth.txt';
+constantSE3Object2Motion = getSE3MotionVertexValue(obj2FilePath);
+constantSE3ObjectMotion = [constantSE3Object1Motion,...
+    constantSE3Object2Motion];
+writeDataAssociationVerticesEdges(config,constantSE3ObjectMotion);
 
 % VIII-
 groundTruthCell  = graphFileToCell(config,config.groundTruthFileName);
@@ -97,7 +97,7 @@ fprintf('\nTotal time solving: %f\n',totalTime)
 graph0  = solverEnd.graphs(1);
 graphN  = solverEnd.graphs(end);
 fprintf('\nChi-squared error: %f\n',solverEnd.systems(end).chiSquaredError)
-graphN.saveGraphFile(config,'icra18_results.graph');
+graphN.saveGraphFile(config,'icra18_results2.graph');
 
 % X- Error analysis
 graphGT = Graph(config,groundTruthCell);
@@ -117,5 +117,5 @@ zlabel('z')
 hold on
 view([-50,25])
 plotGraphFile(config,groundTruthCell,[0 0 1]);
-resultsCell = graphFileToCell(config,'icra18_results.graph');
+resultsCell = graphFileToCell(config,'icra18_results2.graph');
 plotGraphFile(config,resultsCell,[1 0 0])

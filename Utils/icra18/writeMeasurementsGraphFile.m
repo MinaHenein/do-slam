@@ -29,13 +29,10 @@ b = cell2mat(a(5:end));
 fclose(fid);
 
 fid = fopen(strcat(filePath,'odometryMeasGraphFile.txt'));
-format = repmat('%s ',1,31);
+format = strcat('%s %d %d',repmat('%f ',1,27));
 g = textscan(fid,format,'delimiter',' ');
 fclose(fid);
-for i = 5:size(g,2)
-    h(:,i-4) = str2double(cellstr(g{i}));
-end
-
+h = cell2mat(g(4:end));
 
 pointsSeenSoFar = [];
 
