@@ -6,32 +6,44 @@
     % $ rostopic echo /mobile_base/sensors/imu_data >> imu.txt
     % $ rosbag play <rosbag_name.bag>
     
-% II- run the matlab script writeOdomMeas.m
-writeOdomMeas()
-filePath = '/home/mina/workspace/src/Git/do-slam/Utils/icra18/odometryMeasGraphFile.txt';
-modifyOdometryFile(filePath,51)
+% II- run the matlab script getOdomIMUTimeStamp & getOdomIMUMeas.m
+getOdomIMUTimeStamp()
+[odomMeas,imuMeas] = getOdomIMUMeas();
 
 % III- in a new terminal
     % $ cd catkin_ws/
     % $ catkin_make
     % $ source devel/setup.bash
     % $ rosrun depth_extraction extract_depth_images.py
-    
-% III- in a different terminal
-    % $ roscore 
-    % $ rosbag play <rosbag_name.bag>
+    % save rgbTimeStamp & depthTimeStamp as .mat 
+    % - in a different terminal
+        % $ roscore 
+        % $ rosbag play <rosbag_name.bag>
 
-% IV-
+% IV- sunchronise Data
+load('rgbTimeStamp');
+rgbTimeStamp = rgbTimeStamp(3:30,1);
+load('odomTimeStamp');
+load('imuTimeStamp');
+load('GTCameraPoseTimeStamp');
+load('GTObj1PoseTimeStamp');
+load('GTObj2PoseTimeStamp');
+synchronisedData = synchroniseROSVICONData(rgbTimeStamp,odomTimeStamp,imuTimeStamp,...
+    GTCameraPoseTimeStamp,GTObj1PoseTimeStamp,GTObj2PoseTimeStamp);
+
+% V- write odometry measurements
+writeOdomMeas(odomMeas, imuMeas, synchronisedData)
+
+% VI-
 %% GT & Measurements Graph Files
-n = 51;
 VICONFilePath = '/home/mina/Downloads/icra18/VICON/';
-writeVICONGroundtruth(VICONFilePath,'robot.txt')
-filePath = '/home/mina/workspace/src/Git/do-slam/Utils/icra18/';
-modifyGTFile(strcat(filePath,'cameraGroundtruth.txt'),n)
-writeVICONGroundtruth(VICONFilePath,'obj1.txt')
-modifyGTFile(strcat(filePath,'obj1Groundtruth.txt'),n)
-writeVICONGroundtruth(VICONFilePath,'obj2.txt')
-modifyGTFile(strcat(filePath,'obj2Groundtruth.txt'),n)
+robotGTPoses = getVICONGroundtruth(VICONFilePath,'robot.txt');
+obj1GTPoses = getVICONGroundtruth(VICONFilePath,'obj1.txt');
+obj2GTPoses = getVICONGroundtruth(VICONFilePath,'obj2.txt');
+
+writeVICONGroundtruth('robot',robotGTPoses,synchronisedData)
+writeVICONGroundtruth('obj1',obj1GTPoses,synchronisedData)
+writeVICONGroundtruth('obj2',obj2GTPoses,synchronisedData)
 
 rgbImagesPath =  '/home/mina/Downloads/icra18/images/rgb/';
 depthImagesPath =  '/home/mina/Downloads//icra18/images/depth/';
@@ -48,11 +60,12 @@ save('pointsTurtlebotID','pointsTurtlebotID');
 save('pointsCameras','pointsCameras');
 writeLandmarkMeas(pointsMeasurements,pointsLabels,pointsCameras)
 
+filePath = '/home/mina/workspace/src/Git/do-slam/Utils/icra18/';
 unique3DPoints = extractUnique3DPoints(filePath);
 writeGroundtruthGraphFile(filePath,unique3DPoints)
 writeMeasurementsGraphFile(filePath)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% V-
+% VII-
 config = CameraConfig();
 setAppConfig(config); % copy same settings for error Analysis
 config.set('std2PointsSE3Motion', [0.1,0.1,0.1]');
@@ -60,17 +73,19 @@ config.set('std2PointsSE3Motion', [0.1,0.1,0.1]');
 config.set('groundTruthFileName','icra18GT_GraphFile.graph');
 config.set('measurementsFileName','icra18Measurement_GraphFile.graph');
 
-% constantSE3Object1Motion = [0.4534,0.0908,0.0002,0,0,0.12]';
-% constantSE3Object2Motion = [0.2833,0.3873,0.0006,0.0002,0.0001,-0.165]';
-% constantSE3ObjectMotion = [constantSE3Object1Motion,...
-%     constantSE3Object2Motion];
-% writeDataAssociationVerticesEdges(config,constantSE3ObjectMotion);
 
-% VI-
+filePath = '/home/mina/workspace/src/Git/do-slam/Utils/icra18/obj1Groundtruth.txt';
+constantSE3Object1Motion = getSeE#
+constantSE3Object2Motion = [0.2833,0.3873,0.0006,0.0002,0.0001,-0.165]';
+constantSE3ObjectMotion = [constantSE3Object1Motion,...
+    constantSE3Object2Motion];
+writeDataAssociationVerticesEdges(config,constantSE3ObjectMotion);
+
+% VIII-
 groundTruthCell  = graphFileToCell(config,config.groundTruthFileName);
 measurementsCell = graphFileToCell(config,config.measurementsFileName);
 
-% VII-
+% IX-
 timeStart = tic;
 graph0 = Graph();
 solver = graph0.process(config,measurementsCell,groundTruthCell);
@@ -83,11 +98,11 @@ graphN  = solverEnd.graphs(end);
 fprintf('\nChi-squared error: %f\n',solverEnd.systems(end).chiSquaredError)
 graphN.saveGraphFile(config,'icra18_results.graph');
 
-% VIII- Error analysis
+% X- Error analysis
 graphGT = Graph(config,groundTruthCell);
 results = errorAnalysis(config,graphGT,graphN);
 
-% IX- Plot
+% XI- Plot
 figure
 subplot(1,2,1)
 spy(solverEnd.systems(end).A)

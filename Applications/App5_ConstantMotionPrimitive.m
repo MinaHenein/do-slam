@@ -17,12 +17,13 @@ t  = linspace(t0,tN,nSteps);
 config = CameraConfig();
 config = setAppConfig(config); % copy same settings for error Analysis
 config.set('t',t);
-config.set('noiseModel','Off');
+% config.set('noiseModel','Off');
 config.set('groundTruthFileName','app5_groundTruth.graph');
 config.set('measurementsFileName','app5_measurements.graph');
 
 % SE3 Motion
 config.set('pointMotionMeasurement','point2DataAssociation');
+% config.set('pointMotionMeasurement','Off');
 config.set('motionModel','constantSE3MotionDA');
 config.set('std2PointsSE3Motion', [0.1,0.1,0.1]');
 
