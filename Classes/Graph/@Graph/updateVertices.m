@@ -6,7 +6,7 @@ for j = 1:obj.nVertices
     jBlock = blockMap(system,j,'vertex');
 %     if norm(dVertices(jBlock)) > 1e-4
         switch obj.vertices(j).type
-            case 'pose'
+            case {'pose','SE3Motion'}
                 obj.vertices(j).value = config.relativeToAbsolutePoseHandle(obj.vertices(j).value,dVertices(jBlock));
     %             obj.vertices(j).value = RelativeToAbsolutePose(obj.vertices(j).value,dVertices(jBlock));
     %             obj.vertices(j).value = Relative2AbsoluteSE3(obj.vertices(j).value,dVertices(jBlock));          
