@@ -48,7 +48,7 @@ for i=1:size(c,1)
         c(i,1),c(i,2),c(i,3));
 end
 fclose(fileID);
-delete /Data/Temp/rearrangeVertices.txt;
+delete Data/Temp/rearrangeVertices.txt;
 
 fileID = fopen(filepath,'r');
 Data = textscan(fileID,'%s','delimiter','\n','whitespace',' ');

@@ -17,12 +17,13 @@ t  = linspace(t0,tN,nSteps);
 config = CameraConfig();
 config = setAppConfig(config); % copy same settings for error Analysis
 config.set('t',t);
-config.set('noiseModel','Off');
+% config.set('noiseModel','Off');
 config.set('groundTruthFileName','app5_groundTruth.graph');
 config.set('measurementsFileName','app5_measurements.graph');
 
 % SE3 Motion
 config.set('pointMotionMeasurement','point2DataAssociation');
+% config.set('pointMotionMeasurement','Off');
 config.set('motionModel','constantSE3MotionDA');
 config.set('std2PointsSE3Motion', [0.1,0.1,0.1]');
 
@@ -32,7 +33,7 @@ if config.rngSeed
 end
 
 % construct primitive trajectory
-primitiveInitialPose_R3xso3 = [10 0 0 0 0 0]';
+primitiveInitialPose_R3xso3 = [10 0 0 0 0 0.2]';
 primitiveMotion_R3xso3 = [1.5*dt; 0; 0; arot(eul2rot([0.05*dt,0,0.005*dt]))];
 primitiveTrajectory = ConstantMotionDiscretePoseTrajectory(t,primitiveInitialPose_R3xso3,primitiveMotion_R3xso3,'R3xso3');
 
@@ -66,21 +67,22 @@ figure
 spy(sensor.get('pointVisibility'));
 
 %% 4. Plot Environment
-% figure
-% hold on
-% grid on
-% axis equal
-% viewPoint = [-50,25];
-% axisLimits = [-20,50,-10,70,-5,25];
-% axis equal
-% xlabel('x (m)')
-% ylabel('y (m)')
-% zlabel('z (m)')
-% view(viewPoint)
-% axis(axisLimits)
-% primitiveTrajectory.plot(t,[0 0 0],'axesOFF')
-% cameraTrajectory.plot(t,[0 1 1],'axesOFF')
-% frames = sensor.plot(t,environment);
+figure
+hold on
+grid on
+axis equal
+viewPoint = [-50,25];
+axisLimits = [-30,50,-10,60,-5,25];
+axis equal
+xlabel('x (m)')
+ylabel('y (m)')
+zlabel('z (m)')
+view(viewPoint)
+axis(axisLimits)
+primitiveTrajectory.plot(t,[0 0 0],'axesOFF')
+cameraTrajectory.plot(t,[0 0 1],'axesOFF')
+% set(gcf,'Position',[0 0 1024 768]);
+frames = sensor.plot(t,environment);
 % implay(frames);
 
 %% 4.a output video
@@ -130,7 +132,7 @@ results = errorAnalysis(config,graphGT,graphN);
 % fprintf('All to All Relative Point Squared Translation Error: %.4d \n',results.AARPTE_squared_translation_error)
 
 %% 10. Plot
-    %% 10.1 Plot intial, final and ground-truth solutions
+    %% 10.1 Plot initial, final and ground-truth solutions
 %no constraints
 figure
 subplot(1,2,1)

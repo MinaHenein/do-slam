@@ -16,11 +16,15 @@ t  = linspace(t0,tN,nSteps);
 
 config = CameraConfig();
 config = setAppConfig(config); % copy same settings for error Analysis
-config.set('std2PointsSE3Motion', [0.1,0.1,0.1]');
 config.set('t',t);
 % set motion model in setAppConfig function
 config.set('groundTruthFileName','app7_groundTruth.graph');
 config.set('measurementsFileName','app7_measurements.graph');
+
+% SE3 Motion
+config.set('pointMotionMeasurement','point2DataAssociation');
+config.set('motionModel','constantSE3MotionDA');
+config.set('std2PointsSE3Motion', [0.1,0.1,0.1]');
 
 %% 2. Generate Environment
 if config.rngSeed
@@ -28,7 +32,7 @@ if config.rngSeed
 end
 
 robotWaypoints = [linspace(0,tN,6); 0 10 15 20 15 10; 0 0 5 10 15 15; 0 0 1 2 4 2];
-primitiveInitialPose_R3xso3 = [10 0 3 0 0 0]';
+primitiveInitialPose_R3xso3 = [10 0 3 0 0 0.2]';
 primitiveMotion_R3xso3 = [0.6*dt; 0; 0; arot(eul2rot([0.035*dt,0,0.001*dt]))];
 
 % construct trajectories
@@ -62,8 +66,8 @@ sensor.setVisibility(config,environment);
 %% 4. Plot Environment
 figure
 viewPoint = [-50,25];
-axisLimits = [-10,30,-10,40,-5,20];
-title('Sensed Environment')
+axisLimits = [-15,30,-10,40,-5,20];
+% title('Sensed Environment')
 axis equal
 xlabel('x (m)')
 ylabel('y (m)')
@@ -73,15 +77,16 @@ axis(axisLimits)
 hold on
 grid on
 primitiveTrajectory.plot(t,[0 0 0],'axesOFF')
-cameraTrajectory.plot(t,[0 1 1],'axesOFF')
-frames = sensor.plot(t,environment);
+cameraTrajectory.plot(t,[0 0 1],'axesOFF')
+% set(gcf,'Position',[0 0 1024 768]);
+frames = sensor.plot(t(end),environment);
 % implay(frames);
 
     %% 4.a output video
-% v = VideoWriter('Data/Videos/App7_sensor_environment.mp4','MPEG-4');
-% open(v)
-% writeVideo(v,frames);
-% close(v)
+v = VideoWriter('Data/Videos/App7_sensor_environment.mp4','MPEG-4');
+open(v)
+writeVideo(v,frames);
+close(v)
 
 %% 5. Generate Measurements & Save to Graph File
 sensor.generateMeasurements(config);
@@ -93,7 +98,7 @@ groundTruthCell  = graphFileToCell(config,config.groundTruthFileName);
 measurementsCell = graphFileToCell(config,config.measurementsFileName);
 
 %% 7. Manual recreation of vertices
-initialCell = recreateInitialVertexes(config,measurementsCell,groundTruthCell);
+% initialCell = recreateInitialVertexes(config,measurementsCell,groundTruthCell);
 
 %% 8. Solve
 %no constraints

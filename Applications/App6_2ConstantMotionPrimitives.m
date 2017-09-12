@@ -86,14 +86,15 @@ grid on
 primitive1Trajectory.plot(t,[0 0 0],'axesOFF')
 primitive2Trajectory.plot(t,[0 0 0],'axesOFF')
 cameraTrajectory.plot(t,[0 0 1],'axesOFF')
+% set(gcf,'Position',[0 0 1024 768]);
 frames = sensor.plot(t,environment);
 % implay(frames);
 
     %% 4.a output video
-v = VideoWriter('Data/Videos/App6_sensor_environment.mp4','MPEG-4');
-open(v)
-writeVideo(v,frames);
-close(v)
+% v = VideoWriter('Data/Videos/App6_sensor_environment.mp4','MPEG-4');
+% open(v)
+% writeVideo(v,frames);
+% close(v)
 
 %% 5. Generate Measurements & Save to Graph File
 sensor.generateMeasurements(config);
@@ -149,6 +150,7 @@ xlabel('x (m)')
 ylabel('y (m)')
 zlabel('z (m)')
 hold on
+grid on
 view([-50,25])
 %plot groundtruth
 plotGraphFile(config,groundTruthCell,[0 0 1]);
