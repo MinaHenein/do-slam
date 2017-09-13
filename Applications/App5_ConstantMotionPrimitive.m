@@ -16,6 +16,8 @@ t  = linspace(t0,tN,nSteps);
 
 config = CameraConfig();
 config = setAppConfig(config); % copy same settings for error Analysis
+% config = setLowErrorAppConfig(config);
+% config = setHighErrorAppConfig(config);
 config.set('t',t);
 % config.set('noiseModel','Off');
 config.set('groundTruthFileName','app5_groundTruth.graph');
@@ -65,23 +67,23 @@ figure
 spy(sensor.get('pointVisibility'));
 
 %% 4. Plot Environment
-figure
-hold on
-grid on
-axis equal
-viewPoint = [-50,25];
-axisLimits = [-30,50,-10,60,-10,25];
-axis equal
-xlabel('x (m)')
-ylabel('y (m)')
-zlabel('z (m)')
-view(viewPoint)
-axis(axisLimits)
-primitiveTrajectory.plot(t,[0 0 0],'axesOFF')
-cameraTrajectory.plot(t,[0 0 1],'axesOFF')
-% set(gcf,'Position',[0 0 1024 768]);
-frames = sensor.plot(t,environment);
-% implay(frames);
+% figure
+% hold on
+% grid on
+% axis equal
+% viewPoint = [-50,25];
+% axisLimits = [-30,50,-10,60,-10,25];
+% axis equal
+% xlabel('x (m)')
+% ylabel('y (m)')
+% zlabel('z (m)')
+% view(viewPoint)
+% axis(axisLimits)
+% primitiveTrajectory.plot(t,[0 0 0],'axesOFF')
+% cameraTrajectory.plot(t,[0 0 1],'axesOFF')
+% % set(gcf,'Position',[0 0 1024 768]);
+% frames = sensor.plot(t,environment);
+% % implay(frames);
 
 %% 4.a output video
 % v = VideoWriter('Data/Videos/App5_sensor_environment.mp4','MPEG-4');
