@@ -41,7 +41,7 @@ objPtsRelative = {[0 1 0]',[1 -1 1]',[1 1 1]'};
 % applies relative motion - rotation of pi/6 radians per time step about z
 % axis and -pi/4 radians about y axis with linear translation of x = 1 and
 % y = 2
-objectPose = [5 0 0 0 0 0]'; % initial object pose - moved 5 forward on x axis
+objectPose = [5 0 0 0 0 -pi/3]'; % initial object pose - moved 5 forward on x axis
 rotationMatrix = rot([pi/6;-pi/4;0]);
 translationVector = [1;2;0];
 objectRelativePose = [translationVector; arot(rotationMatrix)];

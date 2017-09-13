@@ -2,9 +2,9 @@ function writeOdomMeas2()
 
 %odometry Meas Noise
 odomMu = [0,0,0,0,0,0]';
-odomSigma = [0.4,0.4,0.4,pi/30,pi/30,pi/30]'; %1 cm, pi/60rad or 3deg std
-odomCov = [0.16,0.0,0.0,0.0,0.0,0.0,0.16,0.0,0.0,0.0,0.0,0.16,0.0,...
-    0.0,0.0,pi^2/900,0.0,0.0,pi^2/900,0.0,pi^2/900];
+odomSigma = [0.04,0.04,0.04,pi/90,pi/90,pi/90]'; %4 cm, pi/90 rad or 2 deg std
+odomCov = [0.0016,0.0,0.0,0.0,0.0,0.0,0.0016,0.0,0.0,0.0,0.0,0.0016,0.0,...
+    0.0,0.0,pi^2/8100,0.0,0.0,pi^2/8100,0.0,pi^2/8100];
 
 filePath = '/home/mina/workspace/src/Git/do-slam/Utils/icra18/cameraGroundtruth.txt';
 fid = fopen(filePath);

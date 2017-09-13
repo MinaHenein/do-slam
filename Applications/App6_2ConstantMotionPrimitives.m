@@ -47,7 +47,7 @@ primitive1Trajectory = ConstantMotionDiscretePoseTrajectory(t,primitive1InitialP
 primitive2Trajectory = ConstantMotionDiscretePoseTrajectory(t,primitive2InitialPose_R3xso3,primitive2Motion_R3xso3,'R3xso3');
 constantSE3ObjectMotion = [];
 constantSE3ObjectMotion(:,1) = primitive1Trajectory.RelativePoseGlobalFrameR3xso3(t(1),t(2));
-constantSE3ObjectMotion = primitive2Trajectory.RelativePoseGlobalFrameR3xso3(t(1),t(2));
+constantSE3ObjectMotion(:,2) = primitive2Trajectory.RelativePoseGlobalFrameR3xso3(t(1),t(2));
 
 environment = Environment();
 environment.addEllipsoid([0.5 0.5 0.8],8,'R3',primitive1Trajectory);

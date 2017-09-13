@@ -1,7 +1,7 @@
 function writeLandmarkMeas(pointsMeasurements,pointsLabels,pointsCameras)
 
 disp('Writing landmarkMeasGraphFile ...');
-
+% 0.4 m
 pointMeasCov = [0.16 0.0 0.0 0.16 0.0 0.16];
 staticPointSeen = 0;
 nTimesStaticPoitnSeen = 0;

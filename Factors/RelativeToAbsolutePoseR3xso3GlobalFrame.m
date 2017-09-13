@@ -8,7 +8,7 @@ function posesAbsolute = RelativeToAbsolutePoseR3xso3GlobalFrame(posesOldFrame, 
 % inputs
     %poseOldFrame  = matrix of pose column vectors of old reference frame
     %posesRelative = matrix of relative pose column vectors, pose = [position; axis]
-    %defined in global frame unlike RelativeToAbsolutePoseR3xso3 wehre the
+    %defined in global frame unlike RelativeToAbsolutePoseR3xso3 where the
     %relative poses are defined w.r.t to poseOldFrame
 % output
     %posesAbsolute = matrix of absolute pose column vectors, pose = [position; axis]

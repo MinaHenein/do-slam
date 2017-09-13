@@ -31,8 +31,6 @@ for i = 1:28
     line = textscan(fid,'%s',1,'delimiter','\n','headerlines',camID-1);
     splitLine = strsplit(cell2mat(line{1,1}),' ');
     pose = str2double(splitLine(3:end));
-    pose(1) = pose(1)-0.1;
-    pose(3) = 0.31;
     fclose(fid);
     
     if(isempty(cameraVertexID))
