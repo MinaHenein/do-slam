@@ -8,7 +8,7 @@ clear all
 
 %% 1. Config
 % time
-nSteps = 601;
+nSteps = 121;
 t0 = 0;
 tN = 120;
 dt = (tN-t0)/(nSteps-1);
@@ -22,8 +22,6 @@ config.set('groundTruthFileName','app5_groundTruth.graph');
 config.set('measurementsFileName','app5_measurements.graph');
 
 % SE3 Motion
-config.set('pointMotionMeasurement','point2DataAssociation');
-% config.set('pointMotionMeasurement','Off');
 config.set('motionModel','constantSE3MotionDA');
 config.set('std2PointsSE3Motion', [0.1,0.1,0.1]');
 
@@ -72,7 +70,7 @@ hold on
 grid on
 axis equal
 viewPoint = [-50,25];
-axisLimits = [-30,50,-10,60,-5,25];
+axisLimits = [-30,50,-10,60,-10,25];
 axis equal
 xlabel('x (m)')
 ylabel('y (m)')
@@ -91,48 +89,67 @@ frames = sensor.plot(t,environment);
 % writeVideo(v,frames);
 % close(v)
 
-%% 5. Generate Measurements & Save to Graph File
-sensor.generateMeasurements(config);
+%% 5. Generate Measurements & Save to Graph File, load graph file as well
+
 config.set('constantSE3Motion',constantSE3ObjectMotion);
-writeDataAssociationVerticesEdges(config,constantSE3ObjectMotion);
+    %% 5.1 For initial (without SE3)
+    config.set('pointMotionMeasurement','Off')
+    config.set('measurementsFileName','app5_measurementsNoSE3.graph')
+    config.set('groundTruthFileName','app5_groundTruthNoSE3.graph')
+    sensor.generateMeasurements(config);
+    groundTruthNoSE3Cell = graphFileToCell(config,config.groundTruthFileName);
+    measurementsNoSE3Cell = graphFileToCell(config,config.measurementsFileName);
+    
+    %% 5.2 For test (with SE3)
+    config.set('pointMotionMeasurement','point2DataAssociation');
+    config.set('measurementsFileName','app5_measurements.graph');
+    config.set('groundTruthFileName','app5_groundTruth.graph');
+    sensor.generateMeasurements(config);
+    writeDataAssociationVerticesEdges(config,constantSE3ObjectMotion);
+    measurementsCell = graphFileToCell(config,config.measurementsFileName);
+    groundTruthCell  = graphFileToCell(config,config.groundTruthFileName);
 
-%% 6. load graph files
-groundTruthCell  = graphFileToCell(config,config.groundTruthFileName);
-measurementsCell = graphFileToCell(config,config.measurementsFileName);
+%% 6. Solve
+    %% 6.1 Without SE3
+    timeStart = tic;
+    initialGraph0 = Graph();
+    initialSolver = initialGraph0.process(config,measurementsNoSE3Cell,groundTruthNoSE3Cell);
+    initialSolverEnd = initialSolver(end);
+    totalTime = toc(timeStart);
+    fprintf('\nTotal time solving: %f\n',totalTime)
 
-%% 7. Manual recreation of vertices
-% initialCell = recreateInitialVertexes(config,measurementsCell,groundTruthCell);
+    %get desired graphs & systems
+    initialGraph0  = initialSolverEnd.graphs(1);
+    initialGraphN  = initialSolverEnd.graphs(end);
+    %save results to graph file
+    initialGraphN.saveGraphFile(config,'app5_resultsNoSE3.graph');
+    
+    %% 6.2 With SE3
+    %no constraints
+    timeStart = tic;
+    graph0 = Graph();
+    solver = graph0.process(config,measurementsCell,groundTruthCell);
+    solverEnd = solver(end);
+    totalTime = toc(timeStart);
+    fprintf('\nTotal time solving: %f\n',totalTime)
 
-%% 8. Solve
-%no constraints
-timeStart = tic;
-graph0 = Graph();
-solver = graph0.process(config,measurementsCell,groundTruthCell);
-solverEnd = solver(end);
-totalTime = toc(timeStart);
-fprintf('\nTotal time solving: %f\n',totalTime)
+    %get desired graphs & systems
+    graph0  = solverEnd.graphs(1);
+    graphN  = solverEnd.graphs(end);
+    %save results to graph file
+    graphN.saveGraphFile(config,'app5_results.graph');
 
-%get desired graphs & systems
-graph0  = solverEnd.graphs(1);
-graphN  = solverEnd.graphs(end);
-fprintf('\nChi-squared error: %f\n',solverEnd.systems(end).chiSquaredError)
-%save results to graph file
-graphN.saveGraphFile(config,'app5_results.graph');
-
-%% 9. Error analysis
+%% 7. Error analysis
 %load ground truth into graph, sort if required
+graphGTNoSE3 = Graph(config,groundTruthNoSE3Cell);
 graphGT = Graph(config,groundTruthCell);
-results = errorAnalysis(config,graphGT,graphN);
-% fprintf('Chi Squared Error: %.4d \n',solverEnd.systems.chiSquaredError)
-% fprintf('Absolute Trajectory Translation Error: %.4d \n',results.ATE_translation_error)
-% fprintf('Absolute Trajectory Rotation Error: %.4d \n',results.ATE_rotation_error)
-% fprintf('Absolute Structure Points Error: %d \n',results.ASE_translation_error);
-% fprintf('All to All Relative Pose Squared Translation Error: %.4d \n',results.AARPE_squared_translation_error)
-% fprintf('All to All Relative Pose Squared Rotation Error: %.4d \n',results.AARPE_squared_rotation_error)
-% fprintf('All to All Relative Point Squared Translation Error: %.4d \n',results.AARPTE_squared_translation_error)
+fprintf('\nInitial results for without SE(3) Transform:\n')
+resultsNoSE3 = errorAnalysis(config,graphGTNoSE3,initialGraphN);
+fprintf('\nFinal results for SE(3) Transform:\n')
+resultsSE3 = errorAnalysis(config,graphGT,graphN);
 
-%% 10. Plot
-    %% 10.1 Plot initial, final and ground-truth solutions
+%% 8. Plot
+    %% 8.1 Plot initial, final and ground-truth solutions
 %no constraints
 figure
 subplot(1,2,1)
@@ -146,9 +163,14 @@ ylabel('y (m)')
 zlabel('z (m)')
 hold on
 grid on
+axis equal
+axisLimits = [-30,50,-10,60,-15,25];
+axis(axisLimits)
 view([-50,25])
 %plot groundtruth
-plotGraphFile(config,groundTruthCell,[0 0 1]);
+plotGraphFileICRA(config,groundTruthCell,'groundTruth');
 %plot results
+resultsNoSE3Cell = graphFileToCell(config,'app5_resultsNoSE3.graph');
 resultsCell = graphFileToCell(config,'app5_results.graph');
-plotGraphFile(config,resultsCell,[1 0 0])
+plotGraphFileICRA(config,resultsNoSE3Cell,'initial')
+plotGraphFileICRA(config,resultsCell,'solverResults',resultsSE3.relPose.get('R3xso3Pose'),resultsSE3.posePointsN.get('R3xso3Pose'))

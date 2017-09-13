@@ -41,6 +41,11 @@ if isempty(self.pointVisibility)
     error('Visibility must be set first.');
 end
 
+%% 1.a Clear vertex Indexes
+for j=1:self.nPoints
+    self.get('points',j).clearIndex();
+end
+
 %% 2. Loop over timestep, simulate observations, write to graph file
 for i = 1:nSteps
     %sensor @ time t
@@ -291,12 +296,6 @@ for i = 1:nSteps
             end
         end
     end
-    
-%     for j = dynamiObjectIndexes
-%         continue
-%         % for dynamic objects
-%     end
-    
 end
 
 fclose(gtFileID);

@@ -1,4 +1,4 @@
-function plotGraphFileICRA(config,groundTruthCell,setting)
+function plotGraphFileICRA(config,groundTruthCell,setting,varargin)
 %PLOTGRAPHFILE Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -41,15 +41,21 @@ switch setting
         plotPoints = plot3(points(1,:),points(2,:),points(3,:),'g.');
         set(plotPoints,'MarkerSize',3)
     case 'solverResults'
+        relPose = varargin{1};
+        posePoints = varargin{2};
+        
         for i = 1:sum(poseVertices)
             iPose = poses(:,i);
             if strcmp(config.poseParameterisation,'SE3')
                 iPose = LogSE3_Rxt(iPose);
             end
+            iPose = RelativeToAbsolutePoseR3xso3(iPose,relPose);
             scale = 1;
             plotCoordinates(iPose(1:3,:),scale*rot(iPose(4:6,1))) % plots the trajectory as axes
         end
-        
+        for i=1:size(points,2)
+            points(:,i) = RelativeToAbsolutePositionR3xso3(posePoints,points(:,i));
+        end
         plotPoints = plot3(points(1,:),points(2,:),points(3,:),'b.');
         set(plotPoints,'MarkerSize',3)
     case 'initial'

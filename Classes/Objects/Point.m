@@ -36,6 +36,10 @@ classdef Point < ArrayGetSet
         function self = setSwitch(self,property,value)
         	self.(property) = value;
         end
+        
+        function self = clearIndex(self)
+            self.vertexIndex = [];
+        end
     end
     
 end

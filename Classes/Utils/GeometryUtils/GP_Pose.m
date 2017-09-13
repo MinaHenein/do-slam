@@ -31,8 +31,8 @@ classdef GP_Pose < GeometricPrimitive
                         case 'logSE3'
                             self.R3xso3Pose = LogSE3_Rxt(pose);
                         case 'SE3'
-                            R3xso3Pose(1:3,1) = P(1:3,4);
-                            R3xso3Pose(4:6,1) = pose(4:6,1);
+                            R3xso3Pose(1:3,1) = pose(1:3,4);
+                            R3xso3Pose(4:6,1) = arot(pose(1:3,1:3));
                             self.R3xso3Pose = R3xso3Pose;
                         otherwise
                             error('Error: invalid parameterisation')
