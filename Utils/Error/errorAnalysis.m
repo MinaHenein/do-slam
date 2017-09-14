@@ -36,7 +36,8 @@ for i= 1:size(pointsN,2)
     pointsN(1:3,i) = point(1:3,1);
 end
 
-
+posePointsN_SE3 = T_point;
+posePointsN = GP_Pose(T_point,'SE3');
 
 % %planes
 % planesN = [graphN.vertices(graphN.identifyVertices('plane')).value];
@@ -100,6 +101,10 @@ results.RPTE_translation_error              = RPTE_translation_error;
 results.RPTE_squared_translation_error      = RPTE_squared_translation_error;
 results.AARPTE_translation_error            = AARPTE_translation_error;
 results.AARPTE_squared_translation_error    = AARPTE_squared_translation_error;
+results.relPose = GP_Pose(v_rel_pose);
+results.posePointsN_SE3 = posePointsN_SE3;
+results.posePointsN = posePointsN;
+
 % results = [ATE_translation_error,ATE_rotation_error,...
 %     ATE_squared_translation_error,ATE_squared_rotation_error,...
 %     RPE_translation_error,RPE_rotation_error,...
