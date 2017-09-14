@@ -8,8 +8,10 @@ imuLine = fgetl(imuFileID);
 odomTimeStamped = 0;
 imuTimeStamped = 0;
 linearData = 0;
+odomAngularData = 0;
 angularData = 0;
 nextLineLinearData = 0;
+nextLineOdomAngularData = 0;
 nextLineAngularData = 0; 
 odomMeas = [];
 imuMeas = [];
@@ -37,13 +39,30 @@ while ischar(odomLine)
         linearData = 1;
     end
     
-    if odomTimeStamped && linearData
+    if length(odomLine)==13 && strcmp(odomLine(1:13),'    angular: ')
+        nextLineOdomAngularData = 1;
+    end
+    if length(odomLine)>9 && nextLineOdomAngularData && strcmp(odomLine(1:9),'      x: ')
+        odomwx = str2double(odomLine(10:end));
+    end
+    if length(odomLine)>9 && nextLineOdomAngularData && strcmp(odomLine(1:9),'      y: ')
+        odomwy = str2double(odomLine(10:end));
+    end
+    if length(odomLine)>9 && nextLineOdomAngularData && strcmp(odomLine(1:9),'      z: ')
+        odomwz = str2double(odomLine(10:end));
+        nextLineOdomAngularData = 0;
+        odomAngularData = 1;
+    end
+    
+    if odomTimeStamped && linearData && odomAngularData
         dt = odomTime - previousOdomTime;
-        odomMeas = [odomMeas;[odomTime,vx*dt,vy*dt,vz*dt]];
+        odomMeas = [odomMeas;[odomTime,vx*dt,vy*dt,vz*dt,odomwx*dt,odomwy*dt,odomwz*dt]];
         previousOdomTime = odomTime;
         odomTimeStamped = 0;
         linearData = 0;
+        odomAngularData = 0;
         nextLineLinearData = 0;
+        nextLineOdomAngularData = 0;
     end
     odomLine = fgetl(odomFileID);
 end
