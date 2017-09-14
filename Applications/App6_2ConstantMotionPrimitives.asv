@@ -31,10 +31,10 @@ if config.rngSeed
     rng(config.rngSeed); 
 end
 
-robotWaypoints = [linspace(0,tN,9); ...
-    0 0  25 25 0 0  -25 -25 0; ...
-    0 25 25 0  0 25 25  0   0; ...
-    1.5*ones(1,9)];
+robotWaypoints = [linspace(0,tN,17); ...
+    0 0    0  12.5 25 25    25 12.5 0 0     0   -12.5 -25 -25   -25 -12.5 0; ...
+    0 12.5 25 25   25 12.5  0  0    0 12.5  25   25    25 12.5   0   0    0; ...
+    1.5*ones(1,17)];
 primitive1InitialPose_R3xso3 = [-2.5 12.5 0.8 0 0 pi/2]';
 primitive1Motion_R3xso3 = [1*dt; 0; 0; arot(eul2rot([0.1*dt,0,0]))];
 
@@ -42,7 +42,7 @@ primitive2InitialPose_R3xso3 = [2.5 12.5 0.8 0 0 -pi/2]';
 primitive2Motion_R3xso3 = [-1*dt; 0; 0; arot(eul2rot([-0.1*dt,0,0]))];
 
 % construct trajectories
-robotTrajectory = PositionModelPoseTrajectory(robotWaypoints,'R3','smoothingspline');
+robotTrajectory = PositionModelPoseTrajectory(robotWaypoints,'R3','spline');
 primitive1Trajectory = ConstantMotionDiscretePoseTrajectory(t,primitive1InitialPose_R3xso3,primitive1Motion_R3xso3,'R3xso3');
 primitive2Trajectory = ConstantMotionDiscretePoseTrajectory(t,primitive2InitialPose_R3xso3,primitive2Motion_R3xso3,'R3xso3');
 constantSE3ObjectMotion = [];
@@ -91,10 +91,10 @@ frames = sensor.plot(t,environment);
 % implay(frames);
 
     %% 4.a output video
-v = VideoWriter('Data/Videos/App6_sensor_environment.mp4','MPEG-4');
-open(v)
-writeVideo(v,frames);
-close(v)
+% v = VideoWriter('Data/Videos/App6_sensor_environment.mp4','MPEG-4');
+% open(v)
+% writeVideo(v,frames);
+% close(v)
 
 %% 5. Generate Measurements & Save to Graph File, load graph file as well
 config.set('constantSE3Motion',constantSE3ObjectMotion);

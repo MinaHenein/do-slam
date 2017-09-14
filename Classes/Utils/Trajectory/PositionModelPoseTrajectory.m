@@ -83,7 +83,9 @@ classdef PositionModelPoseTrajectory < PoseTrajectory
             %assign orientation from velocity
             orientation = zeros(3,nPoses);
             for i = 1:nPoses
-                orientation(:,i) = assignOrientation(velocity(:,i));
+%                 orientation(:,i) = assignOrientation(velocity(:,i)); %
+%                 this function has errors, disabled for now
+                [~, orientation(:,i)] = attitude3D([0,0,0]',velocity(:,i));
             end
             %output is GP_Pose
             poses(nPoses) = GP_Pose();
