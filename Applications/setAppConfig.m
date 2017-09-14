@@ -72,10 +72,10 @@ orientation = arot(rot);
 config.set('stdPosePrior',[0.01,0.01,0.01,orientation(1),orientation(2),orientation(3)]');
 
 % set point prior error
-config.set('stdPointPrior',[0.01,0.01,0.01]');
+config.set('stdPointPrior',[0.02,0.02,0.02]');
 
 % set odometry error
-rot = eul2rot([pi/180,pi/180,pi/180]); % 1 degree position error
+rot = eul2rot([pi/90,pi/90,pi/90]); % 1 degree position error
 orientation = arot(rot);
 config.set('stdPosePose'  ,[0.04,0.04,0.04,orientation']');
 
@@ -98,6 +98,8 @@ config.set('automaticAngleConstraints',0);
 config.set('startPose','initial');
 %   static assumption
 config.set('staticAssumption',0);
+% data association
+config.set('staticDataAssociation','consistent');
 %   solver settings
 config.set('sortVertices',0);
 config.set('sortEdges',0);

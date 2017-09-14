@@ -59,6 +59,21 @@ switch setting
         plotPoints = plot3(points(1,:),points(2,:),points(3,:),'b.');
         set(plotPoints,'MarkerSize',3)
     case 'initial'
+        relPose = varargin{1};
+        posePoints = varargin{2};
+        
+        for i = 1:sum(poseVertices)
+            iPose = poses(:,i);
+            if strcmp(config.poseParameterisation,'SE3')
+                iPose = LogSE3_Rxt(iPose);
+            end
+            iPose = RelativeToAbsolutePoseR3xso3(iPose,relPose);
+            poses(:,i) = iPose;
+        end
+        
+        for i=1:size(points,2)
+            points(:,i) = RelativeToAbsolutePositionR3xso3(posePoints,points(:,i));
+        end
         plotPoses = plot3(poses(1,:),poses(2,:),poses(3,:),'Color','r','Marker','.','LineStyle','none');
         set(plotPoses,'MarkerSize',8);
         plotPoints = plot3(points(1,:),points(2,:),points(3,:),'r.');
