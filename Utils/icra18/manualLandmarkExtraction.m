@@ -15,7 +15,6 @@ for i= 1:nImages
     nLandmarks = input(prompt);
     points = zeros(nLandmarks,2);
     for j=1:size(points,1)
-        nPoints = nPoints+1;
         disp('Manually extract turtlebot landmark');
         [x,y] = ginput(1);
         points(j,:) = [x,y];
@@ -35,7 +34,7 @@ for i= 1:nImages
             continue
         end
         PCamera = PCamera*zCamera;
-        pointsMeasurements = [pointsMeasurements;PCamera];
+        pointsMeasurements = [pointsMeasurements,PCamera];
         pointsLabels = [pointsLabels;label];
         pointsTurtlebotID = [pointsTurtlebotID;turtlebotID];
         pointsCameras = [pointsCameras;frame];

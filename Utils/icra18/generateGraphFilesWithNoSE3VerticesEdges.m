@@ -13,7 +13,7 @@ Index2 = find(~cellfun('isempty', IndexC2));
 CStr(Index2) = [];
 
 % Save the file again:
-fileID = fopen(strcat(filePath,'2.graph'), 'w');
+fileID = fopen(strcat(filePath,'NOSE3.graph'), 'w');
 fprintf(fileID, '%s\n', CStr{:});
 fclose(fileID);
 
