@@ -56,8 +56,8 @@ writeVICONGroundtruth('obj1',obj1GTPoses,synchronisedData)
 writeVICONGroundtruth('obj2',obj2GTPoses,synchronisedData)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% VI- write odometry & landmark measurements
-odomSigma = [0.1,0.1,0.1,pi/30,pi/30,pi/30]';
-pointMeasSigma = [0.1,0.1,0.1];
+odomSigma = [0.04,0.04,0.04,pi/90,pi/90,pi/90]';
+pointMeasSigma = [0.2,0.2,0.2];
 
 odomCov = [odomSigma(1)^2,0.0,0.0,0.0,0.0,0.0,odomSigma(2)^2,0.0,0.0,0.0,0.0,...
     odomSigma(3)^2,0.0,0.0,0.0,odomSigma(4)^2,0.0,0.0,odomSigma(5)^2,0.0,odomSigma(6)^2];
@@ -77,7 +77,7 @@ writeMeasurementsGraphFile(filePath)
 %% VIII- config w/ SE3
 config = CameraConfig();
 setAppConfig(config); 
-config.set('std2PointsSE3Motion', [0.01,0.01,0.01]');
+config.set('std2PointsSE3Motion', [0.05,0.05,0.05]');
 config.set('groundTruthFileName','icra18GT_GraphFile.graph');
 config.set('measurementsFileName','icra18Measurement_GraphFile.graph');
 
@@ -121,7 +121,7 @@ hold on
 view([-50,25])
 plotGraphFile(config,groundTruthCell,[0 0 1]);
 resultsCell = graphFileToCell(config,'icra18_results.graph');
-plotGraphFile(config,resultsCell,[1 0 0])
+plotICRARealDataGraphFile(config,resultsCell,[1 0 0])
 
 %% VIII- config w/o SE3
 GTFilePath = '/home/mina/workspace/src/Git/do-slam/Data/GraphFiles/icra18GT_GraphFile';

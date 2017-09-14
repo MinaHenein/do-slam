@@ -56,14 +56,14 @@ writeVICONGroundtruth('obj1',obj1GTPoses,synchronisedData)
 writeVICONGroundtruth('obj2',obj2GTPoses,synchronisedData)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% VI- write odometry & landmark measurements
-odomSigma = [0.04,0.04,0.04,pi/18,pi/18,pi/18]'; %4 cm, pi/180rad or 1deg std
-pointMeasSigma = [0.04,0.04,0.04];
+odomSigma = [0.04,0.04,0.04,pi/90,pi/90,pi/90]';
+pointMeasSigma = [0.2,0.2,0.2];
 
 odomCov = [odomSigma(1)^2,0.0,0.0,0.0,0.0,0.0,odomSigma(2)^2,0.0,0.0,0.0,0.0,...
     odomSigma(3)^2,0.0,0.0,0.0,odomSigma(4)^2,0.0,0.0,odomSigma(5)^2,0.0,odomSigma(6)^2];
 % writeOdomMeas(odomMeas,imuMeas,synchronisedData,odomCov)
-writeOdomMeas2(odomSigma,odomCov) % obtained from GT data + noise
-% writeOdomMeas3(odomMeas,imuMeas,synchronisedData,odomCov) % integrating odometry measurement between intervals
+% writeOdomMeas2(odomSigma,odomCov) % obtained from GT data + noise
+writeOdomMeas3(odomMeas,imuMeas,synchronisedData,odomCov) % integrating odometry measurement between intervals
 pointMeasCov = [pointMeasSigma(1)^2 0.0 0.0 pointMeasSigma(2)^2 0.0 pointMeasSigma(3)^2];
 writeLandmarkMeas(pointsMeasurements,pointsLabels,pointsCameras,pointMeasCov)
 
@@ -76,8 +76,8 @@ writeMeasurementsGraphFile(filePath)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% VIII- config w/ SE3
 config = CameraConfig();
-setAppConfig(config); % copy same settings for error Analysis
-config.set('std2PointsSE3Motion', [0.01,0.01,0.01]');
+setAppConfig(config); 
+config.set('std2PointsSE3Motion', [0.05,0.05,0.05]');
 config.set('groundTruthFileName','icra18GT_GraphFile.graph');
 config.set('measurementsFileName','icra18Measurement_GraphFile.graph');
 
@@ -121,7 +121,7 @@ hold on
 view([-50,25])
 plotGraphFile(config,groundTruthCell,[0 0 1]);
 resultsCell = graphFileToCell(config,'icra18_results.graph');
-plotGraphFile(config,resultsCell,[1 0 0])
+plotICRARealDataGraphFile(config,resultsCell,[1 0 0])
 
 %% VIII- config w/o SE3
 GTFilePath = '/home/mina/workspace/src/Git/do-slam/Data/GraphFiles/icra18GT_GraphFile';
@@ -129,7 +129,7 @@ generateGraphFilesWithNoSE3VerticesEdges(GTFilePath);
 MeasFilePath = '/home/mina/workspace/src/Git/do-slam/Data/GraphFiles/icra18Measurement_GraphFile';
 generateGraphFilesWithNoSE3VerticesEdges(MeasFilePath);
 config = CameraConfig();
-setAppConfig(config); % copy same settings for error Analysis
+setAppConfig(config);
 config.set('groundTruthFileName','icra18GT_GraphFileNOSE3.graph');
 config.set('measurementsFileName','icra18Measurement_GraphFileNOSE3.graph');
 %% IX- solve w/o SE3
