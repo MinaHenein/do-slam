@@ -74,6 +74,10 @@ classdef Config < ArrayGetSet
         %static assumption
         staticAssumption
         
+        staticDataAssociation % this determines whether points are 
+        % always data associated or whether only between 2 time steps
+        % settings are 'On' meaning global data association or or 'Off'
+        
         %solver settings
         sortVertices
         sortEdges

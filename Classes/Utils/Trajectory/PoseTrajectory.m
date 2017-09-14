@@ -85,6 +85,7 @@ classdef PoseTrajectory < Trajectory
             relativePoseGlobalFrameSE3 = self.RelativePoseGlobalFrameSE3(varargin{1},varargin{2});
             value = [relativePoseGlobalFrameSE3(1:3,4); arot(relativePoseGlobalFrameSE3(1:3,1:3))];
         end
+        
     end
     
     % Plotting

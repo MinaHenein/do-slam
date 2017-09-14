@@ -15,9 +15,9 @@ dt = (tN-t0)/(nSteps-1);
 t  = linspace(t0,tN,nSteps);
 
 config = CameraConfig();
-config = setAppConfig(config); % copy same settings for error Analysis
+% config = setAppConfig(config); % copy same settings for error Analysis
 % config = setLowErrorAppConfig(config);
-% config = setHighErrorAppConfig(config);
+config = setHighErrorAppConfig(config);
 config.set('t',t);
 % config.set('noiseModel','Off');
 config.set('groundTruthFileName','app5_groundTruth.graph');
@@ -166,7 +166,7 @@ zlabel('z (m)')
 hold on
 grid on
 axis equal
-axisLimits = [-30,50,-10,60,-15,25];
+axisLimits = [-30,50,-10,60,-25,25];
 axis(axisLimits)
 view([-50,25])
 %plot groundtruth
@@ -174,5 +174,5 @@ plotGraphFileICRA(config,groundTruthCell,'groundTruth');
 %plot results
 resultsNoSE3Cell = graphFileToCell(config,'app5_resultsNoSE3.graph');
 resultsCell = graphFileToCell(config,'app5_results.graph');
-plotGraphFileICRA(config,resultsNoSE3Cell,'initial')
+plotGraphFileICRA(config,resultsNoSE3Cell,'initial',resultsNoSE3.relPose.get('R3xso3Pose'),resultsNoSE3.posePointsN.get('R3xso3Pose'))
 plotGraphFileICRA(config,resultsCell,'solverResults',resultsSE3.relPose.get('R3xso3Pose'),resultsSE3.posePointsN.get('R3xso3Pose'))

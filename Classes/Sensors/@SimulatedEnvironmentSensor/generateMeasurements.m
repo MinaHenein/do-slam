@@ -103,8 +103,17 @@ for i = 1:nSteps
                 label = config.pointVertexLabel;
                 index = jPoint.get('vertexIndex');
                 value = jPoint.get('R3Position',t(i));
+                writeVertex(label,index,value,gtFileID);        
+            elseif (i>1) && (~self.pointVisibility(j,i-1)) && strcmp(config.staticDataAssociation,'Off' )
+                label = config.pointVertexLabel;
+                vertexCount = vertexCount + 1;
+                vertexIndex = [jPoint.get('vertexIndex') vertexCount];
+                jPoint.set('vertexIndex',vertexIndex);
+                index = vertexIndex(end);
+                value = jPoint.get('R3Position',t(i));
                 writeVertex(label,index,value,gtFileID);
             end
+            
             %WRITE EDGE TO FILE
             label = config.posePointEdgeLabel;
             switch config.poseParameterisation
@@ -122,7 +131,8 @@ for i = 1:nSteps
             end
             covariance = config.covPosePoint;
             index1 = cameraVertexIndexes(i);
-            index2 = jPoint.get('vertexIndex');
+            vertexIndex = jPoint.get('vertexIndex');
+            index2 = vertexIndex(end);
 %             writeEdge(label,index1,index2,valueGT,covariance,gtFileID);
             writeEdge(label,index1,index2,valueMeas,covariance,mFileID);
         end
@@ -188,7 +198,7 @@ for i = 1:nSteps
                         pointMotion = GP_Point(valueGT);
                         pointMotionNoisy = pointMotion.addNoise(config.noiseModel,zeros(size(config.stdPointPoint)),config.stdPointPoint); 
                         valueMeas = pointMotionNoisy.get('R3Position');
-                        writeEdge(label,index1,index2,valueGT,covariance,gtFileID);
+%                         writeEdge(label,index1,index2,valueGT,covariance,gtFileID);
                         writeEdge(label,index1,index2,valueMeas,covariance,mFileID);
                     case 'point3Edge'
                         if (i > 2) && (self.pointVisibility(j,i-2)) % checks for second condition - whether last two were observed
@@ -207,7 +217,7 @@ for i = 1:nSteps
                             point3Motion = GP_Point(valueGT);
                             point3MotionNoisy = point3Motion.addNoise(config.noiseModel,zeros(size(config.std3Points)),config.std3Points);
                             valueMeas = point3MotionNoisy.get('R3Position');
-                            writeEdge(label,[index1 index2],index3,valueGT,covariance,gtFileID);
+%                             writeEdge(label,[index1 index2],index3,valueGT,covariance,gtFileID);
                             writeEdge(label,[index1 index2],index3,valueMeas,covariance,mFileID);
                         end
                     case 'velocity'
@@ -241,14 +251,14 @@ for i = 1:nSteps
                             valueMeas1_2 = velocityEdge1_2.get('R3Position');
                             velocityEdge2_3 = GP_Point(valueGT2_3).addNoise(config.noiseModel,zeros(size(config.std2PointsVelocity)),config.std2PointsVelocity);
                             valueMeas2_3 = velocityEdge2_3.get('R3Position');
-                            writeEdge(edgeLabel,[index1 index2],index3,valueGT1_2,covariance,gtFileID);
+%                             writeEdge(edgeLabel,[index1 index2],index3,valueGT1_2,covariance,gtFileID);
                             writeEdge(edgeLabel,[index1 index2],index3,valueMeas1_2,covariance,mFileID);
                             
                             % point @ time 2,3 - velocity
                             index1 = vertexIndexes(end-1);
                             index2 = vertexIndexes(end);
                             index3 = vertexCount;
-                            writeEdge(edgeLabel,[index1 index2],index3,valueGT2_3,covariance,gtFileID);
+%                             writeEdge(edgeLabel,[index1 index2],index3,valueGT2_3,covariance,gtFileID);
                             writeEdge(edgeLabel,[index1 index2],index3,valueMeas2_3,covariance,mFileID);
                         end
                     case 'Off'

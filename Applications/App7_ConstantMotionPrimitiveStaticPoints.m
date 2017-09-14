@@ -17,6 +17,8 @@ t  = linspace(t0,tN,nSteps);
 config = CameraConfig();
 config = setAppConfig(config); % copy same settings for error Analysis
 config.set('t',t);
+% config.set('staticDataAssociation','Off');
+config.set('staticDataAssociation','On');
 % set motion model in setAppConfig function
 % config.set('groundTruthFileName','app7_groundTruth.graph');
 % config.set('measurementsFileName','app7_measurements.graph');
@@ -68,23 +70,23 @@ figure
 spy(sensor.get('pointVisibility'));
 
 %% 4. Plot Environment
-figure
-viewPoint = [-50,25];
-axisLimits = [-15,30,-10,40,-5,20];
-% title('Sensed Environment')
-axis equal
-xlabel('x (m)')
-ylabel('y (m)')
-zlabel('z (m)')
-view(viewPoint)
-axis(axisLimits)
-hold on
-grid on
-primitiveTrajectory.plot(t,[0 0 0],'axesOFF')
-cameraTrajectory.plot(t,[0 0 1],'axesOFF')
-set(gcf,'Position',[0 0 1024 768]);
-frames = sensor.plot(t,environment);
-% implay(frames);
+% figure
+% viewPoint = [-50,25];
+% axisLimits = [-15,30,-10,40,-5,20];
+% % title('Sensed Environment')
+% axis equal
+% xlabel('x (m)')
+% ylabel('y (m)')
+% zlabel('z (m)')
+% view(viewPoint)
+% axis(axisLimits)
+% hold on
+% grid on
+% primitiveTrajectory.plot(t,[0 0 0],'axesOFF')
+% cameraTrajectory.plot(t,[0 0 1],'axesOFF')
+% set(gcf,'Position',[0 0 1024 768]);
+% frames = sensor.plot(t,environment);
+% % implay(frames);
 
     %% 4.a output video
 % v = VideoWriter('Data/Videos/App7_sensor_environment.mp4','MPEG-4');
@@ -168,12 +170,13 @@ zlabel('z (m)')
 hold on
 grid on
 axis equal
-% axis(axisLimits)
+axisLimits = [-10 30 0 40 -5 20];
+axis(axisLimits)
 view([-50,25])
 %plot groundtruth
 plotGraphFileICRA(config,groundTruthCell,'groundTruth');
 %plot results
 resultsNoSE3Cell = graphFileToCell(config,'app7_resultsNoSE3.graph');
 resultsCell = graphFileToCell(config,'app7_results.graph');
-plotGraphFileICRA(config,resultsNoSE3Cell,'initial')
+plotGraphFileICRA(config,resultsNoSE3Cell,'initial',resultsNoSE3.relPose.get('R3xso3Pose'),resultsNoSE3.posePointsN.get('R3xso3Pose'))
 plotGraphFileICRA(config,resultsCell,'solverResults',resultsSE3.relPose.get('R3xso3Pose'),resultsSE3.posePointsN.get('R3xso3Pose'))
