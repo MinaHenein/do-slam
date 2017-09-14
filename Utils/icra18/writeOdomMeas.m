@@ -1,9 +1,6 @@
-function writeOdomMeas(odomMeas, imuMeas, synchronisedData)
+function writeOdomMeas(odomMeas,imuMeas,synchronisedData,covariance)
 
 pose1ID = 1;
-covariance = [0.16 0.0 0.0 0.0 0.0 0.0 0.16 0.0 0.0 0.0 0.0 0.16 0.0 0.0...
-    0.0 0.00030625 0.0 0.0 0.00030625 0.0 0.00030625];
-
 for i=2:size(synchronisedData,1)
     
     odomDt = odomMeas(synchronisedData(i,2),1) - odomMeas(synchronisedData(i-1,2),1); 

@@ -26,7 +26,7 @@ d = edgeValue;
 J = zeros(length(edgeValue),length(SE3Motion));
 
 for j=1:dof
-    perturbedSE3Motion = config.relativeToAbsolutePoseHandle(SE3Motion,Eps(:,j)); 
+    perturbedSE3Motion = config.relativeToAbsolutePoseHandle(SE3Motion,Eps(:,j));     
     perturbedSE3MotionTransformationMatrix = ...
         [rot(perturbedSE3Motion(4:6)) perturbedSE3Motion(1:3);0 0 0 1];
     

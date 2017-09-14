@@ -1,10 +1,6 @@
-function writeOdomMeas3(odomMeas, imuMeas, synchronisedData)
+function writeOdomMeas3(odomMeas,imuMeas,synchronisedData,covariance)
 
 pose1ID = 1;
-% 0.04 m, 1 deg = 0.0175 rad 
-covariance = [0.0016 0.0 0.0 0.0 0.0 0.0 0.0016 0.0 0.0 0.0 0.0 0.0016 0.0 0.0...
-    0.0 0.00030625 0.0 0.0 0.00030625 0.0 0.00030625];
-
 for i=2:size(synchronisedData,1)
      
     dx = 0;
@@ -14,13 +10,13 @@ for i=2:size(synchronisedData,1)
     oy = 0;
     oz = 0;
     
-    odomDt = odomMeas(synchronisedData(i,2),1) - odomMeas(synchronisedData(i-1,2),1); 
-    imuDt =  imuMeas(synchronisedData(i,3),1) - imuMeas(synchronisedData(i-1,3),1);
+    %odomDt = odomMeas(synchronisedData(i,2),1) - odomMeas(synchronisedData(i-1,2),1); 
+    %imuDt =  imuMeas(synchronisedData(i,3),1) - imuMeas(synchronisedData(i-1,3),1);
     
     
     for j=synchronisedData(i-1,2)+1:synchronisedData(i,2)
         
-        %odomDt = odomMeas(j,1) - odomMeas(j-1,1);
+        odomDt = max(odomMeas(j,1)-odomMeas(j-1,1),0.2);
         
         vx = odomMeas(j-1,2);
         vy = odomMeas(j-1,3);
@@ -33,7 +29,7 @@ for i=2:size(synchronisedData,1)
     
     for k=synchronisedData(i-1,3)+1:synchronisedData(i,3)
         
-        %imuDt = imuMeas(k,1) - imuMeas(k-1,1);
+        imuDt = max(imuMeas(k,1)-imuMeas(k-1,1),0.2);
         
         wx = imuMeas(k-1,2);
         wy = imuMeas(k-1,3);
