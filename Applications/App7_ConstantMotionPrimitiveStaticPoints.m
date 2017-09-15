@@ -26,7 +26,7 @@ config.set('staticDataAssociation','On');
 % SE3 Motion
 % config.set('pointMotionMeasurement','point2DataAssociation');
 config.set('motionModel','constantSE3MotionDA');
-config.set('std2PointsSE3Motion', [0.1,0.1,0.1]');
+config.set('std2PointsSE3Motion', [0.05,0.05,0.05]');
 
 %% 2. Generate Environment
 if config.rngSeed
