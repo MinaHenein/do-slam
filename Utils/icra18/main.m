@@ -147,7 +147,7 @@ fprintf('\nChi-squared error: %f\n',solverEnd.systems(end).chiSquaredError)
 graphN.saveGraphFile(config,'icra18_resultsNoSE3.graph');
 %% X- Error analysis w/o SE3
 graphGT = Graph(config,groundTruthCell);
-results = errorAnalysis(config,graphGT,graphN);
+resultsNOSE3 = errorAnalysis(config,graphGT,graphN);
 %% XI- Plot w/o SE3
 figure
 subplot(1,2,1)
