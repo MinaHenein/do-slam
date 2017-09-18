@@ -30,6 +30,7 @@ K_Cam = [526.37013657, 0.00000000  , 313.68782938;
          0.00000000  , 0.00000000  , 1.00000000 ];
 [pointsMeasurements,pointsLabels,pointsTurtlebotID,pointsCameras] = ...
     manualLandmarkExtraction(rgbImagesPath,depthImagesPath, K_Cam);
+pointsMeasurements = reshape(pointsMeasurements,[3,138])';
 save('pointsMeasurements','pointsMeasurements');
 save('pointsLabels','pointsLabels');
 save('pointsTurtlebotID','pointsTurtlebotID');
@@ -65,14 +66,14 @@ odomCov = [odomSigma(1)^2,0.0,0.0,0.0,0.0,0.0,odomSigma(2)^2,0.0,0.0,0.0,0.0,...
 % writeOdomMeas2(odomSigma,odomCov) % obtained from GT data + noise
 writeOdomMeas3(odomMeas,imuMeas,synchronisedData,odomCov) % integrating odometry measurement between intervals
 pointMeasCov = [pointMeasSigma(1)^2 0.0 0.0 pointMeasSigma(2)^2 0.0 pointMeasSigma(3)^2];
-writeLandmarkMeas(pointsMeasurements,pointsLabels,pointsCameras,pointMeasCov)
+writeLandmarkMeas2(pointsMeasurements,pointsLabels,pointsCameras,pointMeasCov)
 
 %% VII- GT & Measurements Graph Files
 filePath = '/home/mina/workspace/src/Git/do-slam/Utils/icra18/';
-%unique3DPoints = extractUnique3DPoints(filePath);
+% unique3DPoints = extractUnique3DPoints2(filePath);
 load('unique3DPoints');
-writeGroundtruthGraphFile(filePath,unique3DPoints)
-writeMeasurementsGraphFile(filePath)
+writeGroundtruthGraphFile2(filePath,unique3DPoints)
+writeMeasurementsGraphFile2(filePath)
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %% VIII- config w/ SE3
 config = CameraConfig();
@@ -105,23 +106,23 @@ graphN.saveGraphFile(config,'icra18_results.graph');
 
 %% X- Error analysis w/ SE3
 graphGT = Graph(config,groundTruthCell);
-results = errorAnalysis(config,graphGT,graphN);
+resultsSE3 = errorAnalysis(config,graphGT,graphN);
 
 %% XI- Plot w/ SE3
-figure
-subplot(1,2,1)
-spy(solverEnd.systems(end).A)
-subplot(1,2,2)
-spy(solverEnd.systems(end).H)
-h = figure; 
-xlabel('x')
-ylabel('y')
-zlabel('z')
-hold on
-view([-50,25])
-plotGraphFile(config,groundTruthCell,[0 0 1]);
+% figure
+% subplot(1,2,1)
+% spy(solverEnd.systems(end).A)
+% subplot(1,2,2)
+% spy(solverEnd.systems(end).H)
+% h = figure; 
+% xlabel('x')
+% ylabel('y')
+% zlabel('z')
+% hold on
+% view([-50,25])
+% plotGraphFile(config,groundTruthCell,[0 0 1]);
 resultsCell = graphFileToCell(config,'icra18_results.graph');
-plotICRARealDataGraphFile(config,resultsCell,[1 0 0])
+% plotICRARealDataGraphFile(config,resultsCell,[1 0 0])
 
 %% VIII- config w/o SE3
 GTFilePath = '/home/mina/workspace/src/Git/do-slam/Data/GraphFiles/icra18GT_GraphFile';
@@ -147,7 +148,7 @@ fprintf('\nChi-squared error: %f\n',solverEnd.systems(end).chiSquaredError)
 graphN.saveGraphFile(config,'icra18_resultsNoSE3.graph');
 %% X- Error analysis w/o SE3
 graphGT = Graph(config,groundTruthCell);
-resultsNOSE3 = errorAnalysis(config,graphGT,graphN);
+resultsNoSE3 = errorAnalysis(config,graphGT,graphN);
 %% XI- Plot w/o SE3
 figure
 subplot(1,2,1)
@@ -163,3 +164,74 @@ view([-50,25])
 plotGraphFile(config,groundTruthCell,[0 0 1]);
 resultsCell = graphFileToCell(config,'icra18_resultsNoSE3.graph');
 plotGraphFile(config,resultsCell,[1 0 0])
+
+% %% different plot
+
+j = figure; 
+xlabel('x (m)')
+ylabel('y (m)')
+zlabel('z (m)')
+hold on
+grid on
+axis equal
+view([-50,25])
+%plot groundtruth
+plotGraphFileICRA(config,groundTruthCell,'groundTruth');
+%plot results
+resultsNoSE3Cell = graphFileToCell(config,'icra18_resultsNoSE3.graph');
+resultsCell = graphFileToCell(config,'icra18_results.graph');
+plotGraphFileICRA(config,resultsNoSE3Cell,'initial',...
+resultsNoSE3.relPose.get('R3xso3Pose'),resultsNoSE3.posePointsN.get('R3xso3Pose'))
+plotGraphFileICRA(config,resultsCell,'solverResults',...
+resultsSE3.relPose.get('R3xso3Pose'),resultsSE3.posePointsN.get('R3xso3Pose'))
+
+%% a third plot
+cameraFilePath = '/home/mina/workspace/src/Git/do-slam/Utils/icra18/cameraGroundtruth.txt';
+figure
+plotObjectGTPoses(cameraFilePath,[0 1 0])
+xlabel('x')
+ylabel('y')
+zlabel('z')
+grid on
+%axis equal
+hold on
+plotObjectGTPoses(obj1FilePath,'m')
+xlabel('x')
+ylabel('y')
+zlabel('z')
+grid on
+%axis equal
+hold on
+plotObjectGTPoses(obj2FilePath,'c')
+xlabel('x')
+ylabel('y')
+zlabel('z')
+grid on
+%axis equal
+view([0 0 1])
+hold on
+%% 1. get vertices and labels
+rowLengths = cellfun('length',resultsCell);
+vertexRows = (rowLengths==3);
+verticesCellTemp = resultsCell(vertexRows,:);
+verticesCell = cell(sum(vertexRows),3);
+for i = 1:sum(vertexRows)
+    verticesCell(i,:) = verticesCellTemp{i,:};
+end
+vertexLabels = verticesCell(:,1);
+poseVertices  = strcmp(vertexLabels,config.poseVertexLabel);
+poses  = [verticesCell{poseVertices,3}];
+plot3(poses(1,:),poses(2,:),poses(3,:),'Color','k','Marker','o','LineStyle','none');
+% for i = 1:sum(poseVertices)
+%     iPose = poses(:,i);
+%     scale = 0.3;
+%     plotCoordinates(iPose(1:3,:),scale*rot(iPose(4:6,1)))
+% end
+H1 = []';
+H2 = []';
+hold on
+plotObjectPoses(obj1FilePath,H1,'r')
+hold on
+plotObjectPoses(obj2FilePath,H2,'b')
+
+

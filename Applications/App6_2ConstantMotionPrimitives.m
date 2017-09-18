@@ -28,6 +28,9 @@ config.set('pointMotionMeasurement','point2DataAssociation');
 config.set('motionModel','constantSE3MotionDA');
 config.set('std2PointsSE3Motion', [0.05,0.05,0.05]');
 
+% config.set('sortVertices',1);
+% config.set('sortEdges', 1);
+
 %% 2. Generate Environment
 if config.rngSeed
     rng(config.rngSeed); 
@@ -160,10 +163,10 @@ resultsSE3 = errorAnalysis(config,graphGT,graphN);
     %% 8.1 Plot initial, final and ground-truth solutions
 %no constraints
 figure
-subplot(1,2,1)
-spy(solverEnd.systems(end).A)
-subplot(1,2,2)
 spy(solverEnd.systems(end).H)
+
+figure
+spy(chol(solverEnd.systems(end).H))
 
 h = figure; 
 xlabel('x (m)')

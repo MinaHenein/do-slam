@@ -37,9 +37,9 @@ planes = [verticesCell{planeVertices,3}];
 switch setting
     case 'groundTruth'
         plotPoses = plot3(poses(1,:),poses(2,:),poses(3,:),'Color','g','Marker','.','LineStyle','none');
-        set(plotPoses,'MarkerSize',8);
+        set(plotPoses,'MarkerSize',12);
         plotPoints = plot3(points(1,:),points(2,:),points(3,:),'g.');
-        set(plotPoints,'MarkerSize',3)
+        set(plotPoints,'MarkerSize',10)
     case 'solverResults'
         relPose = varargin{1};
         posePoints = varargin{2};
@@ -57,7 +57,7 @@ switch setting
             points(:,i) = RelativeToAbsolutePositionR3xso3(posePoints,points(:,i));
         end
         plotPoints = plot3(points(1,:),points(2,:),points(3,:),'b.');
-        set(plotPoints,'MarkerSize',3)
+        set(plotPoints,'MarkerSize',10)
     case 'initial'
         relPose = varargin{1};
         posePoints = varargin{2};
@@ -75,9 +75,9 @@ switch setting
             points(:,i) = RelativeToAbsolutePositionR3xso3(posePoints,points(:,i));
         end
         plotPoses = plot3(poses(1,:),poses(2,:),poses(3,:),'Color','r','Marker','.','LineStyle','none');
-        set(plotPoses,'MarkerSize',8);
+        set(plotPoses,'MarkerSize',12);
         plotPoints = plot3(points(1,:),points(2,:),points(3,:),'r.');
-        set(plotPoints,'MarkerSize',3)
+        set(plotPoints,'MarkerSize',10)
 end
 
 %% 7. plot planes

@@ -211,10 +211,10 @@ end
 %reorder vertices and edges
 measurementsCellCurrent = measurementsCell;
 if config.sortVertices
-    [obj,newToOldVertices,measurementsCellCurrent] = obj.sortVertices(measurementsCellCurrent);
+    [obj,newToOldVertices,measurementsCellCurrent] = sortVertices(obj,measurementsCellCurrent);
 end
 if config.sortEdges
-    [obj,newToOldEdges,measurementsCellCurrent] = obj.sortEdges(measurementsCellCurrent);
+    [obj,newToOldEdges,measurementsCellCurrent] = sortEdges(obj,measurementsCellCurrent);
 end
 
 %construct linear system, solve
@@ -223,10 +223,10 @@ solver = solver.solve(config,obj,measurementsCellCurrent);
 
 %undo reordering (so indexes will match GT)
 if config.sortEdges
-    [obj] = obj.unsortEdges(newToOldEdges);
+    [obj] = unsortEdges(obj,newToOldEdges);
 end
 if config.sortVertices
-    [obj] = obj.unsortVertices(newToOldVertices);
+    [obj] = unsortVertices(obj,newToOldVertices);
 end
 
 end

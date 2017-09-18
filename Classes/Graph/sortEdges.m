@@ -6,16 +6,20 @@ function [graph,newToOldMap,measurementsCellSorted] = sortEdges(graph,measuremen
 iPosePriorEdges     = graph.identifyEdges('posePrior');
 iPosePoseEdges      = graph.identifyEdges('pose-pose');
 iPosePointEdges     = graph.identifyEdges('pose-point');
-iPlanePriorEdges    = graph.identifyEdges('planePrior');
-iPointPlaneEdges    = graph.identifyEdges('point-plane');
-iAngleEdges         = graph.identifyEdges('plane-plane-angle');
-iDistanceEdges      = graph.identifyEdges('plane-plane-distance');
-iFixedAngleEdges    = graph.identifyEdges('plane-plane-fixedAngle');
-iFixedDistanceEdges = graph.identifyEdges('plane-plane-fixedDistance');
+% iPlanePriorEdges    = graph.identifyEdges('planePrior');
+% iPointPlaneEdges    = graph.identifyEdges('point-plane');
+% iAngleEdges         = graph.identifyEdges('plane-plane-angle');
+% iDistanceEdges      = graph.identifyEdges('plane-plane-distance');
+% iFixedAngleEdges    = graph.identifyEdges('plane-plane-fixedAngle');
+% iFixedDistanceEdges = graph.identifyEdges('plane-plane-fixedDistance');
+iPointMotionEdges = graph.identifyEdges('2points-SE3Motion');
 
-newToOldMap = [iPosePriorEdges; iPosePoseEdges; iPosePointEdges;...
-               iPlanePriorEdges; iPointPlaneEdges; iAngleEdges;...
-               iDistanceEdges; iFixedAngleEdges; iFixedDistanceEdges];
+
+% newToOldMap = [iPosePriorEdges; iPosePoseEdges; iPosePointEdges;...
+%                iPlanePriorEdges; iPointPlaneEdges; iAngleEdges;...
+%                iDistanceEdges; iFixedAngleEdges; iFixedDistanceEdges];
+newToOldMap = [iPosePriorEdges; iPosePoseEdges; iPosePointEdges;iPointMotionEdges];
+
 oldToNewMap = zeros(size(newToOldMap));
 for i = 1:graph.nEdges
     oldToNewMap(newToOldMap(i)) = i;

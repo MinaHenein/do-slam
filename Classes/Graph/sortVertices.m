@@ -5,9 +5,11 @@ function [graph,newToOldMap,measurementsCellSorted] = sortVertices(graph,measure
 %identify indexes
 iPoseVertices  = graph.identifyVertices('pose');
 iPointVertices = graph.identifyVertices('point');
-iPlaneVertices = graph.identifyVertices('plane');
+%iPlaneVertices = graph.identifyVertices('plane');
+iMotionVertices = graph.identifyVertices('SE3Motion');
 
-newToOldMap = [iPoseVertices; iPointVertices; iPlaneVertices];
+% newToOldMap = [iPoseVertices; iPointVertices; iPlaneVertices];
+newToOldMap = [iPoseVertices; iPointVertices;iMotionVertices];
 oldToNewMap = zeros(size(newToOldMap));
 for i = 1:graph.nVertices
     oldToNewMap(newToOldMap(i)) = i;

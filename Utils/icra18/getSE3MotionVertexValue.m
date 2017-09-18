@@ -6,6 +6,8 @@ g = textscan(fid,format,'delimiter',' ');
 fclose(fid);
 poses = cell2mat(g(3:end));
 
+%poses = poses(5:7,:);
+
 for i = 2:size(poses,1)
    relativePose = AbsoluteToRelativePoseR3xso3GlobalFrame(poses(i-1,:)',poses(i,:)');
    translations(:,i-1) = relativePose(1:3);
