@@ -42,11 +42,11 @@ constantSE3ObjectMotion = primitiveTrajectory.RelativePoseGlobalFrameR3xso3(t(1)
 
 sampleTimes = t(1:floor(numel(t)/5):numel(t));
 sampleWaypoints = primitiveTrajectory.get('R3xso3Pose',sampleTimes);
-robotWaypoints = [linspace(0,tN+3,7); 0 sampleWaypoints(1,:); 0 (sampleWaypoints(2,:)+0.1); 0 (sampleWaypoints(3,:)-0.1)];
+robotWaypoints = [linspace(0,tN+5,7); 0 sampleWaypoints(1,:); 0 (sampleWaypoints(2,:)+0.1); 0 (sampleWaypoints(3,:)-0.1)];
 robotTrajectory = PositionModelPoseTrajectory(robotWaypoints,'R3','smoothingspline');
 
 environment = Environment();
-environment.addEllipsoid([1 1 2],12,'R3',primitiveTrajectory);
+environment.addEllipsoid([1.25 1.25 3],12,'R3',primitiveTrajectory);
 nPoints = 50;
 environment.addStaticPoints([30*ones(1,nPoints); 40*rand(1,nPoints); 20*rand(1,nPoints)]);
 environment.addStaticPoints([30*rand(1,nPoints); 40*ones(1,nPoints); 20*rand(1,nPoints)]);
@@ -70,29 +70,29 @@ figure
 spy(sensor.get('pointVisibility'));
 
 %% 4. Plot Environment
-% figure
-% viewPoint = [-50,25];
-% axisLimits = [-15,30,-10,40,-5,20];
-% % title('Sensed Environment')
-% axis equal
-% xlabel('x (m)')
-% ylabel('y (m)')
-% zlabel('z (m)')
-% view(viewPoint)
-% axis(axisLimits)
-% hold on
-% grid on
-% primitiveTrajectory.plot(t,[0 0 0],'axesOFF')
-% cameraTrajectory.plot(t,[0 0 1],'axesOFF')
-% set(gcf,'Position',[0 0 1024 768]);
-% frames = sensor.plot(t,environment);
-% % implay(frames);
+figure
+viewPoint = [-50,25];
+axisLimits = [-15,30,-10,40,-5,20];
+% title('Sensed Environment')
+axis equal
+xlabel('x (m)')
+ylabel('y (m)')
+zlabel('z (m)')
+view(viewPoint)
+axis(axisLimits)
+hold on
+grid on
+primitiveTrajectory.plot(t,[0 0 0],'axesOFF')
+cameraTrajectory.plot(t,[0 0 1],'axesOFF')
+set(gcf,'Position',[0 0 1024 768]);
+frames = sensor.plot(t,environment);
+% implay(frames);
 
     %% 4.a output video
-% v = VideoWriter('Data/Videos/App7_sensor_environment.mp4','MPEG-4');
-% open(v)
-% writeVideo(v,frames);
-% close(v)
+v = VideoWriter('Data/Videos/App7_sensor_environment.mp4','MPEG-4');
+open(v)
+writeVideo(v,frames);
+close(v)
 
 %% 5. Generate Measurements & Save to Graph File, load graph file as well
 config.set('constantSE3Motion',constantSE3ObjectMotion);
@@ -170,7 +170,7 @@ zlabel('z (m)')
 hold on
 grid on
 axis equal
-axisLimits = [-10 30 0 40 -5 20];
+axisLimits = [-8 30 0 40 -5 20];
 axis(axisLimits)
 view([-50,25])
 %plot groundtruth

@@ -51,11 +51,11 @@ switch setting
             end
             iPose = RelativeToAbsolutePoseR3xso3(iPose,relPose);
             scale = 1;
-            plotCoordinates(iPose(1:3,:),scale*rot(iPose(4:6,1))) % plots the trajectory as axes
+            poses(:,i) = iPose;
+%             plotCoordinates(iPose(1:3,:),scale*rot(iPose(4:6,1))) % plots the trajectory as axes
         end
-        for i=1:size(points,2)
-            points(:,i) = RelativeToAbsolutePositionR3xso3(posePoints,points(:,i));
-        end
+        plotPoses = plot3(poses(1,:),poses(2,:),poses(3,:),'Color','b','Marker','.','LineStyle','none');
+        set(plotPoses,'MarkerSize',8);
         plotPoints = plot3(points(1,:),points(2,:),points(3,:),'b.');
         set(plotPoints,'MarkerSize',10)
     case 'initial'

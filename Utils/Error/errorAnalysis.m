@@ -160,12 +160,12 @@ results.posePointsN = posePointsN;
 % disp(X);
 
 %% debug
-fprintf('Absolute Trajectory Translation Error: %.4d \n',results.ATE_translation_error)
-fprintf('Absolute Trajectory Rotation Error: %.4d \n',results.ATE_rotation_error)
-fprintf('Absolute Structure Points Error: %d \n',results.ASE_translation_error);
-fprintf('All to All Relative Pose Translation Error: %.4d \n',results.AARPE_translation_error)
-fprintf('All to All Relative Pose Rotation Error: %.4d \n',results.AARPE_rotation_error)
-fprintf('All to All Relative Point Translation Error: %.4d \n',results.AARPTE_translation_error)
+fprintf('Absolute Trajectory Translation Error: %.3f \n',results.ATE_translation_error)
+fprintf('Absolute Trajectory Rotation Error: %.3f \n',results.ATE_rotation_error)
+fprintf('Absolute Structure Points Error: %.3f \n',results.ASE_translation_error);
+fprintf('All to All Relative Pose Translation Error: %.3f \n',results.AARPE_translation_error)
+fprintf('All to All Relative Pose Rotation Error: %.3f \n',results.AARPE_rotation_error)
+fprintf('All to All Relative Point Translation Error (e-3): %.3f \n',results.AARPTE_translation_error*1000)
 
 end
 

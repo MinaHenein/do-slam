@@ -36,15 +36,15 @@ if config.rngSeed
     rng(config.rngSeed); 
 end
 
-robotWaypoints = [linspace(0,tN,9); ...
-    0 0  25 25 0 0  -25 -25 0; ...
-    0 25 25 0  0 25 25  0   0; ...
-    1.5*ones(1,9)];
+robotWaypoints = [linspace(0,tN,10); ...
+    0 0  25 25 0 0    0  -25  -25 0; ...
+    0 25 25 0  0 12.5 25  25   0  0; ...
+    1.5*ones(1,10)];
 primitive1InitialPose_R3xso3 = [-2.5 12.5 0.8 0 0 pi/2]';
-primitive1Motion_R3xso3 = [1*dt; 0; 0; arot(eul2rot([0.1*dt,0,0]))];
+primitive1Motion_R3xso3 = [1.05*dt; 0; 0; arot(eul2rot([0.105*dt,0,0]))];
 
 primitive2InitialPose_R3xso3 = [2.5 12.5 0.8 0 0 -pi/2]';
-primitive2Motion_R3xso3 = [-1*dt; 0; 0; arot(eul2rot([-0.1*dt,0,0]))];
+primitive2Motion_R3xso3 = [-1.05*dt; 0; 0; arot(eul2rot([-0.105*dt,0,0]))];
 
 % construct trajectories
 robotTrajectory = PositionModelPoseTrajectory(robotWaypoints,'R3','smoothingspline');
@@ -55,8 +55,8 @@ constantSE3ObjectMotion(:,1) = primitive1Trajectory.RelativePoseGlobalFrameR3xso
 constantSE3ObjectMotion(:,2) = primitive2Trajectory.RelativePoseGlobalFrameR3xso3(t(1),t(2));
 
 environment = Environment();
-environment.addEllipsoid([0.5 0.5 0.8],8,'R3',primitive1Trajectory);
-environment.addEllipsoid([0.5 0.5 0.8],8,'R3',primitive2Trajectory);
+environment.addEllipsoid([1 1 2.5],8,'R3',primitive1Trajectory);
+environment.addEllipsoid([1 1 2.5],8,'R3',primitive2Trajectory);
 
 %% 3. Initialise Sensor
 cameraTrajectory = RelativePoseTrajectory(robotTrajectory,config.cameraRelativePose);
@@ -78,14 +78,14 @@ spy(sensor.get('pointVisibility'));
 %% 4. Plot Environment
 % figure
 % viewPoint = [-35,35];
-% axisLimits = [-30,30,-5,30,-2,2];
+% % axisLimits = [-30,30,-5,30,-2,2];
 % % title('Environment')
 % axis equal
 % xlabel('x (m)')
 % ylabel('y (m)')
 % zlabel('z (m)')
 % view(viewPoint)
-% axis(axisLimits)
+% % axis(axisLimits)
 % hold on
 % grid on
 % primitive1Trajectory.plot(t,[0 0 0],'axesOFF')
@@ -93,7 +93,7 @@ spy(sensor.get('pointVisibility'));
 % cameraTrajectory.plot(t,[0 0 1],'axesOFF')
 % set(gcf,'Position',[0 0 1024 768]);
 % frames = sensor.plot(t,environment);
-% % implay(frames);
+% % % implay(frames);
 
     %% 4.a output video
 % v = VideoWriter('Data/Videos/App6_sensor_environment.mp4','MPEG-4');
@@ -121,6 +121,8 @@ config.set('constantSE3Motion',constantSE3ObjectMotion);
     groundTruthCell  = graphFileToCell(config,config.groundTruthFileName);
 
 %% 6. Solve
+% config.set('sortVertices',1);
+% config.set('sortEdges',1);
     %% 6.1 Without SE3
     timeStart = tic;
     initialGraph0 = Graph();
@@ -175,8 +177,8 @@ zlabel('z (m)')
 hold on
 grid on
 axis equal
-% axisLimits = [-30,30,-5,30,-5,5];
-% axis(axisLimits)
+axisLimits = [-25,25,0,30,-5,15];
+axis(axisLimits)
 view([-50,25])
 %plot groundtruth
 plotGraphFileICRA(config,groundTruthCell,'groundTruth');
