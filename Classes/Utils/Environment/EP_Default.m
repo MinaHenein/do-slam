@@ -57,7 +57,7 @@ classdef EP_Default < EnvironmentPrimitive
         function handle = plot(self,t,varargin) %plots the primitive, provides the figure object handle
             meshPoints = self.get('meshPointsAbsolute',t).get('R3Position');
             meshLinks = self.get('meshLinks');
-            edgecolor = 'b';
+            edgecolor = 'g';
             if numel(varargin)>0
                 edgecolor = varargin{1};
             end

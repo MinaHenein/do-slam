@@ -53,7 +53,7 @@ end
 %% 6. plot points
 plotPoints = plot3(points(1,:),points(2,:),points(3,:),'.');
 set(plotPoints,'MarkerEdgeColor',graphColour)
-set(plotPoints,'MarkerSize',10)
+set(plotPoints,'MarkerSize',8)
 % set(plotPoints,'MarkerSize',8)
 axis equal
 %% 7. plot planes

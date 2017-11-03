@@ -9,8 +9,8 @@ config.set('noiseModel','Gaussian');
 config.set('poseParameterisation','R3xso3');
 
 %% select type of motion model - comment out the correct lines
-% config.set('pointMotionMeasurement','Off');
-% % 2 point edge
+config.set('pointMotionMeasurement','Off');
+% 2 point edge
 % config.set('pointMotionMeasurement','point2Edge')
 % config.set('stdPointPoint',[0.01 0.01 0.01]');
 
@@ -37,8 +37,8 @@ config.set('poseParameterisation','R3xso3');
 %     config.set('std2PointsVelocity',[0.01 0.01 0.01]');
 
 % SE3 Motion
-config.set('pointMotionMeasurement','point2DataAssociation');
-config.set('motionModel','constantSE3MotionDA');
+% config.set('pointMotionMeasurement','point2DataAssociation');
+% config.set('motionModel','constantSE3MotionDA');
 
 %% pose handles
 % temporarily changed function handles to public for setting
