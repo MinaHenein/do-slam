@@ -52,7 +52,7 @@ hold on;
 for j=1:size(objectPts,2)
     objectPts{j} = RelativeToAbsolutePositionR3xso3(objectPose,repmat(objectPts{j},1,nSteps));
 %     plot3(objPts{j}(1,:),objPts{j}(2,:),objPts{j}(3,:),'b.');
-    plot3(objectPts{j}(1,:),objectPts{j}(2,:),objectPts{j}(3,:),'k');
+%     plot3(objectPts{j}(1,:),objectPts{j}(2,:),objectPts{j}(3,:),'k');
 end
 
 % iPose = sensorPose(:,1);

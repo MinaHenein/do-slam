@@ -47,26 +47,26 @@ sensor.addEnvironment(environment);
 sensor.addCamera(config.fieldOfView,cameraTrajectory);
 sensor.setVisibility(config,environment);
 
-figure
-spy(sensor.get('pointVisibility'));
+% figure
+% spy(sensor.get('pointVisibility'));
 
 %% 4. Plot Environment
-figure
-hold on
-grid on
-axis equal
-viewPoint = [-50,25];
-axisLimits = [-10,30,-10,20,-5,20];
-axis equal
-xlabel('x')
-ylabel('y')
-zlabel('z')
-view(viewPoint)
-axis(axisLimits)
-primitiveTrajectory.plot(t,[0 0 0],'axesOFF')
-cameraTrajectory.plot(t,[0 1 1],'axesOFF')
-frames = sensor.plot(t,environment);
-implay(frames);
+% figure
+% hold on
+% grid on
+% axis equal
+% viewPoint = [-50,25];
+% axisLimits = [-5,30,-5,20,-5,20];
+% axis equal
+% xlabel('x')
+% ylabel('y')
+% zlabel('z')
+% view(viewPoint)
+% axis(axisLimits)
+% primitiveTrajectory.plot(t,[0 0 0],'axesOFF')
+% cameraTrajectory.plot(t,[0 1 1],'axesOFF')
+% frames = sensor.plot(t(1),environment);
+% % implay(frames);
 
     %% 4.a output video
     % add code here for that
@@ -79,12 +79,12 @@ groundTruthCell  = graphFileToCell(config,config.groundTruthFileName);
 measurementsCell = graphFileToCell(config,config.measurementsFileName);
 
 %% 7. Manual recreation of vertices
-[initialCell1, initialCell2] = recreateInitialVertexes(config,measurementsCell,groundTruthCell);
+% [initialCell1, initialCell2] = recreateInitialVertexes(config,measurementsCell,groundTruthCell);
 
-initialGraph1 = Graph().graphFileToGraph(config,initialCell1);
-initialGraph2 = Graph().graphFileToGraph(config,initialCell2);
-initialGraph1.saveGraphFile(config,'app4_initial1.graph');
-initialGraph2.saveGraphFile(config,'app4_initial2.graph');
+% initialGraph1 = Graph().graphFileToGraph(config,initialCell1);
+% initialGraph2 = Graph().graphFileToGraph(config,initialCell2);
+% initialGraph1.saveGraphFile(config,'app4_initial1.graph');
+% initialGraph2.saveGraphFile(config,'app4_initial2.graph');
 
 %% 8. Solve
 %no constraints
@@ -104,27 +104,28 @@ graphN.saveGraphFile(config,'app4_results.graph');
 %% 9. Error analysis
 %load ground truth into graph, sort if required
 graphGT = Graph(config,groundTruthCell);
-fprintf('Initial 1 error: \n');
-resultsInitial1 = errorAnalysis(config,graphGT,initialGraph1);
-fprintf('Initial 2 error: \n');
-resultsInitial2 = errorAnalysis(config,graphGT,initialGraph2);
-fprintf('Results error: \n');
+% fprintf('Initial 1 error: \n');
+% resultsInitial1 = errorAnalysis(config,graphGT,initialGraph1);
+% fprintf('Initial 2 error: \n');
+% resultsInitial2 = errorAnalysis(config,graphGT,initialGraph2);
+% fprintf('Results error: \n');
 results = errorAnalysis(config,graphGT,graphN);
 
 %% 10. Plot
     %% 10.1 Plot intial, final and ground-truth solutions
 %no constraints
-figure
-subplot(1,2,1)
-spy(solverEnd.systems(end).A)
-subplot(1,2,2)
-spy(solverEnd.systems(end).H)
+% figure
+% subplot(1,2,1)
+% spy(solverEnd.systems(end).A)
+% subplot(1,2,2)
+% spy(solverEnd.systems(end).H)
 
 h = figure; 
 xlabel('x')
 ylabel('y')
 zlabel('z')
 hold on
+grid on
 view([-50,25])
 %plot groundtruth
 plotGraphFile(config,groundTruthCell,[0 0 1]);

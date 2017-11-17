@@ -72,7 +72,7 @@ spy(sensor.get('pointVisibility'));
 %% 4. Plot Environment
 figure
 viewPoint = [-50,25];
-axisLimits = [-15,30,-10,40,-5,20];
+axisLimits = [-8 30 -5 40 -10 20];
 % title('Sensed Environment')
 axis equal
 xlabel('x (m)')
@@ -84,7 +84,7 @@ hold on
 grid on
 primitiveTrajectory.plot(t,[0 0 0],'axesOFF')
 cameraTrajectory.plot(t,[0 0 1],'axesOFF')
-set(gcf,'Position',[0 0 1024 768]);
+% set(gcf,'Position',[0 0 1024 768]);
 frames = sensor.plot(t,environment);
 % implay(frames);
 

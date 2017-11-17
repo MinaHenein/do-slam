@@ -26,12 +26,12 @@ if config.rngSeed
     rng(config.rngSeed); 
 end
 
-robotWaypoints = [0:2:tN; 0 10 15 20 15 10; 0 0 5 10 15 15; 0 0 1 2 4 2];
-primitiveWaypoints = [0:2:tN; 10 20 25 20 10 5; 0 0 10 15 15 15; 0 2 1 3 5 2];
+robotWaypoints = [0:2:tN; 0 10 15 20 25 30; 0 0 2 4 6 8; 0 0 2 3 4 4];
+primitiveWaypoints = [0:2:tN; 20 25 30 35 40 45; 0 2 4 6 8 10; 0 1 2 3 4 5];
 
 % construct trajectories
 robotTrajectory = PositionModelPoseTrajectory(robotWaypoints,'R3','smoothingspline');
-primitiveTrajectory = PositionModelPoseTrajectory(primitiveWaypoints,'R3','smoothingspline');
+primitiveTrajectory = PositionModelPoseTrajectory(primitiveWaypoints,'R3','linearinterp');
 robotPose = GP_Pose([5 0 0 0 0 0]);
 % robotTrajectory = RelativePoseTrajectory(primitiveTrajectory,robotPose);
 % primitive2Trajectory = PositionModelPoseTrajectory(primitiveWaypoints-1,'R3','smoothingspline');
@@ -45,37 +45,37 @@ environment.addEllipsoid([1 1 2],12,'R3',primitiveTrajectory);
 cameraTrajectory = RelativePoseTrajectory(robotTrajectory,config.cameraRelativePose);
 
 % standard sensor
-sensor = SimulatedEnvironmentSensor();
-sensor.addEnvironment(environment);
-sensor.addCamera(config.fieldOfView,cameraTrajectory);
-sensor.setVisibility(config);
-
-% occlusion sensor
-% sensor = SimulatedEnvironmentOcclusionSensor();
+% sensor = SimulatedEnvironmentSensor();
 % sensor.addEnvironment(environment);
 % sensor.addCamera(config.fieldOfView,cameraTrajectory);
-% sensor.setVisibility(config,environment);
+% sensor.setVisibility(config);
+
+% occlusion sensor
+sensor = SimulatedEnvironmentOcclusionSensor();
+sensor.addEnvironment(environment);
+sensor.addCamera(config.fieldOfView,cameraTrajectory);
+sensor.setVisibility(config,environment);
 
 % figure
-% spy(sensor.get('pointVisibility'));
+spy(sensor.get('pointVisibility'));
 
 %% 4. Plot Environment
-figure
-viewPoint = [-50,25];
-% axisLimits = [-10,50,-10,40,-1,10];
-title('Environment')
-axis equal
-xlabel('x')
-ylabel('y')
-zlabel('z')
-view(viewPoint)
-% axis(axisLimits)
-hold on
-grid on
-primitiveTrajectory.plot(t,[0 0 0],'axesOFF')
-cameraTrajectory.plot(t,[0 1 1],'axesOFF')
-frames = sensor.plot(t,environment);
-% implay(frames);
+% figure
+% viewPoint = [-50,25];
+% % axisLimits = [-10,50,-10,40,-1,10];
+% % title('Environment')
+% axis equal
+% xlabel('x')
+% ylabel('y')
+% zlabel('z')
+% view(viewPoint)
+% % axis(axisLimits)
+% hold on
+% grid on
+% primitiveTrajectory.plot(t,[0 0 0],'axesOFF')
+% cameraTrajectory.plot(t,[0 1 1],'axesOFF')
+% frames = sensor.plot(t(end),environment);
+% % implay(frames);
 
 %% 5. Generate Measurements & Save to Graph File
 sensor.generateMeasurements(config);
@@ -118,17 +118,17 @@ results = errorAnalysis(config,graphGT,graphN);
 %% 10. Plot
     %% 10.1 Plot intial, final and ground-truth solutions
 %no constraints
-figure
-subplot(1,2,1)
-spy(solverEnd.systems(end).A)
-subplot(1,2,2)
-spy(solverEnd.systems(end).H)
-
+% figure
+% subplot(1,2,1)
+% spy(solverEnd.systems(end).A)
+% subplot(1,2,2)
+% spy(solverEnd.systems(end).H)
 h = figure; 
+hold on
 xlabel('x')
 ylabel('y')
 zlabel('z')
-hold on
+grid on;
 view([-50,25])
 %plot groundtruth
 plotGraphFile(config,groundTruthCell,[0 0 1]);
