@@ -19,6 +19,7 @@ config = CameraConfig();
 % config = setLowErrorAppConfig(config);
 config = setHighErrorAppConfig(config);
 config.set('t',t);
+config.set('nSteps',nSteps);
 % config.set('noiseModel','Off');
 config.set('groundTruthFileName','app5_groundTruth.graph');
 config.set('measurementsFileName','app5_measurements.graph');

@@ -18,6 +18,7 @@ classdef Config < ArrayGetSet
     properties(GetAccess = 'public', SetAccess = 'protected')
         %array of time values when measurements are made
         t
+        nSteps
         
         % rng seed
         rngSeed
@@ -118,6 +119,7 @@ classdef Config < ArrayGetSet
         % general settings
         displayProgress
         plotPlanes
+        plotIncremental
         displaySPPARMS
         
         %files

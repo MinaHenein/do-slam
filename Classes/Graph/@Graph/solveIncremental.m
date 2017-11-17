@@ -1,10 +1,11 @@
-function [solver] = processIncremental(obj,config,measurementsCell,groundTruthCell)
-%PROCESSINCREMENTAL Incrementally processes measurements, builds linear
+function [solver] = solveIncremental(obj,config,measurementsCell,groundTruthCell)
+%SOLVEINCREMENTAL Incrementally processes measurements, builds linear
 %system and solves
 %   At each time step, measurements are processed and vertices and edges
 %   are added to the graph.
+%   With every new measurement, the system is incrementally optimised.
 %   When enough vertices or edges are added, OR a number of time steps have
-%   occurred, the system is optimised.
+%   occurred, the system is batch optimised.
 %   This repeats until all measurements have been processed
 
 %% 1. Plot incrementally
@@ -86,6 +87,10 @@ for i = 1:nSteps
                 obj = obj.constructPoseVertex(config,jRow);
                 %construct prior edge
                 obj = obj.constructPosePriorEdge(config,jRow);
+                % the new graph update
+                graphUpdate = Graph();
+                graphUpdate = graphUpdate.constructPoseVertex(config,jRow);
+                graphUpdate = graphUpdate.constructPosePriorEdge(config,jRow);
             case config.posePoseEdgeLabel %odometry
                 %edge index
                 jRow{2} = obj.nEdges+1;
@@ -168,12 +173,48 @@ for i = 1:nSteps
         end
         %construct edge
     end
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+    %incremental update
+    %reorder vertices and edges
+    measurementsCellCurrent = measurementsCell;
+    if config.sortVertices
+        [obj,newToOldVertices,measurementsCellCurrent] = obj.sortVertices(measurementsCellCurrent);
+    end
+    if config.sortEdges
+        [obj,newToOldEdges,measurementsCellCurrent] = obj.sortEdges(measurementsCellCurrent);
+    end
+    
+    %display progress
+    if config.displayProgress
+        fprintf('\n----------------------------------\n')
+        fprintf('Time step:\t%d/%d\n',i,nSteps)
+        fprintf('Vertices:\t%d/%d\n',obj.nVertices,nVertices)
+        fprintf('Edges:\t\t%d/%d\n',obj.nEdges,nEdges)
+    end
+    
+    %construct linear system, solve
+    iSolver = NonlinearSolver(config);
+    iSolver = iSolver.updateIncrementally(config,obj,measurementsCellCurrent);
+    obj  = iSolver.graphs(end);%update graph
+    
+    %undo reordering *TODO - only do this at the end
+    if config.sortEdges
+        [obj] = obj.unsortEdges(newToOldEdges);
+    end
+    if config.sortVertices
+        [obj] = obj.unsortVertices(newToOldVertices);
+    end
+    
+    %store iSolver
+    solver = [solver iSolver];
+    %  solver = iSolver; %if memory is problem
+    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
     %counts
     nNewVertices = obj.nVertices - vertexCount;
     nNewEdges    = obj.nEdges - edgeCount;
     
-    %solve?
+    %batch solve?
     if (nNewVertices > config.nVerticesThreshold) || (nNewEdges > config.nEdgesThreshold) ||...
         (skipCount>=config.solveRate-1) || (i==nSteps) %|| (~mod(i,config.solveRate))
    

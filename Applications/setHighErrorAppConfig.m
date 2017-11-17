@@ -101,7 +101,9 @@ config.set('staticAssumption',0);
 %   solver settings
 config.set('sortVertices',0);
 config.set('sortEdges',0);
-config.set('processing','batch');
+% config.set('processing','batch');
+config.set('processing','incremental');
+config.set('plotIncremental',1);
 config.set('nVerticesThreshold',100);
 config.set('nEdgesThreshold',200);
 config.set('solveRate',5);
