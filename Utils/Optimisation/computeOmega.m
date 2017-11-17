@@ -15,6 +15,7 @@ for i =  vertex1+1:vertex2-1
             nZeros = nZeros + config.dimPose;
         case 'point'
             nZeros = nZeros + config.dimPoint;
+        %% TODO add more vertices cases
     end
 end
 
