@@ -110,7 +110,8 @@ for i = 1:nSteps
                 end
                 %construct pose-point edge
                 obj = obj.constructPosePointEdge(config,jRow);
-                
+                graphUpdate = Graph();
+                graphUpdate = graphUpdate.constructPosePointEdge(config,jRow);
             case config.pointPointEdgeLabel
                 %edgeIndex
                 jRow{2} = obj.nEdges+1;
@@ -178,9 +179,24 @@ for i = 1:nSteps
     end
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %incremental update
-    %compute omega
-    [Omega, omega] = computeOmega(config, obj,graphUpdate);
+    %reorder vertices and edges
+    measurementsCellCurrent = measurementsCell;
+    if config.sortVertices
+        [obj,newToOldVertices,measurementsCellCurrent] = obj.sortVertices(measurementsCellCurrent);
+    end
+    if config.sortEdges
+        [obj,newToOldEdges,measurementsCellCurrent] = obj.sortEdges(measurementsCellCurrent);
+    end
     
+    %display progress
+    if config.displayProgress
+        fprintf('\n----------------------------------\n')
+        fprintf('Time step:\t%d/%d\n',i,nSteps)
+        fprintf('Vertices:\t%d/%d\n',obj.nVertices,nVertices)
+        fprintf('Edges:\t\t%d/%d\n',obj.nEdges,nEdges)
+    end
+    
+    %construct linear system, solve
     iSolver = NonlinearSolver(config);
     iSolver = iSolver.updateIncrementally(config,obj,measurementsCellCurrent);
     obj  = iSolver.graphs(end);%update graph
