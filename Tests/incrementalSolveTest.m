@@ -4,13 +4,15 @@
 %--------------------------------------------------------------------------
 
 %% general setup
-nSteps = 3;
+nSteps = 30;
 
 %% config setup 
 config = CameraConfig();
 config = setUnitTestConfig(config);
 config.set('groundTruthFileName' ,'incrememntalSolveTest_groundTruth.graph');
 config.set('measurementsFileName','incrementalSolveTest_measurements.graph');
+config.set('processing','incrementalSolveCholesky'); % L,d
+% config.set('processing','incrementalSolveHessian'); % Lambda,eta
 
 rng(config.rngSeed);
 %% set up sensor - MANUAL
@@ -99,14 +101,14 @@ graphN  = solverEnd.graphs(end);
 graphN.saveGraphFile(config,'incrementalSolveTest_results.graph');
 
 graphGT = Graph(config,groundTruthCell);
-results = errorAnalysis(config,graphGT,graphN);
-fprintf('Chi Squared Error: %.4d \n',solverEnd.systems.chiSquaredError)
-fprintf('Absolute Trajectory Translation Error: %.4d \n',results.ATE_translation_error)
-fprintf('Absolute Trajectory Rotation Error: %.4d \n',results.ATE_rotation_error)
-fprintf('Absolute Structure Points Error: %d \n',results.ASE_translation_error);
-fprintf('All to All Relative Pose Squared Translation Error: %.4d \n',results.AARPE_squared_translation_error)
-fprintf('All to All Relative Pose Squared Rotation Error: %.4d \n',results.AARPE_squared_rotation_error)
-fprintf('All to All Relative Point Squared Translation Error: %.4d \n',results.AARPTE_squared_translation_error)
+% results = errorAnalysis(config,graphGT,graphN);
+% fprintf('Chi Squared Error: %.4d \n',solverEnd.systems.chiSquaredError)
+% fprintf('Absolute Trajectory Translation Error: %.4d \n',results.ATE_translation_error)
+% fprintf('Absolute Trajectory Rotation Error: %.4d \n',results.ATE_rotation_error)
+% fprintf('Absolute Structure Points Error: %d \n',results.ASE_translation_error);
+% fprintf('All to All Relative Pose Squared Translation Error: %.4d \n',results.AARPE_squared_translation_error)
+% fprintf('All to All Relative Pose Squared Rotation Error: %.4d \n',results.AARPE_squared_rotation_error)
+% fprintf('All to All Relative Point Squared Translation Error: %.4d \n',results.AARPTE_squared_translation_error)
 
 %% plot graph files
 h = figure; 

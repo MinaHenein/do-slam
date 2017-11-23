@@ -19,6 +19,10 @@ switch processing
         solver = obj.processBatch(config,measurementsCell,groundTruthCell);
     case 'incremental'
         solver = obj.processIncremental(config,measurementsCell,groundTruthCell);
+    case 'incrementalSolveHessian'
+        solver = obj.solveIncremental(config,measurementsCell,groundTruthCell);
+    case 'incrementalSolveCholesky'
+        solver = obj.solveIncremental(config,measurementsCell,groundTruthCell);
 end
 
 end

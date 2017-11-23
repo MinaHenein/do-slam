@@ -23,12 +23,12 @@
         end
 
         %% solver
-        function [obj] = solve(obj,config,graph0,measurementsCell)
+        function [obj] = solve(obj,config,graph0,measurementsCell,system)
             switch config.solverType
                 case 'Gauss-Newton'
                     obj = obj.GNSolver(config,graph0,measurementsCell);
                 case 'Levenberg-Marquardt'
-                    obj = obj.LMSolver(config,graph0,measurementsCell);
+                    obj = obj.LMSolver(config,graph0,measurementsCell,system);
                 case 'Levenberg-Marquardt-g2o'
                     obj = obj.LMSolver_g2o(config,graph0,measurementsCell);
                 case 'Levenberg-Marquardt-testing'
@@ -42,6 +42,7 @@
             end
         
         end
+        
         
     end
     

@@ -28,10 +28,10 @@ for i = 1:numel(graph.iPoseVertices)
 end
 
 %% 2. plot points
-points = [graph.vertices(graph.iPointVertices).value];
-plotPoints = plot3(points(1,:),points(2,:),points(3,:),'.');
-set(plotPoints,'MarkerEdgeColor',graphColour)
-set(plotPoints,'MarkerSize',8)
+% points = [graph.vertices(graph.iPointVertices).value];
+% plotPoints = plot3(points(1,:),points(2,:),points(3,:),'.');
+% set(plotPoints,'MarkerEdgeColor',graphColour)
+% set(plotPoints,'MarkerSize',8)
 
 %% 3. plot entities & objects
 plotPlanePoints = [];
@@ -62,7 +62,7 @@ for i = 1:graph.nVertices
 end
 
 %output plot handles
-plotHandles = {plotCameras,plotPoints,plotPlanePoints,planeHandles};
-
+% plotHandles = {plotCameras,plotPoints,plotPlanePoints,planeHandles};
+plotHandles = {plotCameras};
 end
 

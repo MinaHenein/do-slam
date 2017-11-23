@@ -87,10 +87,6 @@ for i = 1:nSteps
                 obj = obj.constructPoseVertex(config,jRow);
                 %construct prior edge
                 obj = obj.constructPosePriorEdge(config,jRow);
-                % the new graph update
-                graphUpdate = Graph();
-                graphUpdate = graphUpdate.constructPoseVertex(config,jRow);
-                graphUpdate = graphUpdate.constructPosePriorEdge(config,jRow);
             case config.posePoseEdgeLabel %odometry
                 %edge index
                 jRow{2} = obj.nEdges+1;
@@ -98,9 +94,15 @@ for i = 1:nSteps
                 obj = obj.constructPoseVertex(config,jRow);
                 %construct pose-pose edge
                 obj = obj.constructPosePoseEdge(config,jRow);
-                graphUpdate = Graph();
-                graphUpdate = graphUpdate.constructPoseVertex(config,jRow);
-                graphUpdate = graphUpdate.constructPosePoseEdge(config,jRow);
+                % addEdgeUpdate
+                system = System(config,obj,measurementsCell);
+                if strcmp(config.processing,'incrementalSolveHessian')
+                    system = system.addEdgeUpdateHessian(config,obj,jRow);
+                elseif strcmp(config.processing,'incrementalSolveCholesky')
+                    system = system.addEdgeUpdateCholesky(config,obj,jRow);
+                else
+                    error('%s incremental solving invalid',config.processing)
+                end
             case config.posePointEdgeLabel
                 %edge index
                 jRow{2} = obj.nEdges+1;
@@ -110,12 +112,17 @@ for i = 1:nSteps
                 end
                 %construct pose-point edge
                 obj = obj.constructPosePointEdge(config,jRow);
-                
+                % addEdgeUpdate
+                system = System(config,obj,measurementsCell);
+                system = system.addEdgeUpdateHessian(config,obj,jRow);
             case config.pointPointEdgeLabel
                 %edgeIndex
                 jRow{2} = obj.nEdges+1;
                 % construct point-point edge - both points should already exist
                 obj = obj.constructPointPointEdge(config,jRow);
+                % addEdgeUpdate
+                system = System(config,obj,measurementsCell);
+                system = system.addEdgeUpdateHessian(config,obj,jRow);
             case config.pointPlaneEdgeLabel
                 %edge index
                 jRow{2} = obj.nEdges+1;
@@ -128,6 +135,9 @@ for i = 1:nSteps
                 end
                 %construct point-plane edge
                 obj = obj.constructPointPlaneEdge(config,jRow);
+                % addEdgeUpdate
+                system = System(config,obj,measurementsCell);
+                system = system.addEdgeUpdateHessian(config,obj,jRow);
             case config.planePriorEdgeLabel
                 %edge index
                 jRow{2} = obj.nEdges+1;
@@ -157,10 +167,16 @@ for i = 1:nSteps
                     obj = obj.constructAngleVertex(config,jRow);
                 end
                 obj = obj.constructAngleEdge(config,jRow);
+                % addEdgeUpdate
+                system = System(config,obj,measurementsCell);
+                system = system.addEdgeUpdateHessian(config,obj,jRow);
             case config.fixedAngleEdgeLabel
                 %edge index
                 jRow{2} = obj.nEdges+1;
                 obj = obj.constructFixedAngleEdge(config,jRow);
+                % addEdgeUpdate
+                system = System(config,obj,measurementsCell);
+                system = system.addEdgeUpdateHessian(config,obj,jRow);
             case config.distanceEdgeLabel
                 %edge index
                 jRow{2} = obj.nEdges+1;
@@ -168,44 +184,30 @@ for i = 1:nSteps
                     obj = obj.constructDistanceVertex(config,jRow);
                 end
                 obj = constructDistanceEdge(config,jRow);
+                % addEdgeUpdate
+                system = System(config,obj,measurementsCell);
+                system = system.addEdgeUpdateHessian(config,obj,jRow);
             case config.fixedDistanceEdgeLabel
                 %edge index
                 jRow{2} = obj.nEdges+1;
                 obj = obj.constructFixedDistanceEdge(config,jRow);
+                % addEdgeUpdate
+                system = System(config,obj,measurementsCell);
+                system = system.addEdgeUpdateHessian(config,obj,jRow);
             otherwise; error('%s type invalid',label)
         end
         %construct edge
     end
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    %incremental update
-    %compute omega
-    [Omega, omega] = computeOmega(config, obj,graphUpdate);
-    
-    iSolver = NonlinearSolver(config);
-    iSolver = iSolver.updateIncrementally(config,obj,measurementsCellCurrent);
-    obj  = iSolver.graphs(end);%update graph
-    
-    %undo reordering *TODO - only do this at the end
-    if config.sortEdges
-        [obj] = obj.unsortEdges(newToOldEdges);
-    end
-    if config.sortVertices
-        [obj] = obj.unsortVertices(newToOldVertices);
-    end
-    
-    %store iSolver
-    solver = [solver iSolver];
-    %  solver = iSolver; %if memory is problem
-    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     
     %counts
     nNewVertices = obj.nVertices - vertexCount;
     nNewEdges    = obj.nEdges - edgeCount;
     
     %batch solve?
-    if (nNewVertices > config.nVerticesThreshold) || (nNewEdges > config.nEdgesThreshold) ||...
-        (skipCount>=config.solveRate-1) || (i==nSteps) %|| (~mod(i,config.solveRate))
-   
+%     if (nNewVertices > config.nVerticesThreshold) || (nNewEdges > config.nEdgesThreshold) ||...
+%         (skipCount>=config.solveRate-1) || (i==nSteps) %|| (~mod(i,config.solveRate))
+        if obj.nEdges>1
+            
         %will solve
         skipCount = 0;
         vertexCount = obj.nVertices;
@@ -235,7 +237,8 @@ for i = 1:nSteps
         
         %construct linear system, solve
         iSolver = NonlinearSolver(config);
-        iSolver = iSolver.solve(config,obj,measurementsCellCurrent);
+        %system = System(config,obj,measurementsCellCurrent);
+        iSolver = iSolver.solve(config,obj,measurementsCellCurrent,system);
         obj  = iSolver.graphs(end);%update graph
         
         %undo reordering *TODO - only do this at the end
@@ -249,9 +252,10 @@ for i = 1:nSteps
         %store iSolver
         solver = [solver iSolver];
 %         solver = iSolver; %if memory is problem
-    else
-        skipCount = skipCount + 1;
-    end
+%     else
+%         skipCount = skipCount + 1;
+%     end
+        end
        
     %plot while solving
     if config.plotIncremental

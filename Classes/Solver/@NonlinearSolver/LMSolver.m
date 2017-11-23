@@ -1,4 +1,4 @@
-function [obj] = LMSolver(obj,config,graph0,measurementsCell)
+function [obj] = LMSolver(obj,config,graph0,measurementsCell,system)
 %LM solver combines gradient descent and gauss-newton
 
 done      = 0;
@@ -6,7 +6,7 @@ iteration = 1;
 lambda     = 1e-8; %initial value
 lambdaUp   = 8;
 lambdaDown = 12;
-system = System(config,graph0,measurementsCell);
+%system = System(config,graph0,measurementsCell);
 % covariance = system.covariance; %doesn't change in this function
 errorCurrent = norm(system.b);   %initial value
 
@@ -18,8 +18,14 @@ obj.systems = [system];
 timeStart = tic;
 while (~done)    
     %   build system & solve    
+   if strcmp(config.processing,'incrementalSolveCholesky')
+    d = spdiags(lambda*spdiags(system.L,0),0,size(system.L,1),size(system.L,2));
+    dX = (system.L + d) \ system.d;
+   else
     d = spdiags(lambda*spdiags(system.H,0),0,size(system.H,1),size(system.H,2));
     dX = (system.H + d) \ system.c;
+   end
+    
     if strcmp(config.planeNormalParameterisation,'S2')
         dX = system.kPerp*dX;   
         dX = adjustUpdate(system,graph0,dX);
