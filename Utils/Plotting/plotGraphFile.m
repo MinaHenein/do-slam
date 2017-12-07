@@ -51,11 +51,11 @@ for i = 1:sum(poseVertices)
 end
 
 %% 6. plot points
-plotPoints = plot3(points(1,:),points(2,:),points(3,:),'.');
-set(plotPoints,'MarkerEdgeColor',graphColour)
-set(plotPoints,'MarkerSize',8)
+% plotPoints = plot3(points(1,:),points(2,:),points(3,:),'.');
+% set(plotPoints,'MarkerEdgeColor',graphColour)
 % set(plotPoints,'MarkerSize',8)
-axis equal
+% % set(plotPoints,'MarkerSize',8)
+% axis equal
 %% 7. plot planes
 %need edges to figure out which points are on which planes
 iPlaneVertices = [verticesCell{planeVertices,2}];

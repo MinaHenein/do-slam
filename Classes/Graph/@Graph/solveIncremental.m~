@@ -96,13 +96,13 @@ for i = 1:nSteps
                 obj = obj.constructPosePoseEdge(config,jRow);
                 % addEdgeUpdate
                 system = System(config,obj,measurementsCell);
-                if strcmp(config.processing,'incrementalSolveHessian')
-                    system = system.addEdgeUpdateHessian(config,obj,jRow);
-                elseif strcmp(config.processing,'incrementalSolveCholesky')
-                    system = system.addEdgeUpdateCholesky(config,obj,jRow);
-                else
-                    error('%s incremental solving invalid',config.processing)
-                end
+%                 if strcmp(config.processing,'incrementalSolveHessian')
+%                     system = system.addEdgeUpdateHessian(config,obj,jRow);
+%                 elseif strcmp(config.processing,'incrementalSolveCholesky')
+%                     system = system.addEdgeUpdateCholesky(config,obj,jRow);
+%                 else
+%                     error('%s incremental solving invalid',config.processing)
+%                 end
             case config.posePointEdgeLabel
                 %edge index
                 jRow{2} = obj.nEdges+1;
@@ -238,8 +238,9 @@ for i = 1:nSteps
         %construct linear system, solve
         iSolver = NonlinearSolver(config);
         %system = System(config,obj,measurementsCellCurrent);
-        iSolver = iSolver.solve(config,obj,measurementsCellCurrent,system);
-        obj  = iSolver.graphs(end);%update graph
+%         iSolver = iSolver.solve(config,obj,measurementsCellCurrent,system);
+%         obj  = iSolver.graphs(end);%update graph
+        
         %undo reordering *TODO - only do this at the end
         if config.sortEdges
             [obj] = obj.unsortEdges(newToOldEdges);

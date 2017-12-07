@@ -31,6 +31,8 @@ classdef Config < ArrayGetSet
         
         % if motionModel is constantSE3Motion
         constantSE3Motion
+        % if motionModel is constantAccelerationSE3Motion
+        constantAccelerationSE3Motion
         
         %measurement std dev
         stdPosePrior

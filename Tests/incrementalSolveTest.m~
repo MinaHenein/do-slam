@@ -11,8 +11,8 @@ config = CameraConfig();
 config = setUnitTestConfig(config);
 config.set('groundTruthFileName' ,'incrememntalSolveTest_groundTruth.graph');
 config.set('measurementsFileName','incrementalSolveTest_measurements.graph');
-% config.set('processing','incrementalSolveCholesky'); % L,d
-config.set('processing','incrementalSolveHessian'); % Lambda,eta
+config.set('processing','incrementalSolveCholesky'); % L,d
+% config.set('processing','incrementalSolveHessian'); % Lambda,eta
 
 rng(config.rngSeed);
 %% set up sensor - MANUAL
@@ -101,6 +101,7 @@ graphN  = solverEnd.graphs(end);
 graphN.saveGraphFile(config,'incrementalSolveTest_results.graph');
 
 graphGT = Graph(config,groundTruthCell);
+graphMeasurements = Graph(config,measurementsCell);
 % results = errorAnalysis(config,graphGT,graphN);
 % fprintf('Chi Squared Error: %.4d \n',solverEnd.systems.chiSquaredError)
 % fprintf('Absolute Trajectory Translation Error: %.4d \n',results.ATE_translation_error)
@@ -118,6 +119,7 @@ ylabel('y')
 zlabel('z')
 hold on
 plotGraph(config,graphN,'red');
+plotGraph(config,graphMeasurements,'blue');
 plotGraphFile(config,groundTruthCell,'blue');
 
 figure

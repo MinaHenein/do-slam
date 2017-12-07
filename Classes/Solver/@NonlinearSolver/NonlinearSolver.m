@@ -28,7 +28,8 @@
                 case 'Gauss-Newton'
                     obj = obj.GNSolver(config,graph0,measurementsCell);
                 case 'Levenberg-Marquardt'
-                    obj = obj.LMSolver(config,graph0,measurementsCell,system);
+%                     obj = obj.LMSolver(config,graph0,measurementsCell,system);
+                    obj = obj.LMSolver(config,graph0,measurementsCell);
                 case 'Levenberg-Marquardt-g2o'
                     obj = obj.LMSolver_g2o(config,graph0,measurementsCell);
                 case 'Levenberg-Marquardt-testing'

@@ -23,13 +23,13 @@ classdef System
         Hk
         ck
         kPerp
-        H
-        c
+%         H
+%         c
     end
     
     properties (Dependent)
-%         H
-%         c
+         H
+         c
         chiSquaredError
     end
     
@@ -40,13 +40,13 @@ classdef System
         end
         
         %% useful transformations
-%         function H = get.H(obj)
-%             H = (obj.covSqrtInv*obj.A)'*(obj.covSqrtInv*obj.A);
-%         end
-%         
-%         function c = get.c(obj)
-%             c = (obj.covSqrtInv*obj.A)'*(obj.covSqrtInv*obj.b);
-%         end
+        function H = get.H(obj)
+            H = (obj.covSqrtInv*obj.A)'*(obj.covSqrtInv*obj.A);
+        end
+        
+        function c = get.c(obj)
+            c = (obj.covSqrtInv*obj.A)'*(obj.covSqrtInv*obj.b);
+        end
         
         function chiSquaredError = get.chiSquaredError(obj)
             nEdges = size(obj.edgeHeights,1);

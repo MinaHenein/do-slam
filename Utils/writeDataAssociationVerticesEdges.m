@@ -1,6 +1,10 @@
 function writeDataAssociationVerticesEdges(config,constantSE3ObjectMotion)
 
-nObjects = size(constantSE3ObjectMotion,2);
+if strcmp(config.motionModel,'constantAccelerationSE3MotionDA')
+    nObjects = size(constantSE3ObjectMotion,3);
+else
+    nObjects = size(constantSE3ObjectMotion,2);
+end
 
 GTFileName = config.groundTruthFileName;
 filepath = strcat(config.folderPath,config.sep,'Data',...
@@ -71,12 +75,14 @@ while ischar(line)
 end
 fclose(fileID);
 
-SE3ObjectMotion = zeros(4,4,nObjects);
-for i=1:nObjects
-SE3ObjectMotion(:,:,i) = [rot(constantSE3ObjectMotion(4:6,i)),...
-    constantSE3ObjectMotion(1:3,i); 0 0 0 1]; 
+if strcmp(config.motionModel,'constantSE3MotionDA')
+    SE3ObjectMotion = zeros(4,4,nObjects);
+    for i=1:nObjects
+        SE3ObjectMotion(:,:,i) = [rot(constantSE3ObjectMotion(4:6,i)),...
+            constantSE3ObjectMotion(1:3,i); 0 0 0 1];
+    end
+    constantSE3ObjectMotion = SE3ObjectMotion;
 end
-constantSE3ObjectMotion = SE3ObjectMotion;
 
 nSE3MotionVertices = 0;
 isNewSE3Vertex = 0;
@@ -103,32 +109,66 @@ for j=1:1:length(Index)
     CStr = Data{1};
     IndexC = strfind(CStr, strcat({'VERTEX_POINT_3D'},{' '},{num2str(index1)},{' '}));
     fclose(fileID);
-    lineIndex = find(~cellfun('isempty', IndexC));
+    line1Index = find(~cellfun('isempty', IndexC));
     fileID = fopen(filepath,'r');
-    line1 = textscan(fileID,'%s',1,'delimiter','\n','headerlines',lineIndex-1);
+    line1 = textscan(fileID,'%s',1,'delimiter','\n','headerlines',line1Index-1);
     line1 = cell2mat(line1{1,1});
     splitLine1 = str2double(strsplit(line1,' '));
     vertex1Value = splitLine1(1,3:5)';
     fclose(fileID);
     
     IndexC = strfind(CStr, strcat({'VERTEX_POINT_3D'},{' '},{num2str(index2)},{' '}));
-    lineIndex = find(~cellfun('isempty', IndexC));
+    line2Index = find(~cellfun('isempty', IndexC));
     fileID = fopen(filepath,'r');
-    line2 = textscan(fileID,'%s',1,'delimiter','\n','headerlines',lineIndex-1);
+    line2 = textscan(fileID,'%s',1,'delimiter','\n','headerlines',line2Index-1);
     line2 = cell2mat(line2{1,1});
     splitLine2 = str2double(strsplit(line2,' '));
     vertex2Value = splitLine2(1,3:5)';
     fclose(fileID);
     
+    % find time step
+    if strcmp(config.motionModel,'constantAccelerationSE3MotionDA')
+        fileID = fopen(filepath,'r');
+        Data = textscan(fileID,'%s','delimiter','\n','whitespace',' ');
+        CStr = Data{1};
+        IndexC = strfind(CStr, strcat({'VERTEX_POSE_R3_SO3'},{' '}));
+        fclose(fileID);
+        lineIndex = find(~cellfun('isempty', IndexC));
+        [~ ,v1] = min(abs(lineIndex-line1Index));
+        temp = lineIndex(v1);
+        lineIndex(v1)= inf;
+        [~ ,v2] = min(abs(lineIndex-line1Index));
+       if (temp<line1Index) 
+           line3Index = temp;
+       else
+           line3Index = lineIndex(v2);
+       end
+       lineIndex(v1) = temp;
+       fileID = fopen(filepath,'r');
+       line1 = textscan(fileID,'%s',1,'delimiter','\n','headerlines',line3Index-1);
+       line1 = cell2mat(line1{1,1});
+       splitLine1 = str2double(strsplit(line1,' '));
+       poseIndex = splitLine1(1,2)';
+       timeStep = find(lineIndex==poseIndex);
+       fclose(fileID);        
+    end
+    
     if nSE3MotionVertices == 0
         isNewSE3Vertex = 1;
         newVertexID = nVertices +1;
     end
-    if j > 1 && nObjects > 1 && object~=lastObject
-        isNewSE3Vertex = 1;
-        newVertexID = newVertexID+1;
+    if strcmp(config.motionModel,'constantSE3MotionDA')
+        if j > 1 && nObjects > 1 && object~=lastObject
+            isNewSE3Vertex = 1;
+            newVertexID = newVertexID+1;
+        end
     end
-    
+    if strcmp(config.motionModel,'constantAccelerationSE3MotionDA')
+        if j > 1
+            isNewSE3Vertex = 1;
+            newVertexID = newVertexID+1;
+        end
+    end
     % get motion model and replace line accordingly
     if ~isempty(Index(j)+nLinesAdded)
         switch config.motionModel
@@ -155,7 +195,33 @@ for j=1:1:length(Index)
                     objectSE3Motion(1:3,1:3)'*objectSE3Motion(1:3,4));
                 edge.std = config.std2PointsSE3Motion;
                 edge.cov = config.cov2PointsSE3Motion;
-                edge.covUT = covToUpperTriVec(edge.cov); 
+                edge.covUT = covToUpperTriVec(edge.cov);
+            case 'constantAccelerationSE3MotionDA'
+                vertex = struct();
+                vertex.label = config.SE3MotionVertexLabel;
+                vertex.index = newVertexID;
+                if nObjects > 1
+                    objectSE3Motion = [rot(constantSE3ObjectMotion(4:6,timeStep,object)),...
+            constantSE3ObjectMotion(1:3,timeStep,object); 0 0 0 1]; 
+                else
+                    objectSE3Motion = [rot(constantSE3ObjectMotion(4:6,timeStep)),...
+            constantSE3ObjectMotion(1:3,timeStep); 0 0 0 1];
+                end
+                vertex.value = [objectSE3Motion(1:3,4);...
+                    arot(objectSE3Motion(1:3,1:3))];
+                
+                edge = struct();
+                edge.index1 = index1;
+                edge.index2 = index2;
+                edge.index3 = newVertexID;
+                edge.label = config.pointSE3MotionEdgeLabel;
+                edge.value = vertex1Value -...
+                    (objectSE3Motion(1:3,1:3)'*...
+                    vertex2Value -...
+                    objectSE3Motion(1:3,1:3)'*objectSE3Motion(1:3,4));
+                edge.std = config.std2PointsSE3Motion;
+                edge.cov = config.cov2PointsSE3Motion;
+                edge.covUT = covToUpperTriVec(edge.cov);
             case 'constantSE3' % to be done
             case 'constantSE3Motion' % to be done
         end
@@ -175,6 +241,18 @@ for j=1:1:length(Index)
             end
             CStr(newVertexID) = cellstr(sprintf('%s %d %f %f %f %f %f %f',...
             vertex.label,vertex.index,vertex.value'));
+            
+        
+%             fileID = fopen(filepath,'r');
+%             Data = textscan(fileID,'%s','delimiter','\n','whitespace',' ');
+%             Str = Data{1};
+%             IndexC = strfind(Str,strcat({'2POINTS_DataAssociation'},{' '},...
+%                 {num2str(index1)},{' '},{num2str(index2)}));
+%             lineToReplace = find(~cellfun('isempty', IndexC));
+%             fclose(fileID);
+%             CStr(lineToReplace) = cellstr(sprintf('%s %d %f %f %f %f %f %f',...
+%             vertex.label,vertex.index,vertex.value'));
+        
             % if new line added before 2POINTS_DataAssociation, incerment
             % nLinesAdded to be able to delete the correct line afterwards
             nLinesAdded = nLinesAdded+1;
@@ -194,7 +272,7 @@ for j=1:1:length(Index)
             edge.label,edge.index1,edge.index2,edge.index3,edge.value',...
             edge.covUT));
         end
-        % delete 1 line with 2POINTS_DataAssociation
+        % delete 1 line with 2POINTS_DataAssociation  
         CStr(Index(j)+nLinesAdded) = [];
         nLinesAdded = nLinesAdded-1;
         isNewSE3Vertex = 0;
@@ -272,7 +350,7 @@ for j=1:length(Index)
     fclose(fileID);
     CStr(end+1) = cellstr(sprintf('%s %d %d %d %f %f %f %f %f %f %f %f %f',...
         edgeLabel,index1,index2,index3,edgeValue',edgeCovUT));
-
+    
     CStr(Index(j)+nLinesAdded) = [];
     nLinesAdded = nLinesAdded-1;
      % Save the file again:

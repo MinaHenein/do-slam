@@ -1,5 +1,5 @@
-% function [obj] = LMSolver(obj,config,graph0,measurementsCell,system)
-function [obj] = LMSolver(obj,config,graph0,measurementsCell)
+function [obj] = LMSolver(obj,config,graph0,measurementsCell,system)
+function [obj] = LMSolver(obj,config,graph0,measurementsCell,sy)
 %LM solver combines gradient descent and gauss-newton
 
 done      = 0;
@@ -7,7 +7,7 @@ iteration = 1;
 lambda     = 1e-8; %initial value
 lambdaUp   = 8;
 lambdaDown = 12;
-system = System(config,graph0,measurementsCell);
+%system = System(config,graph0,measurementsCell);
 % covariance = system.covariance; %doesn't change in this function
 errorCurrent = norm(system.b);   %initial value
 
