@@ -20,12 +20,9 @@ config = setAppConfig(config); % copy same settings for error Analysis
 config.set('t',t);
 config.set('nSteps',nSteps);
 % config.set('noiseModel','Off');
-config.set('groundTruthFileName','app8_groundTruth.graph');
-config.set('measurementsFileName','app8_measurements.graph');
 
 % SE3 Motion
-% config.set('motionModel','constantAccelerationSE3MotionDA');
-config.set('motionModel','constantSE3MotionDA');
+config.set('motionModel','constantAccelerationSE3MotionDA');
 config.set('std2PointsSE3Motion', [0.1,0.1,0.1]');
 
 %% 2. Generate Environment
@@ -36,7 +33,7 @@ end
 % construct primitive trajectory
 primitiveInitialPose_R3xso3 = [10 0 0 0 0 0.2]';
 primitiveMotion_R3xso3 = [1.5*dt; 0; 0; arot(eul2rot([0.05*dt,0,0.005*dt]))];
-primitiveAcceleration_R3xso3 = [0.002;0;0;0.001;0;0.001];
+primitiveAcceleration_R3xso3 = [0.002;0.01;0.01;0.8;0.2;0.2];
 primitiveTrajectory = ConstantAccelerationDiscretePoseTrajectory(t,primitiveInitialPose_R3xso3,...
     primitiveMotion_R3xso3,primitiveAcceleration_R3xso3,'R3xso3');
 
@@ -45,12 +42,11 @@ sampleTimes = t(1:floor(numel(t)/5):numel(t));
 sampleWaypoints = primitiveTrajectory.get('R3xso3Pose',sampleTimes);
 robotWaypoints = [linspace(0,tN+3,numel(sampleTimes)+1); 0 sampleWaypoints(1,:); 0 (sampleWaypoints(2,:)+0.1); 0 (sampleWaypoints(3,:)-0.1)];
 robotTrajectory = PositionModelPoseTrajectory(robotWaypoints,'R3','smoothingspline');
-% Assuming constant SE3 Motion between consecutive time steps
-% constantSE3ObjectMotion = zeros(6,length(t)-1);
-% for i = 1:numel(t)-1
-%     constantSE3ObjectMotion(:,i) = primitiveTrajectory.RelativePoseGlobalFrameR3xso3(t(i),t(i+1));
-% end
-constantSE3ObjectMotion = primitiveTrajectory.RelativePoseGlobalFrameR3xso3(t(1),t(2));
+% Constant Acceleration - Assuming constant SE3 Motion between consecutive time steps
+constantSE3ObjectMotion = zeros(6,length(t)-1);
+for i = 1:numel(t)-1
+    constantSE3ObjectMotion(:,i) = primitiveTrajectory.RelativePoseGlobalFrameR3xso3(t(i),t(i+1));
+end
 environment = Environment();
 environment.addEllipsoid([5 2 3],8,'R3',primitiveTrajectory);
 
@@ -86,8 +82,7 @@ frames = sensor.plot(0,environment);
 % implay(frames);
 
 %% 5. Generate Measurements & Save to Graph File, load graph file as well
-% config.set('constantAccelerationSE3Motion',constantSE3ObjectMotion);
-config.set('constantSE3Motion',constantSE3ObjectMotion);
+config.set('constantAccelerationSE3Motion',constantSE3ObjectMotion);
     %% 5.1 For initial (without SE3)
     config.set('pointMotionMeasurement','Off')
     config.set('measurementsFileName','app8_measurementsNoSE3.graph')
@@ -101,7 +96,7 @@ config.set('constantSE3Motion',constantSE3ObjectMotion);
     config.set('measurementsFileName','app8_measurements.graph');
     config.set('groundTruthFileName','app8_groundTruth.graph');
     sensor.generateMeasurements(config);
-    writeDataAssociationVerticesEdges(config,constantSE3ObjectMotion);
+    writeDataAssociationVerticesEdges2(config,constantSE3ObjectMotion);
     measurementsCell = graphFileToCell(config,config.measurementsFileName);
     groundTruthCell  = graphFileToCell(config,config.groundTruthFileName);
 

@@ -1,4 +1,4 @@
-function writeDataAssociationVerticesEdges(config,constantSE3ObjectMotion)
+function writeDataAssociationVerticesEdges2(config,constantSE3ObjectMotion)
 
 if strcmp(config.motionModel,'constantAccelerationSE3MotionDA')
     nObjects = size(constantSE3ObjectMotion,3);
@@ -226,25 +226,15 @@ for j=1:1:length(Index)
             case 'constantSE3Motion' % to be done
         end
         if  isNewSE3Vertex
-            % Shift all lines below vertices 1 line below to allow space for 
-            % new vertex in the right place
-            fileID = fopen(strcat(config.folderPath,config.sep,'Data',...
-                config.sep,config.graphFileFolderName,config.sep,GTFileName),'r');
-            fseek(fileID, 0, 'eof');
-            fileSize = ftell(fileID);
-            frewind(fileID);
-            data = fread(fileID, fileSize, 'uint8');
-            nLines = sum(data == 10) + 1;
+            fileID = fopen(filepath,'r');
+            Data = textscan(fileID,'%s','delimiter','\n','whitespace',' ');
+            Str = Data{1};
+            IndexC = strfind(Str,strcat({'2POINTS_DataAssociation'},{' '},...
+                {num2str(index1)},{' '},{num2str(index2)}));
+            lineToReplace = find(~cellfun('isempty', IndexC));
             fclose(fileID);
-            for i= nLines-1:-1:nVertices+1
-                CStr(i+1) = CStr(i);
-            end
-            CStr(newVertexID) = cellstr(sprintf('%s %d %f %f %f %f %f %f',...
+            CStr(lineToReplace) = cellstr(sprintf('%s %d %f %f %f %f %f %f',...
             vertex.label,vertex.index,vertex.value'));
-            % if new line added before 2POINTS_DataAssociation, incerment
-            % nLinesAdded to be able to delete the correct line afterwards
-            nLinesAdded = nLinesAdded+1;
-            nSE3MotionVertices = nSE3MotionVertices +1;            
         end
         
         fileID = fopen(filepath,'r');
@@ -260,9 +250,7 @@ for j=1:1:length(Index)
             edge.label,edge.index1,edge.index2,edge.index3,edge.value',...
             edge.covUT));
         end
-        % delete 1 line with 2POINTS_DataAssociation  
-        CStr(Index(j)+nLinesAdded) = [];
-        nLinesAdded = nLinesAdded-1;
+        % set isNewVertex to 0  
          isNewSE3Vertex = 0;
     end
     % Save the file again

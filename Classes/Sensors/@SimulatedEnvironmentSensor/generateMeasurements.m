@@ -64,7 +64,6 @@ for i = 1:nSteps
             error('Error: unsupported pose parameterisation')
     end
     writeVertex(label,index,value,gtFileID);
-    
     %odometry
     if i> 1
         prevSensorPose = self.get('GP_Pose',t(i-1));
@@ -103,7 +102,7 @@ for i = 1:nSteps
                 label = config.pointVertexLabel;
                 index = jPoint.get('vertexIndex');
                 value = jPoint.get('R3Position',t(i));
-                writeVertex(label,index,value,gtFileID);        
+                writeVertex(label,index,value,gtFileID);
             elseif (i>1) && (~self.pointVisibility(j,i-1)) && strcmp(config.staticDataAssociation,'Off' )
                 label = config.pointVertexLabel;
                 vertexCount = vertexCount + 1;
@@ -239,7 +238,6 @@ for i = 1:nSteps
                                 valueGT1_2 = value-(jPoint.get('R3Position',t(i-1))-jPoint.get('R3Position',t(i-2)));
                                 valueGT2_3 = value-(jPoint.get('R3Position',t(i))-jPoint.get('R3Position',t(i-1)));
                             end
-                            
                             writeVertex(config.velocityVertexLabel,vertexCount,value,gtFileID);
                             % write velocity edges
                             % point @ time 1,2 - velocity    
