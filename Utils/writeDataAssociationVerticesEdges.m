@@ -266,7 +266,7 @@ filepathCopy = strcat(config.folderPath,config.sep,'Data',...
 copyfile(filepath,filepathCopy);
 delete(filepath);
 fileID = fopen(filepathCopy);
-a = textscan(fileID,'%s %f %f %f %f %f %f %f %f %f %f %f %f','delimiter',' ');
+a = textscan(fileID,strcat('%s ',repmat(' %f',1,29)),'delimiter',' ');
 [~,idx]=unique(strcat(num2str(cell2mat(a(:,2))),num2str(cell2mat(a(:,3))),...
     num2str(cell2mat(a(:,4)))),'rows','stable');
 for i=1:length(idx)
