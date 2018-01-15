@@ -1,5 +1,5 @@
 %--------------------------------------------------------------------------
-% Author: Mina Henein - mina.henein@anu.edu.au - 01/09/17
+% Author: Mina Henein - mina.henein@anu.edu.au - 09/01/18
 % Contributors:
 %--------------------------------------------------------------------------
 % Test11_multipleCameraCalibration
