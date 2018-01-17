@@ -1,55 +1,56 @@
 %--------------------------------------------------------------------------
-% Author: Yash Vyas - yjvyas@gmail.com - 19/08/17
+% Author: Mina Henein - mina.henein@anu.edu.au - 17/01/18
 % Contributors:
 %--------------------------------------------------------------------------
-% frontEndSolverExample
-clear all 
-% close all 
 
 %% 1. Config
 % time
-nSteps = 121;
+nSteps = 242;
 t0 = 0;
-tN = 120;
-dt = (tN-t0)/(nSteps-1);
-t  = linspace(t0,tN,nSteps);
+tN = 240;
+dt = (tN-t0)/(nSteps-2);
+t1  = linspace(t0,tN/2,nSteps/2); % trajectory 1st half
+t2 = linspace(tN/2,t0,nSteps/2); % trajectory 2nd half
+t = linspace(t0,tN,nSteps);
 
 config = CameraConfig();
 config = setAppConfig(config); % copy same settings for error Analysis
 % config = setLowErrorAppConfig(config);
 % config = setHighErrorAppConfig(config);
+config.set('noiseModel','Off');
+config.set('groundTruthFileName','RSS18a_groundTruth.graph');
+config.set('measurementsFileName','RSS18a_measurements.graph');
 config.set('t',t);
-% config.set('noiseModel','Off');
-config.set('groundTruthFileName','app6_groundTruth.graph');
-config.set('measurementsFileName','app6_measurements.graph');
-
 % SE3 Motion
 config.set('pointMotionMeasurement','point2DataAssociation');
 config.set('motionModel','constantSE3MotionDA');
 config.set('std2PointsSE3Motion', [0.05,0.05,0.05]');
-
-% config.set('sortVertices',1);
-% config.set('sortEdges', 1);
 
 %% 2. Generate Environment
 if config.rngSeed
     rng(config.rngSeed); 
 end
 
-robotWaypoints = [linspace(0,tN,10); ...
-    0 0  25 25 0 0    0  -25  -25 0; ...
-    0 25 25 0  0 12.5 25  25   0  0; ...
-    1.5*ones(1,10)];
-primitive1InitialPose_R3xso3 = [-2.5 12.5 0.8 0 0 pi/2]';
+% shiftting spiral down
+robotWaypoints1 = [sin(t1 * .5); cos(t1 * .5) + t1 * .1; (25 - 10 * (.5 + .5 * sin(t1 /10)))]'; 
+% shiftting spiral up
+robotWaypoints2 = [-sin(t2 * .5); cos(t2 * .5) + t2 * .1; (25 - 10 * (.5 + .5 * sin(t2/ 10)))]';
+robotWaypoints = [robotWaypoints1; robotWaypoints2];
+robotWaypoints = reshape(robotWaypoints',[size(robotWaypoints,2),size(robotWaypoints,1)]);
+robotTrajectoryWaypoints = [linspace(0,tN,nSteps);robotWaypoints];
+
+primitive1InitialPose_R3xso3 = [-1 5 -2 pi/3 0 pi/2]';
 primitive1Motion_R3xso3 = [1.05*dt; 0; 0; arot(eul2rot([0.105*dt,0,0]))];
 
-primitive2InitialPose_R3xso3 = [2.5 12.5 0.8 0 0 -pi/2]';
-primitive2Motion_R3xso3 = [-1.05*dt; 0; 0; arot(eul2rot([-0.105*dt,0,0]))];
+primitive2InitialPose_R3xso3 = [1 5 -2 pi/3 0 -pi/2]';
+primitive2Motion_R3xso3 = [-1.575*dt; 0; 0; arot(eul2rot([-0.105*dt,0,0]))];
 
 % construct trajectories
-robotTrajectory = PositionModelPoseTrajectory(robotWaypoints,'R3','smoothingspline');
-primitive1Trajectory = ConstantMotionDiscretePoseTrajectory(t,primitive1InitialPose_R3xso3,primitive1Motion_R3xso3,'R3xso3');
-primitive2Trajectory = ConstantMotionDiscretePoseTrajectory(t,primitive2InitialPose_R3xso3,primitive2Motion_R3xso3,'R3xso3');
+robotTrajectory = PositionModelPoseTrajectory(robotTrajectoryWaypoints,'R3','smoothingspline');
+primitive1Trajectory = ConstantMotionDiscretePoseTrajectory(t,...
+    primitive1InitialPose_R3xso3,primitive1Motion_R3xso3,'R3xso3');
+primitive2Trajectory = ConstantMotionDiscretePoseTrajectory(t,...
+    primitive2InitialPose_R3xso3,primitive2Motion_R3xso3,'R3xso3');
 constantSE3ObjectMotion = [];
 constantSE3ObjectMotion(:,1) = primitive1Trajectory.RelativePoseGlobalFrameR3xso3(t(1),t(2));
 constantSE3ObjectMotion(:,2) = primitive2Trajectory.RelativePoseGlobalFrameR3xso3(t(1),t(2));
@@ -60,12 +61,6 @@ environment.addEllipsoid([1 1 2.5],8,'R3',primitive2Trajectory);
 
 %% 3. Initialise Sensor
 cameraTrajectory = RelativePoseTrajectory(robotTrajectory,config.cameraRelativePose);
-
-% standard sensor
-% sensor = SimulatedEnvironmentSensor();
-% sensor.addEnvironment(environment);
-% sensor.addCamera(config.fieldOfView,cameraTrajectory);
-% sensor.setVisibility(config);
 
 % occlusion sensor
 sensor = SimulatedEnvironmentOcclusionSensor();
@@ -78,14 +73,14 @@ spy(sensor.get('pointVisibility'));
 %% 4. Plot Environment
 figure
 viewPoint = [-35,35];
-axisLimits = [-30,30,-5,30,-10,10];
+% axisLimits = [-30,30,-5,30,-10,10];
 % title('Environment')
 axis equal
 xlabel('x (m)')
 ylabel('y (m)')
 zlabel('z (m)')
 view(viewPoint)
-axis(axisLimits)
+% axis(axisLimits)
 hold on
 grid on
 primitive1Trajectory.plot(t,[0 0 0],'axesOFF')
@@ -93,7 +88,7 @@ primitive2Trajectory.plot(t,[0 0 0],'axesOFF')
 cameraTrajectory.plot(t,[0 0 1],'axesOFF')
 % set(gcf,'Position',[0 0 1024 768]);
 frames = sensor.plot(t,environment);
-% implay(frames);
+implay(frames);
 
     %% 4.a output video
 % v = VideoWriter('Data/Videos/App6_sensor_environment.mp4','MPEG-4');
@@ -105,16 +100,16 @@ frames = sensor.plot(t,environment);
 config.set('constantSE3Motion',constantSE3ObjectMotion);
      %% 5.1 For initial (without SE3)
     config.set('pointMotionMeasurement','Off')
-    config.set('measurementsFileName','app6_measurementsNoSE3.graph')
-    config.set('groundTruthFileName','app6_groundTruthNoSE3.graph')
+    config.set('measurementsFileName','RSS18a_measurementsNoSE3.graph')
+    config.set('groundTruthFileName','RSS18a_groundTruthNoSE3.graph')
     sensor.generateMeasurements(config);
     groundTruthNoSE3Cell = graphFileToCell(config,config.groundTruthFileName);
     measurementsNoSE3Cell = graphFileToCell(config,config.measurementsFileName);
     
     %% 5.2 For test (with SE3)
     config.set('pointMotionMeasurement','point2DataAssociation');
-    config.set('measurementsFileName','app6_measurements.graph');
-    config.set('groundTruthFileName','app6_groundTruth.graph');
+    config.set('measurementsFileName','RSS18a_measurements.graph');
+    config.set('groundTruthFileName','RSS18a_groundTruth.graph');
     sensor.generateMeasurements(config);
     writeDataAssociationVerticesEdges_constantSE3Motion(config,constantSE3ObjectMotion);
     measurementsCell = graphFileToCell(config,config.measurementsFileName);
@@ -135,7 +130,7 @@ config.set('constantSE3Motion',constantSE3ObjectMotion);
     initialGraph0  = initialSolverEnd.graphs(1);
     initialGraphN  = initialSolverEnd.graphs(end);
     %save results to graph file
-    initialGraphN.saveGraphFile(config,'app6_resultsNoSE3.graph');
+    initialGraphN.saveGraphFile(config,'RSS18a_resultsNoSE3.graph');
     
     %% 6.2 With SE3
     %no constraints
@@ -150,7 +145,7 @@ config.set('constantSE3Motion',constantSE3ObjectMotion);
     graph0  = solverEnd.graphs(1);
     graphN  = solverEnd.graphs(end);
     %save results to graph file
-    graphN.saveGraphFile(config,'app6_results.graph');
+    graphN.saveGraphFile(config,'RSS18a_results.graph');
 
 %% 7. Error analysis
 %load ground truth into graph, sort if required
@@ -167,8 +162,8 @@ resultsSE3 = errorAnalysis(config,graphGT,graphN);
 figure
 spy(solverEnd.systems(end).H)
 
-figure
-spy(chol(solverEnd.systems(end).H))
+% figure
+% spy(chol(solverEnd.systems(end).H))
 
 h = figure; 
 xlabel('x (m)')
@@ -183,7 +178,9 @@ view([-50,25])
 %plot groundtruth
 plotGraphFileICRA(config,groundTruthCell,'groundTruth');
 %plot results
-resultsNoSE3Cell = graphFileToCell(config,'app6_resultsNoSE3.graph');
-resultsCell = graphFileToCell(config,'app6_results.graph');
-plotGraphFileICRA(config,resultsNoSE3Cell,'initial',resultsNoSE3.relPose.get('R3xso3Pose'),resultsNoSE3.posePointsN.get('R3xso3Pose'))
-plotGraphFileICRA(config,resultsCell,'solverResults',resultsSE3.relPose.get('R3xso3Pose'),resultsSE3.posePointsN.get('R3xso3Pose'))
+resultsNoSE3Cell = graphFileToCell(config,'RSS18a_resultsNoSE3.graph');
+resultsCell = graphFileToCell(config,'RSS18a_results.graph');
+plotGraphFileICRA(config,resultsNoSE3Cell,'initial',resultsNoSE3.relPose.get('R3xso3Pose'),...
+    resultsNoSE3.posePointsN.get('R3xso3Pose'))
+plotGraphFileICRA(config,resultsCell,'solverResults',resultsSE3.relPose.get('R3xso3Pose'),...
+    resultsSE3.posePointsN.get('R3xso3Pose'))

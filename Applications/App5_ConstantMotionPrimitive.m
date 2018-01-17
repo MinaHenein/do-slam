@@ -109,7 +109,7 @@ config.set('constantSE3Motion',constantSE3ObjectMotion);
     config.set('measurementsFileName','app5_measurements.graph');
     config.set('groundTruthFileName','app5_groundTruth.graph');
     sensor.generateMeasurements(config);
-    writeDataAssociationVerticesEdges(config,constantSE3ObjectMotion);
+    writeDataAssociationVerticesEdges_constantSE3Motion(config,constantSE3ObjectMotion);
     measurementsCell = graphFileToCell(config,config.measurementsFileName);
     groundTruthCell  = graphFileToCell(config,config.groundTruthFileName);
 
