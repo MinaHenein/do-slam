@@ -18,8 +18,8 @@ config = setAppConfig(config); % copy same settings for error Analysis
 % config = setLowErrorAppConfig(config);
 % config = setHighErrorAppConfig(config);
 config.set('noiseModel','Off');
-config.set('groundTruthFileName','RSS18a_groundTruth.graph');
-config.set('measurementsFileName','RSS18a_measurements.graph');
+config.set('groundTruthFileName','RSS18c_groundTruth.graph');
+config.set('measurementsFileName','RSS18c_measurements.graph');
 config.set('t',t);
 % SE3 Motion
 config.set('pointMotionMeasurement','point2DataAssociation');
@@ -43,7 +43,7 @@ primitive1InitialPose_R3xso3 = [-2 5 -2 pi/3 0 pi/2]';
 primitive1Motion_R3xso3 = [1.05*dt; 0; 0; arot(eul2rot([0.105*dt,0,0]))];
 
 primitive2InitialPose_R3xso3 = [2 5 -2 pi/3 0 -pi/2]';
-primitive2Motion_R3xso3 = [-1.6*dt; 0; 0; arot(eul2rot([-0.105*dt,0,0]))];
+primitive2Motion_R3xso3 = [-1.575*dt; 0; 0; arot(eul2rot([-0.105*dt,0,0]))];
 
 % construct trajectories
 robotTrajectory = PositionModelPoseTrajectory(robotTrajectoryWaypoints,'R3','smoothingspline');
@@ -58,6 +58,9 @@ constantSE3ObjectMotion(:,2) = primitive2Trajectory.RelativePoseGlobalFrameR3xso
 environment = Environment();
 environment.addEllipsoid([1 1 2.5],8,'R3',primitive1Trajectory);
 environment.addEllipsoid([1 1 2.5],8,'R3',primitive2Trajectory);
+
+nPoints = 100;
+environment.addStaticPoints([30*rand(1,nPoints); 40*rand(1,nPoints); 30*ones(1,nPoints)]);
 
 %% 3. Initialise Sensor
 cameraTrajectory = RelativePoseTrajectory(robotTrajectory,config.cameraRelativePose);
@@ -100,16 +103,16 @@ implay(frames);
 config.set('constantSE3Motion',constantSE3ObjectMotion);
      %% 5.1 For initial (without SE3)
     config.set('pointMotionMeasurement','Off')
-    config.set('measurementsFileName','RSS18a_measurementsNoSE3.graph')
-    config.set('groundTruthFileName','RSS18a_groundTruthNoSE3.graph')
+    config.set('measurementsFileName','RSS18c_measurementsNoSE3.graph')
+    config.set('groundTruthFileName','RSS18c_groundTruthNoSE3.graph')
     sensor.generateMeasurements(config);
     groundTruthNoSE3Cell = graphFileToCell(config,config.groundTruthFileName);
     measurementsNoSE3Cell = graphFileToCell(config,config.measurementsFileName);
     
     %% 5.2 For test (with SE3)
     config.set('pointMotionMeasurement','point2DataAssociation');
-    config.set('measurementsFileName','RSS18a_measurements.graph');
-    config.set('groundTruthFileName','RSS18a_groundTruth.graph');
+    config.set('measurementsFileName','RSS18c_measurements.graph');
+    config.set('groundTruthFileName','RSS18c_groundTruth.graph');
     sensor.generateMeasurements(config);
     writeDataAssociationVerticesEdges_constantSE3Motion(config,constantSE3ObjectMotion);
     measurementsCell = graphFileToCell(config,config.measurementsFileName);
@@ -130,7 +133,7 @@ config.set('constantSE3Motion',constantSE3ObjectMotion);
     initialGraph0  = initialSolverEnd.graphs(1);
     initialGraphN  = initialSolverEnd.graphs(end);
     %save results to graph file
-    initialGraphN.saveGraphFile(config,'RSS18a_resultsNoSE3.graph');
+    initialGraphN.saveGraphFile(config,'RSS18c_resultsNoSE3.graph');
     
     %% 6.2 With SE3
     %no constraints
@@ -145,7 +148,7 @@ config.set('constantSE3Motion',constantSE3ObjectMotion);
     graph0  = solverEnd.graphs(1);
     graphN  = solverEnd.graphs(end);
     %save results to graph file
-    graphN.saveGraphFile(config,'RSS18a_results.graph');
+    graphN.saveGraphFile(config,'RSS18c_results.graph');
 
 %% 7. Error analysis
 %load ground truth into graph, sort if required
@@ -178,8 +181,8 @@ view([-50,25])
 %plot groundtruth
 plotGraphFileICRA(config,groundTruthCell,'groundTruth');
 %plot results
-resultsNoSE3Cell = graphFileToCell(config,'RSS18a_resultsNoSE3.graph');
-resultsCell = graphFileToCell(config,'RSS18a_results.graph');
+resultsNoSE3Cell = graphFileToCell(config,'RSS18c_resultsNoSE3.graph');
+resultsCell = graphFileToCell(config,'RSS18c_results.graph');
 plotGraphFileICRA(config,resultsNoSE3Cell,'initial',resultsNoSE3.relPose.get('R3xso3Pose'),...
     resultsNoSE3.posePointsN.get('R3xso3Pose'))
 plotGraphFileICRA(config,resultsCell,'solverResults',resultsSE3.relPose.get('R3xso3Pose'),...

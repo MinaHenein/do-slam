@@ -20,6 +20,7 @@ config.set('measurementsFileName','measurementsTest10.graph');
 config.set('motionModel','constantSE3MotionDA');
 config.set('std2PointsSE3Motion', [0.1,0.1,0.1]');
 config = setUnitTestConfig(config);
+config.set('noiseModel','Off');
 rng(config.rngSeed);
 
 %% set up sensor - MANUAL
@@ -212,7 +213,7 @@ fclose(groundTruthGraph);
 fclose(measurementGraph);
 
 %% solver
-writeDataAssociationVerticesEdges(config,constantSE3ObjectMotion)
+writeDataAssociationVerticesEdges_constantSE3Motion(config,constantSE3ObjectMotion)
 
 groundTruthCell  = graphFileToCell(config,config.groundTruthFileName);
 measurementsCell = graphFileToCell(config,config.measurementsFileName);
