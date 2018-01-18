@@ -18,8 +18,8 @@ config = setAppConfig(config); % copy same settings for error Analysis
 % config = setLowErrorAppConfig(config);
 % config = setHighErrorAppConfig(config);
 config.set('noiseModel','Off');
-config.set('groundTruthFileName','RSS18b_groundTruth.graph');
-config.set('measurementsFileName','RSS18b_measurements.graph');
+config.set('groundTruthFileName','RSS18d_groundTruth.graph');
+config.set('measurementsFileName','RSS18d_measurements.graph');
 config.set('t',t);
 % SE3 Motion
 config.set('pointMotionMeasurement','point2DataAssociation');
@@ -39,18 +39,19 @@ robotWaypoints = [robotWaypoints1; robotWaypoints2];
 robotWaypoints = reshape(robotWaypoints',[size(robotWaypoints,2),size(robotWaypoints,1)]);
 robotTrajectoryWaypoints = [linspace(0,tN,nSteps);robotWaypoints];
 
-primitive1Waypoints = [0.01 * ((t*2 + t) .* sin(t)); 0.01 * ((t*2 + t) .* cos(t)); 0.05*t]';
-primitive1Waypoints = reshape(primitive1Waypoints',[size(primitive1Waypoints,2),...
-    size(primitive1Waypoints,1)]);
-primitive1Waypoints = [linspace(0,tN,nSteps);primitive1Waypoints];
-square = [0  5  5  0; ...
-          8 12 12 8; ...
-          0  0 6 6];
+primitive1initialPose = [-10 0 -5 0 0 pi/2]';
+primitive1motion = [1, 0, 0.05, 0, 0, 0.07]';
+primitive1Trajectory = ConstantMotionDiscretePoseTrajectory(t,primitive1initialPose, primitive1motion./dt,'R3xso3');
+primitive1Waypoints = primitive1Trajectory.get('R3xso3Pose',t);
+primitive1Waypoints = [t(1:10:end); primitive1Waypoints(1:3,1:10:end)];
+square = [10  15  15  10; ...
+          -10 20 20 -10; ...
+          -5  -5 6 6];
 primitive2Waypoints = [linspace(0,tN,24); repmat(square,[1 6])];
 
 % construct trajectories
 robotTrajectory = PositionModelPoseTrajectory(robotTrajectoryWaypoints,'R3','smoothingspline');
-primitive1Trajectory = PositionModelPoseTrajectory(primitive1Waypoints,'R3','smoothingspline');
+primitive1Trajectory = PositionModelPoseTrajectory(primitive1Waypoints,'R3','smoothingspline'); % recreates constant motion trajectory using a spline
 primitive2Trajectory = PositionModelPoseTrajectory(primitive2Waypoints,'R3','linearinterp');
 constantSE3ObjectMotion = [];
 constantSE3ObjectMotion(:,1) = primitive1Trajectory.RelativePoseGlobalFrameR3xso3(t(1),t(2));
@@ -59,6 +60,9 @@ constantSE3ObjectMotion(:,2) = primitive2Trajectory.RelativePoseGlobalFrameR3xso
 environment = Environment();
 environment.addEllipsoid([1 1 2.5],8,'R3',primitive1Trajectory);
 environment.addEllipsoid([1 1 2.5],8,'R3',primitive2Trajectory);
+
+nPoints = 100;
+environment.addStaticPoints([80*rand(1,nPoints)-40; 40*rand(1,nPoints)-20; -10*ones(1,nPoints)]);
 %% 3. Initialise Sensor
 cameraTrajectory = RelativePoseTrajectory(robotTrajectory,config.cameraRelativePose);
 
@@ -100,16 +104,16 @@ frames = sensor.plot(t,environment);
 config.set('constantSE3Motion',constantSE3ObjectMotion);
      %% 5.1 For initial (without SE3)
     config.set('pointMotionMeasurement','Off')
-    config.set('measurementsFileName','RSS18b_measurementsNoSE3.graph')
-    config.set('groundTruthFileName','RSS18b_groundTruthNoSE3.graph')
+    config.set('measurementsFileName','RSS18d_measurementsNoSE3.graph')
+    config.set('groundTruthFileName','RSS18d_groundTruthNoSE3.graph')
     sensor.generateMeasurements(config);
     groundTruthNoSE3Cell = graphFileToCell(config,config.groundTruthFileName);
     measurementsNoSE3Cell = graphFileToCell(config,config.measurementsFileName);
     
     %% 5.2 For test (with SE3)
     config.set('pointMotionMeasurement','point2DataAssociation');
-    config.set('measurementsFileName','RSS18b_measurements.graph');
-    config.set('groundTruthFileName','RSS18b_groundTruth.graph');
+    config.set('measurementsFileName','RSS18d_measurements.graph');
+    config.set('groundTruthFileName','RSS18d_groundTruth.graph');
     sensor.generateMeasurements(config);
     writeDataAssociationVerticesEdges_constantSE3Motion(config,constantSE3ObjectMotion);
     measurementsCell = graphFileToCell(config,config.measurementsFileName);
@@ -130,7 +134,7 @@ config.set('constantSE3Motion',constantSE3ObjectMotion);
     initialGraph0  = initialSolverEnd.graphs(1);
     initialGraphN  = initialSolverEnd.graphs(end);
     %save results to graph file
-    initialGraphN.saveGraphFile(config,'RSS18b_resultsNoSE3.graph');
+    initialGraphN.saveGraphFile(config,'RSS18d_resultsNoSE3.graph');
     
     %% 6.2 With SE3
     %no constraints
@@ -145,7 +149,7 @@ config.set('constantSE3Motion',constantSE3ObjectMotion);
     graph0  = solverEnd.graphs(1);
     graphN  = solverEnd.graphs(end);
     %save results to graph file
-    graphN.saveGraphFile(config,'RSS18b_results.graph');
+    graphN.saveGraphFile(config,'RSS18d_results.graph');
 
 %% 7. Error analysis
 %load ground truth into graph, sort if required
@@ -178,8 +182,8 @@ view([-50,25])
 %plot groundtruth
 plotGraphFileICRA(config,groundTruthCell,'groundTruth');
 %plot results
-resultsNoSE3Cell = graphFileToCell(config,'RSS18b_resultsNoSE3.graph');
-resultsCell = graphFileToCell(config,'RSS18b_results.graph');
+resultsNoSE3Cell = graphFileToCell(config,'RSS18d_resultsNoSE3.graph');
+resultsCell = graphFileToCell(config,'RSS18d_results.graph');
 plotGraphFileICRA(config,resultsNoSE3Cell,'initial',resultsNoSE3.relPose.get('R3xso3Pose'),...
     resultsNoSE3.posePointsN.get('R3xso3Pose'))
 plotGraphFileICRA(config,resultsCell,'solverResults',resultsSE3.relPose.get('R3xso3Pose'),...

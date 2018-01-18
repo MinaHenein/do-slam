@@ -39,18 +39,19 @@ robotWaypoints = [robotWaypoints1; robotWaypoints2];
 robotWaypoints = reshape(robotWaypoints',[size(robotWaypoints,2),size(robotWaypoints,1)]);
 robotTrajectoryWaypoints = [linspace(0,tN,nSteps);robotWaypoints];
 
-primitive1Waypoints = [0.01 * ((t*2 + t) .* sin(t)); 0.01 * ((t*2 + t) .* cos(t)); 0.05*t]';
-primitive1Waypoints = reshape(primitive1Waypoints',[size(primitive1Waypoints,2),...
-    size(primitive1Waypoints,1)]);
-primitive1Waypoints = [linspace(0,tN,nSteps);primitive1Waypoints];
-square = [0  5  5  0; ...
-          8 12 12 8; ...
-          0  0 6 6];
+primitive1initialPose = [-10 0 -5 0 0 pi/2]';
+primitive1motion = [1, 0, 0.05, 0, 0, 0.07]';
+primitive1Trajectory = ConstantMotionDiscretePoseTrajectory(t,primitive1initialPose, primitive1motion./dt,'R3xso3');
+primitive1Waypoints = primitive1Trajectory.get('R3xso3Pose',t);
+primitive1Waypoints = [t(1:10:end); primitive1Waypoints(1:3,1:10:end)];
+square = [10  15  15  10; ...
+          -10 20 20 -10; ...
+          -5  -5 6 6];
 primitive2Waypoints = [linspace(0,tN,24); repmat(square,[1 6])];
 
 % construct trajectories
 robotTrajectory = PositionModelPoseTrajectory(robotTrajectoryWaypoints,'R3','smoothingspline');
-primitive1Trajectory = PositionModelPoseTrajectory(primitive1Waypoints,'R3','smoothingspline');
+primitive1Trajectory = PositionModelPoseTrajectory(primitive1Waypoints,'R3','smoothingspline'); % recreates constant motion trajectory using a spline
 primitive2Trajectory = PositionModelPoseTrajectory(primitive2Waypoints,'R3','linearinterp');
 constantSE3ObjectMotion = [];
 constantSE3ObjectMotion(:,1) = primitive1Trajectory.RelativePoseGlobalFrameR3xso3(t(1),t(2));
@@ -172,8 +173,8 @@ zlabel('z (m)')
 hold on
 grid on
 axis equal
-axisLimits = [-25,25,0,30,-5,15];
-axis(axisLimits)
+% axisLimits = [-25,25,0,30,-5,15];
+% axis(axisLimits)
 view([-50,25])
 %plot groundtruth
 plotGraphFileICRA(config,groundTruthCell,'groundTruth');
