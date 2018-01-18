@@ -39,19 +39,19 @@ robotWaypoints = [robotWaypoints1; robotWaypoints2];
 robotWaypoints = reshape(robotWaypoints',[size(robotWaypoints,2),size(robotWaypoints,1)]);
 robotTrajectoryWaypoints = [linspace(0,tN,nSteps);robotWaypoints];
 
-primitive1Waypoints = [sin(t * .5); cos(t * .5); (3 - .5 * (.5 + .5 * sin(t / 10)))]';
+primitive1Waypoints = [0.01 * ((t*2 + t) .* sin(t)); 0.01 * ((t*2 + t) .* cos(t)); 0.05*t]';
 primitive1Waypoints = reshape(primitive1Waypoints',[size(primitive1Waypoints,2),...
     size(primitive1Waypoints,1)]);
 primitive1Waypoints = [linspace(0,tN,nSteps);primitive1Waypoints];
-square = [0 5  5  0; ...
-          3 5  5  3; ...
-          2 2 10 10];
+square = [0  5  5  0; ...
+          8 12 12 8; ...
+          0  0 6 6];
 primitive2Waypoints = [linspace(0,tN,nSteps-2); repmat(square,[1 60])];
 
 % construct trajectories
 robotTrajectory = PositionModelPoseTrajectory(robotTrajectoryWaypoints,'R3','smoothingspline');
 primitive1Trajectory = PositionModelPoseTrajectory(primitive1Waypoints,'R3','smoothingspline');
-primitive2Trajectory = PositionModelPoseTrajectory(primitive2Waypoints,'R3','smoothingspline');
+primitive2Trajectory = PositionModelPoseTrajectory(primitive2Waypoints,'R3','linearinterp');
 constantSE3ObjectMotion = [];
 constantSE3ObjectMotion(:,1) = primitive1Trajectory.RelativePoseGlobalFrameR3xso3(t(1),t(2));
 constantSE3ObjectMotion(:,2) = primitive2Trajectory.RelativePoseGlobalFrameR3xso3(t(1),t(2));
