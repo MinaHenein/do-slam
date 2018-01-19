@@ -17,7 +17,7 @@ config = CameraConfig();
 config = setAppConfig(config); % copy same settings for error Analysis
 % config = setLowErrorAppConfig(config);
 % config = setHighErrorAppConfig(config);
-config.set('noiseModel','Off');
+% config.set('noiseModel','Off');
 config.set('groundTruthFileName','RSS18d_groundTruth.graph');
 config.set('measurementsFileName','RSS18d_measurements.graph');
 config.set('t',t);
