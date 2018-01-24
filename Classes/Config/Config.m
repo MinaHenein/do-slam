@@ -80,6 +80,7 @@ classdef Config < ArrayGetSet
         staticDataAssociation % this determines whether points are 
         % always data associated or whether only between 2 time steps
         % settings are 'On' meaning global data association or or 'Off'
+        objectAssociation % same as above but for objects
         
         %solver settings
         sortVertices

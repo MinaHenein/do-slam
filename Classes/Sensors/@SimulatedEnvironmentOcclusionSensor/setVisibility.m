@@ -21,6 +21,13 @@ for i = 1:nSteps
         self.pointVisibility(j,i) = jPointVisible;
         self.pointObservationRelative(j,i) = jPointRelative;
     end
+    for k = 1:self.nObjects
+       pointIndexes = self.get('objects',k).get('pointIndexes');
+       visibilities = self.pointVisibility(pointIndexes,i);
+       if any(visibilities)
+           self.objectVisibility(k,i) = 1;
+       end
+    end
 end
         
 end

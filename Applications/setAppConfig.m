@@ -99,7 +99,8 @@ config.set('startPose','initial');
 %   static assumption
 config.set('staticAssumption',0);
 % data association
-config.set('staticDataAssociation','consistent');
+config.set('staticDataAssociation','On');
+config.set('staticDataAssociation','On'); % set this to 'Off' to change object indexes
 %   solver settings
 config.set('sortVertices',0);
 config.set('sortEdges',0);
