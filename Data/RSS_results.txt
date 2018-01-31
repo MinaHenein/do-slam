@@ -1,0 +1,101 @@
+RSS18ExpB
+Initial results for without SE(3) Transform:
+Absolute Trajectory Translation Error: 0.394 
+Absolute Trajectory Rotation Error: 9.791 
+Absolute Structure Points Error: 1.321 
+All to All Relative Pose Translation Error: 0.010 
+All to All Relative Pose Rotation Error: 0.129 
+All to All Relative Point Translation Error (e-3): 3.665 
+
+Final results for SE(3) Transform:
+Absolute Trajectory Translation Error: 0.393 
+Absolute Trajectory Rotation Error: 6.047 
+Absolute Structure Points Error: 0.406 
+All to All Relative Pose Translation Error: 0.002 
+All to All Relative Pose Rotation Error: 0.039 
+All to All Relative Point Translation Error (e-3): 1.128 
+
+RSSExpB2
+Initial results for without SE(3) Transform:
+Absolute Trajectory Translation Error: 0.342 
+Absolute Trajectory Rotation Error: 6.211 
+Absolute Structure Points Error: 0.733 
+All to All Relative Pose Translation Error: 0.003 
+All to All Relative Pose Rotation Error: 0.082 
+All to All Relative Point Translation Error (e-3): 4.021 
+
+Final results for SE(3) Transform:
+Absolute Trajectory Translation Error: 0.195 
+Absolute Trajectory Rotation Error: 3.707 
+Absolute Structure Points Error: 0.496 
+All to All Relative Pose Translation Error: 0.003 
+All to All Relative Pose Rotation Error: 0.058 
+All to All Relative Point Translation Error (e-3): 2.705 
+
+RSSExpC
+Initial results for without SE(3) Transform:
+Absolute Trajectory Translation Error: 0.773 
+Absolute Trajectory Rotation Error: 11.464 
+Absolute Structure Points Error: 0.752 
+All to All Relative Pose Translation Error: 0.006 
+All to All Relative Pose Rotation Error: 0.107 
+All to All Relative Point Translation Error (e-3): 3.261 
+
+Final results for SE(3) Transform:
+Absolute Trajectory Translation Error: 0.430 
+Absolute Trajectory Rotation Error: 12.158 
+Absolute Structure Points Error: 0.717 
+All to All Relative Pose Translation Error: 0.007 
+All to All Relative Pose Rotation Error: 0.121 
+All to All Relative Point Translation Error (e-3): 3.078 
+
+RSSExpD
+Initial results for without SE(3) Transform:
+Absolute Trajectory Translation Error: 0.697 
+Absolute Trajectory Rotation Error: 7.754 
+Absolute Structure Points Error: 1.416 
+All to All Relative Pose Translation Error: 0.006 
+All to All Relative Pose Rotation Error: 0.108 
+All to All Relative Point Translation Error (e-3): 3.302 
+
+Final results for SE(3) Transform:
+Absolute Trajectory Translation Error: 0.135 
+Absolute Trajectory Rotation Error: 1.713 
+Absolute Structure Points Error: 0.298 
+All to All Relative Pose Translation Error: 0.002 
+All to All Relative Pose Rotation Error: 0.028 
+All to All Relative Point Translation Error (e-3): 0.690 
+
+RSSExpD2
+Initial results for without SE(3) Transform:
+Absolute Trajectory Translation Error: 0.457 
+Absolute Trajectory Rotation Error: 6.439 
+Absolute Structure Points Error: 1.127 
+All to All Relative Pose Translation Error: 0.004 
+All to All Relative Pose Rotation Error: 0.091 
+All to All Relative Point Translation Error (e-3): 6.516 
+
+Final results for SE(3) Transform:
+Absolute Trajectory Translation Error: 0.207 
+Absolute Trajectory Rotation Error: 4.249 
+Absolute Structure Points Error: 0.595 
+All to All Relative Pose Translation Error: 0.005 
+All to All Relative Pose Rotation Error: 0.066 
+All to All Relative Point Translation Error (e-3): 3.522 
+
+RSSExpE
+Initial results for without SE(3) Transform:
+Absolute Trajectory Translation Error: 0.288 
+Absolute Trajectory Rotation Error: 5.543 
+Absolute Structure Points Error: 0.412 
+All to All Relative Pose Translation Error: 0.004 
+All to All Relative Pose Rotation Error: 0.080 
+All to All Relative Point Translation Error (e-3): 1.857 
+
+Final results for SE(3) Transform:
+Absolute Trajectory Translation Error: 0.206 
+Absolute Trajectory Rotation Error: 2.120 
+Absolute Structure Points Error: 0.135 
+All to All Relative Pose Translation Error: 0.003 
+All to All Relative Pose Rotation Error: 0.037 
+All to All Relative Point Translation Error (e-3): 0.617 
