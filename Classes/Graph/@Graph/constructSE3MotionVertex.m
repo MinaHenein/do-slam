@@ -14,10 +14,11 @@ edgeValue = edgeRow{5};
 edgeCovariance = edgeRow{6};
 
 
-[rotM,t] = Kabsch( obj.vertices(pointVertex(1)).value,...
-    obj.vertices(pointVertex(2)).value);
+% [rotM,t] = Kabsch( obj.vertices(pointVertex(1)).value,...
+%     obj.vertices(pointVertex(2)).value);
 
-SE3Motion = [t;arot(rotM)];
+
+SE3Motion = [0 0 0 0 0 0]';
 
 %% 2. compute SE3Motion value
 % nSteps = 0;

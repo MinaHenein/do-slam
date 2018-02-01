@@ -63,7 +63,7 @@ sensor.setVisibility(config,environment);
 
 figure
 spy(sensor.get('pointVisibility'));
-print('RSS18ExpB22_PointVisibility','-dpdf')
+print('RSS18ExpB2_PointVisibility','-dpdf')
 %% 4. Plot Environment
 figure
 viewPoint = [-35,35];
@@ -82,11 +82,11 @@ primitive2Trajectory.plot(t,[0 0 0],'axesOFF')
 cameraTrajectory.plot(t,[0 0 1],'axesOFF')
 % set(gcf,'Position',[0 0 1024 768]);
 frames = sensor.plot(t,environment);
-print('RSS18ExpB22_Environment','-dpdf')
+print('RSS18ExpB2_Environment','-dpdf')
 % implay(frames);
 
     %% 4.a output video
-v = VideoWriter('Data/Videos/RSS18ExpB22_sensor_environment.mp4','MPEG-4');
+v = VideoWriter('Data/Videos/RSS18ExpB2_sensor_environment.mp4','MPEG-4');
 open(v)
 writeVideo(v,frames);
 close(v)

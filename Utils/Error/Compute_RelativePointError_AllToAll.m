@@ -16,8 +16,8 @@ for n_delta = 1:n-1
 end
 
 % divide by number of edges
-r_f_translation_error = r_f_translation_error/(n*(n-1)/2);
-r_f_squared_translation_error = r_f_squared_translation_error/(n*(n-1)/2);
+r_f_translation_error = r_f_translation_error/(n/2);
+r_f_squared_translation_error = r_f_squared_translation_error/(n/2);
 
 end
 		
