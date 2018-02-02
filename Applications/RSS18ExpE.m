@@ -55,8 +55,8 @@ constantSE3ObjectMotion(:,1) = primitive1Trajectory.RelativePoseGlobalFrameR3xso
 constantSE3ObjectMotion(:,2) = primitive2Trajectory.RelativePoseGlobalFrameR3xso3(t(1),t(2));
 
 environment = Environment();
-environment.addEllipsoid([1 1 2.5],8,'R3',primitive1Trajectory);
-environment.addEllipsoid([1 1 2.5],8,'R3',primitive2Trajectory);
+environment.addEllipsoid([2.5 1 1],8,'R3',primitive1Trajectory);
+environment.addEllipsoid([2.5 1 1],8,'R3',primitive2Trajectory);
 %% 3. Initialise Sensor
 cameraTrajectory = RelativePoseTrajectory(robotTrajectory,config.cameraRelativePose);
 

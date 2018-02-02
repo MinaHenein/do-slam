@@ -34,10 +34,10 @@ robotWaypoints = [( -6 - .5 * (.5 + 10 * sin(t / 10))); sin(t * .5); cos(t * .5)
 robotWaypoints = reshape(robotWaypoints',[size(robotWaypoints,2),size(robotWaypoints,1)]);
 robotTrajectoryWaypoints = [linspace(0,tN,nSteps);robotWaypoints];
 
-primitive1InitialPose_R3xso3 = [-15 5 5 0 0 0]';
+primitive1InitialPose_R3xso3 = [-15 5 5 pi/2 0 0]';
 primitive1Motion_R3xso3 = [0.1*dt; 0; 0; arot(eul2rot([0,0,0]))];
 
-primitive2InitialPose_R3xso3 = [3 -5 2 0 0 0]';
+primitive2InitialPose_R3xso3 = [3 -5 2 pi/2 0 0]';
 primitive2Motion_R3xso3 = [-0.15*dt; 0; 0; arot(eul2rot([0,0,0]))];
 
 % construct trajectories
@@ -49,8 +49,8 @@ constantSE3ObjectMotion(:,1) = primitive1Trajectory.RelativePoseGlobalFrameR3xso
 constantSE3ObjectMotion(:,2) = primitive2Trajectory.RelativePoseGlobalFrameR3xso3(t(1),t(2));
 
 environment = Environment();
-environment.addEllipsoid([1 1 2.5],8,'R3',primitive1Trajectory);
-environment.addEllipsoid([1 1 2.5],8,'R3',primitive2Trajectory);
+environment.addEllipsoid([2.5 1 1],8,'R3',primitive1Trajectory);
+environment.addEllipsoid([2.5 1 1],8,'R3',primitive2Trajectory);
 %% 3. Initialise Sensor
 cameraTrajectory = RelativePoseTrajectory(robotTrajectory,config.cameraRelativePose);
 
