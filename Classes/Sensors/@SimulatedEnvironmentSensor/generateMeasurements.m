@@ -23,6 +23,7 @@ nSteps = numel(t);
 
 % indexing variables
 vertexCount         = 0;
+objectCount         = 0;
 cameraVertexIndexes = zeros(1,nSteps);
 pointVertexIndexes = zeros(1,nSteps);
 
@@ -34,16 +35,21 @@ dynamicObjectLogical = ~staticObjectLogical;
 staticPointIndexes      = find(staticPointLogical);
 staticObjectIndexes  = find(staticObjectLogical);
 dynamicPointIndexes     = find(dynamicPointLogical);
-dynamiObjectIndexes = find(dynamicObjectLogical);
+dynamicObjectIndexes = find(dynamicObjectLogical);
 
 % error check for visibility
 if isempty(self.pointVisibility)
     error('Visibility must be set first.');
 end
 
-%% 1.a Clear vertex Indexes
+%% 1.a Clear vertex and object Indexes, instantiate object indexes
 for j=1:self.nPoints
     self.get('points',j).clearIndex();
+end
+
+for j=1:self.nObjects
+    self.get('objects',j).set('vertexIndex',j) % sets the index of the object to its default
+    objectCount = j;
 end
 
 %% 2. Loop over timestep, simulate observations, write to graph file
@@ -181,13 +187,12 @@ for i = 1:nSteps
                 switch config.pointMotionMeasurement
                     case 'point2DataAssociation'
                         label = config.pointDataAssociationLabel;
-                        covariance = [];
                         index1 = vertexIndexes(end-1);
                         index2 = vertexIndexes(end);
                         object = jPoint.get('objectIndexes');
-                        value = [];
-                        fprintf(gtFileID,'%s %d %d %d\n',label,index1,index2,object(1));
-                        fprintf(mFileID,'%s %d %d %d\n',label,index1,index2,object(1));
+                        objectIndex = self.get('objects',object(1)).get('vertexIndex');
+                        fprintf(gtFileID,'%s %d %d %d\n',label,index1,index2,objectIndex(end));
+                        fprintf(mFileID,'%s %d %d %d\n',label,index1,index2,objectIndex(end));
                     case 'point2Edge'
                         label = config.pointPointEdgeLabel;
                         covariance = config.covPointPoint;
@@ -301,6 +306,16 @@ for i = 1:nSteps
                 index2 = jObject.get('vertexIndex');
                 writeEdge(label,index1,index2,valueGT,covariance,gtFileID);
                 writeEdge(label,index1,index2,valueMeas,covariance,mFileID);
+            end
+        end
+    end
+    
+    for j = 1:self.nObjects
+        if i > 1
+            if self.objectVisibility(j,i) && ~self.objectVisibility(j,i-1) && strcmp(config.objectAssociation,'Off')
+                objectCount = objectCount + 1; 
+                objectIndex = [self.get('objects',j).get('vertexIndex') objectCount];
+                self.get('objects',j).set('vertexIndex',objectIndex);
             end
         end
     end
