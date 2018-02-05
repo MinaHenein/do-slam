@@ -1,4 +1,4 @@
-function [obj] = constructSE3MotionVertex(obj,config,edgeRow)
+function [obj] = constructSE3MotionVertex(obj,config,edgeRow, objectCount)
 %CONSTRUCTSE3MOTIONVERTEX constructs vertex representing SE3 motion of an object. 
 %SE3 motion is initialised by extracting information from the same points at 
 %different time steps. 
@@ -13,11 +13,21 @@ SE3MotionVertex = edgeRow{4};
 edgeValue = edgeRow{5};
 edgeCovariance = edgeRow{6};
 
+switch config.SE3MotionVertexInitialization
+    case 'eye'
+        SE3Motion = [0;0;0;0;0;0];
+    case 'translation'
+        [rotM,t] = Kabsch( obj.vertices(pointVertex(1)).value,...
+        obj.vertices(pointVertex(2)).value);
+        SE3Motion = [t;arot(rotM)];
+    case 'GT'
+        SE3Motion =  config.constantSE3Motion(:,objectCount);
+    case 'noisyGT'
+        SE3Motion =  config.constantSE3Motion(:,objectCount);
+        noise = normrnd(SE3Motion,config.stdPosePose,size(SE3Motion));
+        SE3Motion = RelativeToAbsolutePoseR3xso3(SE3Motion,noise);
+end
 
-[rotM,t] = Kabsch( obj.vertices(pointVertex(1)).value,...
-    obj.vertices(pointVertex(2)).value);
-
-SE3Motion = [t;arot(rotM)];
 
 %% 2. compute SE3Motion value
 % nSteps = 0;

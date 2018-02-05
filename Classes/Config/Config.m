@@ -67,6 +67,9 @@ classdef Config < ArrayGetSet
         %plane parameterisation
         planeNormalParameterisation
         
+        %SE3 Motion Vertex initialization
+        SE3MotionVertexInitialization
+        
         %constraints
         applyAngleConstraints
         automaticAngleConstraints

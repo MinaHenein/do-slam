@@ -162,22 +162,22 @@ for j=1:1:length(Index)
         if  isNewSE3Vertex
             % Shift all lines below vertices 1 line below to allow space for 
             % new vertex in the right place
-            fileID = fopen(strcat(config.folderPath,config.sep,'Data',...
-                config.sep,config.graphFileFolderName,config.sep,GTFileName),'r');
-            fseek(fileID, 0, 'eof');
-            fileSize = ftell(fileID);
-            frewind(fileID);
-            data = fread(fileID, fileSize, 'uint8');
-            nLines = sum(data == 10) + 1;
-            fclose(fileID);
-            for i= nLines-1:-1:nVertices+1
-                CStr(i+1) = CStr(i);
-            end
+%             fileID = fopen(strcat(config.folderPath,config.sep,'Data',...
+%                 config.sep,config.graphFileFolderName,config.sep,GTFileName),'r');
+%             fseek(fileID, 0, 'eof');
+%             fileSize = ftell(fileID);
+%             frewind(fileID);
+%             data = fread(fileID, fileSize, 'uint8');
+%             nLines = sum(data == 10) + 1;
+%             fclose(fileID);
+%             for i= nLines-1:-1:nVertices+1
+%                 CStr(i+1) = CStr(i);
+%             end
             CStr(newVertexID) = cellstr(sprintf('%s %d %f %f %f %f %f %f',...
             vertex.label,vertex.index,vertex.value'));
-            % if new line added before 2POINTS_DataAssociation, incerment
+            % if new line added before 2POINTS_DataAssociation, increment
             % nLinesAdded to be able to delete the correct line afterwards
-            nLinesAdded = nLinesAdded+1;
+%             nLinesAdded = nLinesAdded+1;
             nSE3MotionVertices = nSE3MotionVertices +1;
         end
         
@@ -195,8 +195,8 @@ for j=1:1:length(Index)
             edge.covUT));
         end
         % delete 1 line with 2POINTS_DataAssociation
-        CStr(Index(j)+nLinesAdded) = [];
-        nLinesAdded = nLinesAdded-1;
+%         CStr(Index(j)+nLinesAdded) = [];
+%         nLinesAdded = nLinesAdded-1;
         isNewSE3Vertex = 0;
     end
     % Save the file again
@@ -206,6 +206,9 @@ for j=1:1:length(Index)
     fprintf(fileID, '%s\n', Edges{:});
     fclose(fileID);
 end
+GTFilePath = strcat(config.folderPath,config.sep,'Data',...
+        config.sep,config.graphFileFolderName,config.sep,GTFileName);
+deleteDataAssociationFromGraphFile(GTFilePath)
 
 MeasurementsFileName = config.measurementsFileName;
 filepath = strcat(config.folderPath,config.sep,'Data',...

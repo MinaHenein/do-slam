@@ -18,6 +18,7 @@ config.set('groundTruthFileName' ,'groundTruthTest11.graph');
 config.set('measurementsFileName','measurementsTest11.graph');
 config.set('motionModel','constantSE3MotionDA');
 config.set('std2PointsSE3Motion', [0.1,0.1,0.1]');
+config.set('SE3MotionVertexInitialization','eye');
 config = setUnitTestConfig(config);
 rng(config.rngSeed);
 
@@ -267,7 +268,7 @@ fclose(groundTruthGraph);
 fclose(measurementGraph);
 
 %% solver
-writeDataAssociationVerticesEdges(config,planeSE3motion)
+writeDataAssociationVerticesEdges_constantSE3Motion(config,planeSE3motion)
 
 groundTruthCell  = graphFileToCell(config,config.groundTruthFileName);
 measurementsCell = graphFileToCell(config,config.measurementsFileName);
@@ -283,17 +284,6 @@ graphN.saveGraphFile(config,'resultsTest11.graph');
 %
 graphGT = Graph(config,groundTruthCell);
 results = errorAnalysis(config,graphGT,graphN);
-results2HIGH = results;
-fprintf('Chi Squared Error: %.4d \n',solverEnd.systems.chiSquaredError)
-fprintf('Absolute Trajectory Translation Error: %.4d \n',results.ATE_translation_error)
-fprintf('Absolute Trajectory Rotation Error: %.4d \n',results.ATE_rotation_error)
-fprintf('Absolute Structure Points Error: %d \n',results.ASE_translation_error);
-fprintf('All to All Relative Pose Squared Translation Error: %.4d \n',...
-    results.AARPE_squared_translation_error)
-fprintf('All to All Relative Pose Squared Rotation Error: %.4d \n',...
-    results.AARPE_squared_rotation_error)
-fprintf('All to All Relative Point Squared Translation Error: %.4d \n',...
-    results.AARPTE_squared_translation_error)
 
 %% plot graph files
 % h = figure;

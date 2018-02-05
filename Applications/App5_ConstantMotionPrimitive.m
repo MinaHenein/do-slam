@@ -82,9 +82,9 @@ spy(sensor.get('pointVisibility'));
 % axis(axisLimits)
 % primitiveTrajectory.plot(t,[0 0 0],'axesOFF')
 % cameraTrajectory.plot(t,[0 0 1],'axesOFF')
-% set(gcf,'Position',[0 0 1024 768]);
-% frames = sensor.plot(0,environment);
-% % implay(frames);
+% % set(gcf,'Position',[0 0 1024 768]);
+% frames = sensor.plot(t,environment);
+% implay(frames);
 
 
 %% 4.a output video

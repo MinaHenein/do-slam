@@ -83,7 +83,8 @@ config.set('stdPosePose'  ,[0.1,0.1,0.1,orientation']');
 config.set('stdPosePoint' ,[0.1,0.1,0.1]');
 config.set('stdPointPlane',0.001);
 % set properties of CameraConfig
-config.set('fieldOfView',[-pi/3,pi/3,-pi/6,pi/6,1,40]); %az,el,r limits
+% config.set('fieldOfView',[-pi/3,pi/3,-pi/6,pi/6,1,40]); 
+config.set('fieldOfView',[-pi/2,pi/2,-pi/3,pi/3,1,40]);%az,el,r limits
 config.set('cameraRelativePose',GP_Pose([0,0,0,0,0,-pi/8]'));
 % set properties of solverConfig
 %   dimensions
@@ -101,8 +102,8 @@ config.set('staticAssumption',0);
 %   solver settings
 config.set('sortVertices',0);
 config.set('sortEdges',0);
-% config.set('processing','batch');
-config.set('processing','incremental');
+config.set('processing','batch');
+% config.set('processing','incremental');
 config.set('plotIncremental',1);
 config.set('nVerticesThreshold',100);
 config.set('nEdgesThreshold',200);

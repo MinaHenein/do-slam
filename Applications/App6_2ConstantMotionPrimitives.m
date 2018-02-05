@@ -19,7 +19,7 @@ config = setAppConfig(config); % copy same settings for error Analysis
 % config = setLowErrorAppConfig(config);
 % config = setHighErrorAppConfig(config);
 config.set('t',t);
-% config.set('noiseModel','Off');
+config.set('noiseModel','Off');
 config.set('groundTruthFileName','app6_groundTruth.graph');
 config.set('measurementsFileName','app6_measurements.graph');
 
