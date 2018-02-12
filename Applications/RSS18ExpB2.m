@@ -63,7 +63,7 @@ sensor.setVisibility(config,environment);
 
 figure
 spy(sensor.get('pointVisibility'));
-print('RSS18ExpB2_PointVisibility','-dpdf')
+print('RSS18ExpB22_PointVisibility','-dpdf')
 %% 4. Plot Environment
 figure
 viewPoint = [-35,35];
@@ -82,11 +82,11 @@ primitive2Trajectory.plot(t,[0 0 0],'axesOFF')
 cameraTrajectory.plot(t,[0 0 1],'axesOFF')
 % set(gcf,'Position',[0 0 1024 768]);
 frames = sensor.plot(t,environment);
-print('RSS18ExpB2_Environment','-dpdf')
+print('RSS18ExpB22_Environment','-dpdf')
 % implay(frames);
 
     %% 4.a output video
-v = VideoWriter('Data/Videos/RSS18ExpB2_sensor_environment.mp4','MPEG-4');
+v = VideoWriter('Data/Videos/RSS18ExpB22_sensor_environment.mp4','MPEG-4');
 open(v)
 writeVideo(v,frames);
 close(v)
@@ -167,8 +167,8 @@ zlabel('z (m)')
 hold on
 grid on
 axis equal
-% axisLimits = [-25,25,0,30,-5,15];
-% axis(axisLimits)
+axisLimits = [-25,25,0,30,-5,15];
+axis(axisLimits)
 view([-50,25])
 %plot groundtruth
 plotGraphFileICRA(config,groundTruthCell,'groundTruth');
@@ -177,4 +177,4 @@ resultsNoSE3Cell = graphFileToCell(config,'RSS18ExpB2_resultsNoSE3.graph');
 resultsCell = graphFileToCell(config,'RSS18ExpB2_results.graph');
 plotGraphFileICRA(config,resultsNoSE3Cell,'initial',resultsNoSE3.relPose.get('R3xso3Pose'),resultsNoSE3.posePointsN.get('R3xso3Pose'))
 plotGraphFileICRA(config,resultsCell,'solverResults',resultsSE3.relPose.get('R3xso3Pose'),resultsSE3.posePointsN.get('R3xso3Pose'))
-print('RSS18ExpB2_Solution','-dpdf')
+print('RSS18ExpB_Solution','-dpdf')

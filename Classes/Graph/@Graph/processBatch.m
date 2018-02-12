@@ -38,7 +38,6 @@ iPoseVertices = [];
 iPointVertices = [];
 iEntityVertices = [];
 iObjectVertices = [];
-objectCount = 0;
 
 %loop over nSteps
 nSteps = numel(odometryRows) + 1;
@@ -131,8 +130,7 @@ for i = 1:nSteps
                 jRow{2} = obj.nEdges+1;
                 %create velocity vertex if it doesn't exist
                 if jRow{4} > obj.nVertices
-                    objectCount = objectCount + 1;
-                    obj = obj.constructSE3MotionVertex(config,jRow,objectCount);
+                    obj = obj.constructSE3MotionVertex(config,jRow);
                 end
                 obj = obj.construct2PointsSE3MotionEdge(config,jRow);
             case config.pointPlaneEdgeLabel

@@ -69,6 +69,8 @@ classdef Config < ArrayGetSet
         
         %SE3 Motion Vertex initialization
         SE3MotionVertexInitialization
+        %new Motion Vertex per n-landmarks
+        newMotionVertexPerNLandmarks
         
         %constraints
         applyAngleConstraints

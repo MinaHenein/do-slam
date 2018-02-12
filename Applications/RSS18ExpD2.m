@@ -170,8 +170,8 @@ zlabel('z (m)')
 hold on
 grid on
 axis equal
-% axisLimits = [-25,25,0,30,-5,15];
-% axis(axisLimits)
+axisLimits = [-25,25,0,30,-5,15];
+axis(axisLimits)
 view([-50,25])
 %plot groundtruth
 plotGraphFileICRA(config,groundTruthCell,'groundTruth');

@@ -1,4 +1,4 @@
-function [obj] = constructSE3MotionVertex(obj,config,edgeRow, objectCount)
+function [obj] = constructSE3MotionVertex(obj,config,edgeRow)
 %CONSTRUCTSE3MOTIONVERTEX constructs vertex representing SE3 motion of an object. 
 %SE3 motion is initialised by extracting information from the same points at 
 %different time steps. 
@@ -15,7 +15,6 @@ edgeCovariance = edgeRow{6};
 
 % [rotM,t] = Kabsch( obj.vertices(pointVertex(1)).value,...
 %     obj.vertices(pointVertex(2)).value);
-
 
 SE3Motion = [0 0 0 0 0 0]';
 

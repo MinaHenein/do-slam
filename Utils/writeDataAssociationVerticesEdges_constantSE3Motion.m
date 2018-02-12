@@ -82,10 +82,13 @@ nSE3MotionVertices = 0;
 isNewSE3Vertex = 0;
 object = 0;
 lastObject = 0;
+index2Last = 0;
+nLandmarksPerMotionVertex = 0;
 for j=1:1:length(Index)
     Edges = {};
     if j > 1
         lastObject = object;
+        index2Last = index2;
     end
     % get line of Index
     fileID = fopen(filepath,'r');
@@ -123,10 +126,24 @@ for j=1:1:length(Index)
     if nSE3MotionVertices == 0
         isNewSE3Vertex = 1;
         newVertexID = nVertices +1;
+        nLandmarksPerMotionVertex = 2;
     end
-    if j > 1 && nObjects > 1 && object~=lastObject
+    if nObjects > 1 && object~=lastObject
+        nLandmarksPerMotionVertex = config.newMotionVertexPerNLandmarks;
+    end
+    
+    if j > 1 % && nObjects > 1 && object~=lastObject 
+        if nLandmarksPerMotionVertex < config.newMotionVertexPerNLandmarks
+            if index1 ~= index2Last
+                nLandmarksPerMotionVertex = nLandmarksPerMotionVertex + 2;
+            else
+                nLandmarksPerMotionVertex = nLandmarksPerMotionVertex + 1;
+            end
+        else
         isNewSE3Vertex = 1;
         newVertexID = newVertexID+1;
+        nLandmarksPerMotionVertex = 2;
+        end
     end
     
     % get motion model and replace line accordingly

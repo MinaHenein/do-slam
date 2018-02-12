@@ -130,7 +130,7 @@ config.set('constantSE3Motion',constantSE3ObjectMotion);
 %% 7. Error analysis
 %load ground truth into graph, sort if required
 % to evaluate vs GT generated with constant acceleration
-groundTruthCell  = graphFileToCell(config,'app8_groundTruth.graph');
+groundTruthCell  = graphFileToCell(config,'app9_groundTruth.graph');
 
 graphGTNoSE3 = Graph(config,groundTruthNoSE3Cell);
 graphGT = Graph(config,groundTruthCell);
