@@ -1,5 +1,5 @@
 
-function plotRSS(SE3VertexInitialization, noiseLevel, trial)
+function plotRSS(SE3VertexInitialization, noiseLevel, name)
 if SE3VertexInitialization == 1
     SE3Vertex = 'Motion Vertex initialized as identity';
 elseif SE3VertexInitialization == 2
@@ -23,8 +23,9 @@ allRTE = [];
 allRRE = [];
 allRSE = [];
 
+
 for i = sequence
-    edges = load(strcat('Data/test12_results_JL/edges_',num2str(fibonacci(i)),'_',...
+    edges = load(strcat('Data/',name,'_results/edges_',num2str(fibonacci(i)),'_',...
         num2str(SE3VertexInitialization),'_',num2str(noiseLevel)));
     edges = edges.edges;
 end
@@ -44,10 +45,10 @@ edges = edgesCopy;
 
 for i = sequence
     if ~ismember(i,k)
-    resultsSE3 = load(strcat('Data/test12_results_JL/resultsSE3_',num2str(fibonacci(i)),'_',...
+    resultsSE3 = load(strcat('Data/',name,'_results/resultsSE3_',num2str(fibonacci(i)),'_',...
     num2str(SE3VertexInitialization),'_',num2str(noiseLevel)));
     resultsSE3 = resultsSE3.resultsSE3;
-    resultsNoSE3 = load(strcat('Data/test12_results_JL/resultsNoSE3_',num2str(fibonacci(i)),'_',...
+    resultsNoSE3 = load(strcat('Data/',name,'_results/resultsNoSE3_',num2str(fibonacci(i)),'_',...
     num2str(SE3VertexInitialization),'_',num2str(noiseLevel)));
     resultsNoSE3 = resultsNoSE3.resultsNoSE3;
     
@@ -78,7 +79,7 @@ legend('w/o DOM ATE - w/ DOM ATE','w/o DOM ASE - w/ DOM ASE','w/o DOM ARE - w/ D
 yyaxis right
 ylabel('differences of  absolute rotational error values')
 
-print('Absolute_JL','-dpdf')
+print(strcat('Absolute_',name),'-dpdf')
 
 
 
@@ -99,5 +100,5 @@ legend('w/o DOM allRTE - w/ DOM allRTE','w/o DOM allRSE - w/ DOM allRSE','w/o DO
 yyaxis right
 ylabel('differences of all-all relative rotational error values')
 
-print('Relative_JL','-dpdf')
+print(strcat('Relative_',name),'-dpdf')
 end
