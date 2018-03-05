@@ -3,7 +3,6 @@ function config = setUnitTestConfig(config)
 %unit tests, required as new solver features (such as edges) are added.
 
 % set properties of Config
-config.set('t',0.1);
 config.set('rngSeed',1);
 config.set('noiseModel','Gaussian');
 % config.set('noiseModel','Off');
@@ -43,7 +42,7 @@ config.set('posePriorEdgeLabel','EDGE_6D');
 config.set('graphFileFolderName' ,'GraphFiles');
 
 % set pose prior
-orientation = [pi/180;pi/180;pi/180]; % 1 degree position error
+orientation = [pi/360;pi/360;pi/360]; % 1 degree position error
 config.set('stdPosePrior',[0.005;0.005;0.005;orientation]);
 
 % set point prior error
@@ -57,19 +56,19 @@ end
 
 % set odometry error
 orientation = [pi/360;pi/360;pi/360]; % 2 degrees position error
-config.set('stdPosePose'  ,[0.04,0.04,0.04,orientation']');
+config.set('stdPosePose',[0.05,0.05,0.05,orientation']');
 if strcmp(config.motionModel,'constantSE3Rob') ||...
         strcmp(config.motionModel,'constantSE3Mina')||...
         strcmp(config.motionModel,'constantSE3')
-    config.set('stdPosePoint' ,[0.4,0.4,0.4,0.01]');
+    config.set('stdPosePoint' ,[0.06,0.06,0.06,0.01]');
 else 
-    config.set('stdPosePoint' ,[0.4,0.4,0.4]');
+    config.set('stdPosePoint' ,[0.04,0.04,0.04]');
 end
 
 
 config.set('stdPointPlane',0.001);
 % set properties of CameraConfig
-config.set('fieldOfView',[-pi/3,pi/3,-pi/6,pi/6,1,10]); %az,el,r limits
+config.set('fieldOfView',[-pi/4,pi/4,-pi/6,pi/6,1,20]); %az,el,r limits
 config.set('cameraRelativePose',GP_Pose([0,0,0,0,0,-pi/8]'));
 % set properties of solverConfig
 %   dimensions

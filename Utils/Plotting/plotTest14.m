@@ -80,6 +80,7 @@ for j = 1:length(newVertexPerNLandmarks)
     legend('w/o DOM ATE - w/ DOM ATE','w/o DOM ASE - w/ DOM ASE','w/o DOM ARE - w/ DOM ARE','Location','northwest')
     yyaxis right
     ylabel('differences of  absolute rotational error values')
+    print(strcat('Absolute_',name,'_',num2str(newVertexPerNLandmarks(j))),'-dpdf')
     
     figure
     yyaxis left
@@ -97,6 +98,7 @@ for j = 1:length(newVertexPerNLandmarks)
     legend('w/o DOM allRTE - w/ DOM allRTE','w/o DOM allRSE - w/ DOM allRSE','w/o DOM allRRE - w/ DOM allRRE','Location','northwest')
     yyaxis right
     ylabel('differences of all-all relative rotational error values')
+    print(strcat('Relative_',name,'_',num2str(newVertexPerNLandmarks(j))),'-dpdf')
     
 end
 

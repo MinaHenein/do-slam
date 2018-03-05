@@ -7,7 +7,7 @@
 %% config setup
 config = CameraConfig();
 config.set('motionModel','constantSE3MotionDA');
-config.set('std2PointsSE3Motion', [0.05,0.05,0.05]');
+config.set('std2PointsSE3Motion', [0.03,0.03,0.03]');
 config.set('SE3MotionVertexInitialization','eye');
 config.set('newMotionVertexPerNLandmarks',inf)
 config = setUnitTestConfig(config);
@@ -15,9 +15,9 @@ rng(config.rngSeed);
 
 %% solver
 config.set('pointMotionMeasurement','point2DataAssociation');
-config.set('measurementsFileName','app10_measurementsRotTr.graph');
+config.set('measurementsFileName','app10_measurementsTr1.graph');
 config.set('groundTruthFileName','app10_groundTruth.graph');
-writeDataAssociationVerticesEdges_constantSE3MotionNoGT(config);
+%writeDataAssociationVerticesEdges_constantSE3MotionNoGT(config);
 measurementsCell = graphFileToCell(config,config.measurementsFileName);
 groundTruthCell  = graphFileToCell(config,config.groundTruthFileName);
 

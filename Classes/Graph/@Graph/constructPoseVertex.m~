@@ -30,50 +30,36 @@ switch edgeLabel
                 %                 pose2 = Relative2AbsoluteSE3(pose1,controlInput*config.dt);
         end
     case config.posePointEdgeLabel %to initialise a pose from point measurement - multicamera system
-%         pose2 = zeros(6,1);
+        %         pose2 = zeros(6,1);
         if inputVertices == 517
             pose2 = [0;3;0;0;0;1.57];
-            disp('camera 2 initialized')
-            if ~strcmp(config.noiseModel,'Off')
-                for i = 1:size(pose2,2)
-                    pose2(:,i) = config.relativeToAbsolutePoseHandle(pose2(:,i),config.stdPosePose(:,i));
-                end
+            for i = 1:size(pose2,2)
+                pose2(:,i) = config.relativeToAbsolutePoseHandle(pose2(:,i),config.stdPosePose(:,i));
             end
         elseif inputVertices == 1140
-            disp('camera 3 initialized')
             pose2 = [-3;0;0;0;0;3.14];
-            if ~strcmp(config.noiseModel,'Off')
-                for i = 1:size(pose2,2)
-                    pose2(:,i) = config.relativeToAbsolutePoseHandle(pose2(:,i),config.stdPosePose(:,i));
-                end
+            for i = 1:size(pose2,2)
+                pose2(:,i) = config.relativeToAbsolutePoseHandle(pose2(:,i),config.stdPosePose(:,i));
             end
         elseif inputVertices == 241
-            disp('camera 2 initialized')
-%             pose2 = [1.8;0;0;0;0;-1.2];
-            pose2 = [0;3;0;0;0;1.57];
-            if ~strcmp(config.noiseModel,'Off')
-                for i = 1:size(pose2,2)
-                    pose2(:,i) = config.relativeToAbsolutePoseHandle(pose2(:,i),config.stdPosePose(:,i));
-                end
+camera3Pose = 
+camera4Pose = [0;4.7;0;0;0;1.93];
+
+            pose2 = [1.8;0;0;0;0;-1.2];
+            for i = 1:size(pose2,2)
+                pose2(:,i) = config.relativeToAbsolutePoseHandle(pose2(:,i),config.stdPosePose(:,i));
             end
-        elseif inputVertices == 757 %984
-            disp('camera 3 initialized')
-%             pose2 = [1.8;4.7;0;0;0;1.2];
+        elseif inputVertices == 984
+            pose2 = [1.8;4.7;0;0;0;1.2];
+            for i = 1:size(pose2,2)
+                pose2(:,i) = config.relativeToAbsolutePoseHandle(pose2(:,i),config.stdPosePose(:,i));
+            end
+        elseif inputVertices == 1278
             pose2 = [-3;0;0;0;0;3.14];
-            if ~strcmp(config.noiseModel,'Off')
-                for i = 1:size(pose2,2)
-                    pose2(:,i) = config.relativeToAbsolutePoseHandle(pose2(:,i),config.stdPosePose(:,i));
-                end
+            for i = 1:size(pose2,2)
+                pose2(:,i) = config.relativeToAbsolutePoseHandle(pose2(:,i),config.stdPosePose(:,i));
             end
-        elseif inputVertices == 1380 %1278
-            disp('camera 4 initialized')
-%             pose2 = [0;4.7;0;0;0;1.93];
-              pose2 = [0;-3;0;0;0;-1.57];
-%             if ~strcmp(config.noiseModel,'Off')
-%                 for i = 1:size(pose2,2)
-%                     pose2(:,i) = config.relativeToAbsolutePoseHandle(pose2(:,i),config.stdPosePose(:,i));
-%                 end
-%             end
+            
         end
         outputVertices = inputVertices;
     otherwise; error('error, wrong edgeLabel')

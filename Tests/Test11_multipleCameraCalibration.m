@@ -20,12 +20,13 @@ config.set('motionModel','constantSE3MotionDA');
 config.set('std2PointsSE3Motion', [0.1,0.1,0.1]');
 config.set('SE3MotionVertexInitialization','eye');
 config = setUnitTestConfig(config);
+config.set('plotPlanes',1);
 rng(config.rngSeed);
 
 %% set up cameras
 camera1Pose1 = zeros(6,1);
-camera2Pose1 = [3.53;1.46;1;0.39;0.19;0.26];
-camera3Pose1 = [5;5;2;0.78;0.39;0.52];
+camera2Pose1 = [0.25;0.5;0;0;0;1.57];
+camera3Pose1 = [0;1;0;0;0;3.14];
 camera1Pose2 = camera1Pose1;
 camera2Pose2 = camera2Pose1;
 camera3Pose2 = camera3Pose1;
@@ -35,7 +36,7 @@ camerasPoses = [camera1Pose1,camera2Pose1,camera3Pose1;
 
 %% set up planar pattern
 normal = [0.8,0.2,0.82]';
-distance = 8;
+distance = 2;
 planeParameters1 = [normal; distance];
 planeParameters1 = planeParameters1/norm(planeParameters1(1:3));
 % Points

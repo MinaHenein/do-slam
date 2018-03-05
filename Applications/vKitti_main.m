@@ -4,39 +4,39 @@
 %--------------------------------------------------------------------------
 %vKitti main
 %% 1. Config
-
-objectPoses = load('objPose_test2.mat');
-objectPoses = objectPoses.objPose;
-
-nObjects = 3;
-constantSE3ObjectMotion = [];
-
-for i=1:nObjects
-    poses = objectPoses(i).pose;
-    rotations= {};
-    translations = [];
-    for j=2:size(poses,1)
-        objectMotion = AbsoluteToRelativePoseR3xso3(poses(j-1,:)', poses(j,:)');
-        objectMotion = poseToTransformationMatrix(objectMotion);
-        rotM = objectMotion(1:3,1:3);
-        t = objectMotion(1:3,4);
-        rotations{j-1} = rotM;
-        translations(:,j-1) = t;
-    end
-    R = rotationAveraging(rotations);
-    t = mean(translations,2);
-    SE3Motion = [t;arot(R)];
-    constantSE3ObjectMotion(:,i) =SE3Motion;
-end
+% objectPoses = load('objPose_test2.mat');
+% objectPoses = objectPoses.objPose;
+% 
+% nObjects = 3;
+% constantSE3ObjectMotion = [];
+% 
+% for i=1:nObjects
+%     poses = objectPoses(i).pose;
+%     rotations= {};
+%     translations = [];
+%     for j=2:size(poses,1)
+%         objectMotion = AbsoluteToRelativePoseR3xso3(poses(j-1,:)', poses(j,:)');
+%         objectMotion = poseToTransformationMatrix(objectMotion);
+%         rotM = objectMotion(1:3,1:3);
+%         t = objectMotion(1:3,4);
+%         rotations{j-1} = rotM;
+%         translations(:,j-1) = t;
+%     end
+%     R = rotationAveraging(rotations);
+%     t = mean(translations,2);
+%     SE3Motion = [t;arot(R)];
+%     constantSE3ObjectMotion(:,i) =SE3Motion;
+% end
 
 config = CameraConfig();
 config = setAppConfig(config);
 config.set('motionModel','constantSE3MotionDA');
 config.set('std2PointsSE3Motion', [0.05,0.05,0.05]');
+config.set('SE3MotionVertexInitialization','eye');
 
 %% 5. Generate Measurements & Save to Graph File, load graph file as well
 
-config.set('constantSE3Motion',constantSE3ObjectMotion);
+% config.set('constantSE3Motion',constantSE3ObjectMotion);
 %% 5.1 For initial (without SE3)
 config.set('pointMotionMeasurement','Off')
 config.set('measurementsFileName','vKitti_measurementsNoSE3_test2.graph')
@@ -48,7 +48,7 @@ measurementsNoSE3Cell = graphFileToCell(config,config.measurementsFileName);
 config.set('pointMotionMeasurement','point2DataAssociation');
 config.set('measurementsFileName','vKitti_measurements_test2.graph');
 config.set('groundTruthFileName','vKitti_groundTruth_test2.graph');
-writeDataAssociationVerticesEdges_constantSE3Motion(config,constantSE3ObjectMotion);
+writeDataAssociationVerticesEdges_constantSE3MotionNoGT(config);
 measurementsCell = graphFileToCell(config,config.measurementsFileName);
 groundTruthCell  = graphFileToCell(config,config.groundTruthFileName);
 

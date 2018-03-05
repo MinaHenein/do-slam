@@ -56,20 +56,37 @@ end
 for i = 1:nSteps
     %sensor @ time t
     currentSensorPose = self.get('GP_Pose',t(i));
-    vertexCount = vertexCount + 1;
-    cameraVertexIndexes(i) = vertexCount;
-    %WRITE VERTEX TO FILE
-    label = config.poseVertexLabel;
-    index = cameraVertexIndexes(i);
     switch config.poseParameterisation
-        case 'R3xso3'
-            value = currentSensorPose.get('R3xso3Pose');
-        case 'logSE3'
-            value = currentSensorPose.get('logSE3Pose');
-        otherwise
-            error('Error: unsupported pose parameterisation')
+            case 'R3xso3'
+                value = currentSensorPose.get('R3xso3Pose');
+                if i > 1
+                prevValue = self.get('GP_Pose',t(i-1)).get('R3xso3Pose');
+                end
+            case 'logSE3'
+                value = currentSensorPose.get('logSE3Pose');
+                if i > 1 
+                prevValue = self.get('GP_Pose',t(i-1)).get('logSE3Pose');
+                end
+            otherwise
+                error('Error: unsupported pose parameterisation')
     end
-    writeVertex(label,index,value,gtFileID);
+        if i == 1 
+            vertexCount = vertexCount + 1;
+            cameraVertexIndexes(i) = vertexCount;
+            %WRITE VERTEX TO FILE
+            label = config.poseVertexLabel;
+            index = cameraVertexIndexes(i);
+            writeVertex(label,index,value,gtFileID);
+        elseif (i > 1) && ~any(value == prevValue)
+            vertexCount = vertexCount + 1;
+            cameraVertexIndexes(i) = vertexCount;
+            %WRITE VERTEX TO FILE
+            label = config.poseVertexLabel;
+            index = cameraVertexIndexes(i);
+            writeVertex(label,index,value,gtFileID);
+        elseif (i > 1) && any(value == prevValue)
+            cameraVertexIndexes(i) = cameraVertexIndexes(i-1);
+        end
     %odometry
     if i> 1
         prevSensorPose = self.get('GP_Pose',t(i-1));
@@ -87,13 +104,14 @@ for i = 1:nSteps
             otherwise
                 error('Error: unsupported pose parameterisation')
         end
-        covariance = config.covPosePose;
-        index1 = cameraVertexIndexes(i-1);
-        index2 = cameraVertexIndexes(i);
-%         writeEdge(label,index1,index2,valueGT,covariance,gtFileID);
-        writeEdge(label,index1,index2,valueMeas,covariance,mFileID);
+        if valueGT ~= zeros(6,1)
+            covariance = config.covPosePose;
+            index1 = cameraVertexIndexes(i-1);
+            index2 = cameraVertexIndexes(i);
+            %         writeEdge(label,index1,index2,valueGT,covariance,gtFileID);
+            writeEdge(label,index1,index2,valueMeas,covariance,mFileID);
+        end
     end
-    
     %point observations
     for j = staticPointIndexes
         jPoint = self.get('points',j);

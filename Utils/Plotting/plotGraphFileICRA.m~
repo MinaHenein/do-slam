@@ -1,4 +1,4 @@
-function plotGraphFile(config,groundTruthCell,graphColour)
+function plotGraphFileICRA(config,groundTruthCell,setting,varargin)
 %PLOTGRAPHFILE Summary of this function goes here
 %   Detailed explanation goes here
 
@@ -32,30 +32,59 @@ poses  = [verticesCell{poseVertices,3}];
 points = [verticesCell{pointVertices,3}];
 planes = [verticesCell{planeVertices,3}];
 
-%% 5. plot poses
-plot3(poses(1,:),poses(2,:),poses(3,:),'Color',graphColour,'Marker','o','LineStyle','none');
-for i = 1:sum(poseVertices)
-    iPose = poses(:,i);
-    if strcmp(config.poseParameterisation,'SE3')
-        iPose = LogSE3_Rxt(iPose);
-    end
-    
-    scale = 0.2;
-    plotCoordinates(iPose(1:3,:),scale*rot(iPose(4:6,1)))
-%     plotiCamera = plotCamera('Location',iPose(1:3),'Orientation',rot(-iPose(4:6))); %LHS invert pose
-%     scale = 0.5;
-%     plotCoordinates(iPose(1:3),scale*rot(iPose(4:6)))
-%     plotiCamera.Opacity = 0.1;
-%     plotiCamera.Size = 0.1;
-%     plotiCamera.Color = graphColour;
+%% 5. plot poses and points
+
+switch setting
+    case 'groundTruth'
+        plotPoses = plot3(poses(1,:),poses(2,:),poses(3,:),'Color','g','Marker','.','LineStyle','none');
+        set(plotPoses,'MarkerSize',7);
+        plotPoints = plot3(points(1,:),points(2,:),points(3,:),'g.');
+        set(plotPoints,'MarkerSize',5)
+    case 'solverResults'
+        relPose = varargin{1};
+        posePoints = varargin{2};
+        
+        for i = 1:sum(poseVertices)
+            iPose = poses(:,i);
+            if strcmp(config.poseParameterisation,'SE3')
+                iPose = LogSE3_Rxt(iPose);
+            end
+            iPose = RelativeToAbsolutePoseR3xso3(iPose,relPose);
+            scale = 1;
+            poses(:,i) = iPose;
+            plotCoordinates(iPose(1:3,:),scale*rot(iPose(4:6,1))) % plots the trajectory as axes
+        end
+        
+        for i=1:size(points,2)
+            points(:,i) = RelativeToAbsolutePositionR3xso3(posePoints,points(:,i));
+        end
+        
+        plotPoses = plot3(poses(1,:),poses(2,:),poses(3,:),'Color','b','Marker','.','LineStyle','none');
+        set(plotPoses,'MarkerSize',8);
+        plotPoints = plot3(points(1,:),points(2,:),points(3,:),'b.');
+        set(plotPoints,'MarkerSize',5)
+    case 'initial'
+        relPose = varargin{1};
+        posePoints = varargin{2};
+        
+        for i = 1:sum(poseVertices)
+            iPose = poses(:,i);
+            if strcmp(config.poseParameterisation,'SE3')
+                iPose = LogSE3_Rxt(iPose);
+            end
+            iPose = RelativeToAbsolutePoseR3xso3(iPose,relPose);
+            poses(:,i) = iPose;
+        end
+        
+        for i=1:size(points,2)
+            points(:,i) = RelativeToAbsolutePositionR3xso3(posePoints,points(:,i));
+        end
+        plotPoses = plot3(poses(1,:),poses(2,:),poses(3,:),'Color','r','Marker','.','LineStyle','none');
+        set(plotPoses,'MarkerSize',7);
+        plotPoints = plot3(points(1,:),points(2,:),points(3,:),'r.');
+        set(plotPoints,'MarkerSize',5)
 end
 
-%% 6. plot points
-plotPoints = plot3(points(1,:),points(2,:),points(3,:),'.');
-set(plotPoints,'MarkerEdgeColor',graphColour)
-set(plotPoints,'MarkerSize',8)
-% set(plotPoints,'MarkerSize',8)
-% axis equal
 %% 7. plot planes
 %need edges to figure out which points are on which planes
 iPlaneVertices = [verticesCell{planeVertices,2}];

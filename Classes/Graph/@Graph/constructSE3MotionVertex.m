@@ -13,10 +13,17 @@ SE3MotionVertex = edgeRow{4};
 edgeValue = edgeRow{5};
 edgeCovariance = edgeRow{6};
 
-% [rotM,t] = Kabsch( obj.vertices(pointVertex(1)).value,...
-%     obj.vertices(pointVertex(2)).value);
+[rotM,t] = Kabsch( obj.vertices(pointVertex(1)).value,...
+    obj.vertices(pointVertex(2)).value);
 
-SE3Motion = [0 0 0 0 0 0]';
+if strcmp(config.SE3MotionVertexInitialization,'eye')
+    SE3Motion = [0 0 0 0 0 0]';
+elseif strcmp(config.SE3MotionVertexInitialization,'translation')
+    SE3Motion = [t;arot(rotM)];
+else 
+    error('error, motion vertex initialization undefined')
+end
+    
 
 %% 2. compute SE3Motion value
 % nSteps = 0;
