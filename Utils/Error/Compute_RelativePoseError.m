@@ -16,9 +16,9 @@ f_deg_per_rad = 180/pi;
 %gt_vertices_transformed;
 assert(isequal(size(est_vertices),size(gt_vertices)));
 n = size(est_vertices,2);
-for i = 1:n-1
+for i = 1:n
     
-    v_gt_pose_cur = RelativeToAbsolutePoseR3xso3(v_rel_pose, gt_vertices(:,i));
+    v_gt_pose_cur = RelativeToAbsolutePoseR3xso3(gt_vertices(:,i),v_rel_pose);
     
     if(i > n_delta)
         % get the previous and current vertices
@@ -27,8 +27,8 @@ for i = 1:n-1
         v_est_pose_cur = est_vertices(:,i);
         
         % calculate edges between those vertices
-        v_edge_est = AbsoluteToRelativePoseR3xso3(v_est_pose_cur, v_est_pose_prev);
-        v_edge_gt = AbsoluteToRelativePoseR3xso3(v_gt_pose_cur, v_gt_pose_prev);
+        v_edge_est = AbsoluteToRelativePoseR3xso3(v_est_pose_prev,v_est_pose_cur);
+        v_edge_gt = AbsoluteToRelativePoseR3xso3(v_gt_pose_prev,v_gt_pose_cur);
         %%
         
         % calculate the errors

@@ -8,12 +8,13 @@
 clear
 close all
 
+nCameras = 3;
+plotEnvironment = 0;
+
 t0 = 1;
 tN = 320;
 nSteps = tN;
 t  = linspace(t0,tN,nSteps);
-plotEnvironment = 0;
-
 %% config setup
 config = CameraConfig();
 config = setUnitTestConfig(config);
@@ -23,7 +24,6 @@ config.set('pointMotionMeasurement','point2DataAssociation');
 config.set('std2PointsSE3Motion', [0.01,0.01,0.01]');
 config.set('SE3MotionVertexInitialization','eye');
 config.set('newMotionVertexPerNLandmarks',inf)
-config.set('plotPlanes',1);
 % config.set('noiseModel','Off');
 rng(config.rngSeed);
 
@@ -31,10 +31,12 @@ rng(config.rngSeed);
 camera1Pose = [3;0;0;0;0;0];
 camera2Pose = [0;3;0;0;0;1.57];
 camera3Pose = [-3;0;0;0;0;3.14];
+camera4Pose = [0;-3;0;0;0;-1.57];
 
 camera1Trajectory = StaticPoseTrajectory(camera1Pose);
 camera2Trajectory = StaticPoseTrajectory(camera2Pose);
 camera3Trajectory = StaticPoseTrajectory(camera3Pose);
+camera4Trajectory = StaticPoseTrajectory(camera4Pose);
 %% set up primitive
 primitiveInitialPose_R3xso3 = [0 -9 0 0 0 0.002]';
 primitiveMotion_R3xso3 = [0.2; 0; 0; arot(eul2rot([0.02,0,0]))];
@@ -63,12 +65,22 @@ sensor3.addEnvironment(environment);
 sensor3.addCamera(config.fieldOfView,camera3Trajectory);
 sensor3.setVisibility(config,environment);
 
+if nCameras == 4
+    sensor4 = SimulatedEnvironmentOcclusionSensor();
+    sensor4.addEnvironment(environment);
+    sensor4.addCamera(config.fieldOfView,camera4Trajectory);
+    sensor4.setVisibility(config,environment);
+end
 figure
 spy(sensor1.get('pointVisibility'));
 figure
 spy(sensor2.get('pointVisibility'));
 figure
 spy(sensor3.get('pointVisibility'));
+if nCameras == 4 
+    figure
+    spy(sensor4.get('pointVisibility'));
+end
 %% 4. Plot Environment
 if plotEnvironment
     figure
@@ -84,13 +96,22 @@ if plotEnvironment
     camera1Trajectory.plot(t,[0 0 1],'axesOFF')
     camera2Trajectory.plot(t,[0 0 1],'axesOFF')
     camera3Trajectory.plot(t,[0 0 1],'axesOFF')
+    if nCameras == 4
+        camera4Trajectory.plot(t,[0 0 1],'axesOFF')
+    end
     % set(gcf,'Position',[0 0 1024 768]);
     frames1 = sensor1.plot(t,environment);
     frames2 = sensor2.plot(t,environment);
     frames3 = sensor3.plot(t,environment);
+    if nCameras == 4
+        frames4 = sensor4.plot(t,environment);
+    end    
     implay(frames1);
     implay(frames2);
     implay(frames3);
+    if nCameras == 4
+        implay(frames4);    
+    end    
 end
 %% 5.Generate Measurements & Save to Graph Files
 config.set('groundTruthFileName' ,'groundTruthTest15a.graph');
@@ -102,10 +123,20 @@ sensor2.generateMeasurements(config);
 config.set('groundTruthFileName' ,'groundTruthTest15c.graph');
 config.set('measurementsFileName','measurementsTest15c.graph');
 sensor3.generateMeasurements(config);
+if nCameras == 4
+    config.set('groundTruthFileName' ,'groundTruthTest15d.graph');
+    config.set('measurementsFileName','measurementsTest15d.graph');
+    sensor4.generateMeasurements(config);
+end
 
 config.set('groundTruthFileName' ,'groundTruthTest15.graph');
 config.set('measurementsFileName','measurementsTest15.graph');
-writeGraphFileMultipleCameras(config,[sensor1,sensor2,sensor3]);
+
+if nCameras == 3
+    writeGraphFileMultipleCameras(config,[sensor1,sensor2,sensor3]);
+elseif nCameras == 4
+    writeGraphFileMultipleCameras(config,[sensor1,sensor2,sensor3,sensor4]);
+end
 writeDataAssociationVerticesEdges_constantSE3Motion(config,objectMotion);
 % writeDataAssociationVerticesEdges_constantSE3Motion_NoOrdering(config,objectMotion);
 groundTruthCell  = graphFileToCell(config,config.groundTruthFileName);

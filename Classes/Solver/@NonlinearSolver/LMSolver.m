@@ -8,6 +8,7 @@ lambda     = 1e-8; %initial value
 lambdaUp   = 8;
 lambdaDown = 12;
 system = System(config,graph0,measurementsCell);
+
 % covariance = system.covariance; %doesn't change in this function
 errorCurrent = norm(system.b);   %initial value
 

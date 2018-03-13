@@ -6,7 +6,7 @@ sensorTimeStart = zeros(length(sensors),1);
 for i=1:length(sensors)
     sensorPointVisibility = sensors(i).get('pointVisibility');
     [~,col] = find(sensorPointVisibility);
-    sensorTimeStart(i,1) = col(1); 
+    sensorTimeStart(i,1) = col(1);
 end
 
 gtFileID = fopen(strcat(config.folderPath,config.sep,'Data',...
@@ -16,15 +16,41 @@ mFileID  = fopen(strcat(config.folderPath,config.sep,'Data',...
     config.sep,config.graphFileFolderName,config.sep,...
     config.measurementsFileName),'w');
 
-vertexCount = 0;
+% indexing variables
+vertexCount         = 0;
+objectCount         = 0;
 cameraVertexIndexes = zeros(nSteps,length(sensors),1);
+
+staticPointIndexes = cell(1,length(sensors));
+dynamicPointIndexes = cell(1,length(sensors));
+
+for j= 1:length(sensors)
+    % find indexes for static and dynamic points
+    staticPointLogical{j}      = sensors(j).get('points').get('static');
+    staticObjectLogical{j}  = sensors(j).get('objects').get('static');
+    dynamicPointLogical{j}     = ~staticPointLogical{j};
+    dynamicObjectLogical{j} = ~staticObjectLogical{j};
+    staticPointIndexes{j}      = find(staticPointLogical{j});
+    staticObjectIndexes{j}  = find(staticObjectLogical{j});
+    dynamicPointIndexes{j}     = find(dynamicPointLogical{j});
+    dynamicObjectIndexes{j} = find(dynamicObjectLogical{j});
+    
+    % error check for visibility
+    if isempty(sensors(j).get('pointVisibility'))
+        error('Visibility must be set first.');
+    end
+    %% 1.a Clear vertex and object Indexes, instantiate object indexes
+    for k=1:sensors(j).nPoints
+        sensors(j).get('points',k).clearIndex();
+    end
+    for k=1:sensors(j).nObjects
+        sensors(j).get('objects',k).set('vertexIndex',k) % sets the index of the object to its default
+        objectCount = k;
+    end    
+end
 
 for i=1:nSteps
     for j= 1:length(sensors)
-        staticPointLogical      = sensors(j).get('points').get('static');
-        staticPointIndexes      = find(staticPointLogical);
-        dynamicPointLogical     = ~staticPointLogical;
-        dynamicPointIndexes     = find(dynamicPointLogical);        
         %sensor @ time t
         currentSensorPose = sensors(j).get('GP_Pose',config.t(i));
         switch config.poseParameterisation
@@ -41,7 +67,6 @@ for i=1:nSteps
             otherwise
                 error('Error: unsupported pose parameterisation')
         end
-%         if i == 1
         if i == sensorTimeStart(j,1)
             vertexCount = vertexCount + 1;
             cameraVertexIndexes(i,j,1) = vertexCount;
@@ -49,14 +74,6 @@ for i=1:nSteps
             label = config.poseVertexLabel;
             index = vertexCount;
             writeVertex(label,index,value,gtFileID);
-%         elseif (i>1)  && ~any(value == prevValue)
-% %         elseif i == sensorTimeStart(j,1)    
-%             vertexCount = vertexCount + 1;
-%             cameraVertexIndexes(i,j,1) = vertexCount;
-%             %WRITE VERTEX TO FILE
-%             label = config.poseVertexLabel;
-%             index = vertexCount;
-%             writeVertex(label,index,value,gtFileID);
         elseif (i>1) && (i ~= sensorTimeStart(j,1)) && any(value == prevValue)
             cameraVertexIndexes(i,j,1) = cameraVertexIndexes(i-1,j,1);
         end
@@ -89,8 +106,7 @@ for i=1:nSteps
         %point observations
         sensorPointVisibility = sensors(j).get('pointVisibility');
         sensorPointObservationRelative = sensors(j).get('pointObservationRelative');
-        
-        for k = staticPointIndexes
+        for k = staticPointIndexes{j}
             kPoint = sensors(j).get('points',k);
             kPointVisible = sensorPointVisibility(k,i);
             kPointRelative = sensorPointObservationRelative(k,i);
@@ -140,25 +156,30 @@ for i=1:nSteps
                 writeEdge(label,index1,index2,valueMeas,covariance,mFileID);
             end
         end
-        %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-        
-        
-        for k = dynamicPointIndexes
+        if (j>1)
+            previousSensorPointVisibility = sensors(j-1).get('pointVisibility');
+        end
+        for k = dynamicPointIndexes{j}
             kPoint = sensors(j).get('points',k);
             kPointVisible = sensorPointVisibility(k,i);
             kPointRelative = sensorPointObservationRelative(k,i);
             
             if kPointVisible
-                % add new vertex index to existing ones
-                vertexCount = vertexCount + 1;
-                vertexIndexes = [kPoint.get('vertexIndex') vertexCount];
-                kPoint.set('vertexIndex',vertexIndexes); % sets new vertex
-                
-                label = config.pointVertexLabel;
-                index = vertexIndexes(end);
-                value = kPoint.get('R3Position',config.t(i));
-                writeVertex(label,index,value,gtFileID);
-                
+                if j==1 || (j>1 && ~previousSensorPointVisibility(k,i))
+                    % add new vertex index to existing ones
+                    vertexCount = vertexCount + 1;
+                    vertexIndexes = [kPoint.get('vertexIndex') vertexCount];
+                    
+                    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                    
+                    
+                    kPoint.set('vertexIndex',vertexIndexes); % sets new vertex
+                    
+                    label = config.pointVertexLabel;
+                    index = vertexIndexes(end);
+                    value = kPoint.get('R3Position',config.t(i));
+                    writeVertex(label,index,value,gtFileID);
+                end
                 %WRITE SENSOR OBSERVATION EDGE TO FILE
                 label = config.posePointEdgeLabel;
                 switch config.poseParameterisation
@@ -179,7 +200,9 @@ for i=1:nSteps
                 index1 = cameraVertexIndexes(i,j,1);
                 index2 = vertexIndexes(end);
                 writeEdge(label,index1,index2,valueMeas,covariance,mFileID);
-                if (i > 1) && (sensorPointVisibility(k,i-1))
+%                 if (i > 1) && (sensorPointVisibility(k,i-1))
+                if ((i>1) && (sensorPointVisibility(k,i-1))) ...
+                        || ((i>1) && (j>1) && (previousSensorPointVisibility(k,i-1)))
                     % write edge between points if point was visible in
                     % previous step by same sensor
                     switch config.pointMotionMeasurement
@@ -197,9 +220,20 @@ for i=1:nSteps
                     end
                 end
             end
-        end 
-    end   
+        end
+        sensorObjectVisibility = sensors(j).get('objectVisibility');
+        for k = 1:sensors(j).nObjects
+            if i > 1
+                if sensorObjectVisibility(k,i) && ~sensorObjectVisibility(k,i-1) && ...
+                        strcmp(config.objectAssociation,'Off')
+                    objectCount = objectCount + 1;
+                    objectIndex = [sensors(j).get('objects',k).get('vertexIndex') objectCount];
+                    sensors(j).get('objects',k).set('vertexIndex',objectIndex);
+                end
+            end
+        end
+    end
 end
-   fclose(gtFileID);
-   fclose(mFileID);
+fclose(gtFileID);
+fclose(mFileID);
 end

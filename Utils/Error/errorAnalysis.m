@@ -15,7 +15,7 @@ end
 
 % [rotM, t, ~] = Kabsch(posesN(1:3,:),posesGT(1:3,:));
 % v_rel_pose = [t;arot(rotM)];
-v_rel_pose = AbsoluteToRelativePoseR3xso3(posesN(:,1),posesGT(:,1));
+v_rel_pose = AbsoluteToRelativePoseR3xso3(posesGT(:,1),posesN(:,1));
 
 % T_pose =[rotM t; 0 0 0 1];
 

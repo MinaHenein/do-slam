@@ -30,50 +30,39 @@ switch edgeLabel
                 %                 pose2 = Relative2AbsoluteSE3(pose1,controlInput*config.dt);
         end
     case config.posePointEdgeLabel %to initialise a pose from point measurement - multicamera system
-%         pose2 = zeros(6,1);
-        if inputVertices == 517
-            pose2 = [0;3;0;0;0;1.57];
-            disp('camera 2 initialized')
+        GTFileName = config.groundTruthFileName;
+        filepath = strcat(config.folderPath,config.sep,'Data',...
+            config.sep,config.graphFileFolderName,config.sep,GTFileName);
+        fileID = fopen(filepath,'r');
+        Data = textscan(fileID, '%s', 'delimiter', '\n', 'whitespace', '');
+        CStr = Data{1};
+        fclose(fileID);
+        IndexC = strfind(CStr, config.poseVertexLabel);
+        % find lines with a DataAssociation entry
+        Index = find(~cellfun('isempty', IndexC));
+        poseIndexes = [];
+        poseValues = [];
+        for j=1:length(Index)
+            % get line of Index
+            fileID = fopen(filepath,'r');
+            line = textscan(fileID,'%s',1,'delimiter','\n','headerlines',Index(j)-1);
+            line = cell2mat(line{1,1});
+            splitLine = strsplit(line,' ');
+            index = str2double(splitLine(1,2));
+            value = str2double(splitLine(1,3:8));
+            poseIndexes = [poseIndexes;index];
+            poseValues = [poseValues; value];
+            fclose(fileID);
+        end
+        if ~isempty(find(poseIndexes == inputVertices,1))
+            pose2 = poseValues(poseIndexes == inputVertices,:)';
             if ~strcmp(config.noiseModel,'Off')
                 for i = 1:size(pose2,2)
                     pose2(:,i) = config.relativeToAbsolutePoseHandle(pose2(:,i),config.stdPosePose(:,i));
                 end
             end
-        elseif inputVertices == 1140
-            disp('camera 3 initialized')
-            pose2 = [-3;0;0;0;0;3.14];
-            if ~strcmp(config.noiseModel,'Off')
-                for i = 1:size(pose2,2)
-                    pose2(:,i) = config.relativeToAbsolutePoseHandle(pose2(:,i),config.stdPosePose(:,i));
-                end
-            end
-        elseif inputVertices == 241
-            disp('camera 2 initialized')
-%             pose2 = [1.8;0;0;0;0;-1.2];
-            pose2 = [0;3;0;0;0;1.57];
-            if ~strcmp(config.noiseModel,'Off')
-                for i = 1:size(pose2,2)
-                    pose2(:,i) = config.relativeToAbsolutePoseHandle(pose2(:,i),config.stdPosePose(:,i));
-                end
-            end
-        elseif inputVertices == 757 %984
-            disp('camera 3 initialized')
-%             pose2 = [1.8;4.7;0;0;0;1.2];
-            pose2 = [-3;0;0;0;0;3.14];
-            if ~strcmp(config.noiseModel,'Off')
-                for i = 1:size(pose2,2)
-                    pose2(:,i) = config.relativeToAbsolutePoseHandle(pose2(:,i),config.stdPosePose(:,i));
-                end
-            end
-        elseif inputVertices == 1380 %1278
-            disp('camera 4 initialized')
-%             pose2 = [0;4.7;0;0;0;1.93];
-              pose2 = [0;-3;0;0;0;-1.57];
-%             if ~strcmp(config.noiseModel,'Off')
-%                 for i = 1:size(pose2,2)
-%                     pose2(:,i) = config.relativeToAbsolutePoseHandle(pose2(:,i),config.stdPosePose(:,i));
-%                 end
-%             end
+            disp(strcat({'camera'},{' '},num2str(find(poseIndexes == inputVertices)),...
+                {' '},' initialized'))
         end
         outputVertices = inputVertices;
     otherwise; error('error, wrong edgeLabel')
