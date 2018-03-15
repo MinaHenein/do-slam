@@ -3,7 +3,7 @@ function config = setUnitTestConfig(config)
 %unit tests, required as new solver features (such as edges) are added.
 
 % set properties of Config
-config.set('rngSeed',1);
+config.set('rngSeed',);
 config.set('noiseModel','Gaussian');
 % config.set('noiseModel','Off');
 config.set('poseParameterisation','R3xso3');
@@ -55,8 +55,8 @@ else
 end
 
 % set odometry error
-orientation = [pi/9;pi/9;pi/9]; % 2 degrees position error
-config.set('stdPosePose',[0.3,0.3,0.3,orientation']');
+orientation = [pi/90;pi/90;pi/90]; % 2 degrees position error
+config.set('stdPosePose',[0.1,0.1,0.1,orientation']');
 if strcmp(config.motionModel,'constantSE3Rob') ||...
         strcmp(config.motionModel,'constantSE3Mina')||...
         strcmp(config.motionModel,'constantSE3')

@@ -12,7 +12,7 @@ nCameras = 3;
 plotEnvironment = 0;
 
 t0 = 1;
-tN = 640;
+tN = 320;
 nSteps = tN;
 t  = linspace(t0,tN,nSteps);
 %% config setup
@@ -24,7 +24,6 @@ config.set('pointMotionMeasurement','point2DataAssociation');
 config.set('std2PointsSE3Motion', [0.01,0.01,0.01]');
 config.set('SE3MotionVertexInitialization','eye');
 config.set('newMotionVertexPerNLandmarks',inf)
-% config.set('solverType','Gauss-Newton');
 % config.set('noiseModel','Off');
 rng(config.rngSeed);
 
@@ -61,10 +60,10 @@ sensor2.addEnvironment(environment);
 sensor2.addCamera(config.fieldOfView,camera2Trajectory);
 sensor2.setVisibility(config,environment);
 
-% sensor3 = SimulatedEnvironmentOcclusionSensor();
-% sensor3.addEnvironment(environment);
-% sensor3.addCamera(config.fieldOfView,camera3Trajectory);
-% sensor3.setVisibility(config,environment);
+sensor3 = SimulatedEnvironmentOcclusionSensor();
+sensor3.addEnvironment(environment);
+sensor3.addCamera(config.fieldOfView,camera3Trajectory);
+sensor3.setVisibility(config,environment);
 
 if nCameras == 4
     sensor4 = SimulatedEnvironmentOcclusionSensor();
@@ -132,6 +131,7 @@ end
 
 config.set('groundTruthFileName' ,'groundTruthTest15.graph');
 config.set('measurementsFileName','measurementsTest15.graph');
+
 if nCameras == 3
     writeGraphFileMultipleCameras(config,[sensor1,sensor2,sensor3]);
 elseif nCameras == 4

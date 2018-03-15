@@ -63,6 +63,8 @@ switch edgeLabel
             end
             disp(strcat({'camera'},{' '},num2str(find(poseIndexes == inputVertices)),...
                 {' '},' initialized'))
+        else
+            pose2 =  [0;0;0;0;0;0];
         end
         outputVertices = inputVertices;
     otherwise; error('error, wrong edgeLabel')

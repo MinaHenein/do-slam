@@ -21,7 +21,7 @@ config = setUnitTestConfig(config);
 config.set('t',t);
 config.set('motionModel','constantSE3MotionDA');
 config.set('pointMotionMeasurement','point2DataAssociation');
-config.set('std2PointsSE3Motion', [0.01,0.01,0.01]');
+config.set('std2PointsSE3Motion', [0.001,0.001,0.001]');
 config.set('SE3MotionVertexInitialization','eye');
 config.set('newMotionVertexPerNLandmarks',inf)
 % config.set('noiseModel','Off');
@@ -100,9 +100,9 @@ if plotEnvironment
         camera4Trajectory.plot(t,[0 0 1],'axesOFF')
     end
     % set(gcf,'Position',[0 0 1024 768]);
-    frames1 = sensor1.plot(t,environment);
-    frames2 = sensor2.plot(t,environment);
-    frames3 = sensor3.plot(t,environment);
+    frames1 = sensor1.plot(t,environment,[1 0 0]);
+    frames2 = sensor2.plot(t,environment,[0 1 0]);
+    frames3 = sensor3.plot(t,environment,[0 0 1]);
     if nCameras == 4
         frames4 = sensor4.plot(t,environment);
     end    
