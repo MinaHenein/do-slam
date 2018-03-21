@@ -20,11 +20,11 @@ config = setUnitTestConfig(config);
 config.set('t',t);
 config.set('motionModel','constantSE3MotionDA');
 config.set('pointMotionMeasurement','point2DataAssociation');
-config.set('std2PointsSE3Motion', [0.01,0.01,0.01]');
+config.set('std2PointsSE3Motion', [0.001,0.001,0.001]');
 config.set('SE3MotionVertexInitialization','eye');
 config.set('newMotionVertexPerNLandmarks',inf)
 % config.set('plotPlanes',1);
-% config.set('noiseModel','Off');
+config.set('noiseModel','Off');
 rng(config.rngSeed);
 
 %% set up cameras
@@ -71,13 +71,13 @@ sensor4.addCamera(config.fieldOfView,camera4Trajectory);
 sensor4.setVisibility(config,environment);
  
 figure
-spy(sensor1.get('pointVisibility'));
+spy(sensor1.get('pointVisibility'),'r');
 figure
-spy(sensor2.get('pointVisibility'));
+spy(sensor2.get('pointVisibility'),'g');
 figure
-spy(sensor3.get('pointVisibility'));
+spy(sensor3.get('pointVisibility'),'b');
 figure
-spy(sensor4.get('pointVisibility'));
+spy(sensor4.get('pointVisibility'),'k');
 %% 4. Plot Environment
 if plotEnvironment
     figure
@@ -95,10 +95,10 @@ if plotEnvironment
     camera3Trajectory.plot(t,[0 0 1],'axesOFF')
     camera4Trajectory.plot(t,[0 0 1],'axesOFF')
     % set(gcf,'Position',[0 0 1024 768]);
-    frames1 = sensor1.plot(t,environment);
-    frames2 = sensor2.plot(t,environment);
-    frames3 = sensor3.plot(t,environment);
-    frames4 = sensor4.plot(t,environment);
+    frames1 = sensor1.plot(t,environment,'r');
+    frames2 = sensor2.plot(t,environment,'g');
+    frames3 = sensor3.plot(t,environment,'b');
+    frames4 = sensor4.plot(t,environment,'k');
     implay(frames1);
     implay(frames2);
     implay(frames3);
@@ -120,7 +120,8 @@ end
 
 config.set('groundTruthFileName' ,'groundTruthTest16.graph');
 config.set('measurementsFileName','measurementsTest16.graph');
-writeGraphFileMultipleCameras(config,[sensor1,sensor2,sensor3,sensor4]);
+%writeGraphFileMultipleCameras(config,[sensor1,sensor2,sensor3,sensor4]);
+generateMeasurementsMultipleCameras(config,[sensor1,sensor2,sensor3,sensor4]);
 writeDataAssociationVerticesEdges_constantSE3Motion(config,objectMotion);
 % writeDataAssociationVerticesEdges_constantSE3Motion_NoOrdering(config,objectMotion);
 groundTruthCell  = graphFileToCell(config,config.groundTruthFileName);

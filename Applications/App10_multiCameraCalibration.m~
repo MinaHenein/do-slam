@@ -7,8 +7,8 @@
 %% config setup
 config = CameraConfig();
 config.set('motionModel','constantSE3MotionDA');
-config.set('std2PointsSE3Motion', [0.001,0.001,0.001]');
-config.set('SE3MotionVertexInitialization','eye');
+config.set('std2PointsSE3Motion', [0.001,0.001,0.05]');
+config.set('SE3MotionVertexInitialization','translation');
 config.set('newMotionVertexPerNLandmarks',inf)
 config = setUnitTestConfig(config);
 rng(config.rngSeed);

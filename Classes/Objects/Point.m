@@ -14,6 +14,7 @@ classdef Point < ArrayGetSet
         trajectory
         objectIndexes
         vertexIndex
+        vertexIndexTime
     end
     
     
@@ -39,6 +40,7 @@ classdef Point < ArrayGetSet
         
         function self = clearIndex(self)
             self.vertexIndex = [];
+            self.vertexIndexTime = [];
         end
     end
     

@@ -134,8 +134,10 @@ config.set('measurementsFileName','measurementsTest15.graph');
 
 if nCameras == 3
     writeGraphFileMultipleCameras(config,[sensor1,sensor2,sensor3]);
+%     generateMeasurementsMultipleCameras(config,[sensor1,sensor2,sensor3]);
 elseif nCameras == 4
     writeGraphFileMultipleCameras(config,[sensor1,sensor2,sensor3,sensor4]);
+%     generateMeasurementsMultipleCameras(config,[sensor1,sensor2,sensor3,sensor4]);
 end
 writeDataAssociationVerticesEdges_constantSE3Motion(config,objectMotion);
 % writeDataAssociationVerticesEdges_constantSE3Motion_NoOrdering(config,objectMotion);

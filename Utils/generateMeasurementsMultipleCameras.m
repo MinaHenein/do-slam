@@ -1,4 +1,4 @@
-function writeGraphFileMultipleCameras(config,sensors)
+function generateMeasurementsMultipleCameras(config,sensors)
 
 nSteps = numel(config.t);
 
@@ -23,6 +23,7 @@ cameraVertexIndexes = zeros(nSteps,length(sensors),1);
 
 staticPointIndexes = cell(1,length(sensors));
 dynamicPointIndexes = cell(1,length(sensors));
+allDynamicPointIndexes = [];
 
 for j= 1:length(sensors)
     % find indexes for static and dynamic points
@@ -34,6 +35,8 @@ for j= 1:length(sensors)
     staticObjectIndexes{j}  = find(staticObjectLogical{j});
     dynamicPointIndexes{j}     = find(dynamicPointLogical{j});
     dynamicObjectIndexes{j} = find(dynamicObjectLogical{j});
+    
+    allDynamicPointIndexes = [allDynamicPointIndexes,dynamicPointIndexes{j}];
     
     % error check for visibility
     if isempty(sensors(j).get('pointVisibility'))
@@ -48,6 +51,10 @@ for j= 1:length(sensors)
         objectCount = k;
     end    
 end
+
+allDynamicPointIndexes = unique(allDynamicPointIndexes);
+allDynamicPointVertices = cell(length(allDynamicPointIndexes),1);
+allDynamicPointTime = cell(length(allDynamicPointIndexes),1);
 
 for i=1:nSteps
     for j= 1:length(sensors)
@@ -78,88 +85,14 @@ for i=1:nSteps
             cameraVertexIndexes(i,j,1) = cameraVertexIndexes(i-1,j,1);
         end
         
-        %odometry
-        if i> 1
-            prevSensorPose = sensors(j).get('GP_Pose',config.t(i-1));
-            poseRelative = currentSensorPose.AbsoluteToRelativePose(prevSensorPose);
-            poseRelativeNoisy = poseRelative.addNoise(config.noiseModel,...
-                zeros(size(config.stdPosePose)),config.stdPosePose);
-            %WRITE EDGE TO FILE
-            label = config.posePoseEdgeLabel;
-            switch config.poseParameterisation
-                case 'R3xso3'
-                    valueGT   = poseRelative.get('R3xso3Pose');
-                    valueMeas = poseRelativeNoisy.get('R3xso3Pose');
-                case 'logSE3'
-                    valueGT   = poseRelative.get('logSE3Pose');
-                    valueMeas = poseRelativeNoisy.get('logSE3Pose');
-                otherwise
-                    error('Error: unsupported pose parameterisation')
-            end
-            if valueGT ~= zeros(6,1)
-                covariance = config.covPosePose;
-                index1 = cameraVertexIndexes(i-1,j,1);
-                index2 = cameraVertexIndexes(i,j,1);
-                writeEdge(label,index1,index2,valueMeas,covariance,mFileID);
-            end
-        end
         %point observations
         sensorPointVisibility = sensors(j).get('pointVisibility');
         sensorPointObservationRelative = sensors(j).get('pointObservationRelative');
-        for k = staticPointIndexes{j}
-            kPoint = sensors(j).get('points',k);
-            kPointVisible = sensorPointVisibility(k,i);
-            kPointRelative = sensorPointObservationRelative(k,i);
-            if kPointVisible
-                %check if point observed before
-                if isempty(kPoint.get('vertexIndex'))
-                    vertexCount = vertexCount + 1;
-                    kPoint.set('vertexIndex',vertexCount); %*Passed by reference - changes point
-                    %WRITE VERTEX TO FILE
-                    label = config.pointVertexLabel;
-                    index = kPoint.get('vertexIndex');
-                    value = kPoint.get('R3Position',t(i));
-                    writeVertex(label,index,value,gtFileID);
-                elseif (i>1) && (~sensorPointVisibility(k,i-1)) && ...
-                        strcmp(config.staticDataAssociation,'Off' )
-                    label = config.pointVertexLabel;
-                    vertexCount = vertexCount + 1;
-                    vertexIndex = [kPoint.get('vertexIndex') vertexCount];
-                    kPoint.set('vertexIndex',vertexIndex);
-                    index = vertexIndex(end);
-                    value = kPoint.get('R3Position',t(i));
-                    writeVertex(label,index,value,gtFileID);
-                end
-                
-                %WRITE EDGE TO FILE
-                label = config.posePointEdgeLabel;
-                switch config.poseParameterisation
-                    case 'R3xso3'
-                        kPointRelativeNoisy = kPointRelative.addNoise(config.noiseModel,...
-                            zeros(size(config.stdPosePoint)),config.stdPosePoint);
-                        valueGT   = kPointRelative.get('R3Position');
-                        valueMeas = kPointRelativeNoisy.get('R3Position');
-                    case 'logSE3'
-                        kPointRelativeLogSE3      = kPoint.get('GP_Point',...
-                            t(i)).AbsoluteToRelativePoint(sensors(j).get('GP_Pose',t(i)),'logSE3');
-                        kPointRelativeLogSE3Noisy = kPointRelativeLogSE3.addNoise(config.noiseModel,...
-                            zeros(size(config.stdPosePoint)),config.stdPosePoint);
-                        valueGT   = kPointRelativeLogSE3.get('R3Position');
-                        valueMeas = kPointRelativeLogSE3Noisy.get('R3Position');
-                    otherwise
-                        error('Error: unsupported pose parameterisation')
-                end
-                covariance = config.covPosePoint;
-                index1 = cameraVertexIndexes(i,j,1);
-                vertexIndex = kPoint.get('vertexIndex');
-                index2 = vertexIndex(end);
-                writeEdge(label,index1,index2,valueMeas,covariance,mFileID);
-            end
-        end
+        
         if (j>1)
             previousSensorPointVisibility = sensors(j-1).get('pointVisibility');
         end
-        for k = dynamicPointIndexes{j}
+        for k = allDynamicPointIndexes
             kPoint = sensors(j).get('points',k);
             kPointVisible = sensorPointVisibility(k,i);
             kPointRelative = sensorPointObservationRelative(k,i);
@@ -168,25 +101,10 @@ for i=1:nSteps
                 if j==1 || (j>1 && ~previousSensorPointVisibility(k,i))
                     % add new vertex index to existing ones
                     vertexCount = vertexCount + 1;
-                    vertexIndexes = [kPoint.get('vertexIndex') vertexCount];
-                    kPoint.set('vertexIndex',vertexIndexes);% sets new vertex
-                    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-                    vertexIndexesTime = [kPoint.get('vertexIndexTime') i];
-                    kPoint.set('vertexIndexTime',vertexIndexesTime);
-                    pointVertexIndexes = [];
-                    pointVertexIndexesTime = [];
-                    for g = 1:length(sensors)
-                        point = sensors(g).get('points',k);
-                        pointVertexIndexes = [pointVertexIndexes point.get('vertexIndex')];
-                        pointVertexIndexesTime = [pointVertexIndexesTime point.get('vertexIndexTime')];
-                    end
-                    vertexIndexes = unique(pointVertexIndexes);
-                    pointVertexIndexesTime = unique(pointVertexIndexesTime);
-                    kPoint.set('vertexIndex',vertexIndexes); 
-                    kPoint.set('vertexIndexTime',pointVertexIndexesTime);
-                    %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+                    allDynamicPointVertices{k} = [allDynamicPointVertices{k} vertexCount];
+                    allDynamicPointTime{k} = [allDynamicPointTime{k} i];
                     label = config.pointVertexLabel;
-                    index = vertexIndexes(end);
+                    index =  allDynamicPointVertices{k}(end);
                     value = kPoint.get('R3Position',config.t(i));
                     writeVertex(label,index,value,gtFileID);
                 end
@@ -208,19 +126,22 @@ for i=1:nSteps
                 end
                 covariance = config.covPosePoint;
                 index1 = cameraVertexIndexes(i,j,1);
-                index2 = vertexIndexes(end);
+                index2 = allDynamicPointVertices{k}(end);
+                if isempty(index1) || isempty(index2)
+                disp('WRONG!')
+                end
                 writeEdge(label,index1,index2,valueMeas,covariance,mFileID);
-%                 if (i > 1) && (sensorPointVisibility(k,i-1))          
                 if ((i>1) && (sensorPointVisibility(k,i-1))) ...
-                        || ((i>1) && (j>1) && (previousSensorPointVisibility(k,i-1)))
-                    if (pointVertexIndexesTime(end)-pointVertexIndexesTime(end-1)==1)
+                        || ((i>1) && (j>1) && (previousSensorPointVisibility(k,i-1)) ...
+                        && ~previousSensorPointVisibility(k,i))
+                    if (allDynamicPointTime{k}(end)-allDynamicPointTime{k}(end-1)==1)
                     % write edge between points if point was visible in
-                    % previous step by same sensor
+                    % previous step
                     switch config.pointMotionMeasurement
                         case 'point2DataAssociation'
                             label = config.pointDataAssociationLabel;
-                            index1 = vertexIndexes(end-1);
-                            index2 = vertexIndexes(end);
+                            index1 = allDynamicPointVertices{k}(end-1);
+                            index2 = allDynamicPointVertices{k}(end);
                             object = kPoint.get('objectIndexes');
                             objectIndex = sensors(j).get('objects',object(1)).get('vertexIndex');
                             fprintf(gtFileID,'%s %d %d %d\n',label,index1,index2,objectIndex(end));

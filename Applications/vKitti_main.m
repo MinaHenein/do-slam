@@ -4,10 +4,10 @@
 %--------------------------------------------------------------------------
 %vKitti main
 %% 1. Config
-% objectPoses = load('objPose_test2.mat');
+% objectPoses = load('objPose_Scene0001_v2.mat');
 % objectPoses = objectPoses.objPose;
 % 
-% nObjects = 3;
+% nObjects = size(objectPoses,2);
 % constantSE3ObjectMotion = [];
 % 
 % for i=1:nObjects
@@ -15,7 +15,7 @@
 %     rotations= {};
 %     translations = [];
 %     for j=2:size(poses,1)
-%         objectMotion = AbsoluteToRelativePoseR3xso3(poses(j-1,:)', poses(j,:)');
+%         objectMotion = AbsoluteToRelativePoseR3xso3GlobalFrame(poses(j-1,:)', poses(j,:)');
 %         objectMotion = poseToTransformationMatrix(objectMotion);
 %         rotM = objectMotion(1:3,1:3);
 %         t = objectMotion(1:3,4);
@@ -25,31 +25,37 @@
 %     R = rotationAveraging(rotations);
 %     t = mean(translations,2);
 %     SE3Motion = [t;arot(R)];
-%     constantSE3ObjectMotion(:,i) =SE3Motion;
+%     constantSE3ObjectMotion(:,i) = SE3Motion;
 % end
 
 config = CameraConfig();
 config = setAppConfig(config);
 config.set('motionModel','constantSE3MotionDA');
-% config.set('std2PointsSE3Motion', [1,1,1]');
-config.set('SE3MotionVertexInitialization','translation');
-% config.set('newMotionVertexPerNLandmarks',20)
+config.set('std2PointsSE3Motion', [0.05,0.05,0.05]');
+config.set('SE3MotionVertexInitialization','eye');
+config.set('newMotionVertexPerNLandmarks',inf)
 
 %% 5. Generate Measurements & Save to Graph File, load graph file as well
 
 % config.set('constantSE3Motion',constantSE3ObjectMotion);
 %% 5.1 For initial (without SE3)
 config.set('pointMotionMeasurement','Off')
-config.set('measurementsFileName','vKitti_dynamicStaticMeas_1_NoSE3.graph')
-config.set('groundTruthFileName','vKitti_dynamicStaticGT_1_NoSE3.graph')
+config.set('measurementsFileName','vKitti_dynamicStaticMeas_1_v2_NoSE3.graph')
+config.set('groundTruthFileName','vKitti_dynamicStaticGT_1_v2_NoSE3.graph')
 groundTruthNoSE3Cell = graphFileToCell(config,config.groundTruthFileName);
 measurementsNoSE3Cell = graphFileToCell(config,config.measurementsFileName);
 
 %% 5.2 For test (with SE3)
 config.set('pointMotionMeasurement','point2DataAssociation');
-config.set('measurementsFileName','vKitti_dynamicStaticMeas_1.graph');
-config.set('groundTruthFileName','vKitti_dynamicStaticGT_1.graph');
+config.set('measurementsFileName','vKitti_dynamicStaticMeas_1_v2.graph');
+config.set('groundTruthFileName','vKitti_dynamicStaticGT_1_v2.graph');
+% Check for wrong data associations and fix if necessary
+nObjects = 5;%size(constantSE3ObjectMotion,2);
+dataAssociationTest(config,config.measurementsFileName,nObjects)
+dataAssociationTest(config,config.groundTruthFileName,nObjects)
+% writeDataAssociationVerticesEdges_constantSE3Motion(config,constantSE3ObjectMotion);
 writeDataAssociationVerticesEdges_constantSE3MotionNoGT(config);
+config.set('groundTruthFileName','vKitti_dynamicStaticGT_1_v2_NoSE3.graph')
 measurementsCell = graphFileToCell(config,config.measurementsFileName);
 groundTruthCell  = graphFileToCell(config,config.groundTruthFileName);
 
@@ -102,7 +108,8 @@ spy(solverEnd.systems(end).A)
 subplot(1,2,2)
 spy(solverEnd.systems(end).H)
 
-h = figure;
+
+figure('units','normalized','color','w');
 xlabel('x (m)')
 ylabel('y (m)')
 zlabel('z (m)')

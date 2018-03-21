@@ -128,7 +128,7 @@ for j=1:1:length(Index)
         newVertexID = nVertices +1;
         nLandmarksPerMotionVertex = 2;
     end
-    if nObjects > 1 && object~=lastObject
+    if j>1 && nObjects > 1 && object~=lastObject
         nLandmarksPerMotionVertex = config.newMotionVertexPerNLandmarks;
     end
     
@@ -289,13 +289,12 @@ fclose(fileID);
 IndexC = strfind(CStr, 'DataAssociation');
 % find lines with a DataAssociation entry
 Index = find(~cellfun('isempty', IndexC));
-nLinesAdded = 0;
 
 for j=1:length(Index)
     % get line of Index
     fileID = fopen(filepath,'r');
     line = textscan(fileID,'%s',1,'delimiter','\n','headerlines',...
-        Index(j)+nLinesAdded-1);
+        Index(j)-1);
     splitLine = strsplit(cell2mat(line{1,1}),' ');
     index1 = str2double(splitLine{1,2});
     index2 = str2double(splitLine{1,3});
@@ -324,12 +323,9 @@ for j=1:length(Index)
     edgeLabel = config.pointSE3MotionEdgeLabel;
     edgeValue = addGaussianNoise(config,muEdge,sigmaEdge,valueEdge);
     fclose(fileID);
-    CStr(end+1) = cellstr(sprintf('%s %d %d %d %f %f %f %f %f %f %f %f %f',...
+    CStr(Index(j)) = cellstr(sprintf('%s %d %d %d %f %f %f %f %f %f %f %f %f',...
         edgeLabel,index1,index2,index3,edgeValue',edgeCovUT));
-
-    CStr(Index(j)+nLinesAdded) = [];
-    nLinesAdded = nLinesAdded-1;
-     % Save the file again:
+    % Save the file again:
     fileID = fopen(strcat(config.folderPath,config.sep,'Data',...
         config.sep,config.graphFileFolderName,config.sep,MeasurementsFileName), 'w');
     fprintf(fileID, '%s\n', CStr{:});

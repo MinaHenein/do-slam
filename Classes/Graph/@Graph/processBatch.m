@@ -138,7 +138,10 @@ for i = 1:nSteps
                 jRow{2} = obj.nEdges+1;
                 %create velocity vertex if it doesn't exist
                 if jRow{4} > obj.nVertices
-                    obj = obj.constructSE3MotionVertex(config,jRow);
+                    %find all point vertices connected to this SE3 vertex
+                    pointRows = iRows([measurementsCell{iRows,4}]==jRow{4});
+                    pointVertices = [measurementsCell{pointRows,3}]';
+                    obj = obj.constructSE3MotionVertex(config,jRow,pointVertices);
                 end
                 obj = obj.construct2PointsSE3MotionEdge(config,jRow);
             case config.pointPlaneEdgeLabel
