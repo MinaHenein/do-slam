@@ -55,7 +55,7 @@ else
 end
 
 % set odometry error
-orientation = [pi/18;pi/18;pi/18]; % 2 degrees position error
+orientation = [pi/60;pi/180;pi/180]; % 2 degrees position error
 config.set('stdPosePose',[0.1,0.1,0.1,orientation']');
 if strcmp(config.motionModel,'constantSE3Rob') ||...
         strcmp(config.motionModel,'constantSE3Mina')||...

@@ -7,15 +7,15 @@
 %% config setup
 config = CameraConfig();
 config.set('motionModel','constantSE3MotionDA');
-config.set('std2PointsSE3Motion', [0.001,0.001,0.001]');
-config.set('SE3MotionVertexInitialization','eye');
+config.set('std2PointsSE3Motion', [0.1,0.1,0.1]');
+config.set('SE3MotionVertexInitialization','translation');
 config.set('newMotionVertexPerNLandmarks',inf)
 config = setUnitTestConfig(config);
 rng(config.rngSeed);
 
 %% solver
 config.set('pointMotionMeasurement','point2DataAssociation');
-config.set('measurementsFileName','noOverlapLongerGraph_v8.graph');
+config.set('measurementsFileName','noOverlapLongerGraph_v10.graph');
 config.set('groundTruthFileName','app10_groundTruth.graph');
 nObjects = 1;
 if nObjects >1

@@ -128,13 +128,9 @@ plotGraphFileICRA(config,resultsCell,'solverResults',resultsSE3.relPose.get('R3x
 %plot heat map style points error
 pointsGT = [graphGT.vertices(graphGT.identifyVertices('point')).value];
 pointsN = [graphN.vertices(graphN.identifyVertices('point')).value];
+
+posesGT = [graphGT.vertices(graphGT.identifyVertices('point')).value];
+posesN = [graphN.vertices(graphN.identifyVertices('point')).value];
+
 NoSE3_pointsN = [initialGraphN.vertices(initialGraphN.identifyVertices('point')).value];
-
-posesGT = [graphGT.vertices(graphGT.identifyVertices('pose')).value];
-posesN = [graphN.vertices(graphN.identifyVertices('pose')).value];
-NoSE3_posesN = [initialGraphN.vertices(initialGraphN.identifyVertices('pose')).value];
-
-plotHeatMapStylePoints(pointsGT,pointsN,NoSE3_pointsN,...
-    resultsSE3.posePointsN_SE3,resultsNoSE3.posePointsN_SE3,...
-    posesGT,posesN, NoSE3_posesN,resultsSE3.relPose.get('R3xso3Pose'),...
-    resultsNoSE3.relPose.get('R3xso3Pose'))
+plotHeatMapStylePoints(pointsGT,pointsN,NoSE3_pointsN,resultsSE3.posePointsN_SE3,resultsNoSE3.posePointsN_SE3)
