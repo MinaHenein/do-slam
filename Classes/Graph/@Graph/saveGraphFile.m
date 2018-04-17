@@ -15,6 +15,7 @@ for i = 1:obj.nVertices
     switch obj.vertices(i).type
         case 'pose';        vertexLabel = config.poseVertexLabel;
         case 'point';       vertexLabel = config.pointVertexLabel;
+        case 'intrinsics';  vertexLabel = config.intrinsicVertexLabel;
         case 'plane';       vertexLabel = config.planeVertexLabel;
         case 'angle';       vertexLabel = config.angleVertexLabel;
         case 'distance';    vertexLabel = config.distanceVertexLabel;
@@ -41,6 +42,11 @@ for i = 1:obj.nEdges
             edgeLabel = config.posePointEdgeLabel;
             verticesIn = obj.edges(i).iVertices(1);
             verticesOut = obj.edges(i).iVertices(2);
+            edgeCovariance = covToUpperTriVec(obj.edges(i).covariance);
+        case 'pose-point-intrinsic'                  
+            edgeLabel = config.posePointIntrinsicEdgeLabel;
+            verticesIn = obj.edges(i).iVertices(1:2);
+            verticesOut = obj.edges(i).iVertices(3);
             edgeCovariance = covToUpperTriVec(obj.edges(i).covariance);
         case 'point-point'
             edgeLabel = config.pointPointEdgeLabel;

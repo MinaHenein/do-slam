@@ -29,6 +29,9 @@ for i = 1:nVertices
             type = 'point';
             value = verticesCell{i}{3}(1:3);
             pointColour = verticesCell{i}{3}(4:6);
+        case config.intrinsicVertexLabel
+            type = 'intrinsics';
+            value = verticesCell{i}{3};
         case config.velocityVertexLabel
             type = 'velocity';
             value = verticesCell{i}{3};
@@ -79,6 +82,10 @@ for i = 1:nEdges
 %             value = edgesCell{i}{5}(1:3);
 %             pointColour = edgesCell{i}{5}(4:6);
 %             covariance = upperTriVecToCov(edgesCell{i}{6});
+        case config.posePointIntrinsicEdgeLabel
+            type = 'pose-point-intrinsic';
+            value = edgesCell{i}{5};
+            covariance = upperTriVecToCov(edgesCell{i}{6});
         case config.pointPointEdgeLabel
             type = 'point-point';
             value = edgesCell{i}{5};

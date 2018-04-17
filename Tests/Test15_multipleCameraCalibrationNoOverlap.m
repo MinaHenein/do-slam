@@ -8,7 +8,7 @@
 clear
 close all
 
-nCameras = 4;
+nCameras = 3;
 plotEnvironment = 0;
 
 t0 = 1;
@@ -41,8 +41,8 @@ camera2Trajectory = StaticPoseTrajectory(camera2Pose);
 camera3Trajectory = StaticPoseTrajectory(camera3Pose);
 camera4Trajectory = StaticPoseTrajectory(camera4Pose);
 %% set up primitive
-% primitiveInitialPose_R3xso3 = [0 -9 0 0 0 0.002]';
-% primitiveMotion_R3xso3 = [0.2; 0; 0; arot(eul2rot([0.02,0,0]))];
+primitiveInitialPose_R3xso3 = [0 -9 0 0 0 0.002]';
+primitiveMotion_R3xso3 = [0.2; 0; 0; arot(eul2rot([0.02,0,0]))];
 
 if nCameras == 4
     primitiveInitialPose_R3xso3 = [7.5 -6 0 0 0 0.002]';
@@ -50,7 +50,8 @@ if nCameras == 4
 end
 
 % construct trajectories
-primitiveTrajectory = ConstantMotionDiscretePoseTrajectory(t,primitiveInitialPose_R3xso3,primitiveMotion_R3xso3,'R3xso3');
+primitiveTrajectory = ConstantMotionDiscretePoseTrajectory(t,...
+    primitiveInitialPose_R3xso3,primitiveMotion_R3xso3,'R3xso3');
 objectMotion = primitiveTrajectory.RelativePoseGlobalFrameR3xso3(t(1),t(2));
 
 environment = Environment();
@@ -121,6 +122,7 @@ if plotEnvironment
         implay(frames4);    
     end    
 end
+
 %% 5.Generate Measurements & Save to Graph Files
 config.set('groundTruthFileName' ,'groundTruthTest15a.graph');
 config.set('measurementsFileName','measurementsTest15a.graph');
@@ -179,7 +181,37 @@ hold on
 plotGraphFileICRA(config,groundTruthCell,'groundTruth');
 resultsCell = graphFileToCell(config,'resultsTest15.graph');
 hold  on
-plotGraphFileICRA(config,resultsCell,'solverResults',results.relPose.get('R3xso3Pose'),results.posePointsN.get('R3xso3Pose'))
+plotGraphFileICRA(config,resultsCell,'solverResults',results.relPose.get('R3xso3Pose'),...
+    results.posePointsN.get('R3xso3Pose'))
+
+%% to output a video of the calibration after every iteration
+% LM solver needs to be changed to save every graph
+figure;
+for i=1:length(solver.graphs)
+    graph  = solver.graphs(i);
+    %save results to graph file
+    graph.saveGraphFile(config,strcat('results_',num2str(i),'Test15.graph'));
+    resultsCell = graphFileToCell(config,strcat('results_',num2str(i),'Test15.graph'));
+    plotGraphFile(config,groundTruthCell,[0 1 0])
+    hold on
+    plotGraphFile(config,resultsCell,[0 0 1])
+    M(i) = getframe(gcf);
+    hold off
+end
+v = VideoWriter('Data/Videos/3camera_calibration_solution');
+open(v)
+writeVideo(v,M);
+close(v)
+%% to output a different video
+[cameraGraphIndexes, cameraPoses, pointPositions] = preProcessVideo(config,solver,'results_Test15.graph',...
+    length(solver.graphs));
+frames = produceVideo([sensor1,sensor2,sensor3],cameraPoses,...
+    cameraGraphIndexes,pointPositions,t,environment,length(solver.graphs));
+implay(frames);
+v = VideoWriter('Data/Videos/3camera_calibration_video3');
+open(v)
+writeVideo(v,frames);
+close(v)
 
 figure
 xlabel('x')

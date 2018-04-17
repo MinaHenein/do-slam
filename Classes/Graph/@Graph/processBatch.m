@@ -83,6 +83,26 @@ for i = 1:nSteps
                 end
                 %construct pose-point edge
                 obj = obj.constructPosePointEdge(config,jRow);
+            case config.posePointIntrinsicEdgeLabel
+                % edge format {[],[poseID,pointID],IntrinsicsID,edgeValue,edgeCov}
+                %edge index
+                jRow{2} = obj.nEdges+1;
+                %create pose vertex if it doesn't exist
+                posePointVertexes = jRow{3};
+                if (posePointVertexes(1) > obj.nVertices) || isempty(obj.vertices(posePointVertexes(1)).type)
+                    obj = obj.constructPoseVertex(config,jRow);
+                end
+                %create intrinsics vertex if it doesn't exist
+                %% TO DO
+                if jRow{4} > obj.nVertices || isempty(obj.vertices(jRow{4}).type)
+                    obj = obj.constructIntrinsicVertex(config,jRow);
+                end
+                %create point vertex if it doesn't exist
+                if (posePointVertexes(2) > obj.nVertices) || isempty(obj.vertices(posePointVertexes(2)).type)
+                    obj = obj.constructPointVertex(config,jRow);
+                end
+                %construct pose-point edge
+                obj = obj.constructPosePointIntrinsicEdge(config,jRow);
             case config.pointPointEdgeLabel                
                 %edgeIndex
                 jRow{2} = obj.nEdges+1;

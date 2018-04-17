@@ -5,26 +5,35 @@ function [obj] = constructPointVertex(obj,config,edgeRow)
 %% 1. load vars from edge row
 edgeLabel = edgeRow{1};
 edgeIndex = edgeRow{2};
-poseVertex = edgeRow{3};
-pointVertex = edgeRow{4};
+posePointVertexes = edgeRow{3};
+poseVertex = posePointVertexes(1);
+pointVertex = posePointVertexes(2);
+intrinsicVertex = edgeRow{4};
 switch edgeLabel
-    case config.posePointEdgeLabel
+    case {config.posePointEdgeLabel,config.posePointIntrinsicEdgeLabel}
         edgeValue = edgeRow{5};
         pointColour = [];
     case config.posePointRGBEdgeLabel
         edgeValue = edgeRow{5}(1:3);
         pointColour = edgeRow{5}(4:6);
+    otherwise
+        error('%s type invalid',edgeLabel)
 end
 edgeCovariance = edgeRow{6};
 
 %% 2. compute point position
 pose = obj.vertices(poseVertex).value;
+intrinsics = obj.vertices(intrinsicVertex).value;
 positionRelative = edgeValue;
 switch config.cameraPointParameterisation
     case 'euclidean'
-          positionAbsolute = config.relativeToAbsolutePointHandle(pose,positionRelative);
+          if strcmp(config.landmarkErrorToMinimize,'reprojection')
+            positionAbsolute = config.relativeToAbsolutePointHandle(pose,positionRelative,intrinsics);
+          else
+            positionAbsolute = config.relativeToAbsolutePointHandle(pose,positionRelative);
 %         positionAbsolute = RelativeToAbsolutePosition(pose,positionRelative);
 %         positionAbsolute = RelativePoint2AbsolutePoint3D(pose,positionRelative);
+          end
     otherwise
         error('%d point parameterisation not implemented',config.cameraPointParameterisation)
 end

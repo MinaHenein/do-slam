@@ -50,6 +50,11 @@ while ischar(tline)
 %             lineCell = {label,values(1),values(2:7)'};
 %             %store
 %             graphCell{end+1,1} = lineCell;
+        case config.intrinsicVertexLabel
+            noVertices = 0;
+            lineCell = {label,values(1),values(2)};
+            %store
+            graphCell{end+1,1} = lineCell;
         case config.planeVertexLabel
             noVertices = 0;
             lineCell = {label,values(1),values(2:5)'};
@@ -97,6 +102,10 @@ while ischar(tline)
 %             lineCell = {label,[],values(1),values(2),values(3:8)',values(9:14)};
 %             %store
 %             graphCell{end+1,1} = lineCell;
+        case config.posePointIntrinsicEdgeLabel
+            lineCell = {label,[],values(1:2),values(3),values(4:6)',values(7:12)};
+            %store
+            graphCell{end+1,1} = lineCell;
         case config.pointPointEdgeLabel
             lineCell = {label,[],values(1),values(2),values(3:5)',values(6:11)};
              %store

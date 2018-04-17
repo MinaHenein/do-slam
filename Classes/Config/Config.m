@@ -26,6 +26,9 @@ classdef Config < ArrayGetSet
         % noise model
         noiseModel
         
+        % landmark error to minimize
+        landmarkErrorToMinimize
+        
         % motion model
         motionModel
         
@@ -105,6 +108,7 @@ classdef Config < ArrayGetSet
         planeVertexLabel
         posePoseEdgeLabel
         posePointEdgeLabel
+        posePointIntrinsicEdgeLabel
         pointPointEdgeLabel
         point3EdgeLabel
         velocityVertexLabel
@@ -123,6 +127,7 @@ classdef Config < ArrayGetSet
         pointPointRGBEdgeLabel
         fixedAngleEdgeLabel
         fixedDistanceEdgeLabel
+        intrinsicVertexLabel
         
         % general settings
         displayProgress

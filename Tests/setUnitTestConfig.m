@@ -17,18 +17,20 @@ if strcmp(config.motionModel,'constantSE3Rob') ||...
         strcmp(config.motionModel,'constantSE3')
     config.absoluteToRelativePointHandle = @AbsoluteToRelativePositionR3xso3Normalised;
     config.relativeToAbsolutePointHandle = @RelativeToAbsolutePositionR3xso3Normalised;
-else
-    config.absoluteToRelativePointHandle = @AbsoluteToRelativePositionR3xso3;
-    config.relativeToAbsolutePointHandle = @RelativeToAbsolutePositionR3xso3;    
+elseif strcmp(config.landmarkErrorToMinimize,'reprojection')
+    config.absoluteToRelativePointHandle = @AbsoluteToRelativePositionR3xso3Image;
+    config.relativeToAbsolutePointHandle = @RelativeToAbsolutePositionR3xso3Image;    
 end
     
 config.set('cameraPointParameterisation','euclidean');
 config.set('cameraControlInput','relativePose');
+config.set('intrinsicVertexLabel','VERTEX_INTRINSICS');
 config.set('poseVertexLabel'     ,'VERTEX_POSE_R3_SO3');
 config.set('pointVertexLabel'    ,'VERTEX_POINT_3D');
 config.set('planeVertexLabel'    ,'VERTEX_PLANE_4D');
 config.set('posePoseEdgeLabel'   ,'EDGE_R3_SO3');
 config.set('posePointEdgeLabel'  ,'EDGE_3D');
+config.set('posePointIntrinsicEdgeLabel'  ,'EDGE_3D_INTRINSICS');
 config.set('pointPlaneEdgeLabel' ,'EDGE_1D');
 config.set('pointPointEdgeLabel' ,'EDGE_2POINTS');
 config.set('pointPointEdgeSE3Label','EDGE_2POINTS_SE3')
@@ -55,8 +57,8 @@ else
 end
 
 % set odometry error
-orientation = [pi/18;pi/18;pi/18]; % 2 degrees position error
-config.set('stdPosePose',[0.1,0.1,0.1,orientation']');
+orientation = [pi/90;pi/90;pi/90]; % 2 degrees position error
+config.set('stdPosePose',[0.15,0.15,0.15,orientation']');
 if strcmp(config.motionModel,'constantSE3Rob') ||...
         strcmp(config.motionModel,'constantSE3Mina')||...
         strcmp(config.motionModel,'constantSE3')

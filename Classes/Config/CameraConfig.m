@@ -9,6 +9,7 @@ classdef CameraConfig < Config
     %   application that should not be in base Config class
     %% 1. Properties
     properties(GetAccess = 'public', SetAccess = 'private')
+        focalLength
         fieldOfView
         cameraRelativePose
     end

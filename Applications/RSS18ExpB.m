@@ -74,10 +74,10 @@ sensor.addEnvironment(environment);
 sensor.addCamera(config.fieldOfView,cameraTrajectory);
 sensor.setVisibility(config,environment);
 
-% figure
-% spy(sensor.get('pointVisibility'));
-% print('RSS18ExpB_PointVisibility','-dpdf')
-% %% 4. Plot Environment
+figure
+spy(sensor.get('pointVisibility'));
+print('RSS18ExpB_PointVisibility','-dpdf')
+%% 4. Plot Environment
 % figure
 % viewPoint = [-35,35];
 % % axisLimits = [-30,30,-5,30,-10,10];
