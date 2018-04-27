@@ -11,6 +11,7 @@ config.set('std2PointsSE3Motion', [0.1,0.1,0.1]');
 config.set('SE3MotionVertexInitialization','translation');
 config.set('newMotionVertexPerNLandmarks',inf)
 config = setUnitTestConfig(config);
+
 rng(config.rngSeed);
 
 %% solver

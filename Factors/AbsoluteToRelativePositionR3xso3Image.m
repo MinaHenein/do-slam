@@ -20,8 +20,15 @@ for i = 1:size(positionsAbsolute,2)
     screwNewFrame = [rot(posesNewFrame(4:6,i)) posesNewFrame(1:3,i);
                      0 0 0 1];
     normalisedPositionRelative = screwNewFrame \ [positionsAbsolute(:,i); 1];
-    % intrinsics here is just a scalar value - focal length
-    positionsRelative(:,i) = intrinsics * normalisedPositionRelative(1:3,:);
+    if numel(intrinsics)==1
+        intrinsicMatrix = intrinsics;
+    else
+        f = intrinsics(1);
+        cx = intrinsics(2);
+        cy = intrinsics(3);
+        intrinsicMatrix = [f 0 cx; 0 f cy; 0 0 1];
+    end
+    positionsRelative(:,i) = intrinsicMatrix * normalisedPositionRelative(1:3,:);
 end
 
 end

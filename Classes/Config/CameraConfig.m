@@ -10,8 +10,14 @@ classdef CameraConfig < Config
     %% 1. Properties
     properties(GetAccess = 'public', SetAccess = 'private')
         focalLength
+        opticalCentreX
+        opticalCentreY
         fieldOfView
         cameraRelativePose
+    end
+    
+    properties (Dependent)
+        intrinsics
     end
     
     %% 2. Methods
@@ -30,6 +36,13 @@ classdef CameraConfig < Config
         
         function self = setSwitch(self,property,value)
         	self.(property) = value;
+        end
+    end
+    
+    % Dependent properties
+    methods
+        function intrinsics = get.intrinsics(obj)
+            intrinsics = [obj.focalLength;obj.opticalCentreX;obj.opticalCentreY];
         end
     end
 end

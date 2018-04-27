@@ -24,5 +24,16 @@ for j=1:dofPoint
     d2 = config.absoluteToRelativePointHandle(poseAbsolute, positionAbsolute+EpsPoint(:,j),intrinsics);
     H2(:,j)= (d2-d)/(eps_2);
 end
-H3 = config.absoluteToRelativePointHandle(poseAbsolute,positionAbsolute,intrinsics)/intrinsics;
+
+if numel(intrinsics)==1
+    H3 = config.absoluteToRelativePointHandle(poseAbsolute,positionAbsolute,intrinsics)/intrinsics;
+else
+    %computed numerically
+    EpsIntrinsics = EpsPoint;
+    for j=1:3
+        d3 = config.absoluteToRelativePointHandle(poseAbsolute,positionAbsolute,...
+            intrinsics+EpsIntrinsics(:,j));
+        H3(:,j)= (d3-d)/(eps_2);
+    end
+end
 end

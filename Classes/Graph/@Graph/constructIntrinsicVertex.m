@@ -13,7 +13,12 @@ edgeCovariance = edgeRow{6};
 
 %% 2. intrinsics
 % only a scalar representing focal length
-intrinsics = 200;
+%% HOW TO INITIALISE INTRINSICS?
+if numel(config.intrinsics)==1
+    intrinsics = 300;
+else
+    intrinsics = [200;200;100];
+end
 
 %% 3. vertex properties
 value = intrinsics;

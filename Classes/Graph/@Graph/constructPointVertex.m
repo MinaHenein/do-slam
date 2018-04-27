@@ -5,10 +5,15 @@ function [obj] = constructPointVertex(obj,config,edgeRow)
 %% 1. load vars from edge row
 edgeLabel = edgeRow{1};
 edgeIndex = edgeRow{2};
+if strcmp(config.landmarkErrorToMinimize,'reprojection')
 posePointVertexes = edgeRow{3};
 poseVertex = posePointVertexes(1);
 pointVertex = posePointVertexes(2);
 intrinsicVertex = edgeRow{4};
+else
+    poseVertex = edgeRow{3};
+    pointVertex = edgeRow{4};
+end
 switch edgeLabel
     case {config.posePointEdgeLabel,config.posePointIntrinsicEdgeLabel}
         edgeValue = edgeRow{5};
@@ -23,7 +28,9 @@ edgeCovariance = edgeRow{6};
 
 %% 2. compute point position
 pose = obj.vertices(poseVertex).value;
+if strcmp(config.landmarkErrorToMinimize,'reprojection')
 intrinsics = obj.vertices(intrinsicVertex).value;
+end
 positionRelative = edgeValue;
 switch config.cameraPointParameterisation
     case 'euclidean'

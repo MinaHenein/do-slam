@@ -19,7 +19,10 @@ if strcmp(config.motionModel,'constantSE3Rob') ||...
     config.relativeToAbsolutePointHandle = @RelativeToAbsolutePositionR3xso3Normalised;
 elseif strcmp(config.landmarkErrorToMinimize,'reprojection')
     config.absoluteToRelativePointHandle = @AbsoluteToRelativePositionR3xso3Image;
-    config.relativeToAbsolutePointHandle = @RelativeToAbsolutePositionR3xso3Image;    
+    config.relativeToAbsolutePointHandle = @RelativeToAbsolutePositionR3xso3Image; 
+else
+    config.absoluteToRelativePointHandle = @AbsoluteToRelativePositionR3xso3;
+    config.relativeToAbsolutePointHandle = @RelativeToAbsolutePositionR3xso3;
 end
     
 config.set('cameraPointParameterisation','euclidean');
