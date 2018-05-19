@@ -1,4 +1,4 @@
-filepath = '/home/mina/workspace/src/Git/do-slam/Data/GraphFiles/vKitti_results.graph';
+filepath = '/home/mina/workspace/src/Git/do-slam/Data/GraphFiles/vKitti_resultsNoSE3.graph';
 fileID = fopen(filepath,'r');
 poses = [];
 line = fgetl(fileID);
@@ -13,26 +13,26 @@ fclose(fileID);
 
 for k = 1:size(poses,2)
 % Camera Transformation Matrix
-cameraToWorld = [rot(poses(k,4:6)), poses(k,1:3); 0 0 0 1];
+cameraToWorld = [rot(poses(4:6,k)), poses(1:3,k); 0 0 0 1];
 
 % Camera Intrinsics
-K = [329.115520046, 0,             320.0;
-    0,             329.115520046,  240.0;
-    0,             0,                 1];
+K = [725,      0,     620.5;
+       0,    725,     187.0;
+       0,      0,        1];
 
 fx = K(1,1);
 fy = K(2,2);
 cx = K(1,3);
 cy = K(2,3);
 
-factor = 1; % 1/pixel to meter conversion factor
+rgbFilePath = '/home/mina/Downloads/rgbImages';
+depthFilePath = '/home/mina/Downloads/depthImages';
 
-filePath = '/home/mina/City Dataset/img';
-depthFilePath = '/home/mina/City Dataset/data/depth';
-
-I = imread(strcat(filePath,'/',getFileName(imgID),num2str(imgID),'_0.png'));
+imgID = 333+k;
+I = imread(strcat(rgbFilePath,'/00',num2str(imgID),'.png'));
 % THIS IS SO IMPORTANT TO KEEP RIGHT VALUES OF DEPTH
-depth = reshape(load(strcat(depthFilePath,'/',getFileName(imgID),num2str(imgID),'_0.depth')),640, 480)';
+depth = imread(strcat(depthFilePath,'/00',num2str(imgID),'.png'));
+% depth = reshape(load(strcat(depthFilePath,'/00',num2str(imgID),'.png')),640, 480)';
 
 [imgH, imgW, ~] = size(I);
 
@@ -46,18 +46,17 @@ for i=1:imgH
     for j=1:imgW
         
         pt = [j;i;1];
-        eta = K\pt;
-        eta = eta/norm(eta);
+        Z = depth(i,j);
         
-        Z = depth(i,j)*eta(3) / factor;
-        if(Z > 500)
-            Z = 0;
-        end
+%         if(Z > 1000)
+%             Z = 0;
+%         end
+        
         X = (j-cx) * Z  / fx;
         Y = (i-cy) * Z  / fy;
         
         ptCount = ptCount + 1;
-        P3D =  cameraToWorld*[X;Y;Z;1];
+        P3D =  cameraToWorld*double([X;Y;Z;1]);
         PWorld(ptCount,:) = P3D(1:3,1)';
         pcloud(i,j,:) = PWorld(ptCount,:);
         
@@ -66,11 +65,15 @@ end
 
 
 ptCloud = pointCloud(pcloud,'Color',I);
-%figure
+if k==1
+    figure;
+end
 pcshow(ptCloud);
 xlabel('x');
 ylabel('y');
 zlabel('z');
+% axis([-inf inf -inf inf -10 300])
+% view([1 1 1])
 hold on
     
 end

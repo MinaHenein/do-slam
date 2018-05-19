@@ -1,5 +1,5 @@
 function [r_f_translation_error,r_f_rotation_error,...
-    r_f_squared_translation_error,r_f_squared_rotation_error] = ...
+    r_f_squared_translation_error,r_f_squared_rotation_error, rotError] = ...
     Compute_AbsoluteTrajectoryError(est_vertices,gt_vertices,v_rel_pose)
 
 r_f_translation_error = 0;
@@ -12,6 +12,8 @@ f_deg_per_rad = 180/pi;
 
 assert(isequal(size(est_vertices),size(gt_vertices)));
 n = size(est_vertices,2);
+
+rotError = zeros(n,1);
 for i = 1:n
 
     % put the ground truth vertex in the solution coordinate frame
@@ -23,6 +25,7 @@ for i = 1:n
     r_f_translation_error = r_f_translation_error + sqrt(f_trans_error2);
     r_f_squared_translation_error = r_f_squared_translation_error + f_trans_error2;
     f_rot_error_degrees = wrapToPi(norm(v_error(4:6))) * f_deg_per_rad;
+    rotError(i,1) = f_rot_error_degrees;
     r_f_rotation_error = r_f_rotation_error + f_rot_error_degrees;
     r_f_squared_rotation_error = r_f_squared_rotation_error + f_rot_error_degrees * f_rot_error_degrees;
     

@@ -17,7 +17,7 @@ edgeCovariance = edgeRow{6};
 if numel(config.intrinsics)==1
     intrinsics = 300;
 else
-    intrinsics = [200;200;100];
+    intrinsics = [330;320;240];
 end
 
 %% 3. vertex properties

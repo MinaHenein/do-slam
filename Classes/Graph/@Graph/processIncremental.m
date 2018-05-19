@@ -21,7 +21,7 @@ if config.plotIncremental
     xlabel('x')
     ylabel('y')
     zlabel('z')
-    plotGraphFile(config,groundTruthCell,[1 0 0]);
+    plotGraphFile(config,groundTruthCell,[0 1 0]);
     %plotGraphFileICRA(config,groundTruthCell,'groundTruth');
     
 end
@@ -34,12 +34,16 @@ measurementsCell = reshapeCell(measurementsCell,'array');
 %find odometry rows
 odometryRows = find(strcmp({measurementsCell{:,1}}',config.posePoseEdgeLabel));
 odometryIndex = 1; %first pose
-startPoseVertex = measurementsCell{odometryRows(odometryIndex),3};
 poseRows = [];
 for i = 1:numel(groundTruthCell)
     if strcmp(groundTruthCell{i}{1},config.poseVertexLabel)
         poseRows = [poseRows,i];
     end
+end
+if ~isempty(odometryRows)
+    startPoseVertex = measurementsCell{odometryRows(odometryIndex),3};
+else
+    startPoseVertex = groundTruthCell{poseRows(odometryIndex)}{2};
 end
 startPoseValue = groundTruthCell{poseRows(odometryIndex)}{3};
 startPoseCovariance = config.covPosePrior;
@@ -120,6 +124,19 @@ for i = 1:nSteps
                 end
                 %construct point-plane edge
                 obj = obj.constructPointPlaneEdge(config,jRow);
+            
+            case config.pointSE3MotionEdgeLabel
+                %edge index
+                jRow{2} = obj.nEdges+1;
+                %create velocity vertex if it doesn't exist
+                if jRow{4} > obj.nVertices
+                    %find all point vertices connected to this SE3 vertex
+                    pointRows = iRows([measurementsCell{iRows,4}]==jRow{4});
+                    pointVertices = [measurementsCell{pointRows,3}]';
+                    obj = obj.constructSE3MotionVertex(config,jRow,pointVertices);
+                end
+                obj = obj.construct2PointsSE3MotionEdge(config,jRow);
+            
             case config.planePriorEdgeLabel
                 %edge index
                 jRow{2} = obj.nEdges+1;

@@ -105,6 +105,7 @@ config.set('staticDataAssociation','On'); % set this to 'Off' to change object i
 config.set('sortVertices',0);
 config.set('sortEdges',0);
 config.set('processing','batch');
+config.set('plotIncremental',0);
 config.set('nVerticesThreshold',100);
 config.set('nEdgesThreshold',200);
 config.set('solveRate',5);

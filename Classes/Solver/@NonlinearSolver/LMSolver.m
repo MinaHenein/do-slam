@@ -72,13 +72,13 @@ while (~done)
         if updateGraph
             iteration = iteration + 1;
             %store
-%             obj.dX = [obj.dX dX];
-%             obj.graphs = [obj.graphs graph0];
-%             obj.systems = [obj.systems system];
+            obj.dX = [obj.dX dX];
+            obj.graphs = [obj.graphs graph0];
+            obj.systems = [obj.systems system];
             % to save memory
-                obj.dX = dX;
-                obj.graphs = graph0;
-                obj.systems = system;
+%                 obj.dX = dX;
+%                 obj.graphs = graph0;
+%                 obj.systems = system;
         end
     end
     

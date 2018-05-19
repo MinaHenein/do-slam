@@ -21,7 +21,7 @@ if strcmp(config.SE3MotionVertexInitialization,'eye')
     SE3Motion = [0 0 0 0 0 0]';
 elseif strcmp(config.SE3MotionVertexInitialization,'translation')
     SE3Motion = [t;arot(rotM)];
-else 
+else
     error('error, motion vertex initialization undefined')
 end
     

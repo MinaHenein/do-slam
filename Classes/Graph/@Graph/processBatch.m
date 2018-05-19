@@ -93,7 +93,6 @@ for i = 1:nSteps
                     obj = obj.constructPoseVertex(config,jRow);
                 end
                 %create intrinsics vertex if it doesn't exist
-                %% TO DO
                 if jRow{4} > obj.nVertices || isempty(obj.vertices(jRow{4}).type)
                     obj = obj.constructIntrinsicVertex(config,jRow);
                 end

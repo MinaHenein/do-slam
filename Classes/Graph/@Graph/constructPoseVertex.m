@@ -29,7 +29,7 @@ switch edgeLabel
                 %                 pose2 = RelativeToAbsolutePose(pose1,controlInput*config.dt);
                 %                 pose2 = Relative2AbsoluteSE3(pose1,controlInput*config.dt);
         end
-    case config.posePointEdgeLabel %to initialise a pose from point measurement - multicamera system
+    case {config.posePointEdgeLabel,config.posePointIntrinsicEdgeLabel} %to initialise a pose from point measurement - multicamera system
         GTFileName = config.groundTruthFileName;
         filepath = strcat(config.folderPath,config.sep,'Data',...
             config.sep,config.graphFileFolderName,config.sep,GTFileName);
@@ -66,7 +66,7 @@ switch edgeLabel
         else
             pose2 =  [0;0;0;0;0;0];
         end
-        outputVertices = inputVertices;
+        outputVertices = inputVertices(1);
     otherwise; error('error, wrong edgeLabel')
 end
 
