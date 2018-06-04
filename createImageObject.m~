@@ -3,9 +3,6 @@ function image = createImageObject(segmentationFile,detectionFile,i,imageList,as
 I = imread(strcat('00',num2str(imageList(i)),'.png'));
 rgbImage = imread(strcat('/home/mina/Downloads/rgbImages/00',num2str(imageList(i)),'.png'));
 image.I = rgbImage;
-depthImage = imread(strcat('/home/mina/Downloads/depthImages/00',num2str(imageList(i)),'.png'));
-image.depth = depthImage;
-
 for j=1:size(I,1)
     for k=1:size(I,2)
         if j==1 && k==1
@@ -27,10 +24,9 @@ for j=1:size(I,1)
                 image.objects(image.nObjects).rgb = rgb;
                 if assignObjectID
                     image.objects(image.nObjects).id = max([image.objects.id])+1;
-                    % add id to uniqueID
                     image.uniqueID = [image.uniqueID;image.objects(image.nObjects).id];
                 end
-                % add rgb to uniqueRGB
+                % add rgb to uniqueRGB & id to uniqueID
                 image.uniqueRGB = [image.uniqueRGB;rgb];
             end
         end
@@ -72,22 +68,23 @@ for y=1:image.nObjects
     objectBoundingBox = getObjectBoundingBox(detectionFile,imageList(i),...
         image.objects(y).classGT);
     image.objects(y).boundingBox = objectBoundingBox;
-    if ~assignObjectID
-        image.uniqueID = [];
+    %image.uniqueID = [];
+    % for testing only
+    if ~isempty(objectBoundingBox)
+        figure;
+        imshow(rgbImage(objectBoundingBox(2):objectBoundingBox(4),...
+            objectBoundingBox(1):objectBoundingBox(3),:));
+        image.objects(y).classGT
     end
 end
 
 nDeleted = 0;
 for y=1:image.nObjects
-    if isempty(image.objects(y-nDeleted).boundingBox)
-        image.objects(y-nDeleted) = [];
-        image.uniqueRGB(y-nDeleted,:) = [];
-        if assignObjectID
-            image.uniqueID(y-nDeleted,:) = [];
-        end
-        nDeleted = nDeleted + 1; 
+    if isempty(image.objects(y).boundingBox)
+    
     end
 end
 image.nObjects = length(image.objects);
+
 
 end

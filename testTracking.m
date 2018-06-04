@@ -1,13 +1,20 @@
 
-
+clear; clc;
 segmentationFile = '/home/mina/Downloads/vkitti_1.3.1_scenegt/0001_clone_scenegt_rgb_encoding.txt';
+detectionFile = '/home/mina/Downloads/vkitti_1.3.1_motgt/0001_clone.txt';
 imageList = 342:399;
 images = [];
 for i=1:length(imageList)
-    image = createImageObject(segmentationFile,i,imageList);
+    if i==1
+        assignObjectID = 1;
+        image = createImageObject(segmentationFile,detectionFile,i,imageList,assignObjectID);
+    else
+        assignObjectID = 0;
+        image = createImageObject(segmentationFile,detectionFile,i,imageList,assignObjectID);
+    end    
     images = [images, image];
 end
-images = objectTracker(images);
+imagesUniqueID = objectTracker(images);
 
 %plot objetcs of currentImage & image
 %         for j=1:currentImage.nObjects
@@ -23,10 +30,10 @@ images = objectTracker(images);
 %             end
 
 result = {};
-for i=1:length(images)
-    for j=1:images(i).nObjects
-        classGT = images(i).objects(j).classGT;
-        id = images(i).objects(j).id;
+for i=1:length(imagesUniqueID)
+    for j=1:imagesUniqueID(i).nObjects
+        classGT = imagesUniqueID(i).objects(j).classGT;
+        id = imagesUniqueID(i).objects(j).id;
         if i==1
             result{j,1} = classGT;
             result{j,2} = id;

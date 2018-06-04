@@ -111,6 +111,7 @@ classdef SimulatedEnvironmentSensor < Sensor
         self = setVisibility(self, config, environment);
         % Measurements
         generateMeasurements(self,config);
+        generateMeasurementsAllDynamic(self,config);
         varargout  = plot(self,t,varargin);
     end
     

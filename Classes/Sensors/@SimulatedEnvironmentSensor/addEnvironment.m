@@ -10,7 +10,9 @@ function self = addEnvironment(self,environment)
     end
 
     %loop over environmentPrimitives, create objects
-    objects(environment.nEnvironmentPrimitives) = SensorObject();
+    if environment.nEnvironmentPrimitives > 0
+        objects(environment.nEnvironmentPrimitives) = SensorObject();
+    end
     for i = 1:environment.nEnvironmentPrimitives
         switch class(environment.get('environmentPrimitives',i))
             case 'EP_Rectangle'
@@ -27,5 +29,7 @@ function self = addEnvironment(self,environment)
 
     %add properties
     self.points  = points;
-    self.objects = objects;
+    if environment.nEnvironmentPrimitives > 0
+        self.objects = objects;
+    end
 end
