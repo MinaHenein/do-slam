@@ -29,9 +29,15 @@ pointVertexIndexes = zeros(1,nSteps);
 
 % find indexes for static and dynamic points
 staticPointLogical      = self.get('points').get('static');
-staticObjectLogical  = self.get('objects').get('static');
-dynamicPointLogical     = ~staticPointLogical;
-dynamicObjectLogical = ~staticObjectLogical;
+if ~isempty(self.get('objects'))
+    staticObjectLogical  = self.get('objects').get('static');
+    dynamicPointLogical  = ~staticPointLogical;
+    dynamicObjectLogical = ~staticObjectLogical;
+else
+    staticObjectLogical  = [];
+    dynamicPointLogical  = [];
+    dynamicObjectLogical = [];
+end
 staticPointIndexes      = find(staticPointLogical);
 staticObjectIndexes  = find(staticObjectLogical);
 dynamicPointIndexes     = find(dynamicPointLogical);

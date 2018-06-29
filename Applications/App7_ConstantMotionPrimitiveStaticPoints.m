@@ -8,9 +8,9 @@ clear all
 
 %% 1. Config
 % time
-nSteps = 121;
+nSteps = 6;
 t0 = 0;
-tN = 120;
+tN = 5;
 dt = (tN-t0)/(nSteps-1);
 t  = linspace(t0,tN,nSteps);
 
@@ -27,6 +27,7 @@ config.set('staticDataAssociation','On');
 % config.set('pointMotionMeasurement','point2DataAssociation');
 config.set('motionModel','constantSE3MotionDA');
 config.set('std2PointsSE3Motion', [0.05,0.05,0.05]');
+config.set('SE3MotionVertexInitialization','eye');
 
 %% 2. Generate Environment
 if config.rngSeed
@@ -46,8 +47,8 @@ robotWaypoints = [linspace(0,tN+5,7); 0 sampleWaypoints(1,:); 0 (sampleWaypoints
 robotTrajectory = PositionModelPoseTrajectory(robotWaypoints,'R3','smoothingspline');
 
 environment = Environment();
-environment.addEllipsoid([1.25 1.25 3],12,'R3',primitiveTrajectory);
-nPoints = 50;
+environment.addEllipsoid([1.25 1.25 3],4,'R3',primitiveTrajectory);
+nPoints = 5;
 environment.addStaticPoints([30*ones(1,nPoints); 40*rand(1,nPoints); 20*rand(1,nPoints)]);
 environment.addStaticPoints([30*rand(1,nPoints); 40*ones(1,nPoints); 20*rand(1,nPoints)]);
 

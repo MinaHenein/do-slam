@@ -10,8 +10,8 @@ config = setAppConfig(config);
 %% 5. Generate Measurements & Save to Graph File, load graph file as well
 %% 5.1 without SE3
 config.set('pointMotionMeasurement','Off')
-config.set('measurementsFileName','vKitti_staticOnlyMeas_1.graph')
-config.set('groundTruthFileName','vKitti_staticOnlyGT_1.graph')
+config.set('measurementsFileName','staticOnlyNoiseMeas.graph')
+config.set('groundTruthFileName','staticOnlyNoiseGT.graph')
 % config.set('measurementsFileName','vKitti_Meas_staticOnlyTest.graph')
 % config.set('groundTruthFileName','vKitti_GT_staticOnlyTest.graph')
 groundTruthNoSE3Cell = graphFileToCell(config,config.groundTruthFileName);
@@ -29,11 +29,10 @@ fprintf('\nTotal time solving: %f\n',totalTime)
 initialGraph0  = initialSolverEnd.graphs(1);
 initialGraphN  = initialSolverEnd.graphs(end);
 %save results to graph file
-initialGraphN.saveGraphFile(config,'vKitti_staticOnly.graph');
+initialGraphN.saveGraphFile(config,'staticOnlyVKITTI.graph');
 
 %% 7. Error analysis
 %load ground truth into graph, sort if required
 graphGTNoSE3 = Graph(config,groundTruthNoSE3Cell);
 fprintf('\nInitial results for without SE(3) Transform:\n')
 resultsNoSE3 = errorAnalysis(config,graphGTNoSE3,initialGraphN);
-

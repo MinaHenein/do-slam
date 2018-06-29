@@ -31,8 +31,8 @@ end
 config = CameraConfig();
 config = setAppConfig(config);
 config.set('motionModel','constantSE3MotionDA');
-config.set('std2PointsSE3Motion', [5,5,5]');
-config.set('SE3MotionVertexInitialization','eye');
+config.set('std2PointsSE3Motion', [0.001,0.001,0.001]');
+config.set('SE3MotionVertexInitialization','translation');
 config.set('newMotionVertexPerNLandmarks',inf)
 
 %% 5. Generate Measurements & Save to Graph File, load graph file as well
@@ -40,15 +40,23 @@ config.set('newMotionVertexPerNLandmarks',inf)
 % config.set('constantSE3Motion',constantSE3ObjectMotion);
 %% 5.1 For initial (without SE3)
 config.set('pointMotionMeasurement','Off')
-config.set('measurementsFileName','vKitti_dynamicStaticMeas_1_v5_NoSE3.graph')
-config.set('groundTruthFileName','vKitti_dynamicStaticGT_1_v5_NoSE3.graph')
+% vKitti_dynamicStaticMeas_1_v5_NoSE3 %wrong occlusions
+% occlusionWorkingNoMotionMeas_v1
+config.set('measurementsFileName','staticDynamicNoiseMeasNoSE3.graph')
+%vKitti_dynamicStaticGT_1_v5_NoSE3 %wrong occlusions
+%occlusionWorkingNoMotion_v1
+config.set('groundTruthFileName','staticDynamicNoiseGTNoSE3.graph')
 groundTruthNoSE3Cell = graphFileToCell(config,config.groundTruthFileName);
 measurementsNoSE3Cell = graphFileToCell(config,config.measurementsFileName);
 
 %% 5.2 For test (with SE3)
 config.set('pointMotionMeasurement','point2DataAssociation');
-config.set('measurementsFileName','vKitti_dynamicStaticMeas_1_v5.graph');
-config.set('groundTruthFileName','vKitti_dynamicStaticGT_1_v5.graph');
+%vKitti_dynamicStaticMeas_1_v5 %wrong occlusions
+%occlusionWorkingMeas_v1
+config.set('measurementsFileName','staticDynamicNoiseMeas.graph');
+%vKitti_dynamicStaticGT_1_v5 %wrong occlusions
+%occlusionWorking_v1
+config.set('groundTruthFileName','staticDynamicNoiseGT.graph'); 
 % Check for wrong data associations and fix if necessary
 nObjects = 5;%size(constantSE3ObjectMotion,2);
 dataAssociationTest(config,config.measurementsFileName,nObjects)

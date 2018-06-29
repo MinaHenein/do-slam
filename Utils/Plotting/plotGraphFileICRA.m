@@ -38,6 +38,11 @@ switch setting
     case 'groundTruth'
         plotPoses = plot3(poses(1,:),poses(2,:),poses(3,:),'Color','g','Marker','.','LineStyle','none');
         set(plotPoses,'MarkerSize',7);
+        % uncomment to plot ground truth poses as coordinates
+%         for i = 1:sum(poseVertices)
+%         iPose = poses(:,i);
+%         plotCoordinates(iPose(1:3,:),rot(iPose(4:6,1)))
+%         end        
         plotPoints = plot3(points(1,:),points(2,:),points(3,:),'g.');
         set(plotPoints,'MarkerSize',5)
     case 'solverResults'

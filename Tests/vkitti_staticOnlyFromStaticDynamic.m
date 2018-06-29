@@ -1,6 +1,7 @@
 clear; clc;
 % Measurements
-filepath = '/home/mina/workspace/src/Git/do-slam/Data/GraphFiles/vKitti_dynamicStaticMeas_1_v5.graph';
+%vKitti_dynamicStaticMeas_1_v5
+filepath = '/home/mina/workspace/src/Git/do-slam/Data/GraphFiles/occlusionWorkingMeas_v1.graph';
 fileID = fopen(filepath,'r');
 Data = textscan(fileID, '%s', 'delimiter', '\n', 'whitespace', '');
 CStr = Data{1};
@@ -39,8 +40,14 @@ poses = unique(poses);
 points = unique(points);
 dynamicPoints = unique(dynamicPoints);
 
-fileToWritepath = '/home/mina/workspace/src/Git/do-slam/Data/GraphFiles/vKitti_Meas_staticOnlyTest.graph';
+fileToWritepath = '/home/mina/workspace/src/Git/do-slam/Data/GraphFiles/vKitti_OcclusionWorkingMeas_staticOnlyTest.graph';
 fileToWriteID = fopen(fileToWritepath,'w');
+
+if size(pointSeenByCamera,1) < poses(end)
+    for i = size(pointSeenByCamera,1)+1:poses(end)
+        pointSeenByCamera{i, end+1} = [];
+    end
+end
 
 for i=1:length(poses)
     if ~isempty(cell2mat(pointSeenByCamera(poses(i),:)))
@@ -48,7 +55,7 @@ for i=1:length(poses)
         for j=1:length(pointSeen)
             if ~ismember(pointSeen(j),dynamicPoints)
                 IndexC = strfind(CStr, strcat({'EDGE_3D'},{' '},{num2str(poses(i))},...
-                    {' '},{num2str(pointSeen(j))}));
+                    {' '},{num2str(pointSeen(j))},{' '}));
                 lineIndex = find(~cellfun('isempty', IndexC));
                 fileID = fopen(filepath,'r');
                 line = textscan(fileID,'%s',1,'delimiter','\n','headerlines',lineIndex-1);
@@ -60,9 +67,10 @@ for i=1:length(poses)
                 writeEdge('EDGE_3D',poses(i),pointSeen(j),edgeValue,edgeCovariance,fileToWriteID);
             end
         end
+    end
         if i<length(poses)
             IndexC = strfind(CStr, strcat({'EDGE_R3_SO3'},{' '},{num2str(poses(i))},...
-                {' '},{num2str(poses(i+1))}));
+                {' '},{num2str(poses(i+1))},{' '}));
             lineIndex = find(~cellfun('isempty', IndexC));
             fileID = fopen(filepath,'r');
             line = textscan(fileID,'%s',1,'delimiter','\n','headerlines',lineIndex-1);
@@ -73,18 +81,18 @@ for i=1:length(poses)
             fclose(fileID);
             writeEdge('EDGE_R3_SO3',poses(i),poses(i+1),edgeValue,edgeCovariance,fileToWriteID);
         end
-    end
 end
 fclose(fileToWriteID);
 
 % GT
-filepath = '/home/mina/workspace/src/Git/do-slam/Data/GraphFiles/vKitti_dynamicStaticGT_1_v5.graph';
+%vKitti_dynamicStaticGT_1_v5
+filepath = '/home/mina/workspace/src/Git/do-slam/Data/GraphFiles/occlusionWorking_v1.graph';
 fileID = fopen(filepath,'r');
 Data = textscan(fileID, '%s', 'delimiter', '\n', 'whitespace', '');
 CStr = Data{1};
 fclose(fileID);
 
-fileToWritepath = '/home/mina/workspace/src/Git/do-slam/Data/GraphFiles/vKitti_GT_staticOnlyTest.graph';
+fileToWritepath = '/home/mina/workspace/src/Git/do-slam/Data/GraphFiles/vKitti_OcclusionWorkingGT_staticOnlyTest.graph';
 fileToWriteID = fopen(fileToWritepath,'w');
 
 pointWritten = [];
