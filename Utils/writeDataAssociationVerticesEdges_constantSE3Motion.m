@@ -169,7 +169,11 @@ for j=1:1:length(Index)
                 edge.value = vertex1Value -...
                     (objectSE3Motion(1:3,1:3)'*...
                     vertex2Value -...
-                    objectSE3Motion(1:3,1:3)'*objectSE3Motion(1:3,4));
+                    objectSE3Motion(1:3,1:3)'*objectSE3Motion(1:3,4));                
+%                 valueEdge = [0;0;0];
+%                 muEdge =  zeros(size(valueEdge,1),1);
+%                 sigmaEdge = config.std2PointsSE3Motion;
+%                 edge.value = addGaussianNoise(config,muEdge,sigmaEdge,valueEdge);
                 edge.std = config.std2PointsSE3Motion;
                 edge.cov = config.cov2PointsSE3Motion;
                 edge.covUT = covToUpperTriVec(edge.cov); 
@@ -216,21 +220,29 @@ for j=1:1:length(Index)
 %         nLinesAdded = nLinesAdded-1;
         isNewSE3Vertex = 0;
     end
-    % Save the file again
-    fileID = fopen(strcat(config.folderPath,config.sep,'Data',...
-        config.sep,config.graphFileFolderName,config.sep,GTFileName), 'w');
+%     % Save in the file again
+%     fileID = fopen(strcat(config.folderPath,config.sep,'Data',...
+%         config.sep,config.graphFileFolderName,config.sep,GTFileName), 'w');
+%     fprintf(fileID, '%s\n', CStr{:});
+%     fprintf(fileID, '%s\n', Edges{:});
+%     fclose(fileID);
+    
+    % Save in a different file
+    filepath = strcat(config.folderPath,config.sep,'Data',...
+    config.sep,config.graphFileFolderName,config.sep,GTFileName(1:end-6),'Test.graph');
+    fileID = fopen(filepath,'w');
     fprintf(fileID, '%s\n', CStr{:});
     fprintf(fileID, '%s\n', Edges{:});
     fclose(fileID);
 end
+newGTFileName = strcat(GTFileName(1:end-6),'Test.graph');
 GTFilePath = strcat(config.folderPath,config.sep,'Data',...
-        config.sep,config.graphFileFolderName,config.sep,GTFileName);
+        config.sep,config.graphFileFolderName,config.sep,newGTFileName);
 deleteDataAssociationFromGraphFile(GTFilePath)
 
 MeasurementsFileName = config.measurementsFileName;
 filepath = strcat(config.folderPath,config.sep,'Data',...
     config.sep,config.graphFileFolderName,config.sep,MeasurementsFileName);
-
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % re-order data association entries by object
 fileID = fopen(filepath,'r');
@@ -301,7 +313,7 @@ for j=1:length(Index)
     fclose(fileID);
     
     fileID = fopen(strcat(config.folderPath,config.sep,'Data',...
-        config.sep,config.graphFileFolderName,config.sep,GTFileName),'r');
+        config.sep,config.graphFileFolderName,config.sep,newGTFileName),'r');
     Data = textscan(fileID,'%s','delimiter','\n','whitespace',' ');
     CStrGT = Data{1};
     fclose(fileID);
@@ -310,7 +322,7 @@ for j=1:length(Index)
     IndexC = strfind(CStrGT, searchedStr);
     edgeIndex = find(~cellfun('isempty', IndexC),1);
     fileID = fopen(strcat(config.folderPath,config.sep,'Data',...
-        config.sep,config.graphFileFolderName,config.sep,GTFileName),'r');
+        config.sep,config.graphFileFolderName,config.sep,newGTFileName),'r');
     line = textscan(fileID,'%s',1,'delimiter','\n','headerlines',edgeIndex-1);
     line = cell2mat(line{1,1});
     splitLine = str2double(strsplit(line,' '));
@@ -325,12 +337,17 @@ for j=1:length(Index)
     fclose(fileID);
     CStr(Index(j)) = cellstr(sprintf('%s %d %d %d %f %f %f %f %f %f %f %f %f',...
         edgeLabel,index1,index2,index3,edgeValue',edgeCovUT));
-    % Save the file again:
-    fileID = fopen(strcat(config.folderPath,config.sep,'Data',...
-        config.sep,config.graphFileFolderName,config.sep,MeasurementsFileName), 'w');
+%     % Save the file again:
+%     fileID = fopen(strcat(config.folderPath,config.sep,'Data',...
+%         config.sep,config.graphFileFolderName,config.sep,MeasurementsFileName), 'w');
+%     fprintf(fileID, '%s\n', CStr{:});
+%     fclose(fileID);
+    % Save in a different file
+    filepath = strcat(config.folderPath,config.sep,'Data',...
+        config.sep,config.graphFileFolderName,config.sep,MeasurementsFileName(1:end-6),'Test.graph');
+    fileID = fopen(filepath,'w');
     fprintf(fileID, '%s\n', CStr{:});
     fclose(fileID);
-
 end
 
 end

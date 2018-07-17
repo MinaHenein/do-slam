@@ -17,20 +17,19 @@ t  = linspace(t0,tN,nSteps);
 config = CameraConfig();
 config = setAppConfig(config);
 config.set('t',t);
-config.set('groundTruthFileName','RSS18ExpB2_groundTruth.graph');
-config.set('measurementsFileName','RSS18ExpB2_measurements.graph');
-
 % SE3 Motion
 config.set('pointMotionMeasurement','point2DataAssociation');
 config.set('motionModel','constantSE3MotionDA');
-config.set('std2PointsSE3Motion', [0.05,0.05,0.05]');
+config.set('std2PointsSE3Motion', [0.001,0.001,0.001]');
 
 %% 2. Generate Environment
 if config.rngSeed
     rng(config.rngSeed); 
 end
 
-robotWaypoints = [( -6 - .5 * (.5 + 10 * sin(t / 10))); sin(t * .5); 2 + cos(t * .5)]';
+robotWaypoints = [( -6 - 1 * (.5 + 10 * sin(t / 10))); sin(t * .5); 2 + cos(t * .5)]';
+% was submitted with
+% robotWaypoints = [( -6 - .5 * (.5 + 10 * sin(t / 10))); sin(t * .5); 2 + cos(t * .5)]';
 robotWaypoints = reshape(robotWaypoints',[size(robotWaypoints,2),size(robotWaypoints,1)]);
 robotTrajectoryWaypoints = [linspace(0,tN,nSteps);robotWaypoints];
 
@@ -60,36 +59,36 @@ sensor = SimulatedEnvironmentOcclusionSensor();
 sensor.addEnvironment(environment);
 sensor.addCamera(config.fieldOfView,cameraTrajectory);
 sensor.setVisibility(config,environment);
-
-figure
-spy(sensor.get('pointVisibility'));
-print('RSS18ExpB22_PointVisibility','-dpdf')
+ 
+% figure
+% spy(sensor.get('pointVisibility'));
+% print('RSS18ExpB22_PointVisibility','-dpdf')
 %% 4. Plot Environment
-figure
-viewPoint = [-35,35];
-% axisLimits = [-30,30,-5,30,-10,10];
-% title('Environment')
-axis equal
-xlabel('x (m)')
-ylabel('y (m)')
-zlabel('z (m)')
-view(viewPoint)
-% axis(axisLimits)
-hold on
-grid on
-primitive1Trajectory.plot(t,[0 0 0],'axesOFF')
-primitive2Trajectory.plot(t,[0 0 0],'axesOFF')
-cameraTrajectory.plot(t,[0 0 1],'axesOFF')
-% set(gcf,'Position',[0 0 1024 768]);
-frames = sensor.plot(t,environment);
-print('RSS18ExpB22_Environment','-dpdf')
-% implay(frames);
-
-    %% 4.a output video
-v = VideoWriter('Data/Videos/RSS18ExpB22_sensor_environment.mp4','MPEG-4');
-open(v)
-writeVideo(v,frames);
-close(v)
+% figure
+% viewPoint = [-35,35];
+% % axisLimits = [-30,30,-5,30,-10,10];
+% % title('Environment')
+% axis equal
+% xlabel('x (m)')
+% ylabel('y (m)')
+% zlabel('z (m)')
+% view(viewPoint)
+% % axis(axisLimits)
+% hold on
+% grid on
+% primitive1Trajectory.plot(t,[0 0 0],'axesOFF')
+% primitive2Trajectory.plot(t,[0 0 0],'axesOFF')
+% cameraTrajectory.plot(t,[0 0 1],'axesOFF')
+% % set(gcf,'Position',[0 0 1024 768]);
+% frames = sensor.plot(t,environment);
+% print('RSS18ExpB22_Environment','-dpdf')
+% % implay(frames);
+% 
+%     %% 4.a output video
+% v = VideoWriter('Data/Videos/RSS18ExpB22_sensor_environment.mp4','MPEG-4');
+% open(v)
+% writeVideo(v,frames);
+% close(v)
 
 %% 5. Generate Measurements & Save to Graph File, load graph file as well
 config.set('constantSE3Motion',constantSE3ObjectMotion);
@@ -103,6 +102,8 @@ config.set('constantSE3Motion',constantSE3ObjectMotion);
     
     %% 5.2 For test (with SE3)
     config.set('pointMotionMeasurement','point2DataAssociation');
+    config.set('SE3MotionVertexInitialization','translation')
+    config.set('newMotionVertexPerNLandmarks',inf)
     config.set('measurementsFileName','RSS18ExpB2_measurements.graph');
     config.set('groundTruthFileName','RSS18ExpB2_groundTruth.graph');
     sensor.generateMeasurements(config);
@@ -152,13 +153,13 @@ resultsSE3 = errorAnalysis(config,graphGT,graphN);
 %% 8. Plot
     %% 8.1 Plot initial, final and ground-truth solutions
 %no constraints
-figure
-spy(solverEnd.systems(end).H)
-print('RSS18ExpB2_H','-dpdf')
+% figure
+% spy(solverEnd.systems(end).H)
+% print('RSS18ExpB2_H','-dpdf')
 
-figure
-spy(chol(solverEnd.systems(end).H))
-print('RSS18ExpB2_chol(H)','-dpdf')
+% figure
+% spy(chol(solverEnd.systems(end).H))
+% print('RSS18ExpB2_chol(H)','-dpdf')
 
 h = figure; 
 xlabel('x (m)')

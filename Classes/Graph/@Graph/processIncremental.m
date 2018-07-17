@@ -18,6 +18,7 @@ if config.plotIncremental
     %if config.axisEqual; axis equal; end
     %axis(config.axisLimits)
     %view(config.plotView)
+    view([-50,25])
     xlabel('x')
     ylabel('y')
     zlabel('z')
@@ -236,9 +237,11 @@ for i = 1:nSteps
                 
         %store iSolver
         solver = [solver iSolver];
+        storePlot = 1;
 %         solver = iSolver; %if memory is problem
     else
         skipCount = skipCount + 1;
+        storePlot = 0;
     end
        
     %plot while solving
@@ -250,9 +253,13 @@ for i = 1:nSteps
         else
 
         end
+        view([-50,25])
         currentPlotHandle = plotGraph(config,obj,[0 0 1]);
-        %currentPlotHandle = plotGraphFileICRA(config,obj,'solverResults');
+        %plotGraphFileICRA(config,obj,'solverResults');
         frames(i) = getframe(fig);
+        if storePlot
+            solver(end).frames = frames;
+        end
     end
 end
 

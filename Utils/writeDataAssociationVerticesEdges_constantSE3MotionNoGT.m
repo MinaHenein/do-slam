@@ -126,12 +126,18 @@ for j=1:length(Index)
     covEdge = config.cov2PointsSE3Motion;
     edgeCovUT = covToUpperTriVec(covEdge);
     edgeLabel = config.pointSE3MotionEdgeLabel;
-    edgeValue = sigmaEdge.*rand;
+    edgeValue = sigmaEdge.*(2*rand-1);
     CStr(Index(j)) = cellstr(sprintf('%s %d %d %d %f %f %f %f %f %f %f %f %f',...
         edgeLabel,index1,index2,newVertexID,edgeValue',edgeCovUT));
-     % Save the file again:
-    fileID = fopen(strcat(config.folderPath,config.sep,'Data',...
-        config.sep,config.graphFileFolderName,config.sep,MeasurementsFileName), 'w');
+%      Save the file again:
+%     fileID = fopen(strcat(config.folderPath,config.sep,'Data',...
+%         config.sep,config.graphFileFolderName,config.sep,MeasurementsFileName), 'w');
+%     fprintf(fileID, '%s\n', CStr{:});
+%     fclose(fileID);
+    % Save in a different file
+    filepath = strcat(config.folderPath,config.sep,'Data',...
+        config.sep,config.graphFileFolderName,config.sep,MeasurementsFileName(1:end-6),'Test.graph');
+    fileID = fopen(filepath,'w');
     fprintf(fileID, '%s\n', CStr{:});
     fclose(fileID);
 end
