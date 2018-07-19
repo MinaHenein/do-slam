@@ -114,6 +114,7 @@ classdef Config < ArrayGetSet
         velocityVertexLabel
         SE3MotionVertexLabel
         pointVelocityEdgeLabel
+        pointsDataAssociationLabel
         pointSE3MotionEdgeLabel
         pointDataAssociationLabel
         pointPointEdgeSE3Label

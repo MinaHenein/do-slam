@@ -1,9 +1,12 @@
 function image = createImageObject(segmentationFile,detectionFile,i,imageList,assignObjectID)
 
-I = imread(strcat('00',num2str(imageList(i)),'.png'));
-rgbImage = imread(strcat('/home/mina/Downloads/rgbImages/00',num2str(imageList(i)),'.png'));
+I = imread(strcat('/home/mina/Downloads/vKitti/vkitti_1.3.1_scenegt/0001/clone/00',...
+    num2str(imageList(i)),'.png'));
+rgbImage = imread(strcat('/home/mina/Downloads/vKitti/rgbImages/00',...
+    num2str(imageList(i)),'.png'));
 image.I = rgbImage;
-depthImage = imread(strcat('/home/mina/Downloads/depthImages/00',num2str(imageList(i)),'.png'));
+depthImage = imread(strcat('/home/mina/Downloads/vKitti/depthImages/00',...
+    num2str(imageList(i)),'.png'));
 image.depth = depthImage;
 
 for j=1:size(I,1)

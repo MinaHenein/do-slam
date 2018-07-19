@@ -37,6 +37,8 @@ for i = 1:obj.nEdges
             end
         case '2points-SE3Motion'
             edgeUpdater = @update2PointsSE3MotionEdge;
+        case '2points-DataAsspciation'
+            continue
         case 'point-plane'
             edgeUpdater = @updatePointPlaneEdge;
         case 'point-rectangle'

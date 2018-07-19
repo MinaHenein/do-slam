@@ -1,10 +1,12 @@
-function images = objectTracker(images)
+function [images, wrongAssociations] = objectTracker(images)
+
+wrongAssociations = 0;
+maxID = max([images(1).objects.id]);
 
 for i=2:length(images)
     
     currentImage = images(i);
     previousImage = images(i-1);
-    maxID = max([previousImage.objects.id]);
     nObjectCurrentImage  = currentImage.nObjects;
     nObjectPreviousImage = previousImage.nObjects;
     
@@ -155,10 +157,13 @@ for i=2:length(images)
                 
                 % for testing only
                 %------------------------------------------------------------------
-                currentImage.objects(j).classGT
-                highestRankObject.classGT
+                %currentImage.objects(j).classGT
+                %highestRankObject.classGT
+                if~(strcmp(highestRankObject.classGT,currentImage.objects(j).classGT))
+                    wrongAssociations = wrongAssociations + 1;
+                    disp('wrong highest rank')
+                end
                 disp('***********************************************************')
-                assert(strcmp(highestRankObject.classGT,currentImage.objects(j).classGT))
                 %------------------------------------------------------------------
                 
                 % predict next object centroid position
@@ -166,11 +171,14 @@ for i=2:length(images)
                 deltaCentroid = objectCentroid - previousObjectCentroid;
                 nextPredictedCentroid = objectCentroid + deltaCentroid;
                 currentImage.objects(j).predictedCentroid = nextPredictedCentroid;
-                
             end
-            % check if new object
+            %% check if new object -- to be fixed
+            %% only one object should get a maxID+1, others copy previous image ids
         elseif nObjectCurrentImage > nObjectPreviousImage
             currentImage.objects(j).id = maxID + 1;
+        end
+        % update max id
+        if max([currentImage.objects.id]) > maxID
             maxID = max([currentImage.objects.id]);
         end
     end

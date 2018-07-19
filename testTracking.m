@@ -1,7 +1,7 @@
 
 clear; clc;
-segmentationFile = '/home/mina/Downloads/vkitti_1.3.1_scenegt/0001_clone_scenegt_rgb_encoding.txt';
-detectionFile = '/home/mina/Downloads/vkitti_1.3.1_motgt/0001_clone.txt';
+segmentationFile = '/home/mina/Downloads/vKitti/vkitti_1.3.1_scenegt/0001_clone_scenegt_rgb_encoding.txt';
+detectionFile = '/home/mina/Downloads/vKitti/vkitti_1.3.1_motgt/0001_clone.txt';
 imageList = 342:399;
 images = [];
 for i=1:length(imageList)
@@ -14,7 +14,7 @@ for i=1:length(imageList)
     end    
     images = [images, image];
 end
-imagesUniqueID = objectTracker(images);
+[imagesUniqueID, wrongAssociations] = objectTracker(images);
 
 %plot objetcs of currentImage & image
 %         for j=1:currentImage.nObjects

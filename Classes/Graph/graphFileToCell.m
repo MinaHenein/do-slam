@@ -129,7 +129,7 @@ while ischar(tline)
                 lineCell = {label,[],values(1:2),values(3),values(4:6)',values(7:12)'};
             end
              %store
-            graphCell{end+1,1} = lineCell;
+             graphCell{end+1,1} = lineCell;
         case config.pointSE3MotionEdgeLabel
             if strcmp(config.motionModel,'constantSE3')
                 lineCell = {label,[],values(1:2),values(3),values(4:7)',values(8:17)'};
@@ -137,6 +137,12 @@ while ischar(tline)
                     strcmp(config.motionModel,'constantSE3MotionDA') || ...
                     strcmp(config.motionModel,'constantAccelerationSE3MotionDA')
                 lineCell = {label,[],values(1:2),values(3),values(4:6)',values(7:12)'};
+            end
+            %store
+            graphCell{end+1,1} = lineCell;
+        case config.pointsDataAssociationLabel
+            if strcmp(config.motionModel,'constantSE3MotionDA')
+                lineCell = {label,[],values(1:2),values(3),[],[]};
             end
             %store
             graphCell{end+1,1} = lineCell;

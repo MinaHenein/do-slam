@@ -111,14 +111,10 @@ for i = 1:nEdges
             value = edgesCell{i}{5};
             covariance = edgesCell{i}{6}; 
         case config.pointsDataAssociationLabel
-            type = '2points-DataAsspciation';
+            %% to fix
+            type = '2points-SE3Motion';
             value = edgesCell{i}{5};
             covariance = edgesCell{i}{6};
-            jacobians   = [];
-            iVertices   = [edgesCell{i}{3:4}];
-            index       = edgesCell{i}{2};
-            obj.edges(i) = Edge(value,covariance,jacobians,type,iVertices,index);
-            continue
         case config.pointPlaneEdgeLabel
             type = 'point-plane';
             value = edgesCell{i}{5};
