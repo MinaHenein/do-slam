@@ -29,7 +29,7 @@ splitLine = strsplit(line,' ');
         poses = [poses; cam1ID];
         poses = [poses; cam2ID];
     end
-    if strcmp(line(1:length('EDGE_2POINTS_SE3Motion')),'EDGE_2POINTS_SE3Motion')
+    if strcmp(line(1:length('2POINTS_DataAssociation')),'2POINTS_DataAssociation')
         dynamicPoint1ID = str2double(cell2mat(splitLine(2)));
         dynamicPoint2ID = str2double(cell2mat(splitLine(3)));
         dynamicPoints = [dynamicPoints; dynamicPoint1ID];
@@ -42,7 +42,7 @@ points = unique(points);
 dynamicPoints = unique(dynamicPoints);
 
 %vKitti_OcclusionWorkingMeas_staticOnlyTest
-fileToWritepath = '/home/mina/workspace/src/Git/do-slam/Data/GraphFiles/staticDynamic92ImagesStaticOnlyMeas.graph';
+fileToWritepath = '/home/mina/workspace/src/Git/do-slam/Data/GraphFiles/staticDynamic92ImagesStaticOnlyMeasTest.graph';
 fileToWriteID = fopen(fileToWritepath,'w');
 
 if size(pointSeenByCamera,1) < poses(end)
@@ -96,7 +96,7 @@ CStr = Data{1};
 fclose(fileID);
 
 %vKitti_OcclusionWorkingGT_staticOnlyTest
-fileToWritepath = '/home/mina/workspace/src/Git/do-slam/Data/GraphFiles/staticDynamic92ImagesStaticOnlyGT.graph';
+fileToWritepath = '/home/mina/workspace/src/Git/do-slam/Data/GraphFiles/staticDynamic92ImagesStaticOnlyGTTest.graph';
 fileToWriteID = fopen(fileToWritepath,'w');
 
 pointWritten = [];
