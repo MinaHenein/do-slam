@@ -12,23 +12,23 @@ config = CameraConfig();
 config = setAppConfig(config);
 % config.set('noiseModel','Off');
 config.set('motionModel','constantSE3MotionDA');
-config.set('std2PointsSE3Motion', [2,2,2]');
+config.set('std2PointsSE3Motion', [1,1,1]');
 config.set('SE3MotionVertexInitialization','translation');
 config.set('newMotionVertexPerNLandmarks',inf)
 
 %% 5. Generate Measurements & Save to Graph File, load graph file as well
 %% 5.1 For initial (without SE3)
 config.set('pointMotionMeasurement','Off')
-config.set('measurementsFileName','staticDynamic92ImagesNoSE3Meas.graph')
-config.set('groundTruthFileName','staticDynamic92ImagesNoSE3GT.graph')
+config.set('measurementsFileName','staticDynamic50ImagesStaticOnlyMeasTest.graph')
+config.set('groundTruthFileName','staticDynamic50ImagesStaticOnlyGTTest.graph')
 groundTruthNoSE3Cell = graphFileToCell(config,config.groundTruthFileName);
 measurementsNoSE3Cell = graphFileToCell(config,config.measurementsFileName);
 
 %% 5.2 For test (with SE3)
 config.set('pointMotionMeasurement','point2DataAssociation');
 config.set('pointsDataAssociationLabel','2PointsDataAssociation');
-config.set('measurementsFileName','staticDynamic92ImagesMeas.graph');
-config.set('groundTruthFileName','staticDynamic92ImagesGT.graph'); 
+config.set('measurementsFileName','staticDynamic50ImagesMeas.graph');
+config.set('groundTruthFileName','staticDynamic50ImagesGT.graph'); 
 % Check for wrong data associations and fix if necessary
 dataAssociationTest(config,config.measurementsFileName,nObjects)
 dataAssociationTest(config,config.groundTruthFileName,nObjects)
