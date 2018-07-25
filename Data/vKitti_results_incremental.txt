@@ -1,0 +1,389 @@
+﻿20 images
+w/o motion
+447 Vertices
+134 Edges
+w/ motion
+452 Vertices
+786 Edges
+
+Trial #0: static only
+Initial results for without SE(3) Transform:
+Absolute Trajectory Translation Error: 0.256 
+Absolute Trajectory Rotation Error: 3.422 
+Absolute Structure Points Error: 0.674 
+All to All Relative Pose Translation Error: 0.226 
+All to All Relative Pose Rotation Error: 3.293 
+All to All Relative Point Translation Error: 1.050 
+
+Trial #1:unsuccessful
+config.set('std2PointsSE3Motion', [0.001,0.001,0.001]');
+config.set('SE3MotionVertexInitialization','eye');
+config.set('newMotionVertexPerNLandmarks',inf)
+
+Initial results for without SE(3) Transform:
+Absolute Trajectory Translation Error: 0.256 
+Absolute Trajectory Rotation Error: 3.422 
+Absolute Structure Points Error: 0.721 
+All to All Relative Pose Translation Error: 0.226 
+All to All Relative Pose Rotation Error: 3.293 
+All to All Relative Point Translation Error: 1.014 
+
+Final results for SE(3) Transform:
+Absolute Trajectory Translation Error: 1.674 
+Absolute Trajectory Rotation Error: 8.286 
+Absolute Structure Points Error: 1.947 
+All to All Relative Pose Translation Error: 1.366 
+All to All Relative Pose Rotation Error: 7.383 
+All to All Relative Point Translation Error: 3.022 
+
+Trial #2: unsuccessful
+config.set('std2PointsSE3Motion', [0.001,0.001,0.001]');
+config.set('SE3MotionVertexInitialization','translation');
+config.set('newMotionVertexPerNLandmarks',inf)
+
+Initial results for without SE(3) Transform:
+Absolute Trajectory Translation Error: 0.256 
+Absolute Trajectory Rotation Error: 3.422 
+Absolute Structure Points Error: 0.721 
+All to All Relative Pose Translation Error: 0.226 
+All to All Relative Pose Rotation Error: 3.293 
+All to All Relative Point Translation Error: 1.014 
+
+Final results for SE(3) Transform:
+Absolute Trajectory Translation Error: 2.141 
+Absolute Trajectory Rotation Error: 3.251 
+Absolute Structure Points Error: 1.132 
+All to All Relative Pose Translation Error: 1.282 
+All to All Relative Pose Rotation Error: 3.655 
+All to All Relative Point Translation Error: 1.816
+
+Trial #3: successful
+config.set('std2PointsSE3Motion', [1,1,1]');
+config.set('SE3MotionVertexInitialization','eye');
+config.set('newMotionVertexPerNLandmarks',inf)
+
+Initial results for without SE(3) Transform:
+Absolute Trajectory Translation Error: 0.256 
+Absolute Trajectory Rotation Error: 3.422 
+Absolute Structure Points Error: 0.721 
+All to All Relative Pose Translation Error: 0.226 
+All to All Relative Pose Rotation Error: 3.293 
+All to All Relative Point Translation Error: 1.014 
+
+Final results for SE(3) Transform:
+Absolute Trajectory Translation Error: 0.247 
+Absolute Trajectory Rotation Error: 1.946 
+Absolute Structure Points Error: 0.354 
+All to All Relative Pose Translation Error: 0.225 
+All to All Relative Pose Rotation Error: 1.743 
+All to All Relative Point Translation Error: 0.517
+
+Trial #4: successful
+config.set('std2PointsSE3Motion', [1,1,1]');
+config.set('SE3MotionVertexInitialization','translation');
+config.set('newMotionVertexPerNLandmarks',inf)
+
+Initial results for without SE(3) Transform:
+Absolute Trajectory Translation Error: 0.256 
+Absolute Trajectory Rotation Error: 3.422 
+Absolute Structure Points Error: 0.721 
+All to All Relative Pose Translation Error: 0.226 
+All to All Relative Pose Rotation Error: 3.293 
+All to All Relative Point Translation Error: 1.014 
+
+Final results for SE(3) Transform:
+Absolute Trajectory Translation Error: 0.251 
+Absolute Trajectory Rotation Error: 1.764 
+Absolute Structure Points Error: 0.323 
+All to All Relative Pose Translation Error: 0.226 
+All to All Relative Pose Rotation Error: 1.645 
+All to All Relative Point Translation Error: 0.473 
+
+
+
+
+
+
+
+
+
+
+50 images
+w/o motion
+1315 Vertices
+302 Edges
+w/ motion
+1320 Vertices
+2414 Edges
+
+Trial #0: static only
+Initial results for without SE(3) Transform:
+Absolute Trajectory Translation Error: 2.044 
+Absolute Trajectory Rotation Error: 14.680 
+Absolute Structure Points Error: 2.323 
+All to All Relative Pose Translation Error: 1.553 
+All to All Relative Pose Rotation Error: 12.048 
+All to All Relative Point Translation Error: 3.413
+
+Trial #1: unsuccessful
+config.set('std2PointsSE3Motion', [0.001,0.001,0.001]');
+config.set('SE3MotionVertexInitialization','eye');
+config.set('newMotionVertexPerNLandmarks',inf)
+
+Initial results for without SE(3) Transform:
+Absolute Trajectory Translation Error: 10.114 
+Absolute Trajectory Rotation Error: 102.399 
+Absolute Structure Points Error: 11.170 
+All to All Relative Pose Translation Error: 3.633 
+All to All Relative Pose Rotation Error: 68.242 
+All to All Relative Point Translation Error: 15.415 
+
+Final results for SE(3) Transform:
+Absolute Trajectory Translation Error: 6.687 
+Absolute Trajectory Rotation Error: 24.652 
+Absolute Structure Points Error: 5.510 
+All to All Relative Pose Translation Error: 6.457 
+All to All Relative Pose Rotation Error: 32.531 
+All to All Relative Point Translation Error: 7.884 
+
+Trial #2: unsuccessful
+config.set('std2PointsSE3Motion', [0.001,0.001,0.001]');
+config.set('SE3MotionVertexInitialization','translation');
+config.set('newMotionVertexPerNLandmarks',inf)
+
+Initial results for without SE(3) Transform:
+Absolute Trajectory Translation Error: 10.114 
+Absolute Trajectory Rotation Error: 102.399 
+Absolute Structure Points Error: 11.170 
+All to All Relative Pose Translation Error: 3.633 
+All to All Relative Pose Rotation Error: 68.242 
+All to All Relative Point Translation Error: 15.415 
+
+Final results for SE(3) Transform:
+Absolute Trajectory Translation Error: 6.611 
+Absolute Trajectory Rotation Error: 24.347 
+Absolute Structure Points Error: 5.485 
+All to All Relative Pose Translation Error: 6.436 
+All to All Relative Pose Rotation Error: 32.923 
+All to All Relative Point Translation Error: 7.891
+
+Trial #3: successful
+config.set('std2PointsSE3Motion', [1,1,1]');
+config.set('SE3MotionVertexInitialization','eye');
+config.set('newMotionVertexPerNLandmarks',inf)
+
+Initial results for without SE(3) Transform:
+Absolute Trajectory Translation Error: 10.114 
+Absolute Trajectory Rotation Error: 102.399 
+Absolute Structure Points Error: 11.170 
+All to All Relative Pose Translation Error: 3.633 
+All to All Relative Pose Rotation Error: 68.242 
+All to All Relative Point Translation Error: 15.415 
+
+Final results for SE(3) Transform:
+Absolute Trajectory Translation Error: 1.905 
+Absolute Trajectory Rotation Error: 6.629 
+Absolute Structure Points Error: 0.991 
+All to All Relative Pose Translation Error: 1.466 
+All to All Relative Pose Rotation Error: 4.598 
+All to All Relative Point Translation Error: 1.390 
+
+Trial #4: successful
+config.set('std2PointsSE3Motion', [1,1,1]');
+config.set('SE3MotionVertexInitialization','translation');
+config.set('newMotionVertexPerNLandmarks',inf)
+
+Initial results for without SE(3) Transform:
+Absolute Trajectory Translation Error: 10.114 
+Absolute Trajectory Rotation Error: 102.399 
+Absolute Structure Points Error: 11.170 
+All to All Relative Pose Translation Error: 3.633 
+All to All Relative Pose Rotation Error: 68.242 
+All to All Relative Point Translation Error: 15.415 
+
+Final results for SE(3) Transform:
+Absolute Trajectory Translation Error: 1.907 
+Absolute Trajectory Rotation Error: 6.643 
+Absolute Structure Points Error: 0.992 
+All to All Relative Pose Translation Error: 1.466 
+All to All Relative Pose Rotation Error: 4.603 
+All to All Relative Point Translation Error: 1.391 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+92 images
+w/o motion
+2119 Vertices
+592 Edges
+w/ motion
+2124 Vertices
+3885 Edges
+
+Trial #0: static only
+Initial results for without SE(3) Transform:
+Absolute Trajectory Translation Error: 1.918 
+Absolute Trajectory Rotation Error: 33.913 
+Absolute Structure Points Error: 3.878 
+All to All Relative Pose Translation Error: 1.938 
+All to All Relative Pose Rotation Error: 24.779 
+All to All Relative Point Translation Error: 5.911
+
+Trial #1: unsuccessful
+config.set('std2PointsSE3Motion', [0.001,0.001,0.001]');
+config.set('SE3MotionVertexInitialization','eye');
+config.set('newMotionVertexPerNLandmarks',inf)
+
+Initial results for without SE(3) Transform:
+Absolute Trajectory Translation Error: 1.917 
+Absolute Trajectory Rotation Error: 33.902 
+Absolute Structure Points Error: 1.978 
+All to All Relative Pose Translation Error: 1.937 
+All to All Relative Pose Rotation Error: 24.766 
+All to All Relative Point Translation Error: 2.882 
+
+Final results for SE(3) Transform:
+Absolute Trajectory Translation Error: 8.549 
+Absolute Trajectory Rotation Error: 37.335 
+Absolute Structure Points Error: 5.288 
+All to All Relative Pose Translation Error: 9.810 
+All to All Relative Pose Rotation Error: 24.456 
+All to All Relative Point Translation Error: 7.939
+
+Trial #2: unsuccessful
+config.set('std2PointsSE3Motion', [0.001,0.001,0.001]');
+config.set('SE3MotionVertexInitialization','translation');
+config.set('newMotionVertexPerNLandmarks',inf)
+
+Initial results for without SE(3) Transform:
+Absolute Trajectory Translation Error: 1.917 
+Absolute Trajectory Rotation Error: 33.902 
+Absolute Structure Points Error: 1.978 
+All to All Relative Pose Translation Error: 1.937 
+All to All Relative Pose Rotation Error: 24.766 
+All to All Relative Point Translation Error: 2.882 
+
+Final results for SE(3) Transform:
+Absolute Trajectory Translation Error: 15.478 
+Absolute Trajectory Rotation Error: 38.992 
+Absolute Structure Points Error: 15.999 
+All to All Relative Pose Translation Error: 23.413 
+All to All Relative Pose Rotation Error: 45.781 
+All to All Relative Point Translation Error: 21.983 
+
+Trial #3: successful
+config.set('std2PointsSE3Motion', [1,1,1]');
+config.set('SE3MotionVertexInitialization','eye');
+config.set('newMotionVertexPerNLandmarks',inf)
+
+Initial results for without SE(3) Transform:
+Absolute Trajectory Translation Error: 1.917 
+Absolute Trajectory Rotation Error: 33.902 
+Absolute Structure Points Error: 1.978 
+All to All Relative Pose Translation Error: 1.937 
+All to All Relative Pose Rotation Error: 24.766 
+All to All Relative Point Translation Error: 2.882 
+
+Final results for SE(3) Transform:
+Absolute Trajectory Translation Error: 1.676 
+Absolute Trajectory Rotation Error: 25.053 
+Absolute Structure Points Error: 1.546 
+All to All Relative Pose Translation Error: 1.801 
+All to All Relative Pose Rotation Error: 17.496 
+All to All Relative Point Translation Error: 2.297 
+
+Trial #3: successful
+config.set('std2PointsSE3Motion', [5,5,5]');
+config.set('SE3MotionVertexInitialization','eye');
+config.set('newMotionVertexPerNLandmarks',inf)
+
+Initial results for without SE(3) Transform:
+Absolute Trajectory Translation Error: 1.917 
+Absolute Trajectory Rotation Error: 33.902 
+Absolute Structure Points Error: 1.978 
+All to All Relative Pose Translation Error: 1.937 
+All to All Relative Pose Rotation Error: 24.766 
+All to All Relative Point Translation Error: 2.882 
+
+Final results for SE(3) Transform:
+Absolute Trajectory Translation Error: 1.888 
+Absolute Trajectory Rotation Error: 32.363 
+Absolute Structure Points Error: 1.870 
+All to All Relative Pose Translation Error: 1.925 
+All to All Relative Pose Rotation Error: 23.338 
+All to All Relative Point Translation Error: 2.749 
+
+Trial #4: successful
+config.set('std2PointsSE3Motion', [3,3,3]');
+config.set('SE3MotionVertexInitialization','translation');
+config.set('newMotionVertexPerNLandmarks',inf)
+
+Initial results for without SE(3) Transform:
+Absolute Trajectory Translation Error: 1.917 
+Absolute Trajectory Rotation Error: 33.902 
+Absolute Structure Points Error: 1.978 
+All to All Relative Pose Translation Error: 1.937 
+All to All Relative Pose Rotation Error: 24.766 
+All to All Relative Point Translation Error: 2.882
+
+Final results for SE(3) Transform:
+Absolute Trajectory Translation Error: 1.993 
+Absolute Trajectory Rotation Error: 29.509 
+Absolute Structure Points Error: 1.772 
+All to All Relative Pose Translation Error: 1.941 
+All to All Relative Pose Rotation Error: 21.394 
+All to All Relative Point Translation Error: 2.601 
+
+Trial #5: successful
+config.set('std2PointsSE3Motion', [5,5,5]');
+config.set('SE3MotionVertexInitialization','translation');
+config.set('newMotionVertexPerNLandmarks',inf)
+
+Initial results for without SE(3) Transform:
+Absolute Trajectory Translation Error: 1.917 
+Absolute Trajectory Rotation Error: 33.902 
+Absolute Structure Points Error: 1.978 
+All to All Relative Pose Translation Error: 1.937 
+All to All Relative Pose Rotation Error: 24.766 
+All to All Relative Point Translation Error: 2.882 
+
+Final results for SE(3) Transform:
+Absolute Trajectory Translation Error: 1.923 
+Absolute Trajectory Rotation Error: 32.693 
+Absolute Structure Points Error: 1.911 
+All to All Relative Pose Translation Error: 1.947 
+All to All Relative Pose Rotation Error: 23.696 
+All to All Relative Point Translation Error: 2.803 
+
+Trial #6: successful
+config.set('std2PointsSE3Motion', [10,10,10]');
+config.set('SE3MotionVertexInitialization','translation');
+config.set('newMotionVertexPerNLandmarks',inf)
+
+Initial results for without SE(3) Transform:
+Absolute Trajectory Translation Error: 1.917 
+Absolute Trajectory Rotation Error: 33.902 
+Absolute Structure Points Error: 1.978 
+All to All Relative Pose Translation Error: 1.937 
+All to All Relative Pose Rotation Error: 24.766 
+All to All Relative Point Translation Error: 2.882 
+
+Final results for SE(3) Transform:
+Absolute Trajectory Translation Error: 1.909 
+Absolute Trajectory Rotation Error: 33.423 
+Absolute Structure Points Error: 1.943 
+All to All Relative Pose Translation Error: 1.935 
+All to All Relative Pose Rotation Error: 24.312 
+All to All Relative Point Translation Error: 2.840  

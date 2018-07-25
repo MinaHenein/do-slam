@@ -125,7 +125,6 @@ for i = 1:nSteps
                 end
                 %construct point-plane edge
                 obj = obj.constructPointPlaneEdge(config,jRow);
-            
             case config.pointSE3MotionEdgeLabel
                 %edge index
                 jRow{2} = obj.nEdges+1;
@@ -137,7 +136,23 @@ for i = 1:nSteps
                     obj = obj.constructSE3MotionVertex(config,jRow,pointVertices);
                 end
                 obj = obj.construct2PointsSE3MotionEdge(config,jRow);
-            
+          case config.pointsDataAssociationLabel
+                %edge label
+                jRow{1} = config.pointSE3MotionEdgeLabel;
+                %edge index
+                jRow{2} = obj.nEdges+1;
+                %create velocity vertex if it doesn't exist
+                if jRow{4} > obj.nVertices
+                    %find all point vertices connected to this SE3 vertex
+                    pointRows = iRows([measurementsCell{iRows,4}]==jRow{4});
+                    pointVertices = [measurementsCell{pointRows,3}]';
+                    obj = obj.constructSE3MotionVertex(config,jRow,pointVertices);
+                end
+                pointVertices = jRow{3};
+                jRow{5} = (obj.vertices(pointVertices(2)).value - ...
+                    obj.vertices(pointVertices(1)).value)'; 
+                jRow{6} = covToUpperTriVec(config.cov2PointsSE3Motion);
+                obj = obj.construct2PointsSE3MotionEdge(config,jRow);      
             case config.planePriorEdgeLabel
                 %edge index
                 jRow{2} = obj.nEdges+1;
