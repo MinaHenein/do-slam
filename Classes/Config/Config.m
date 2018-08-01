@@ -74,6 +74,12 @@ classdef Config < ArrayGetSet
         SE3MotionVertexInitialization
         %new Motion Vertex per n-landmarks
         newMotionVertexPerNLandmarks
+        %new Motion Vertex per n-object poses
+        newMotionVertexPerNObjectPoses
+        %object poses sliding window 
+        objectPosesSlidingWindow
+        %object poses sliding window size
+        objectPosesSlidingWindowSize
         
         %constraints
         applyAngleConstraints

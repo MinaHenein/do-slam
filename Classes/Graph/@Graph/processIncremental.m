@@ -142,7 +142,7 @@ for i = 1:nSteps
                 %edge index
                 jRow{2} = obj.nEdges+1;
                 %create velocity vertex if it doesn't exist
-                if jRow{4} > obj.nVertices
+                if jRow{4} > obj.nVertices || isempty(obj.vertices(jRow{4}).type)
                     %find all point vertices connected to this SE3 vertex
                     pointRows = iRows([measurementsCell{iRows,4}]==jRow{4});
                     pointVertices = [measurementsCell{pointRows,3}]';

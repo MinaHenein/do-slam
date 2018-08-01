@@ -20,6 +20,8 @@ classdef Graph
         iPosePoseEdges
         iPosePointEdges
         iPointPointEdges
+        % number of deleted SE3 motion edges due to windowing
+        nSE3EdgesDeleted
     end
     
     properties (Dependent)
@@ -34,9 +36,11 @@ classdef Graph
                 case 0 %incremental
                     obj.vertices = Vertex();
                     obj.edges    = Edge();
+                    obj.nSE3EdgesDeleted  = 0;
                 case 2 %build from graph file cell array
                     config = varargin{1};
                     obj = obj.graphFileToGraph(config,varargin{2});
+                    obj.nSE3EdgesDeleted  = 0;
                 case 3 %batch
                     camera = varargin{1};
                     measurements = varargin{2};
@@ -45,6 +49,7 @@ classdef Graph
                     obj = obj.constructVertices(camera,measurements,tree);
                     obj = obj.constructEdges(measurements,tree);
                     obj = obj.identifyTypes();
+                    obj.nSE3EdgesDeleted  = 0;
             end
             
         end

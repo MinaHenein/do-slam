@@ -304,7 +304,7 @@ All to All Relative Pose Translation Error: 1.801
 All to All Relative Pose Rotation Error: 17.496 
 All to All Relative Point Translation Error: 2.297 
 
-Trial #3: successful
+Trial #4: successful
 config.set('std2PointsSE3Motion', [5,5,5]');
 config.set('SE3MotionVertexInitialization','eye');
 config.set('newMotionVertexPerNLandmarks',inf)
@@ -325,7 +325,7 @@ All to All Relative Pose Translation Error: 1.925
 All to All Relative Pose Rotation Error: 23.338 
 All to All Relative Point Translation Error: 2.749 
 
-Trial #4: successful
+Trial #5: successful
 config.set('std2PointsSE3Motion', [3,3,3]');
 config.set('SE3MotionVertexInitialization','translation');
 config.set('newMotionVertexPerNLandmarks',inf)
@@ -346,7 +346,7 @@ All to All Relative Pose Translation Error: 1.941
 All to All Relative Pose Rotation Error: 21.394 
 All to All Relative Point Translation Error: 2.601 
 
-Trial #5: successful
+Trial #6: successful
 config.set('std2PointsSE3Motion', [5,5,5]');
 config.set('SE3MotionVertexInitialization','translation');
 config.set('newMotionVertexPerNLandmarks',inf)
@@ -367,7 +367,7 @@ All to All Relative Pose Translation Error: 1.947
 All to All Relative Pose Rotation Error: 23.696 
 All to All Relative Point Translation Error: 2.803 
 
-Trial #6: successful
+Trial #7: successful
 config.set('std2PointsSE3Motion', [10,10,10]');
 config.set('SE3MotionVertexInitialization','translation');
 config.set('newMotionVertexPerNLandmarks',inf)

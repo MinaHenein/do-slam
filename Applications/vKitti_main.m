@@ -39,6 +39,9 @@ config.set('measurementsFileName',...
 config.set('groundTruthFileName',...
     strcat(config.groundTruthFileName(1:end-6),'Test.graph')); 
 % writeDataAssociationVerticesEdges_constantSE3MotionNoGT(config);
+% corruptDataAssociation(config,0.15);
+% config.set('measurementsFileName',...
+%     strcat(config.measurementsFileName(1:end-6),'Corrupted.graph'));
 measurementsCell = graphFileToCell(config,config.measurementsFileName);
 groundTruthCell  = graphFileToCell(config,config.groundTruthFileName);
 

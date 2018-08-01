@@ -69,7 +69,7 @@ end
 value = SE3Motion;
 covariance = []; %not using this property yet
 type = 'SE3Motion';
-iEdges = [edgeIndex];
+iEdges = edgeIndex;
 index = SE3MotionVertex;  
 
 %% 4. construct vertex
