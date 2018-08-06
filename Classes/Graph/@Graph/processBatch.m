@@ -28,7 +28,8 @@ else
 end
 startPoseValue = groundTruthCell{poseRows(odometryIndex)}{3};
 startPoseCovariance = config.covPosePrior;
-priorLine = {config.posePriorEdgeLabel,1,[],startPoseVertex,startPoseValue,startPoseCovariance};
+priorLine = {config.posePriorEdgeLabel,1,[],startPoseVertex,startPoseValue,...
+    startPoseCovariance};
 
 %add prior line
 measurementsCell = vertcat(priorLine,measurementsCell);
@@ -48,7 +49,8 @@ nSteps = numel(odometryRows) + 1;
 for i = 1:nSteps
     %identify rows from this time step
     %add elements so formula for iRows works for first and last steps
-    odometryRows = [1; find(strcmp(measurementsCell(:,1),config.posePoseEdgeLabel)); size(measurementsCell,1)+1];
+    odometryRows = [1; find(strcmp(measurementsCell(:,1),...
+        config.posePoseEdgeLabel)); size(measurementsCell,1)+1];
     iRows = odometryRows(i):odometryRows(i+1)-1;
     nRows = numel(iRows);
     
@@ -89,7 +91,8 @@ for i = 1:nSteps
                 jRow{2} = obj.nEdges+1;
                 %create pose vertex if it doesn't exist
                 posePointVertexes = jRow{3};
-                if (posePointVertexes(1) > obj.nVertices) || isempty(obj.vertices(posePointVertexes(1)).type)
+                if (posePointVertexes(1) > obj.nVertices) || ...
+                        isempty(obj.vertices(posePointVertexes(1)).type)
                     obj = obj.constructPoseVertex(config,jRow);
                 end
                 %create intrinsics vertex if it doesn't exist
@@ -97,7 +100,8 @@ for i = 1:nSteps
                     obj = obj.constructIntrinsicVertex(config,jRow);
                 end
                 %create point vertex if it doesn't exist
-                if (posePointVertexes(2) > obj.nVertices) || isempty(obj.vertices(posePointVertexes(2)).type)
+                if (posePointVertexes(2) > obj.nVertices) || ...
+                        isempty(obj.vertices(posePointVertexes(2)).type)
                     obj = obj.constructPointVertex(config,jRow);
                 end
                 %construct pose-point edge
@@ -168,16 +172,44 @@ for i = 1:nSteps
                 jRow{1} = config.pointSE3MotionEdgeLabel;
                 %edge index
                 jRow{2} = obj.nEdges+1;
+                constructNewMotionVertex = 0;
+                motionVerticesIndices = ...
+                    unique([obj.vertices(obj.identifyVertices('SE3Motion')).index]);
+                if ismember(jRow{4},motionVerticesIndices)
+                    indx = motionVerticesIndices(end);
+                    %% to do -- how long should you wait until you evaluate this
+                    if indx==obj.nVertices && ...
+                            sum(obj.vertices(indx).value==zeros(6,1))~=6
+                        pointVertices = jRow{3};
+                        projectedPoint = poseToTransformationMatrix(...
+                            obj.vertices(indx).value)*...
+                            [obj.vertices(pointVertices(1)).value;1];
+                        difference = norm(obj.vertices(pointVertices(2)).value - ...
+                            projectedPoint(1:3));
+                        if difference > inf%(norm(config.std2PointsSE3Motion)+...
+                                %norm(config.stdPosePoint))
+                            constructNewMotionVertex = 1;
+                        end
+                    end
+                end
                 %create velocity vertex if it doesn't exist
-                if jRow{4} > obj.nVertices || isempty(obj.vertices(jRow{4}).type)
+                if jRow{4} > obj.nVertices || ...
+                        isempty(obj.vertices(jRow{4}).type) ||...
+                        constructNewMotionVertex
+                    if constructNewMotionVertex
+                        jRow{4}=[jRow{4} obj.nVertices+1];
+                    end
+                    motionIndices = jRow{4};
                     %find all point vertices connected to this SE3 vertex
-                    pointRows = iRows([measurementsCell{iRows,4}]==jRow{4});
+                    pointRows = iRows([measurementsCell{iRows,4}]==motionIndices(1));
                     pointVertices = [measurementsCell{pointRows,3}]';
                     obj = obj.constructSE3MotionVertex(config,jRow,pointVertices);
                 end
                 pointVertices = jRow{3};
-                jRow{5} = (obj.vertices(pointVertices(2)).value - ...
-                    obj.vertices(pointVertices(1)).value)'; 
+                edgeValue = [obj.vertices(pointVertices(1)).value;1] - ...
+                    poseToTransformationMatrix(obj.vertices(motionIndices(end)).value)\...
+                    [obj.vertices(pointVertices(2)).value;1]; 
+                jRow{5} = edgeValue(1:3)'; 
                 jRow{6} = covToUpperTriVec(config.cov2PointsSE3Motion);
                 obj = obj.construct2PointsSE3MotionEdge(config,jRow);
             case config.pointPlaneEdgeLabel
@@ -277,4 +309,3 @@ if config.sortVertices
 end
 
 end
-

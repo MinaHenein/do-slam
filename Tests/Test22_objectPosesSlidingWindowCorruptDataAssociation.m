@@ -22,9 +22,10 @@ config.set('nSteps',nSteps);
 % SE3 Motion
 config.set('motionModel','constantSE3MotionDA');
 config.set('std2PointsSE3Motion', [0.1,0.1,0.1]');
-config.set('SE3MotionVertexInitialization','eye');
+config.set('SE3MotionVertexInitialization','translation');
 config.set('newMotionVertexPerNLandmarks',inf);
-config.set('objectPosesSlidingWindow',true);
+config.set('landmarksSlidingWindowSize',inf);
+config.set('objectPosesSlidingWindow',false);
 config.set('objectPosesSlidingWindowSize',inf);
 config.set('newMotionVertexPerNObjectPoses',inf);
 

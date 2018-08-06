@@ -28,7 +28,7 @@ for i = 1:obj.nVertices
     vertexIndex = obj.vertices(i).index;
     vertexValue = obj.vertices(i).value;
     formatSpec = strcat('%s %d ',repmat(' %6.6f',1,numel(vertexValue)),'\n');
-    fprintf(fileID,formatSpec,vertexLabel,vertexIndex,vertexValue);
+    fprintf(fileID,formatSpec,vertexLabel,vertexIndex(end),vertexValue);
 end
 
 %% 2. write edges

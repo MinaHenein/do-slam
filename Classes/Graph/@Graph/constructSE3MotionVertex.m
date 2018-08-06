@@ -37,10 +37,10 @@ if ~isempty(varargin)
     for i= 1:size(pointTimeVertices,1)
         points1 = [pointTimeVertices{i,1}];
         points2 = [pointTimeVertices{i,2}];
-        if ~isempty(points1) && length(points1) == length(points2)
+        if ~isempty(points1) && length(points1) == length(points2) && length(points1)>2
             pointPositions1 = cell2mat({obj.vertices(points1).value});
             pointPositions2 = cell2mat({obj.vertices(points2).value});
-            [rotM,t] = Kabsch(pointPositions1, pointPositions2);
+            [rotM,t,~] = Kabsch(pointPositions1, pointPositions2);
             rotations{i} = rotM;
             translations(:,i) = t;
         end
@@ -70,9 +70,9 @@ value = SE3Motion;
 covariance = []; %not using this property yet
 type = 'SE3Motion';
 iEdges = edgeIndex;
-index = SE3MotionVertex;  
+index = SE3MotionVertex(end);  
 
 %% 4. construct vertex
-obj.vertices(index) = Vertex(value,covariance,type,iEdges,index);
+obj.vertices(index) = Vertex(value,covariance,type,iEdges,SE3MotionVertex);
 end
 
