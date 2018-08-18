@@ -11,17 +11,17 @@
 %   rho[2] = -2. * rho[1] * aux;
 % }
 %--------------------------------------------------------------------------
-function system = GemanMcClureRobustCostFunction(config,system,edge)
+function errorNorm = GemanMcClureRobustCostFunction(config,system,edge)
 
 iBlock = blockMap(system,edge,'edge');
-error = system.b(iBlock);
-delta = config.robustCostFunctionWidth;
+error = norm(system.b(iBlock));
+delta = 3;%config.robustCostFunctionWidth;
 
 aux    = delta / (delta + error);
 rho(1) = error * aux;
 rho(2) = aux * aux;
 rho(3) = -2 * rho(1) * aux;
 
-system.b(iBlock) = rho(1);
+errorNorm = rho(1);
 
 end

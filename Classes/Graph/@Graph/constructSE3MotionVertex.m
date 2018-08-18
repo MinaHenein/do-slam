@@ -13,7 +13,7 @@ SE3MotionVertex = edgeRow{4};
 edgeValue = edgeRow{5};
 edgeCovariance = edgeRow{6};
 
-if ~isempty(varargin)
+if strcmp(config.SE3MotionVertexInitialization,'translation') && ~isempty(varargin)
     pointVertices = varargin{1};
     pointVertices1 = pointVertices(1:2:end);
     pointVertices2 = pointVertices(2:2:end);

@@ -12,8 +12,8 @@ config = setAppConfig(config);
 config.set('pointMotionMeasurement','Off')
 % config.set('measurementsFileName','staticOnlyNoiseMeas2.graph')
 % config.set('groundTruthFileName','staticOnlyNoiseGT2.graph')
-config.set('measurementsFileName','staticDynamic92ImagesStaticOnlyMeasTest.graph')
-config.set('groundTruthFileName','staticDynamic92ImagesStaticOnlyGTTest.graph')
+config.set('measurementsFileName','vKittiFullSequence_staticOnlyMeas.graph')
+config.set('groundTruthFileName','vKittiFullSequence_staticOnlyGT.graph')
 % config.set('measurementsFileName','vKitti_Meas_staticOnlyTest.graph')
 % config.set('groundTruthFileName','vKitti_GT_staticOnlyTest.graph')
 groundTruthNoSE3Cell = graphFileToCell(config,config.groundTruthFileName);
@@ -31,10 +31,25 @@ fprintf('\nTotal time solving: %f\n',totalTime)
 initialGraph0  = initialSolverEnd.graphs(1);
 initialGraphN  = initialSolverEnd.graphs(end);
 %save results to graph file
-initialGraphN.saveGraphFile(config,'staticOnly92ImagesVKITTI.graph');
+initialGraphN.saveGraphFile(config,'staticOnlyVKITTI.graph');
 
 %% 7. Error analysis
 %load ground truth into graph, sort if required
 graphGTNoSE3 = Graph(config,groundTruthNoSE3Cell);
 fprintf('\nInitial results for without SE(3) Transform:\n')
 resultsNoSE3 = errorAnalysis(config,graphGTNoSE3,initialGraphN);
+
+figure('units','normalized','color','w');
+xlabel('x (m)')
+ylabel('y (m)')
+zlabel('z (m)')
+hold on
+grid on
+axis equal
+view([-50,25])
+%plot groundtruth
+plotGraphFileICRA(config,groundTruthNoSE3Cell,'groundTruth');
+%plot results
+resultsNoSE3Cell = graphFileToCell(config,'staticOnlyVKITTI.graph');
+plotGraphFileICRA(config,resultsNoSE3Cell,'initial',...
+    resultsNoSE3.relPose.get('R3xso3Pose'),resultsNoSE3.posePointsN.get('R3xso3Pose'))

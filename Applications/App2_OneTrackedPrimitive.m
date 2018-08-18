@@ -60,22 +60,22 @@ sensor.setVisibility(config,environment);
 spy(sensor.get('pointVisibility'));
 
 %% 4. Plot Environment
-% figure
-% viewPoint = [-50,25];
-% % axisLimits = [-10,50,-10,40,-1,10];
-% % title('Environment')
-% axis equal
-% xlabel('x')
-% ylabel('y')
-% zlabel('z')
-% view(viewPoint)
-% % axis(axisLimits)
-% hold on
-% grid on
-% primitiveTrajectory.plot(t,[0 0 0],'axesOFF')
-% cameraTrajectory.plot(t,[0 1 1],'axesOFF')
-% frames = sensor.plot(t(end),environment);
-% % implay(frames);
+figure
+viewPoint = [-50,25];
+% axisLimits = [-10,50,-10,40,-1,10];
+% title('Environment')
+axis equal
+xlabel('x')
+ylabel('y')
+zlabel('z')
+view(viewPoint)
+% axis(axisLimits)
+hold on
+grid on
+primitiveTrajectory.plot(t,[0 0 0],'axesOFF')
+cameraTrajectory.plot(t,[0 1 1],'axesOFF')
+frames = sensor.plot(t(end),environment);
+% implay(frames);
 
 %% 5. Generate Measurements & Save to Graph File
 sensor.generateMeasurements(config);
@@ -101,7 +101,7 @@ graph0  = solverEnd.graphs(1);
 graphN  = solverEnd.graphs(end);
 fprintf('\nChi-squared error: %f\n',solverEnd.systems(end).chiSquaredError)
 %save results to graph file
-graphN.saveGraphFile(config,'app1_results.graph');
+graphN.saveGraphFile(config,'app2_results.graph');
 
 %% 9. Error analysis
 %load ground truth into graph, sort if required
@@ -133,5 +133,5 @@ view([-50,25])
 %plot groundtruth
 plotGraphFile(config,groundTruthCell,[0 0 1]);
 %plot results
-resultsCell = graphFileToCell(config,'app1_results.graph');
+resultsCell = graphFileToCell(config,'app2_results.graph');
 plotGraphFile(config,resultsCell,[1 0 0])

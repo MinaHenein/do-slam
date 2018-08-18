@@ -21,7 +21,7 @@ end
 fclose(fileID);
 % re-order data association entries by object
 fileID = fopen(filepath,'r');
-Data = textscan(fileID, '%s', 'delimiter', '\n', 'whitespace', '');
+Data = textscan(fileID, '%s', 'delimiter', '\n', 'whitespace',' ');
 CStr = Data{1};
 fclose(fileID);
 IndexC = strfind(CStr, 'DataAssociation');

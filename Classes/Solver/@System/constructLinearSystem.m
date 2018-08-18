@@ -48,7 +48,7 @@ for i = 1:nActiveEdges
     obj.covSqrtInv(iBlock,iBlock) = graph.edges(iEdge).covariance^-0.5;
     %compute residuals
     obj.b(iBlock,1) = graph.computeResidual(config,iEdge,edgeRow{5});
-        
+    
 end
 
 %kPerp - need this for GN with planar constraints

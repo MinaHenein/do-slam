@@ -14,7 +14,7 @@
 %   rho[2] = -0.5 * dsqrReci * rho[1] / aux1;
 % }
 %--------------------------------------------------------------------------
-function errorNorm = PseudoHuberRobustCostFunction(config,system,edge)
+function system = PseudoHuberRobustCostFunction(config,system,edge)
 
 iBlock = blockMap(system,edge,'edge');
 error = norm(system.b(iBlock));
@@ -28,6 +28,6 @@ rho(1)   = 2 * dsqr * (aux2-1);
 rho(2)   = 1 / aux2;
 rho(3)   = -0.5 * dsqrReci * rho(1) / aux1;
 
-errorNorm = rho(1);
+errorNorm = rho;
 
 end

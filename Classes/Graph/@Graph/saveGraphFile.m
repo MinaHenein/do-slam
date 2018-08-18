@@ -24,11 +24,11 @@ for i = 1:obj.nVertices
             case 'SE3Motion';   vertexLabel = config.SE3MotionVertexLabel;
             otherwise; error('type invalid')
         end
+        vertexIndex = obj.vertices(i).index;
+        vertexValue = obj.vertices(i).value;
+        formatSpec = strcat('%s %d ',repmat(' %6.6f',1,numel(vertexValue)),'\n');
+        fprintf(fileID,formatSpec,vertexLabel,vertexIndex(end),vertexValue);
     end
-    vertexIndex = obj.vertices(i).index;
-    vertexValue = obj.vertices(i).value;
-    formatSpec = strcat('%s %d ',repmat(' %6.6f',1,numel(vertexValue)),'\n');
-    fprintf(fileID,formatSpec,vertexLabel,vertexIndex(end),vertexValue);
 end
 
 %% 2. write edges

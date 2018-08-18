@@ -28,7 +28,7 @@ for i=1:nSteps
     end
     cameraGP_Pose = self.get('trajectory').get('GP_Pose',t(i));
     cameraPose = poseConversion.RelativeToAbsolutePose(cameraGP_Pose).get('R3xso3Pose');
-    cameraHandle = plotCamera('Location',cameraPose(1:3),'Orientation',rot(-cameraPose(4:6)),'Color',varargin{2}); %LHS invert pose
+    cameraHandle = plotCamera('Location',cameraPose(1:3),'Orientation',rot(-cameraPose(4:6)));%,'Color',varargin{2}); %LHS invert pose
     cameraHandle.Opacity = 0.1;
     cameraHandle.Size = 0.5;
     

@@ -47,9 +47,10 @@ while (~done)
     graph1 = graph0Update.updateEdges(config);
     errorTemp = norm(graph1.constructResiduals(config,measurementsCell));
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    errorNorm = zeros(graph1.nEdges,1);
+    nEdges = size(measurementsCell,1);
+    errorNorm = zeros(nEdges,1);
     systemUpdate = System(config,graph1,measurementsCell);
-    for i=1:graph1.nEdges
+    for i=1:nEdges
         %errorEdge = PseudoHuberRobustCostFunction(config,systemUpdate,i);
         errorEdge = GemanMcClureRobustCostFunction(config,systemUpdate,i);
         errorNorm(i) = errorEdge;

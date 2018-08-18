@@ -183,13 +183,13 @@ graphN.saveGraphFile(config,'resultsTest3.graph');
 % 
 graphGT = Graph(config,groundTruthCell);
 results = errorAnalysis(config,graphGT,graphN);
-fprintf('Chi Squared Error: %.4d \n',solverEnd.systems.chiSquaredError)
-fprintf('Absolute Trajectory Translation Error: %.4d \n',results.ATE_translation_error)
-fprintf('Absolute Trajectory Rotation Error: %.4d \n',results.ATE_rotation_error)
-fprintf('Absolute Structure Points Error: %d \n',results.ASE_translation_error);
-fprintf('All to All Relative Pose Squared Translation Error: %.4d \n',results.AARPE_squared_translation_error)
-fprintf('All to All Relative Pose Squared Rotation Error: %.4d \n',results.AARPE_squared_rotation_error)
-fprintf('All to All Relative Point Squared Translation Error: %.4d \n',results.AARPTE_squared_translation_error)
+% fprintf('Chi Squared Error: %.4d \n',solverEnd.systems.chiSquaredError)
+% fprintf('Absolute Trajectory Translation Error: %.4d \n',results.ATE_translation_error)
+% fprintf('Absolute Trajectory Rotation Error: %.4d \n',results.ATE_rotation_error)
+% fprintf('Absolute Structure Points Error: %d \n',results.ASE_translation_error);
+% fprintf('All to All Relative Pose Squared Translation Error: %.4d \n',results.AARPE_squared_translation_error)
+% fprintf('All to All Relative Pose Squared Rotation Error: %.4d \n',results.AARPE_squared_rotation_error)
+% fprintf('All to All Relative Point Squared Translation Error: %.4d \n',results.AARPTE_squared_translation_error)
 
 %% plot graph files
 % h = figure; 

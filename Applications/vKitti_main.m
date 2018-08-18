@@ -6,29 +6,33 @@
 % 1. Config
 objectPosesMatrix = 'objectCameraPoses_vKittiScene0001.mat';
 constantSE3ObjectMotion = vKitti_objectMotion(objectPosesMatrix);
-nObjects = size(constantSE3ObjectMotion,2);
+nObjects = 9;%size(constantSE3ObjectMotion,2);
 
 config = CameraConfig();
 config = setAppConfig(config);
 % config.set('noiseModel','Off');
 config.set('motionModel','constantSE3MotionDA');
-config.set('std2PointsSE3Motion', [1,1,1]');
+config.set('std2PointsSE3Motion', [3,3,3]');
 config.set('SE3MotionVertexInitialization','eye');
-config.set('newMotionVertexPerNLandmarks',inf)
+config.set('newMotionVertexPerNLandmarks',inf);
+config.set('landmarksSlidingWindowSize',inf);
+config.set('objectPosesSlidingWindow',true);
+config.set('objectPosesSlidingWindowSize',8);
+config.set('newMotionVertexPerNObjectPoses',inf);
 
 %% 5. Generate Measurements & Save to Graph File, load graph file as well
 %% 5.1 For initial (without SE3)
-config.set('pointMotionMeasurement','Off')
-config.set('measurementsFileName','staticDynamic92ImagesStaticOnlyMeasTest.graph')
-config.set('groundTruthFileName','staticDynamic92ImagesStaticOnlyGTTest.graph')
-groundTruthNoSE3Cell = graphFileToCell(config,config.groundTruthFileName);
-measurementsNoSE3Cell = graphFileToCell(config,config.measurementsFileName);
+% config.set('pointMotionMeasurement','Off')
+% config.set('measurementsFileName','staticDynamic50ImagesStaticOnlyMeasTest.graph')
+% config.set('groundTruthFileName','staticDynamic50ImagesStaticOnlyGTTest.graph')
+% groundTruthNoSE3Cell = graphFileToCell(config,config.groundTruthFileName);
+% measurementsNoSE3Cell = graphFileToCell(config,config.measurementsFileName);
 
 %% 5.2 For test (with SE3)
 config.set('pointMotionMeasurement','point2DataAssociation');
 config.set('pointsDataAssociationLabel','2PointsDataAssociation');
-config.set('measurementsFileName','staticDynamic92ImagesMeas.graph');
-config.set('groundTruthFileName','staticDynamic92ImagesGT.graph'); 
+config.set('measurementsFileName','vKittiFullSequence_Meas.graph');%staticDynamic20ImagesMeas
+config.set('groundTruthFileName','vKittiFullSequence_GT.graph');%staticDynamic20ImagesGT 
 % Check for wrong data associations and fix if necessary
 dataAssociationTest(config,config.measurementsFileName,nObjects)
 dataAssociationTest(config,config.groundTruthFileName,nObjects)
@@ -39,7 +43,7 @@ config.set('measurementsFileName',...
 config.set('groundTruthFileName',...
     strcat(config.groundTruthFileName(1:end-6),'Test.graph')); 
 % writeDataAssociationVerticesEdges_constantSE3MotionNoGT(config);
-% corruptDataAssociation(config,0.15);
+% corruptDataAssociation(config,0.2);
 % config.set('measurementsFileName',...
 %     strcat(config.measurementsFileName(1:end-6),'Corrupted.graph'));
 measurementsCell = graphFileToCell(config,config.measurementsFileName);
@@ -47,18 +51,17 @@ groundTruthCell  = graphFileToCell(config,config.groundTruthFileName);
 
 %% 6. Solve
 %% 6.1 Without SE3
-timeStart = tic;
-initialGraph0 = Graph();
-initialSolver = initialGraph0.process(config,measurementsNoSE3Cell,groundTruthNoSE3Cell);
-initialSolverEnd = initialSolver(end);
-totalTime = toc(timeStart);
-fprintf('\nTotal time solving: %f\n',totalTime)
-%get desired graphs & systems
-initialGraph0  = initialSolverEnd.graphs(1);
-initialGraphN  = initialSolverEnd.graphs(end);
-%save results to graph file
-initialGraphN.saveGraphFile(config,'vKitti_resultsNoSE3.graph');
-
+% timeStart = tic;
+% initialGraph0 = Graph();
+% initialSolver = initialGraph0.process(config,measurementsNoSE3Cell,groundTruthNoSE3Cell);
+% initialSolverEnd = initialSolver(end);
+% totalTime = toc(timeStart);
+% fprintf('\nTotal time solving: %f\n',totalTime)
+% %get desired graphs & systems
+% initialGraph0  = initialSolverEnd.graphs(1);
+% initialGraphN  = initialSolverEnd.graphs(end);
+% %save results to graph file
+% initialGraphN.saveGraphFile(config,'vKitti_resultsNoSE3.graph');
 
 %% 6.2 With SE3
 %no constraints
@@ -76,10 +79,10 @@ graphN.saveGraphFile(config,'vKitti_results.graph');
 
 %% 7. Error analysis
 %load ground truth into graph, sort if required
-graphGTNoSE3 = Graph(config,groundTruthNoSE3Cell);
+% graphGTNoSE3 = Graph(config,groundTruthNoSE3Cell);
+% fprintf('\nInitial results for without SE(3) Transform:\n')
+% resultsNoSE3 = errorAnalysis(config,graphGTNoSE3,initialGraphN);
 graphGT = Graph(config,groundTruthCell);
-fprintf('\nInitial results for without SE(3) Transform:\n')
-resultsNoSE3 = errorAnalysis(config,graphGTNoSE3,initialGraphN);
 fprintf('\nFinal results for SE(3) Transform:\n')
 resultsSE3 = errorAnalysis(config,graphGT,graphN);
 
@@ -106,10 +109,10 @@ view([-50,25])
 %plot groundtruth
 plotGraphFileICRA(config,groundTruthCell,'groundTruth');
 %plot results
-resultsNoSE3Cell = graphFileToCell(config,'vKitti_resultsNoSE3.graph');
+% resultsNoSE3Cell = graphFileToCell(config,'vKitti_resultsNoSE3.graph');
 resultsCell = graphFileToCell(config,'vKitti_results.graph');
-plotGraphFileICRA(config,resultsNoSE3Cell,'initial',...
-    resultsNoSE3.relPose.get('R3xso3Pose'),resultsNoSE3.posePointsN.get('R3xso3Pose'))
+% plotGraphFileICRA(config,resultsNoSE3Cell,'initial',...
+%     resultsNoSE3.relPose.get('R3xso3Pose'),resultsNoSE3.posePointsN.get('R3xso3Pose'))
 plotGraphFileICRA(config,resultsCell,'solverResults',...
     resultsSE3.relPose.get('R3xso3Pose'),resultsSE3.posePointsN.get('R3xso3Pose'))
 %plot heat map style points error

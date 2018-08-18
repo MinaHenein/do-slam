@@ -52,7 +52,6 @@ if nLandmarks > config.landmarksSlidingWindowSize
     obj.vertices(pointVertices(1)) = Vertex();
 end
 
-
 %% this is for object poses window size
 posesVertices = [obj.vertices(obj.identifyVertices('pose')).index];
 edgesConnectedToMotionVertex = [obj.vertices(SE3MotionVertex).iEdges];
@@ -83,21 +82,22 @@ for i=1:size(pointVerticesConnectedToMotionVertex,1)
     end
 end
 
-nObjectPoses = numel(uniquePoseIndex); 
+nObjectPoses = numel(uniquePoseIndex);
 if nObjectPoses > config.objectPosesSlidingWindowSize
     firstEdgeIndex = obj.vertices(SE3MotionVertex).iEdges(1);
     firstEdgeVertices = [obj.edges(firstEdgeIndex).iVertices];
     firstLandmarkPoseindex = posesVertices(sum((firstEdgeVertices(1)-posesVertices)>0));
+    toBeDeleted = [];
     for j=1:size(pointVerticesConnectedToMotionVertex,1)
         edgeVertex = pointVerticesConnectedToMotionVertex(j,1);
         landmarkPoseIndex = posesVertices(sum((edgeVertex-posesVertices)>0));
-        toBeDeleted = [];
         if landmarkPoseIndex==firstLandmarkPoseindex
             toBeDeleted = [toBeDeleted, edgeVertex];
         end
     end
     for k=1:length(toBeDeleted)
         landmarkPoseIndex = posesVertices(sum((toBeDeleted(k)-posesVertices)>0));
+        if ~(isempty(obj.vertices(toBeDeleted(k)).iEdges))
         % delete observation edge index from pose vertices
         obj.vertices(landmarkPoseIndex).iEdges...
             (obj.vertices(landmarkPoseIndex).iEdges== ...
@@ -106,6 +106,7 @@ if nObjectPoses > config.objectPosesSlidingWindowSize
         obj.vertices(SE3MotionVertex).iEdges...
             (obj.vertices(SE3MotionVertex).iEdges ==...
             obj.vertices(toBeDeleted(k)).iEdges(2)) = [];
+        end
         % delete landmark edges
         edgesIndices = [obj.vertices(toBeDeleted(k)).iEdges];
         for i =1:length(edgesIndices)
@@ -113,8 +114,7 @@ if nObjectPoses > config.objectPosesSlidingWindowSize
         end
         % delete landmark vertices
         obj.vertices(toBeDeleted(k)) = Vertex();
-    end
-    
+    end    
 end
 
 end

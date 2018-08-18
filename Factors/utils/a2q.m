@@ -14,4 +14,3 @@ else
     si = sin(thu / 2);
     q = [co; axis * (si / thu)];
 end
-

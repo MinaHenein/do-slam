@@ -27,11 +27,15 @@ v_rel_pose = AbsoluteToRelativePoseR3xso3(posesGT(:,1),posesN(:,1));
 
 %points
 pointsN = [graphN.vertices(graphN.identifyVertices('point'))];
+% pointsGT = [graphGT.vertices(graphGT.identifyVertices('point')).value];
+
 pointsGT = zeros(3,length(pointsN));
 for i=1:length(pointsN)
-    pointsGT(:,i) = [graphGT.vertices(pointsN(i).index).value];
+   pointsGT(:,i) = [graphGT.vertices(pointsN(i).index).value];
 end
+% pointsGT = [graphGT.vertices(graphGT.identifyVertices('point')).value];
 pointsN = [graphN.vertices(graphN.identifyVertices('point')).value];
+
 
 
 [rotM, t, ~] = Kabsch(pointsN(1:3,:),pointsGT(1:3,:));
