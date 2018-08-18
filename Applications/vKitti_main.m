@@ -12,12 +12,12 @@ config = CameraConfig();
 config = setAppConfig(config);
 % config.set('noiseModel','Off');
 config.set('motionModel','constantSE3MotionDA');
-config.set('std2PointsSE3Motion', [3,3,3]');
+config.set('std2PointsSE3Motion', [1,1,1]');
 config.set('SE3MotionVertexInitialization','eye');
 config.set('newMotionVertexPerNLandmarks',inf);
 config.set('landmarksSlidingWindowSize',inf);
 config.set('objectPosesSlidingWindow',true);
-config.set('objectPosesSlidingWindowSize',8);
+config.set('objectPosesSlidingWindowSize',6);
 config.set('newMotionVertexPerNObjectPoses',inf);
 
 %% 5. Generate Measurements & Save to Graph File, load graph file as well
@@ -31,8 +31,8 @@ config.set('newMotionVertexPerNObjectPoses',inf);
 %% 5.2 For test (with SE3)
 config.set('pointMotionMeasurement','point2DataAssociation');
 config.set('pointsDataAssociationLabel','2PointsDataAssociation');
-config.set('measurementsFileName','vKittiFullSequence_Meas.graph');%staticDynamic20ImagesMeas
-config.set('groundTruthFileName','vKittiFullSequence_GT.graph');%staticDynamic20ImagesGT 
+config.set('measurementsFileName','vKittiFullSequence_Meas100.graph');%staticDynamic20ImagesMeas
+config.set('groundTruthFileName','vKittiFullSequence_GT100.graph');%staticDynamic20ImagesGT 
 % Check for wrong data associations and fix if necessary
 dataAssociationTest(config,config.measurementsFileName,nObjects)
 dataAssociationTest(config,config.groundTruthFileName,nObjects)

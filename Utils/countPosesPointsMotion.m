@@ -41,7 +41,7 @@ nMotionEdges = 0;
 fileID = fopen(filepath,'r');
 line = fgetl(fileID);
 while ischar(line)
-    if strcmp(line(1:length('EDGE_2POINTS_SE3Motion')),'EDGE_2POINTS_SE3Motion')
+    if strcmp(line(1:length('2POINTS_DataAssociation')),'2POINTS_DataAssociation')
         nMotionEdges = nMotionEdges+1;
     end
     line = fgetl(fileID);
