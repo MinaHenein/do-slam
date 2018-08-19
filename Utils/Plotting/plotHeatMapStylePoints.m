@@ -25,10 +25,10 @@ end
 
 minSE3Distance  = min(SE3_translation_error);
 minNoSE3Distance  = min(NoSE3_translation_error);
-assert(minSE3Distance < minNoSE3Distance)
+%assert(minSE3Distance < minNoSE3Distance)
 maxSE3Distance  = max(SE3_translation_error);
 maxNoSE3Distance  = max(NoSE3_translation_error);
-assert(maxSE3Distance < maxNoSE3Distance)
+%assert(maxSE3Distance < maxNoSE3Distance)
 
 a = linspace(minSE3Distance,maxNoSE3Distance,7);
 

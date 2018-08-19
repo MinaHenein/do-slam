@@ -12,14 +12,14 @@ system = System(config,graph0,measurementsCell);
 % covariance = system.covariance; %doesn't change in this function
 errorCurrent = norm(system.b);   %initial value
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-errorNorm = zeros(graph0.nEdges,1);
-for i=1:graph0.nEdges
-    %errorEdge = PseudoHuberRobustCostFunction(config,system,i);
-    errorEdge = GemanMcClureRobustCostFunction(config,system,i);
-    errorNorm(i) = errorEdge;
-end
-errorCurrent = norm(errorNorm);
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% errorNorm = zeros(graph0.nEdges,1);
+% for i=1:graph0.nEdges
+%     errorEdge = PseudoHuberRobustCostFunction(config,system,i);
+%     %errorEdge = GemanMcClureRobustCostFunction(config,system,i);
+%     errorNorm(i) = errorEdge;
+% end
+% errorCurrent = norm(errorNorm);
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %storing variables from each iteration
 obj.dX      = [];
@@ -47,14 +47,14 @@ while (~done)
     graph1 = graph0Update.updateEdges(config);
     errorTemp = norm(graph1.constructResiduals(config,measurementsCell));
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-    errorNorm = zeros(graph1.nEdges,1);
-    systemUpdate = System(config,graph1,measurementsCell);
-    for i=1:graph1.nEdges
-        %errorEdge = PseudoHuberRobustCostFunction(config,systemUpdate,i);
-        errorEdge = GemanMcClureRobustCostFunction(config,systemUpdate,i);
-        errorNorm(i) = errorEdge;
-    end
-    errorTemp = norm(errorNorm);
+%     errorNorm = zeros(graph1.nEdges,1);
+%     systemUpdate = System(config,graph1,measurementsCell);
+%     for i=1:graph1.nEdges
+%         errorEdge = PseudoHuberRobustCostFunction(config,systemUpdate,i);
+%         %errorEdge = GemanMcClureRobustCostFunction(config,systemUpdate,i);
+%         errorNorm(i) = errorEdge;
+%     end
+%     errorTemp = norm(errorNorm);
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %can compute chi-squared error with covariance and residuals
     %b = graph1.constructResiduals(measurementsCell);

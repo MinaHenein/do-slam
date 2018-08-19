@@ -210,7 +210,7 @@ for i = 1:nSteps
                 % previous step
                 switch config.pointMotionMeasurement
                     case 'point2DataAssociation'
-                        label = config.pointDataAssociationLabel;
+                        label = config.pointsDataAssociationLabel;
                         index1 = vertexIndexes(end-1);
                         index2 = vertexIndexes(end);
                         object = jPoint.get('objectIndexes');

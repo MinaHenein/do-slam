@@ -12,8 +12,8 @@ config = setAppConfig(config);
 config.set('pointMotionMeasurement','Off')
 % config.set('measurementsFileName','staticOnlyNoiseMeas2.graph')
 % config.set('groundTruthFileName','staticOnlyNoiseGT2.graph')
-config.set('measurementsFileName','vKittiFullSequence_staticOnlyMeas.graph')
-config.set('groundTruthFileName','vKittiFullSequence_staticOnlyGT.graph')
+config.set('measurementsFileName','staticDynamic92ImagesStaticOnlyMeas.graph')
+config.set('groundTruthFileName','staticDynamic92ImagesStaticOnlyGT.graph')
 % config.set('measurementsFileName','vKitti_Meas_staticOnlyTest.graph')
 % config.set('groundTruthFileName','vKitti_GT_staticOnlyTest.graph')
 groundTruthNoSE3Cell = graphFileToCell(config,config.groundTruthFileName);
