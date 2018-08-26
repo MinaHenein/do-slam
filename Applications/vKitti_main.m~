@@ -6,7 +6,7 @@
 % 1. Config
 objectPosesMatrix = 'objectCameraPoses_vKittiScene0001.mat';
 constantSE3ObjectMotion = vKitti_objectMotion(objectPosesMatrix);
-nObjects = 13;%size(constantSE3ObjectMotion,2);
+nObjects = 9;%size(constantSE3ObjectMotion,2);
 
 config = CameraConfig();
 config = setAppConfig(config);
@@ -31,8 +31,8 @@ config.set('newMotionVertexPerNObjectPoses',inf);
 %% 5.2 For test (with SE3)
 config.set('pointMotionMeasurement','point2DataAssociation');
 config.set('pointsDataAssociationLabel','2PointsDataAssociation');
-config.set('measurementsFileName','finalNoiseSequence0006_Meas.graph');
-config.set('groundTruthFileName','finalNoiseSequence0006_GT.graph'); 
+config.set('measurementsFileName','finalNoiseSequence0001_Meas.graph');
+config.set('groundTruthFileName','finalNoiseSequence0001_GT.graph'); 
 % Check for wrong data associations and fix if necessary
 dataAssociationTest(config,config.measurementsFileName,nObjects)
 dataAssociationTest(config,config.groundTruthFileName,nObjects)
@@ -74,7 +74,7 @@ fprintf('\nTotal time solving: %f\n',totalTime)
 graph0  = solverEnd.graphs(1);
 graphN  = solverEnd.graphs(end);
 %save results to graph file
-graphN.saveGraphFile(config,strcat(config.groundTruthFileName(1:end-12),'results.graph'));
+graphN.saveGraphFile(config,strcat(config.groundTruthFileName(1:end-6),'Test.graph'));
 
 %% 7. Error analysis
 %load ground truth into graph, sort if required
@@ -109,7 +109,7 @@ view([-50,25])
 plotGraphFileICRA(config,groundTruthCell,'groundTruth');
 %plot results
 % resultsNoSE3Cell = graphFileToCell(config,'vKitti_resultsNoSE3.graph');
-resultsCell = graphFileToCell(config,strcat(config.groundTruthFileName(1:end-12),'results.graph'));
+resultsCell = graphFileToCell(config,'vKitti_results.graph');
 % plotGraphFileICRA(config,resultsNoSE3Cell,'initial',...
 %     resultsNoSE3.relPose.get('R3xso3Pose'),resultsNoSE3.posePointsN.get('R3xso3Pose'))
 plotGraphFileICRA(config,resultsCell,'solverResults',...

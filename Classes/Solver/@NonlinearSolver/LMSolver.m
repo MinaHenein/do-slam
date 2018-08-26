@@ -50,11 +50,12 @@ while (~done)
 %     errorNorm = zeros(graph1.nEdges,1);
 %     systemUpdate = System(config,graph1,measurementsCell);
 %     for i=1:graph1.nEdges
-%         errorEdge = PseudoHuberRobustCostFunction(config,systemUpdate,i);
+%         weightedErrorEdge = PseudoHuberRobustCostFunction(config,systemUpdate,i);
 %         %errorEdge = GemanMcClureRobustCostFunction(config,systemUpdate,i);
-%         errorNorm(i) = errorEdge;
+%         errorNorm(i) = weightedErrorEdge;
 %     end
-%     errorTemp = norm(errorNorm);
+%     weightedErrorTemp = norm(errorNorm);
+%     weight = weightedErrorTemp/errorTemp;
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %can compute chi-squared error with covariance and residuals
     %b = graph1.constructResiduals(measurementsCell);

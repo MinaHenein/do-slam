@@ -37,7 +37,6 @@ end
 pointsN = [graphN.vertices(graphN.identifyVertices('point')).value];
 
 
-
 [rotM, t, ~] = Kabsch(pointsN(1:3,:),pointsGT(1:3,:));
 T_point = [rotM t; 0 0 0 1];
 for i= 1:size(pointsN,2)

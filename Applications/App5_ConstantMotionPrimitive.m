@@ -25,14 +25,15 @@ config.set('groundTruthFileName','app5_groundTruth.graph');
 config.set('measurementsFileName','app5_measurements.graph');
 
 % SE3 Motion
-config.set('motionModel','constantSE3MotionDA');
-config.set('std2PointsSE3Motion', [0.1,0.1,0.1]');
-config.set('SE3MotionVertexInitialization','eye');
-config.set('newMotionVertexPerNLandmarks',inf);
-config.set('landmarksSlidingWindowSize',inf);
-config.set('objectPosesSlidingWindow',false);
-config.set('objectPosesSlidingWindowSize',inf);
-config.set('newMotionVertexPerNObjectPoses',inf);
+config.set('motionModel','constantVelocity');
+config.set('std2PointsVelocity', [0.1,0.1,0.1]');
+% config.set('std2PointsSE3Motion', [0.1,0.1,0.1]');
+% config.set('SE3MotionVertexInitialization','eye');
+% config.set('newMotionVertexPerNLandmarks',inf);
+% config.set('landmarksSlidingWindowSize',inf);
+% config.set('objectPosesSlidingWindow',false);
+% config.set('objectPosesSlidingWindowSize',inf);
+% config.set('newMotionVertexPerNObjectPoses',inf);
 
 %% 2. Generate Environment
 if config.rngSeed
@@ -70,27 +71,27 @@ sensor.addEnvironment(environment);
 sensor.addCamera(config.fieldOfView,cameraTrajectory);
 sensor.setVisibility(config,environment);
 
-figure
-spy(sensor.get('pointVisibility'));
-
-%% 4. Plot Environment
-figure
-hold on
-grid on
-axis equal
-viewPoint = [-50,25];
-axisLimits = [-30,50,-10,60,-10,25];
-axis equal
-xlabel('x (m)')
-ylabel('y (m)')
-zlabel('z (m)')
-view(viewPoint)
-axis(axisLimits)
-primitiveTrajectory.plot(t,[0 0 0],'axesOFF')
-cameraTrajectory.plot(t,[0 0 1],'axesOFF')
-% set(gcf,'Position',[0 0 1024 768]);
-frames = sensor.plot(t,environment);
-implay(frames);
+% figure
+% spy(sensor.get('pointVisibility'));
+% 
+% %% 4. Plot Environment
+% figure
+% hold on
+% grid on
+% axis equal
+% viewPoint = [-50,25];
+% axisLimits = [-30,50,-10,60,-10,25];
+% axis equal
+% xlabel('x (m)')
+% ylabel('y (m)')
+% zlabel('z (m)')
+% view(viewPoint)
+% axis(axisLimits)
+% primitiveTrajectory.plot(t,[0 0 0],'axesOFF')
+% cameraTrajectory.plot(t,[0 0 1],'axesOFF')
+% % set(gcf,'Position',[0 0 1024 768]);
+% frames = sensor.plot(t,environment);
+% implay(frames);
 
 
 %% 4.a output video
@@ -111,23 +112,23 @@ config.set('constantSE3Motion',constantSE3ObjectMotion);
     measurementsNoSE3Cell = graphFileToCell(config,config.measurementsFileName);
     
     %% 5.2 For test (with SE3)
-    config.set('pointMotionMeasurement','point2DataAssociation');
+    config.set('pointMotionMeasurement','velocity');
     config.set('pointsDataAssociationLabel','2PointsDataAssociation');
     config.set('measurementsFileName','app5_measurements.graph');
     config.set('groundTruthFileName','app5_groundTruth.graph');
     sensor.generateMeasurements(config);
     
-    writeDataAssociationObjectIndices(config,1)
-    config.set('measurementsFileName',...
-        strcat(config.measurementsFileName(1:end-6),'Test.graph'));
-    config.set('groundTruthFileName',...
-        strcat(config.groundTruthFileName(1:end-6),'Test.graph')); 
-    measurementsCell = graphFileToCell(config,config.measurementsFileName);
-    groundTruthCell  = graphFileToCell(config,config.groundTruthFileName);
-    
-%     writeDataAssociationVerticesEdges_constantSE3Motion(config,constantSE3ObjectMotion);
+%     writeDataAssociationObjectIndices(config,1)
+%     config.set('measurementsFileName',...
+%         strcat(config.measurementsFileName(1:end-6),'Test.graph'));
+%     config.set('groundTruthFileName',...
+%         strcat(config.groundTruthFileName(1:end-6),'Test.graph')); 
 %     measurementsCell = graphFileToCell(config,config.measurementsFileName);
 %     groundTruthCell  = graphFileToCell(config,config.groundTruthFileName);
+    
+%     writeDataAssociationVerticesEdges_constantSE3Motion(config,constantSE3ObjectMotion);
+    measurementsCell = graphFileToCell(config,config.measurementsFileName);
+    groundTruthCell  = graphFileToCell(config,config.groundTruthFileName);
 
 %% 6. Solve
     %% 6.1 Without SE3
@@ -177,20 +178,20 @@ spy(solverEnd.systems(end).A)
 subplot(1,2,2)
 spy(solverEnd.systems(end).H)
 
-h = figure; 
-xlabel('x (m)')
-ylabel('y (m)')
-zlabel('z (m)')
-hold on
-grid on
-axis equal
-axisLimits = [-30,50,-10,60,-25,25];
-axis(axisLimits)
-view([-50,25])
-%plot groundtruth
-plotGraphFileICRA(config,groundTruthCell,'groundTruth');
-%plot results
-resultsNoSE3Cell = graphFileToCell(config,'app5_resultsNoSE3.graph');
-resultsCell = graphFileToCell(config,'app5_results.graph');
-plotGraphFileICRA(config,resultsNoSE3Cell,'initial',resultsNoSE3.relPose.get('R3xso3Pose'),resultsNoSE3.posePointsN.get('R3xso3Pose'))
-plotGraphFileICRA(config,resultsCell,'solverResults',resultsSE3.relPose.get('R3xso3Pose'),resultsSE3.posePointsN.get('R3xso3Pose'))
+% h = figure; 
+% xlabel('x (m)')
+% ylabel('y (m)')
+% zlabel('z (m)')
+% hold on
+% grid on
+% axis equal
+% axisLimits = [-30,50,-10,60,-25,25];
+% axis(axisLimits)
+% view([-50,25])
+% %plot groundtruth
+% plotGraphFileICRA(config,groundTruthCell,'groundTruth');
+% %plot results
+% resultsNoSE3Cell = graphFileToCell(config,'app5_resultsNoSE3.graph');
+% resultsCell = graphFileToCell(config,'app5_results.graph');
+% plotGraphFileICRA(config,resultsNoSE3Cell,'initial',resultsNoSE3.relPose.get('R3xso3Pose'),resultsNoSE3.posePointsN.get('R3xso3Pose'))
+% plotGraphFileICRA(config,resultsCell,'solverResults',resultsSE3.relPose.get('R3xso3Pose'),resultsSE3.posePointsN.get('R3xso3Pose'))
