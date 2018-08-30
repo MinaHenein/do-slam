@@ -18,7 +18,7 @@ function errorNorm = PseudoHuberRobustCostFunction(config,system,edge)
 
 iBlock = blockMap(system,edge,'edge');
 error = norm(system.b(iBlock));
-delta = 3*config.std2PointsSE3Motion(1);%robustCostFunctionWidth;
+delta = config.robustCostFunctionWidth;
 
 dsqr     = delta* delta;
 dsqrReci = 1/dsqr;

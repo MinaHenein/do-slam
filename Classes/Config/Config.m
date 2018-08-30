@@ -109,6 +109,8 @@ classdef Config < ArrayGetSet
         threshold
         maxNormDX
         maxIterations
+        robustCostFunction
+        robustCostFunctionWidth
         
         %graph file labels
         poseVertexLabel

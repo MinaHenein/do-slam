@@ -2,7 +2,7 @@ clear; clc;
 % Measurements
 %vKitti_dynamicStaticMeas_1_v5
 %occlusionWorkingMeas_v1
-filepath = '/home/mina/workspace/src/Git/do-slam/Data/GraphFiles/vKittiFullSequence_Meas.graph';
+filepath = '/home/mina/workspace/src/Git/do-slam/Data/GraphFiles/finalNoiseSequence0002_Meas.graph';
 fileID = fopen(filepath,'r');
 Data = textscan(fileID, '%s', 'delimiter', '\n', 'whitespace', '');
 CStr = Data{1};
@@ -42,7 +42,7 @@ points = unique(points);
 dynamicPoints = unique(dynamicPoints);
 
 %vKitti_OcclusionWorkingMeas_staticOnlyTest
-fileToWritepath = '/home/mina/workspace/src/Git/do-slam/Data/GraphFiles/vKittiFullSequence_staticOnlyMeas.graph';
+fileToWritepath = '/home/mina/workspace/src/Git/do-slam/Data/GraphFiles/finalNoiseSequence0002_staticOnlyMeas.graph';
 fileToWriteID = fopen(fileToWritepath,'w');
 
 if size(pointSeenByCamera,1) < poses(end)
@@ -89,14 +89,14 @@ fclose(fileToWriteID);
 % GT
 %vKitti_dynamicStaticGT_1_v5
 %occlusionWorking_v1
-filepath = '/home/mina/workspace/src/Git/do-slam/Data/GraphFiles/vKittiFullSequence_GT.graph';
+filepath = '/home/mina/workspace/src/Git/do-slam/Data/GraphFiles/finalNoiseSequence0002_GT.graph';
 fileID = fopen(filepath,'r');
 Data = textscan(fileID, '%s', 'delimiter', '\n', 'whitespace', '');
 CStr = Data{1};
 fclose(fileID);
 
 %vKitti_OcclusionWorkingGT_staticOnlyTest
-fileToWritepath = '/home/mina/workspace/src/Git/do-slam/Data/GraphFiles/vKittiFullSequence_staticOnlyGT.graph';
+fileToWritepath = '/home/mina/workspace/src/Git/do-slam/Data/GraphFiles/finalNoiseSequence0002_staticOnlyGT.graph';
 fileToWriteID = fopen(fileToWritepath,'w');
 
 pointWritten = [];

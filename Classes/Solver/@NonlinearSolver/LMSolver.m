@@ -11,14 +11,38 @@ system = System(config,graph0,measurementsCell);
 
 % covariance = system.covariance; %doesn't change in this function
 errorCurrent = norm(system.b);   %initial value
+weightCurrent = 1;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% errorNorm = zeros(graph0.nEdges,1);
-% for i=1:graph0.nEdges
-%     errorEdge = PseudoHuberRobustCostFunction(config,system,i);
-%     %errorEdge = GemanMcClureRobustCostFunction(config,system,i);
-%     errorNorm(i) = errorEdge;
-% end
-% errorCurrent = norm(errorNorm);
+if ~isempty(config.robustCostFunction)
+    errorNorm = zeros(graph0.nEdges,1);
+    for i=1:graph0.nEdges
+        switch config.robustCostFunction
+%             case 'cauchy'
+%                 weightedErrorNorm = cauchyRobustCostFunction(config,system,i);
+%             case 'DCS'
+%                 weightedErrorNorm = DCSRobustCostFunction(config,system,i);
+%             case 'fair'
+%                 weightedErrorNorm = FairRobustCostFunction(config,system,i);
+            case 'gemanMcClure'
+                weightedErrorNorm = GemanMcClureRobustCostFunction(config,system,i);
+%             case 'huber'
+%                 weightedErrorNorm = HuberRobustCostFunction(config,system,i);
+            case 'pseudoHuber'
+                weightedErrorNorm = PseudoHuberRobustCostFunction(config,system,i);
+%             case 'saturated'
+%                 weightedErrorNorm = SaturatedRobustCostFunction(config,system,i);
+%             case 'tukey'
+%                 weightedErrorNorm = TukeyRobustCostFunction(config,system,i);
+%             case 'welsch'
+%                 weightedErrorNorm = WelschRobustCostFunction(config,system,i);
+            otherwise % default --> pseudo-Huber
+                weightedErrorNorm = PseudoHuberRobustCostFunction(config,system,i);
+        end
+        errorNorm(i) = weightedErrorNorm;
+    end
+    weightedErrorCurrent = norm(errorNorm);
+    weightCurrent = weightedErrorCurrent/errorCurrent;
+end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %storing variables from each iteration
@@ -27,7 +51,8 @@ obj.graphs  = [graph0];
 obj.systems = [system];
 
 timeStart = tic;
-while (~done)    
+while (~done)
+    system.b = weightCurrent*system.b;
     %   build system & solve    
    if strcmp(config.processing,'incrementalSolveCholesky')
     d = spdiags(lambda*spdiags(system.L,0),0,size(system.L,1),size(system.L,2));
@@ -47,15 +72,37 @@ while (~done)
     graph1 = graph0Update.updateEdges(config);
     errorTemp = norm(graph1.constructResiduals(config,measurementsCell));
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%     errorNorm = zeros(graph1.nEdges,1);
-%     systemUpdate = System(config,graph1,measurementsCell);
-%     for i=1:graph1.nEdges
-%         weightedErrorEdge = PseudoHuberRobustCostFunction(config,systemUpdate,i);
-%         %errorEdge = GemanMcClureRobustCostFunction(config,systemUpdate,i);
-%         errorNorm(i) = weightedErrorEdge;
-%     end
-%     weightedErrorTemp = norm(errorNorm);
-%     weight = weightedErrorTemp/errorTemp;
+    if ~isempty(config.robustCostFunction)
+        errorTempNorm = zeros(graph1.nEdges,1);
+        systemUpdate = System(config,graph1,measurementsCell);
+        for i=1:graph0.nEdges
+            switch config.robustCostFunction
+%                 case 'cauchy'
+%                     weightedErrorTempNorm = cauchyRobustCostFunction(config,systemUpdate,i);
+%                 case 'DCS'
+%                     weightedErrorTempNorm = DCSRobustCostFunction(config,systemUpdate,i);
+%                 case 'fair'
+%                     weightedErrorTempNorm = FairRobustCostFunction(config,systemUpdate,i);
+                case 'gemanMcClure'
+                    weightedErrorTempNorm = GemanMcClureRobustCostFunction(config,systemUpdate,i);
+%                 case 'huber'
+%                     weightedErrorTempNorm = HuberRobustCostFunction(config,systemUpdate,i);
+                case 'pseudoHuber'
+                    weightedErrorTempNorm = PseudoHuberRobustCostFunction(config,systemUpdate,i);
+%                 case 'saturated'
+%                     weightedErrorTempNorm = SaturatedRobustCostFunction(config,systemUpdate,i);
+%                 case 'tukey'
+%                     weightedErrorTempNorm = TukeyRobustCostFunction(config,systemUpdate,i);
+%                 case 'welsch'
+%                     weightedErrorTempNorm = WelschRobustCostFunction(config,systemUpdate,i);
+                otherwise % default --> pseudo-Huber
+                    weightedErrorTempNorm = PseudoHuberRobustCostFunction(config,systemUpdate,i);
+            end
+            errorTempNorm(i) = weightedErrorTempNorm;
+        end
+        weightedErrorTemp = norm(errorTempNorm);
+        weightTemp = weightedErrorTemp/errorTemp;
+    end
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %can compute chi-squared error with covariance and residuals
     %b = graph1.constructResiduals(measurementsCell);
@@ -71,6 +118,9 @@ while (~done)
         graph0 = graph1;
         system = System(config,graph1,measurementsCell);
         updateGraph = 1;
+        if ~isempty(config.robustCostFunction)
+            weightCurrent = weightTemp;
+        end
     else
         %dont use update
         lambda = lambda*lambdaUp;
@@ -85,20 +135,21 @@ while (~done)
     %   check termination criteria
 %     if (rho > 0 && norm(rho) < 1e-8) || (iteration >= obj.maxIterations) || norm(dX) > config.maxNormDX
 %       graph0 = graph1; %more careful, but slow
-    if (norm(dX) <= obj.threshold) || (iteration >= obj.maxIterations) || norm(dX) > config.maxNormDX
+    if (norm(dX) <= obj.threshold) || (iteration >= obj.maxIterations) || norm(dX) > config.maxNormDX ...
+            || (lambda == 0)
         done = 1;
     else
         %   increment interation
         if updateGraph
             iteration = iteration + 1;
             %store
-            obj.dX = [obj.dX dX];
-            obj.graphs = [obj.graphs graph0];
-            obj.systems = [obj.systems system];
+%             obj.dX = [obj.dX dX];
+%             obj.graphs = [obj.graphs graph0];
+%             obj.systems = [obj.systems system];
             % to save memory
-%                 obj.dX = dX;
-%                 obj.graphs = graph0;
-%                 obj.systems = system;
+                obj.dX = dX;
+                obj.graphs = graph0;
+                obj.systems = system;
         end
     end
     

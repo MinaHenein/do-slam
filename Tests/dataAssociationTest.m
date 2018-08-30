@@ -1,8 +1,6 @@
-function dataAssociationTest(config,fileName,nObjects)
+function [wrongPts,wrongEdges] =  dataAssociationTest(fileName,nObjects)
 
-filepath = strcat(config.folderPath,config.sep,'Data',...
-    config.sep,config.graphFileFolderName,config.sep,...
-    fileName);
+filepath = fileName;
 
 fileID = fopen(filepath,'r');
 Data = textscan(fileID,'%s','delimiter','\n','whitespace',' ');
@@ -12,6 +10,7 @@ IndexC = strfind(CStr, 'DataAssociation');
 % find lines with a DataAssociation entry
 Index = find(~cellfun('isempty', IndexC));
 objectPts = cell(nObjects,1);
+seenObjects = [];
 for j=1:1:length(Index)
     % get line of Index
     fileID = fopen(filepath,'r');
@@ -20,7 +19,11 @@ for j=1:1:length(Index)
     pt1 = str2double(splitLine{1,2});
     pt2 = str2double(splitLine{1,3});
     object = str2double(splitLine{1,4});
-    objectPts{object} = [objectPts{object} pt1 pt2];
+    if ~ismember(object, seenObjects) 
+        seenObjects = [seenObjects, object];
+    end
+    indx = find(seenObjects == object);
+    objectPts{indx} = [objectPts{indx} pt1 pt2];
 end
 
 for i = 1:size(objectPts,1)
@@ -48,14 +51,12 @@ for j=1:1:length(Index)
         wrongEdges = [wrongEdges, Index(j)];
     end
 end
-CStr2 = CStr;
-CStr2(wrongEdges) = [];
-
-% Save the file again:
-fileID = fopen(filepath, 'w');
-fprintf(fileID, '%s\n', CStr2{:});
-fclose(fileID);
-
+% CStr2 = CStr;
+% CStr2(wrongEdges) = [];
+% 
+% % Save the file again:
+% fileID = fopen(filepath, 'w');
+% fprintf(fileID, '%s\n', CStr2{:});
+% fclose(fileID);
 end
-
 

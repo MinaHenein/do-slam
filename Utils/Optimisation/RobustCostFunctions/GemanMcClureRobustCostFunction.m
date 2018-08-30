@@ -15,7 +15,7 @@ function errorNorm = GemanMcClureRobustCostFunction(config,system,edge)
 
 iBlock = blockMap(system,edge,'edge');
 error = norm(system.b(iBlock));
-delta = 3;%config.robustCostFunctionWidth;
+delta = config.robustCostFunctionWidth;
 
 aux    = delta / (delta + error);
 rho(1) = error * aux;

@@ -42,9 +42,11 @@ switch setting
 %         for i = 1:sum(poseVertices)
 %         iPose = poses(:,i);
 %         plotCoordinates(iPose(1:3,:),rot(iPose(4:6,1)))
-%         end        
-        plotPoints = plot3(points(1,:),points(2,:),points(3,:),'g.');
-        set(plotPoints,'MarkerSize',5)
+%         end   
+        if ~isempty(points)
+            plotPoints = plot3(points(1,:),points(2,:),points(3,:),'g.');
+            set(plotPoints,'MarkerSize',5)
+        end
     case 'solverResults'
         relPose = varargin{1};
         posePoints = varargin{2};
@@ -59,15 +61,17 @@ switch setting
             poses(:,i) = iPose;
             plotCoordinates(iPose(1:3,:),scale*rot(iPose(4:6,1))) % plots the trajectory as axes
         end
-        
+        if ~isempty(points)
         for i=1:size(points,2)
             points(:,i) = RelativeToAbsolutePositionR3xso3(posePoints,points(:,i));
         end
-        
+        end
 %         plotPoses = plot3(poses(1,:),poses(2,:),poses(3,:),'Color','b','Marker','.','LineStyle','none');
 %         set(plotPoses,'MarkerSize',8);
-        plotPoints = plot3(points(1,:),points(2,:),points(3,:),'b.');
-        set(plotPoints,'MarkerSize',5)
+        if ~isempty(points)
+            plotPoints = plot3(points(1,:),points(2,:),points(3,:),'b.');
+            set(plotPoints,'MarkerSize',5)
+        end
     case 'initial'
         relPose = varargin{1};
         posePoints = varargin{2};

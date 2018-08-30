@@ -26,27 +26,24 @@ v_rel_pose = AbsoluteToRelativePoseR3xso3(posesGT(:,1),posesN(:,1));
 
 
 %points
-pointsN = [graphN.vertices(graphN.identifyVertices('point'))];
-% pointsGT = [graphGT.vertices(graphGT.identifyVertices('point')).value];
-
-pointsGT = zeros(3,length(pointsN));
-for i=1:length(pointsN)
-   pointsGT(:,i) = [graphGT.vertices(pointsN(i).index).value];
-end
-% pointsGT = [graphGT.vertices(graphGT.identifyVertices('point')).value];
+% pointsN = [graphN.vertices(graphN.identifyVertices('point'))];
+% pointsGT = zeros(3,length(pointsN));
+% for i=1:length(pointsN)
+%    pointsGT(:,i) = [graphGT.vertices(pointsN(i).index).value];
+% end
+pointsGT = [graphGT.vertices(graphGT.identifyVertices('point')).value];
 pointsN = [graphN.vertices(graphN.identifyVertices('point')).value];
 
-
-[rotM, t, ~] = Kabsch(pointsN(1:3,:),pointsGT(1:3,:));
-T_point = [rotM t; 0 0 0 1];
-for i= 1:size(pointsN,2)
-    point = T_point * [pointsN(1:3,i);1];
-    pointsN(1:3,i) = point(1:3,1);
+if ~isempty(pointsGT)
+    [rotM, t, ~] = Kabsch(pointsN(1:3,:),pointsGT(1:3,:));
+    T_point = [rotM t; 0 0 0 1];
+    for i= 1:size(pointsN,2)
+        point = T_point * [pointsN(1:3,i);1];
+        pointsN(1:3,i) = point(1:3,1);
+    end
+    posePointsN_SE3 = T_point;
+    posePointsN = GP_Pose(T_point,'SE3');
 end
-
-posePointsN_SE3 = T_point;
-posePointsN = GP_Pose(T_point,'SE3');
-
 % %planes
 % planesN = [graphN.vertices(graphN.identifyVertices('plane')).value];
 % planesGT = [graphGT.vertices(graphGT.identifyVertices('plane')).value];
@@ -78,6 +75,7 @@ n_delta = 1;
     AARPE_squared_rotation_error] = ...
     Compute_RelativePoseError_AllToAll(posesN,posesGT,v_rel_pose);
 
+if ~isempty(pointsGT)
 %% 1. Point Error
 %ASE
 [ASE_translation_error,ASE_squared_translation_error] = ...
@@ -89,7 +87,7 @@ n_delta = 1;
 %AARPTE
 [AARPTE_translation_error,AARPTE_squared_translation_error] = ...
     Compute_RelativePointError_AllToAll(pointsN,pointsGT);
-
+end
 
 results.ATE_translation_error               = ATE_translation_error;
 results.ATE_rotation_error                  = ATE_rotation_error;
@@ -103,15 +101,17 @@ results.AARPE_translation_error             = AARPE_translation_error;
 results.AARPE_rotation_error                = AARPE_rotation_error;
 results.AARPE_squared_translation_error     = AARPE_squared_translation_error;
 results.AARPE_squared_rotation_error        = AARPE_squared_rotation_error;
-results.ASE_translation_error               = ASE_translation_error;
-results.ASE_squared_translation_error       = ASE_squared_translation_error;
-results.RPTE_translation_error              = RPTE_translation_error;
-results.RPTE_squared_translation_error      = RPTE_squared_translation_error;
-results.AARPTE_translation_error            = AARPTE_translation_error;
-results.AARPTE_squared_translation_error    = AARPTE_squared_translation_error;
+if ~isempty(pointsGT)
+    results.ASE_translation_error               = ASE_translation_error;
+    results.ASE_squared_translation_error       = ASE_squared_translation_error;
+    results.RPTE_translation_error              = RPTE_translation_error;
+    results.RPTE_squared_translation_error      = RPTE_squared_translation_error;
+    results.AARPTE_translation_error            = AARPTE_translation_error;
+    results.AARPTE_squared_translation_error    = AARPTE_squared_translation_error;
+    results.posePointsN_SE3 = posePointsN_SE3;
+    results.posePointsN = posePointsN;
+end
 results.relPose = GP_Pose(v_rel_pose);
-results.posePointsN_SE3 = posePointsN_SE3;
-results.posePointsN = posePointsN;
 results.absRotationErrorVector = absRotError;
 results.relRotationErrorVector = relRotError;
 
@@ -173,10 +173,13 @@ results.relRotationErrorVector = relRotError;
 %% debug
 fprintf('Absolute Trajectory Translation Error: %.3f \n',results.ATE_translation_error)
 fprintf('Absolute Trajectory Rotation Error: %.3f \n',results.ATE_rotation_error)
+if ~isempty(pointsGT)
 fprintf('Absolute Structure Points Error: %.3f \n',results.ASE_translation_error);
+end
 fprintf('All to All Relative Pose Translation Error: %.3f \n',results.AARPE_translation_error)
 fprintf('All to All Relative Pose Rotation Error: %.3f \n',results.AARPE_rotation_error)
+if ~isempty(pointsGT)
 fprintf('All to All Relative Point Translation Error: %.3f \n',results.AARPTE_translation_error)
-
+end
 end
 

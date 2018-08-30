@@ -6,19 +6,21 @@
 % 1. Config
 objectPosesMatrix = 'objectCameraPoses_vKittiScene0001.mat';
 constantSE3ObjectMotion = vKitti_objectMotion(objectPosesMatrix);
-nObjects = 13;%size(constantSE3ObjectMotion,2);
+nObjects = 2;%size(constantSE3ObjectMotion,2);
 
 config = CameraConfig();
 config = setAppConfig(config);
 % config.set('noiseModel','Off');
 config.set('motionModel','constantSE3MotionDA');
-config.set('std2PointsSE3Motion', [0.5,0.5,0.5]');
+config.set('std2PointsSE3Motion', [1,1,1]');
 config.set('SE3MotionVertexInitialization','eye');
 config.set('newMotionVertexPerNLandmarks',inf);
 config.set('landmarksSlidingWindowSize',inf);
 config.set('objectPosesSlidingWindow',false);
 config.set('objectPosesSlidingWindowSize',inf);
 config.set('newMotionVertexPerNObjectPoses',inf);
+config.set('robustCostFunction','pseudoHuber')
+config.set('robustCostFunctionWidth',3)
 
 %% 5. Generate Measurements & Save to Graph File, load graph file as well
 %% 5.1 For initial (without SE3)
@@ -31,8 +33,8 @@ config.set('newMotionVertexPerNObjectPoses',inf);
 %% 5.2 For test (with SE3)
 config.set('pointMotionMeasurement','point2DataAssociation');
 config.set('pointsDataAssociationLabel','2PointsDataAssociation');
-config.set('measurementsFileName','finalNoiseSequence0006_Meas.graph');
-config.set('groundTruthFileName','finalNoiseSequence0006_GT.graph'); 
+config.set('measurementsFileName','150images_noise5_Meas.graph');
+config.set('groundTruthFileName','150images_noise5_GT.graph'); 
 % Check for wrong data associations and fix if necessary
 dataAssociationTest(config,config.measurementsFileName,nObjects)
 dataAssociationTest(config,config.groundTruthFileName,nObjects)
