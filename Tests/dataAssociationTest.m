@@ -1,6 +1,8 @@
-function [wrongPts,wrongEdges] =  dataAssociationTest(fileName,nObjects)
+function [wrongPts,wrongEdges] =  dataAssociationTest(config,fileName,nObjects)
 
-filepath = fileName;
+filepath = strcat(config.folderPath,config.sep,'Data',...
+    config.sep,config.graphFileFolderName,config.sep,...
+    fileName);
 
 fileID = fopen(filepath,'r');
 Data = textscan(fileID,'%s','delimiter','\n','whitespace',' ');
@@ -50,6 +52,11 @@ for j=1:1:length(Index)
     if any(wrongPts == pt1) || any(wrongPts == pt2)
         wrongEdges = [wrongEdges, Index(j)];
     end
+end
+
+if ~isempty(wrongPts) || ~isempty(wrongEdges)
+    error('wrong data association points');
+    error('wrong data association edges');
 end
 % CStr2 = CStr;
 % CStr2(wrongEdges) = [];

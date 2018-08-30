@@ -4,9 +4,9 @@
 %--------------------------------------------------------------------------
 % vKitti main
 % 1. Config
-objectPosesMatrix = 'objectCameraPoses_vKittiScene0001.mat';
-constantSE3ObjectMotion = vKitti_objectMotion(objectPosesMatrix);
-nObjects = 2;%size(constantSE3ObjectMotion,2);
+% objectPosesMatrix = 'objectCameraPoses_vKittiScene0001.mat';
+% constantSE3ObjectMotion = vKitti_objectMotion(objectPosesMatrix);
+% nObjects = size(constantSE3ObjectMotion,2);
 
 config = CameraConfig();
 config = setAppConfig(config);
@@ -19,8 +19,8 @@ config.set('landmarksSlidingWindowSize',inf);
 config.set('objectPosesSlidingWindow',false);
 config.set('objectPosesSlidingWindowSize',inf);
 config.set('newMotionVertexPerNObjectPoses',inf);
-config.set('robustCostFunction','pseudoHuber')
-config.set('robustCostFunctionWidth',3)
+% config.set('robustCostFunction','pseudoHuber')
+% config.set('robustCostFunctionWidth',3)
 
 %% 5. Generate Measurements & Save to Graph File, load graph file as well
 %% 5.1 For initial (without SE3)
@@ -33,17 +33,17 @@ config.set('robustCostFunctionWidth',3)
 %% 5.2 For test (with SE3)
 config.set('pointMotionMeasurement','point2DataAssociation');
 config.set('pointsDataAssociationLabel','2PointsDataAssociation');
-config.set('measurementsFileName','150images_noise5_Meas.graph');
-config.set('groundTruthFileName','150images_noise5_GT.graph'); 
+config.set('measurementsFileName','finalNoiseSequence0001_334to426_rcnn_newNoise_dataA_Meas.graph');
+config.set('groundTruthFileName','finalNoiseSequence0001_334to426_rcnn_newNoise_dataA_GT.graph'); 
 % Check for wrong data associations and fix if necessary
-dataAssociationTest(config,config.measurementsFileName,nObjects)
-dataAssociationTest(config,config.groundTruthFileName,nObjects)
-writeDataAssociationObjectIndices(config,nObjects)
+% dataAssociationTest(config,config.measurementsFileName,nObjects);
+% dataAssociationTest(config,config.groundTruthFileName,nObjects);
+% writeDataAssociationObjectIndices(config,nObjects)
 % writeDataAssociationVerticesEdges_constantSE3Motion(config,constantSE3ObjectMotion);
-config.set('measurementsFileName',...
-    strcat(config.measurementsFileName(1:end-6),'Test.graph'));
-config.set('groundTruthFileName',...
-    strcat(config.groundTruthFileName(1:end-6),'Test.graph')); 
+% config.set('measurementsFileName',...
+%     strcat(config.measurementsFileName(1:end-6),'Test.graph'));
+% config.set('groundTruthFileName',...
+%     strcat(config.groundTruthFileName(1:end-6),'Test.graph')); 
 % corruptDataAssociation(config,0.3);
 % config.set('measurementsFileName',...
 %     strcat(config.measurementsFileName(1:end-6),'Corrupted.graph'));

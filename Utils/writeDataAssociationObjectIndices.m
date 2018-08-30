@@ -130,7 +130,7 @@ for j=1:1:length(Index)
         if  isNewSE3Vertex
             nSE3MotionVertices = nSE3MotionVertices +1;
         end
-        CStr(end+1)= cellstr(sprintf('%s %d %d %d',...
+        CStr(Index(j))= cellstr(sprintf('%s %d %d %d',...
             label,index1,index2,index3));
         isNewSE3Vertex = 0;
     end

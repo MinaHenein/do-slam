@@ -223,10 +223,10 @@ for i = 1:nSteps
         %reorder vertices and edges
         measurementsCellCurrent = measurementsCell;
         if config.sortVertices
-            [obj,newToOldVertices,measurementsCellCurrent] = obj.sortVertices(measurementsCellCurrent);
+            [obj,newToOldVertices,measurementsCellCurrent] = sortVertices(obj,measurementsCellCurrent);
         end
         if config.sortEdges
-            [obj,newToOldEdges,measurementsCellCurrent] = obj.sortEdges(measurementsCellCurrent);
+            [obj,newToOldEdges,measurementsCellCurrent] = sortEdges(obj,measurementsCellCurrent);
         end
         
         %display progress
@@ -244,10 +244,10 @@ for i = 1:nSteps
         
         %undo reordering *TODO - only do this at the end
         if config.sortEdges
-            [obj] = obj.unsortEdges(newToOldEdges);
+            [obj] = unsortEdges(obj,newToOldEdges);
         end
         if config.sortVertices
-            [obj] = obj.unsortVertices(newToOldVertices);
+            [obj] = unsortVertices(obj,newToOldVertices);
         end
                 
         %store iSolver

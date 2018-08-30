@@ -102,12 +102,12 @@ config.set('staticAssumption',0);
 config.set('staticDataAssociation','On');
 config.set('staticDataAssociation','On'); % set this to 'Off' to change object indexes
 %   solver settings
-config.set('sortVertices',0);
-config.set('sortEdges',0);
+config.set('sortVertices',1);
+config.set('sortEdges',1);
 config.set('processing','incremental');
 config.set('plotIncremental',0);
-config.set('nVerticesThreshold',100);
-config.set('nEdgesThreshold',200);
+config.set('nVerticesThreshold',10);
+config.set('nEdgesThreshold',20);
 config.set('solveRate',5);
 config.set('solverType','Levenberg-Marquardt');
 config.set('threshold',10e-4);
