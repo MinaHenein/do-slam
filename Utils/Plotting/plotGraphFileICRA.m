@@ -48,19 +48,25 @@ switch setting
             set(plotPoints,'MarkerSize',5)
         end
     case 'solverResults'
-        relPose = varargin{1};
-        posePoints = varargin{2};
-        
+        T_Pose = varargin{1};
+        gtFirstPose = varargin{2};
+        posePoints = varargin{3};      
         for i = 1:sum(poseVertices)
             iPose = poses(:,i);
             if strcmp(config.poseParameterisation,'SE3')
                 iPose = LogSE3_Rxt(iPose);
             end
-            iPose = RelativeToAbsolutePoseR3xso3(iPose,relPose);
+            pose = T_Pose * [rot(iPose(4:6)) iPose(1:3); 0 0 0 1];
+            if i==1
+                firstPose = transformationMatrixToPose(pose);
+                relPose = AbsoluteToRelativePoseR3xso3(firstPose,gtFirstPose);
+            end
+            iPose = RelativeToAbsolutePoseR3xso3(transformationMatrixToPose(pose),relPose);
             scale = 1;
             poses(:,i) = iPose;
             plotCoordinates(iPose(1:3,:),scale*rot(iPose(4:6,1))) % plots the trajectory as axes
         end
+        %plot3(poses(1,:),poses(2,:),poses(3,:),'Color','b');
         if ~isempty(points)
         for i=1:size(points,2)
             points(:,i) = RelativeToAbsolutePositionR3xso3(posePoints,points(:,i));
@@ -73,7 +79,7 @@ switch setting
             set(plotPoints,'MarkerSize',5)
         end
     case 'initial'
-        relPose = varargin{1};
+        T_Pose = varargin{1};
         posePoints = varargin{2};
         
         for i = 1:sum(poseVertices)
@@ -81,7 +87,7 @@ switch setting
             if strcmp(config.poseParameterisation,'SE3')
                 iPose = LogSE3_Rxt(iPose);
             end
-            iPose = RelativeToAbsolutePoseR3xso3(iPose,relPose);
+            iPose = RelativeToAbsolutePoseR3xso3(iPose,T_Pose);
             poses(:,i) = iPose;
         end
         

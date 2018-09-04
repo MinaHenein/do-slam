@@ -24,16 +24,11 @@ if strcmp(config.poseParameterisation,'SE3')
     end
 end
 
-[rotM, t, ~] = Kabsch(posesN(1:3,:),posesGT(1:3,:));
-T_pose = [rotM t; 0 0 0 1];
-
-% posesPointsN = [posesN(1:3,:),pointsN(1:3,:)];
-% posesPointsGT = [posesGT(1:3,:),pointsGT(1:3,:)];
+posesPointsN = [posesN(1:3,:),pointsN(1:3,:)];
+posesPointsGT = [posesGT(1:3,:),pointsGT(1:3,:)];
 if ~isempty(pointsGT)
-%     [rotM, t, ~] = Kabsch(posesPointsN(1:3,:),posesPointsGT(1:3,:));
-%     [rotM, t, ~] = Kabsch(pointsN(1:3,:),pointsGT(1:3,:));
-%     T_point = [rotM t; 0 0 0 1];
-    T_point = T_pose;
+    [rotM, t, ~] = Kabsch(posesPointsN(1:3,:),posesPointsGT(1:3,:));
+    T_point = [rotM t; 0 0 0 1];
 %     T_point = poseToTransformationMatrix(v_rel_pose);
     for i= 1:size(pointsN,2)
         point = T_point * [pointsN(1:3,i);1];
@@ -43,7 +38,10 @@ if ~isempty(pointsGT)
     posePointsN = GP_Pose(T_point,'SE3');
 end
 
-% T_pose = T_point;
+
+[rotM, t, ~] = Kabsch(posesN(1:3,:),posesGT(1:3,:));
+T_pose = [rotM t; 0 0 0 1];
+T_pose = T_point;
 
 for i= 1:size(posesN,2)
     pose = T_pose * [rot(posesN(4:6,i)) posesN(1:3,i); 0 0 0 1];

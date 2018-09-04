@@ -6,7 +6,8 @@ objectCameraPoses = objectCameraPoses.objPose;
 nObjects = size(objectCameraPoses,2);
 constantSE3ObjectMotion = zeros(6,nObjects);
 
-Rot = [0 0 1 0;-1 0 0 0;0 -1 0 0;0 0 0 1];   
+Rot = [0 0 1 0;-1 0 0 0;0 -1 0 0;0 0 0 1];
+% average transformation
 for i=1:nObjects
     objectPoses = objectCameraPoses(i).obPose;
     cameraPoses = objectCameraPoses(i).cameraPose;
@@ -33,3 +34,19 @@ for i=1:nObjects
     SE3Motion = [t;arot(R)];
     constantSE3ObjectMotion(:,i) = SE3Motion;
 end
+
+% % from pose 1 to pose 2
+% for i=1:nObjects
+%     objectPoses = objectCameraPoses(i).obPose;
+%     cameraPoses = objectCameraPoses(i).cameraPose;
+%     objectPosesWorldFrame = zeros(size(objectPoses));
+%     for j=1:size(objectPoses,1)/4
+%         cameraPoseWorldFrame = Rot/cameraPoses(mapping(j,4),:)/Rot;
+%         objectPosesWorldFrame(mapping(j,4),:) = ...
+%             objectPoses(mapping(j,4),:)*cameraPoseWorldFrame;
+%     end
+%     objectMotion = AbsoluteToRelativePoseR3xso3(...
+%         transformationMatrixToPose(objectPosesWorldFrame(mapping(1,4),:)),...
+%         transformationMatrixToPose(objectPosesWorldFrame(mapping(2,4),:))); 
+%     constantSE3ObjectMotion(:,i) = objectMotion;
+% end

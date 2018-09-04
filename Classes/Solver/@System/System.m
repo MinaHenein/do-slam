@@ -35,8 +35,8 @@ classdef System
     
     methods
         %% constructor
-        function obj = System(config,graph,measurementsCell)
-            obj = constructLinearSystem(obj,config,graph,measurementsCell);
+        function obj = System(config,graph,measurementsCell,weight)
+            obj = constructLinearSystem(obj,config,graph,measurementsCell,weight);
         end
         
         %% useful transformations

@@ -43,6 +43,7 @@ switch label
         end
         CStrOutput(i) =  cellstr(sprintf(pointVertexFormat,g2oLabel,index,value));
     case config.posePoseEdgeLabel
+        %% To fix quaternion covariance
         g2oLabel = 'EDGE_SE3:QUAT';
         index1 = str2double(splitLine{1,2});
         index2 = str2double(splitLine{1,3});
@@ -50,14 +51,17 @@ switch label
         for j=1:config.dimPose
             value = [value,str2double(splitLine{1,4+j-1})];
         end
-        wxyz = a2q(value(4:end)');
+        axisAngle = value(4:end)';
+        wxyz = a2q(axisAngle);
         xyzw = [wxyz(2),wxyz(3),wxyz(4),wxyz(1)];
         covarianceVec = [];
         for j=1:config.dimPose*(config.dimPose+1)/2
             covarianceVec = [covarianceVec,str2double(splitLine{1,4+config.dimPose+j-1})];
         end
+        covAxisAngle = upperTriVecToCov(covarianceVec);
+        covQuat = covAxisAngleToCovQuat(axisAngle, covAxisAngle);
         CStrOutput(i) =  cellstr(sprintf(poseEdgeFormat,g2oLabel,index1,index2,value(1:3),...
-            xyzw,covToUpperTriVec(inv(upperTriVecToCov(covarianceVec)))));
+            xyzw,covToUpperTriVec(inv(covQuat))));
     case config.posePointEdgeLabel
         g2oLabel = 'EDGE_TRACKXYZ';
         index1 = str2double(splitLine{1,2});

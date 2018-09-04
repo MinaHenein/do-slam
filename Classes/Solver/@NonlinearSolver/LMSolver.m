@@ -7,11 +7,11 @@ iteration = 1;
 lambda     = 1e-8; %initial value
 lambdaUp   = 8;
 lambdaDown = 12;
-system = System(config,graph0,measurementsCell);
+weightCurrent = 1;
+system = System(config,graph0,measurementsCell,sqrt(weightCurrent));
 
 % covariance = system.covariance; %doesn't change in this function
 errorCurrent = norm(system.b);   %initial value
-weightCurrent = 1;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if ~isempty(config.robustCostFunction)
     errorNorm = zeros(graph0.nEdges,1);
@@ -52,7 +52,6 @@ obj.systems = [system];
 
 timeStart = tic;
 while (~done)
-    system.b = weightCurrent*system.b;
     %   build system & solve    
    if strcmp(config.processing,'incrementalSolveCholesky')
     d = spdiags(lambda*spdiags(system.L,0),0,size(system.L,1),size(system.L,2));
@@ -74,7 +73,7 @@ while (~done)
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     if ~isempty(config.robustCostFunction)
         errorTempNorm = zeros(graph1.nEdges,1);
-        systemUpdate = System(config,graph1,measurementsCell);
+        systemUpdate = System(config,graph1,measurementsCell,weightCurrent);
         for i=1:graph0.nEdges
             switch config.robustCostFunction
 %                 case 'cauchy'
@@ -110,17 +109,23 @@ while (~done)
     %chiSquaredErrorTemp = chiSquared/graph1.nEdges;
     
     % update
-    rho = errorCurrent - errorTemp;
+    if ~isempty(config.robustCostFunction)
+        rho = weightedErrorCurrent - weightedErrorTemp;
+    else
+        rho = errorCurrent - errorTemp;
+    end
     if rho > 0 %(ie if errorTemp < errorCurrent -> error decreasing)
         %use update
         lambda = lambda/lambdaDown;
-        errorCurrent = errorTemp;
-        graph0 = graph1;
-        system = System(config,graph1,measurementsCell);
-        updateGraph = 1;
         if ~isempty(config.robustCostFunction)
+            weightedErrorCurrent = weightedErrorTemp;
             weightCurrent = weightTemp;
+        else
+            errorCurrent = errorTemp;
         end
+        graph0 = graph1;
+        system = System(config,graph1,measurementsCell,sqrt(weightCurrent));
+        updateGraph = 1;
     else
         %dont use update
         lambda = lambda*lambdaUp;
@@ -147,9 +152,9 @@ while (~done)
 %             obj.graphs = [obj.graphs graph0];
 %             obj.systems = [obj.systems system];
             % to save memory
-                obj.dX = dX;
-                obj.graphs = graph0;
-                obj.systems = system;
+            obj.dX = dX;
+            obj.graphs = graph0;
+            obj.systems = system;
         end
     end
     

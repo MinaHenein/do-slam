@@ -102,7 +102,7 @@ for i = 1:nSteps
                 %edge index
                 jRow{2} = obj.nEdges+1;
                 %create point vertex if it doesn't exist
-                if jRow{4} > obj.nVertices
+                if jRow{4} > obj.nVertices || isempty(obj.vertices(jRow{4}).type)
                     obj = obj.constructPointVertex(config,jRow);
                 end
                 %construct pose-point edge

@@ -8,9 +8,9 @@ clear all
 
 %% 1. Config
 % time
-nSteps = 6;
+nSteps = 121;
 t0 = 0;
-tN = 5;
+tN = 120;
 dt = (tN-t0)/(nSteps-1);
 t  = linspace(t0,tN,nSteps);
 

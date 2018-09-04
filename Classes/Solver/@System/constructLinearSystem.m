@@ -1,4 +1,4 @@
-function [obj] = constructLinearSystem(obj,config,graph,measurementsCell)
+function [obj] = constructLinearSystem(obj,config,graph,measurementsCell,weight)
 %CONSTRUCTLINEARSYSTEM constructs linear system from graph
 %   1. Determine sizes of A,b,covariance matrices from dimensions of edges
 %      and vertices. Remove inactive edges.
@@ -68,6 +68,11 @@ if ~isempty(iPlaneVertices)
 %     system.ck = kPerp'*system.c;
 else
     obj.kPerp = 1;
+end
+
+if ~isempty(config.robustCostFunction)
+    obj.A = weight*obj.A;
+    obj.b = weight*obj.b;
 end
 
 end
