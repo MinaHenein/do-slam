@@ -21,10 +21,13 @@ end
 %translation
 figure;
 for i=1:nObjects
-    plot(1:length(solver)-1,relativeTranslation(:,i))    
+    k = find(relativeTranslation(:,i)); 
+    plot(k(1):length(solver)-1,relativeTranslation(k(1):end,i))    
     hold on
 end
-legend('Object 1','Object 2','Object 3','Object 4','Object 5');
+axis equal
+legend('Object 1','Object 2','Object 3','Object 4','Object 5','Object 6',...
+    'Object 7','Object 8','Object 9','Object 10','Object 11','Object 12');
 xlabel('time step')
 ylabel('Translation difference norm (m)')
 title({'Evolution of object motion vertices','translational component'})
@@ -32,11 +35,15 @@ title({'Evolution of object motion vertices','translational component'})
 %rotation
 figure;
 for i=1:nObjects
-    plot(1:length(solver)-1,relativeRotation(:,i))    
+    k = find(relativeRotation(:,i)); 
+    plot(k(1):length(solver)-1,relativeRotation(k(1):end,i))    
     hold on
 end
-legend('Object 1','Object 2','Object 3','Object 4','Object 5');
+axis equal
+legend('Object 1','Object 2','Object 3','Object 4','Object 5','Object 6',...
+    'Object 7','Object 8','Object 9','Object 10','Object 11','Object 12');
 xlabel('time step')
 ylabel('Rotation difference norm (°)')
 title({'Evolution of object motion vertices','rotational component'})
+
 end

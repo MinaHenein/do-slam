@@ -2,17 +2,6 @@ function [results] = errorAnalysis(config,graphGT,graphN)
 %ERRORANALYSYS Summary of this function goes here
 %   Detailed explanation goes here
 
-%points
-pointsN = [graphN.vertices(graphN.identifyVertices('point'))];
-pointsGT = zeros(3,length(pointsN));
-for i=1:length(pointsN)
-   indx = find([graphGT.vertices.index] == pointsN(i).index); 
-   pointsGT(:,i) = [graphGT.vertices(indx).value];
-end
-% pointsGT = [graphGT.vertices(graphGT.identifyVertices('point')).value];
-pointsN = [graphN.vertices(graphN.identifyVertices('point')).value];
-
-
 %poses
 posesN = [graphN.vertices(graphN.identifyVertices('pose')).value];
 posesGT = [graphGT.vertices(graphGT.identifyVertices('pose')).value];
@@ -24,17 +13,32 @@ if strcmp(config.poseParameterisation,'SE3')
     end
 end
 
-[rotM, t, ~] = Kabsch(posesN(1:3,:),posesGT(1:3,:));
-T_pose = [rotM t; 0 0 0 1];
+% [rotM, t, ~] = Kabsch(posesN(1:3,:),posesGT(1:3,:));
+% v_rel_pose = [t;arot(rotM)];
+v_rel_pose = AbsoluteToRelativePoseR3xso3(posesGT(:,1),posesN(:,1));
 
-% posesPointsN = [posesN(1:3,:),pointsN(1:3,:)];
-% posesPointsGT = [posesGT(1:3,:),pointsGT(1:3,:)];
+% T_pose =[rotM t; 0 0 0 1];
+
+% for i= 1:size(posesN,2)
+%     pose = T_pose * [rot(posesN(4:6,i)) posesN(1:3,i); 0 0 0 1];
+%     posesN(:,i) = [pose(1:3,4); arot(pose(1:3,1:3))];
+% end
+
+
+%points
+pointsN = [graphN.vertices(graphN.identifyVertices('point'))];
+pointsGT = zeros(3,length(pointsN));
+for i=1:length(pointsN)
+    indx = find([graphGT.vertices.index]==pointsN(i).index);
+    pointsGT(:,i) = [graphGT.vertices(indx).value];
+ end
+% pointsGT = [graphGT.vertices(graphGT.identifyVertices('point')).value];
+pointsN = [graphN.vertices(graphN.identifyVertices('point')).value];
+
 if ~isempty(pointsGT)
-%     [rotM, t, ~] = Kabsch(posesPointsN(1:3,:),posesPointsGT(1:3,:));
 %     [rotM, t, ~] = Kabsch(pointsN(1:3,:),pointsGT(1:3,:));
 %     T_point = [rotM t; 0 0 0 1];
-    T_point = T_pose;
-%     T_point = poseToTransformationMatrix(v_rel_pose);
+    T_point = poseToTransformationMatrix(v_rel_pose);
     for i= 1:size(pointsN,2)
         point = T_point * [pointsN(1:3,i);1];
         pointsN(1:3,i) = point(1:3,1);
@@ -42,15 +46,6 @@ if ~isempty(pointsGT)
     posePointsN_SE3 = T_point;
     posePointsN = GP_Pose(T_point,'SE3');
 end
-
-% T_pose = T_point;
-
-for i= 1:size(posesN,2)
-    pose = T_pose * [rot(posesN(4:6,i)) posesN(1:3,i); 0 0 0 1];
-    posesN(:,i) = [pose(1:3,4); arot(pose(1:3,1:3))];
-end
-v_rel_pose = AbsoluteToRelativePoseR3xso3(posesGT(:,1),posesN(:,1));
-
 % %planes
 % planesN = [graphN.vertices(graphN.identifyVertices('plane')).value];
 % planesGT = [graphGT.vertices(graphGT.identifyVertices('plane')).value];
@@ -118,11 +113,10 @@ if ~isempty(pointsGT)
     results.posePointsN_SE3 = posePointsN_SE3;
     results.posePointsN = posePointsN;
 end
-v_rel_pose = T_pose; %AbsoluteToRelativePoseR3xso3(posesN(:,1),posesGT(:,1));
 results.relPose = GP_Pose(v_rel_pose);
 results.absRotationErrorVector = absRotError;
 results.relRotationErrorVector = relRotError;
-results.firstGTPose = posesGT(:,1);
+
 
 % results = [ATE_translation_error,ATE_rotation_error,...
 %     ATE_squared_translation_error,ATE_squared_rotation_error,...

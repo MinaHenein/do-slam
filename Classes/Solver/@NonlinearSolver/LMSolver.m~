@@ -8,14 +8,14 @@ lambda     = 1e-8; %initial value
 lambdaUp   = 8;
 lambdaDown = 12;
 weightCurrent = 1;
-system = System(config,graph0,measurementsCell,weightCurrent);
+system = System(config,graph0,measurementsCell,sqrt(weightCurrent));
 
 % covariance = system.covariance; %doesn't change in this function
 errorCurrent = norm(system.b);   %initial value
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if ~isempty(config.robustCostFunction)
     errorNorm = zeros(graph0.nEdges,1);
-    weightCurrent = zeros(graph0.nEdges,1);
+    weightCurrent =
     for i=1:graph0.nEdges
         switch config.robustCostFunction
 %             case 'cauchy'
@@ -40,11 +40,10 @@ if ~isempty(config.robustCostFunction)
                 weightedErrorNorm = PseudoHuberRobustCostFunction(config,system,i);
         end
         errorNorm(i) = weightedErrorNorm;
-        iBlock = blockMap(system,i,'edge');
-        error = norm(system.b(iBlock));
-        weightCurrent(i) = sqrt(weightedErrorNorm)/error;
+        weightCurrent = weightedErrorCurrent/errorCurrent;
     end
     weightedErrorCurrent = norm(errorNorm);
+    
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -76,8 +75,7 @@ while (~done)
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     if ~isempty(config.robustCostFunction)
         errorTempNorm = zeros(graph1.nEdges,1);
-        weightTemp = zeros(graph0.nEdges,1);
-        systemUpdate = System(config,graph1,measurementsCell,weightCurrent);      
+        systemUpdate = System(config,graph1,measurementsCell,weightCurrent);
         for i=1:graph0.nEdges
             switch config.robustCostFunction
 %                 case 'cauchy'
@@ -102,12 +100,9 @@ while (~done)
                     weightedErrorTempNorm = PseudoHuberRobustCostFunction(config,systemUpdate,i);
             end
             errorTempNorm(i) = weightedErrorTempNorm;
-            iBlock = blockMap(systemUpdate,i,'edge');
-            error = norm(systemUpdate.b(iBlock));
-            weightTemp(i) = sqrt(weightedErrorTempNorm)/error;
-            
         end
         weightedErrorTemp = norm(errorTempNorm);
+        weightTemp = weightedErrorTemp/errorTemp;
     end
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %can compute chi-squared error with covariance and residuals
@@ -131,7 +126,7 @@ while (~done)
             errorCurrent = errorTemp;
         end
         graph0 = graph1;
-        system = System(config,graph1,measurementsCell,weightCurrent);
+        system = System(config,graph1,measurementsCell,sqrt(weightCurrent));
         updateGraph = 1;
     else
         %dont use update

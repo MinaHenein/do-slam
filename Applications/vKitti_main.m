@@ -4,8 +4,8 @@
 %--------------------------------------------------------------------------
 % vKitti main
 % 1. Config
-% objectPosesMatrix = 'objectCameraPoses_vKittiScene0001.mat';
-% constantSE3ObjectMotion = vKitti_objectMotion(objectPosesMatrix);
+objectPosesMatrix = 'objectCameraPoses_vKittiScene0001.mat';
+constantSE3ObjectMotion = vKitti_objectMotion(objectPosesMatrix);
 % nObjects = size(constantSE3ObjectMotion,2);
 
 config = CameraConfig();
@@ -20,7 +20,7 @@ config.set('objectPosesSlidingWindow',false);
 config.set('objectPosesSlidingWindowSize',inf);
 config.set('newMotionVertexPerNObjectPoses',inf);
 % config.set('robustCostFunction','pseudoHuber')
-% config.set('robustCostFunctionWidth',2)
+% config.set('robustCostFunctionWidth',3)
 
 %% 5. Generate Measurements & Save to Graph File, load graph file as well
 %% 5.1 For initial (without SE3)
@@ -33,8 +33,8 @@ config.set('newMotionVertexPerNObjectPoses',inf);
 %% 5.2 For test (with SE3)
 config.set('pointMotionMeasurement','point2DataAssociation');
 config.set('pointsDataAssociationLabel','2PointsDataAssociation');
-config.set('measurementsFileName','finalNoiseSequence0002_Meas.graph');
-config.set('groundTruthFileName','finalNoiseSequence0002_GT.graph'); 
+config.set('measurementsFileName','finalNoiseSequence0001_newNrmrnd_Meas.graph');
+config.set('groundTruthFileName','finalNoiseSequence0001_newNrmrnd_GT.graph'); 
 % Check for wrong data associations and fix if necessary
 % dataAssociationTest(config,config.measurementsFileName,nObjects);
 % dataAssociationTest(config,config.groundTruthFileName,nObjects);
@@ -76,7 +76,7 @@ fprintf('\nTotal time solving: %f\n',totalTime)
 graph0  = solverEnd.graphs(1);
 graphN  = solverEnd.graphs(end);
 %save results to graph file
-graphN.saveGraphFile(config,'finalNoiseSequence0002_results.graph');
+graphN.saveGraphFile(config,'finalNoiseSequence0001_newNrmrnd_results.graph');
 
 %% 7. Error analysis
 %load ground truth into graph, sort if required
@@ -111,11 +111,11 @@ view([-50,25])
 plotGraphFileICRA(config,groundTruthCell,'groundTruth');
 %plot results
 % resultsNoSE3Cell = graphFileToCell(config,'vKitti_resultsNoSE3.graph');
-resultsCell = graphFileToCell(config,'finalNoiseSequence0002_results.graph');
+resultsCell = graphFileToCell(config,'finalNoiseSequence0001_newNrmrnd_results.graph');
 % plotGraphFileICRA(config,resultsNoSE3Cell,'initial',...
 %     resultsNoSE3.relPose.get('R3xso3Pose'),resultsNoSE3.posePointsN.get('R3xso3Pose'))
 plotGraphFileICRA(config,resultsCell,'solverResults',...
-resultsSE3.relPose.get('R3xso3Pose'),resultsSE3.posePointsN.get('R3xso3Pose'))
+resultsSE3.relPose.get('R3xso3Pose'),resultsSE3.firstGTPose,resultsSE3.posePointsN.get('R3xso3Pose'))
 
 % %plot heat map style points error
 % pointsGT = [graphGT.vertices(graphGT.identifyVertices('point')).value];

@@ -50,8 +50,8 @@ for i = 1:nActiveEdges
     obj.b(iBlock,1) = graph.computeResidual(config,iEdge,edgeRow{5});
     
     if ~isempty(config.robustCostFunction)
-        if length(weight)==1
-            obj.b(iBlock,1) = weight*obj.b(iBlock,1);
+        if
+            obj.b(iBlock,1) = weight(i)*obj.b(iBlock,1);
         else
             obj.b(iBlock,1) = weight(i)*obj.b(iBlock,1);
         end

@@ -6,6 +6,8 @@ for i =1:length(solver)
 end
 figure;
 plot(1:length(solver),it)
+xlim([1 length(solver)])
+xlim([0 1000])
 xlabel('time step')
 ylabel('number of iterations')
 title('Number of iterations needed vs time step')
