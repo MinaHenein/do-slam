@@ -76,7 +76,7 @@ fprintf('\nTotal time solving: %f\n',totalTime)
 graph0  = solverEnd.graphs(1);
 graphN  = solverEnd.graphs(end);
 %save results to graph file
-graphN.saveGraphFile(config,'finalNoiseSequence0001_final_results.graph');
+graphN.saveGraphFile(config,'finalNoiseSequence0001final_corrupt_results.graph');
 
 %% 7. Error analysis
 %load ground truth into graph, sort if required
@@ -111,7 +111,7 @@ view([-50,25])
 plotGraphFileICRA(config,groundTruthCell,'groundTruth');
 %plot results
 % resultsNoSE3Cell = graphFileToCell(config,'vKitti_resultsNoSE3.graph');
-resultsCell = graphFileToCell(config,'finalNoiseSequence0001_final_results.graph');
+resultsCell = graphFileToCell(config,'finalNoiseSequence0001_334to426_final_corrupt_results.graph');
 % plotGraphFileICRA(config,resultsNoSE3Cell,'initial',...
 %     resultsNoSE3.relPose.get('R3xso3Pose'),resultsNoSE3.posePointsN.get('R3xso3Pose'))
 plotGraphFileICRA(config,resultsCell,'solverResults',...

@@ -50,6 +50,14 @@ switch setting
     case 'solverResults'
         relPose = varargin{1};
         posePoints = varargin{2};
+        graphN = varargin{3};
+        SE3MotionVertices = [graphN.identifyVertices('SE3Motion')];
+        pointVertices = [graphN.vertices(graphN.identifyVertices('point'))];   
+        pointIndices = [graphN.identifyVertices('point')];
+        edgesConnectedToMotionVertices = [graphN.vertices(SE3MotionVertices).iEdges];
+        dynamicPointsMotionIndices = [graphN.edges(edgesConnectedToMotionVertices).iVertices]';
+        dynamicPointsIndices = setdiff(dynamicPointsMotionIndices,SE3MotionVertices);
+        staticPointsIndices = setdiff(pointIndices,dynamicPointsIndices);
         
         for i = 1:sum(poseVertices)
             iPose = poses(:,i);
@@ -61,6 +69,7 @@ switch setting
             poses(:,i) = iPose;
             plotCoordinates(iPose(1:3,:),scale*rot(iPose(4:6,1))) % plots the trajectory as axes
         end
+        
         if ~isempty(points)
         for i=1:size(points,2)
             points(:,i) = RelativeToAbsolutePositionR3xso3(posePoints,points(:,i));
@@ -68,10 +77,22 @@ switch setting
         end
 %         plotPoses = plot3(poses(1,:),poses(2,:),poses(3,:),'Color','b','Marker','.','LineStyle','none');
 %         set(plotPoses,'MarkerSize',8);
-        if ~isempty(points)
-            plotPoints = plot3(points(1,:),points(2,:),points(3,:),'b.');
-            set(plotPoints,'MarkerSize',5)
+        if ~isempty(staticPointsIndices)      
+         for i=1:size(points,2)
+            if ismember(pointVertices(i).index,staticPointsIndices)
+                plot3(points(1,i),points(2,i),points(3,i),'b.','MarkerSize',5);
+             end
+         end   
         end
+        
+        if ~isempty(dynamicPointsIndices)
+        for i=1:size(points,2)
+            if ismember(pointVertices(i).index,dynamicPointsIndices)
+                plot3(points(1,i),points(2,i),points(3,i),'m.','MarkerSize',5);
+            end
+        end
+        end
+        
     case 'initial'
         relPose = varargin{1};
         posePoints = varargin{2};

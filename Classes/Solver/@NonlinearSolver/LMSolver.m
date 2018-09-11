@@ -42,9 +42,12 @@ if ~isempty(config.robustCostFunction)
         errorNorm(i) = weightedErrorNorm;
         iBlock = blockMap(system,i,'edge');
         error = norm(system.b(iBlock));
-        weightCurrent(i) = sqrt(weightedErrorNorm)/error;
+        weightCurrent(i) = sqrt(weightedErrorNorm/error);
+        if sqrt(weightedErrorNorm)==0 && error==0
+            weightCurrent(i) = 1;
+        end
     end
-    weightedErrorCurrent = norm(errorNorm);
+    weightedErroNormCurrent = norm(errorNorm);
 end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -104,10 +107,12 @@ while (~done)
             errorTempNorm(i) = weightedErrorTempNorm;
             iBlock = blockMap(systemUpdate,i,'edge');
             error = norm(systemUpdate.b(iBlock));
-            weightTemp(i) = sqrt(weightedErrorTempNorm)/error;
-            
+            weightTemp(i) = sqrt(weightedErrorTempNorm/error);
+            if sqrt(weightedErrorTempNorm)==0 && error==0
+                weightTemp(i) = 1;
+            end  
         end
-        weightedErrorTemp = norm(errorTempNorm);
+        weightedErrorNormTemp = norm(errorTempNorm);
     end
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %can compute chi-squared error with covariance and residuals
@@ -117,7 +122,7 @@ while (~done)
     
     % update
     if ~isempty(config.robustCostFunction)
-        rho = weightedErrorCurrent - weightedErrorTemp;
+        rho = weightedErroNormCurrent - weightedErrorNormTemp;
     else
         rho = errorCurrent - errorTemp;
     end
@@ -125,7 +130,7 @@ while (~done)
         %use update
         lambda = lambda/lambdaDown;
         if ~isempty(config.robustCostFunction)
-            weightedErrorCurrent = weightedErrorTemp;
+            weightedErroNormCurrent = weightedErrorNormTemp;
             weightCurrent = weightTemp;
         else
             errorCurrent = errorTemp;
@@ -147,8 +152,8 @@ while (~done)
     %   check termination criteria
 %     if (rho > 0 && norm(rho) < 1e-8) || (iteration >= obj.maxIterations) || norm(dX) > config.maxNormDX
 %       graph0 = graph1; %more careful, but slow
-    if (norm(dX) <= obj.threshold) || (iteration >= obj.maxIterations) || norm(dX) > config.maxNormDX ...
-            || (lambda == 0)
+    
+    if (norm(dX) <= obj.threshold) || (iteration >= obj.maxIterations) || norm(dX) > config.maxNormDX || (lambda == 0)
         done = 1;
     else
         %   increment interation
