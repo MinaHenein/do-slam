@@ -108,6 +108,8 @@ config.set('constantSE3Motion',constantSE3ObjectMotion);
     config.set('groundTruthFileName','RSS18ExpB2_groundTruth.graph');
     sensor.generateMeasurements(config);
     writeDataAssociationVerticesEdges_constantSE3Motion(config,constantSE3ObjectMotion);
+    config.set('measurementsFileName','RSS18ExpB2_measurementsTest.graph');
+    config.set('groundTruthFileName','RSS18ExpB2_groundTruthTest.graph');
     measurementsCell = graphFileToCell(config,config.measurementsFileName);
     groundTruthCell  = graphFileToCell(config,config.groundTruthFileName);
 
@@ -177,5 +179,5 @@ plotGraphFileICRA(config,groundTruthCell,'groundTruth');
 resultsNoSE3Cell = graphFileToCell(config,'RSS18ExpB2_resultsNoSE3.graph');
 resultsCell = graphFileToCell(config,'RSS18ExpB2_results.graph');
 plotGraphFileICRA(config,resultsNoSE3Cell,'initial',resultsNoSE3.relPose.get('R3xso3Pose'),resultsNoSE3.posePointsN.get('R3xso3Pose'))
-plotGraphFileICRA(config,resultsCell,'solverResults',resultsSE3.relPose.get('R3xso3Pose'),resultsSE3.posePointsN.get('R3xso3Pose'))
+plotGraphFileICRA(config,resultsCell,'solverResults',resultsSE3.relPose.get('R3xso3Pose'),resultsSE3.posePointsN.get('R3xso3Pose'),graphN)
 print('RSS18ExpB_Solution','-dpdf')

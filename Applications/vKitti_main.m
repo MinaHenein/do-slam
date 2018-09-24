@@ -5,7 +5,8 @@
 % vKitti main
 % 1. Config
 objectPosesMatrix = 'objectCameraPoses_vKittiScene0001.mat';
-constantSE3ObjectMotion = vKitti_objectMotion(objectPosesMatrix);
+[objectsGTMotion, objectsGTFrames] = vKitti_objectMotion(objectPosesMatrix);
+constantSE3ObjectMotion = vKitti_objectMotionAveraged(objectPosesMatrix);
 % nObjects = size(constantSE3ObjectMotion,2);
 
 config = CameraConfig();

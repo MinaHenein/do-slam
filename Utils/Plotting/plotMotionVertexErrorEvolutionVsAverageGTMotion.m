@@ -1,42 +1,26 @@
-function plotMotionVertexErrorEvolution(solver, objectsGTMotion, objectsGTFrames)
+function plotMotionVertexErrorEvolutionVsAverageGTMotion(solver, GTObjectMotion)
 
- nObjects = size(objectsGTMotion,2);
+ nObjects = size(GTObjectMotion,2);
 
-relativeTranslation = [];
-relativeRotation = [];
+relativeTranslation = zeros(length(solver)-1,nObjects);
+relativeRotation = zeros(length(solver)-1,nObjects);
 f_deg_per_rad = 180/pi;
 
-nObjectsSoFar = 0;
-objectStartFrames = zeros(nObjects,1);
 for i=1:length(solver)-1
     graph = solver(i).graphs(end);
     motionVertices = [graph.vertices(graph.identifyVertices('SE3Motion')).value];
-    if size(motionVertices,2) > nObjectsSoFar
-        objectStartFrames(size(motionVertices,2)) = i;
-    end
-    nObjectsSoFar = size(motionVertices,2);    
+    for j=1:size(motionVertices,2)
+        objectMotion = motionVertices(:,j);
+        objectGTMotion = GTObjectMotion(:,j);
+        relativeMotion = AbsoluteToRelativePoseR3xso3(objectMotion,objectGTMotion);
+        relativeTranslation(i,j) = norm(relativeMotion(1:3));
+        relativeRotation(i,j) = wrapToPi(norm(relativeMotion(4:6)))*f_deg_per_rad;
+    end 
 end
 
-for i=1:nObjects
-    objectStartFrame = objectStartFrames(i);
-    objectGTMotion = cell2mat(objectsGTMotion(i));
-    for j= objectStartFrame:length(solver)-1
-        graph = solver(j).graphs(end);
-        motionVertices = [graph.vertices(graph.identifyVertices('SE3Motion')).value];
-        objectMotion = motionVertices(:,i);
-        indx = find(cell2mat(objectsGTFrames(i))==j);
-        if j > size(objectGTMotion,2) 
-            relativeMotion = AbsoluteToRelativePoseR3xso3(objectMotion,objectGTMotion(:,end));
-        else
-            relativeMotion = AbsoluteToRelativePoseR3xso3(objectMotion,objectGTMotion(:,indx));
-        end
-        relativeTranslation(j,i) = norm(relativeMotion(1:3));
-        relativeRotation(j,i) = wrapToPi(norm(relativeMotion(4:6)))*f_deg_per_rad;
-    end
-end
-        
 colors = {'red','blue','black','green','magenta','sapphire','leather','swamp','light bluish green',...
     'butterscotch','cinnamon','radioactive green','chartreuse'}; 
+
 
 %translation
 figure;
