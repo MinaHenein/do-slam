@@ -28,6 +28,7 @@ for i=1:nObjects
     objectPoseFromMotion(:,1) = ...
         transformationMatrixToPose(objectPosesWorldFrame(mapping(1,4),:));
     for k=1:(size(objectPoses,1)/4) -1
+        % motion is in body-fixed frame
         objectPoseFromMotion(:,k+1) = RelativeToAbsolutePoseR3xso3(...
              objectPoseFromMotion(:,k),objectMotion);
         objectNewPoseFromMotion = objectPoseFromMotion(:,k+1);
@@ -58,8 +59,9 @@ for i=1:nObjects
     objectPoseFromMotion(:,1) = ...
         transformationMatrixToPose(objectPosesWorldFrame(mapping(1,4),:));
     for k=1:(size(objectPoses,1)/4) -1
+        % motion is in global frame
         objectPoseFromMotion(:,k+1) = RelativeToAbsolutePoseR3xso3(...
-             objectPoseFromMotion(:,k),objectMotion);
+             objectMotion,objectPoseFromMotion(:,k));
         objectNewPoseFromMotion = objectPoseFromMotion(:,k+1);
         scatter3(objectNewPoseFromMotion(1),objectNewPoseFromMotion(2),...
             objectNewPoseFromMotion(3),'r+');
