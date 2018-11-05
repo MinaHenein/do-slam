@@ -21,7 +21,7 @@ velocities(:,i-1) = pointPositions(:,i)-pointPositions(:,i-1);
 end
 velocity = mean(velocities,2);
 %% 3. vertex properties
-value = velocity;
+value = velocity; %zeros(3,1);
 covariance = []; %not using this property yet
 type = 'velocity';
 iEdges = [edgeIndex];

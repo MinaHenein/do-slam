@@ -24,16 +24,22 @@ config.set('nSteps',nSteps);
 config.set('groundTruthFileName','app5_groundTruth.graph');
 config.set('measurementsFileName','app5_measurements.graph');
 
+objectAware = 1;
+
 % SE3 Motion
-config.set('motionModel','constantVelocity');
-config.set('std2PointsVelocity', [0.1,0.1,0.1]');
-% config.set('std2PointsSE3Motion', [0.1,0.1,0.1]');
-% config.set('SE3MotionVertexInitialization','eye');
-% config.set('newMotionVertexPerNLandmarks',inf);
-% config.set('landmarksSlidingWindowSize',inf);
-% config.set('objectPosesSlidingWindow',false);
-% config.set('objectPosesSlidingWindowSize',inf);
-% config.set('newMotionVertexPerNObjectPoses',inf);
+if objectAware
+    config.set('motionModel','constantSE3MotionDA');
+    config.set('std2PointsSE3Motion', [0.1,0.1,0.1]');
+    config.set('SE3MotionVertexInitialization','eye');
+    config.set('newMotionVertexPerNLandmarks',inf);
+    config.set('landmarksSlidingWindowSize',inf);
+    config.set('objectPosesSlidingWindow',false);
+    config.set('objectPosesSlidingWindowSize',inf);
+    config.set('newMotionVertexPerNObjectPoses',inf);
+else
+    config.set('motionModel','constantVelocity');
+    config.set('std2PointsVelocity', [0.1,0.1,0.1]');    
+end
 
 %% 2. Generate Environment
 if config.rngSeed
@@ -42,7 +48,7 @@ end
 
 % construct primitive trajectory
 primitiveInitialPose_R3xso3 = [10 0 0 0 0 0.2]';
-primitiveMotion_R3xso3 = [1.5*dt; 0; 0; arot(eul2rot([0.05*dt,0,0.005*dt]))];
+primitiveMotion_R3xso3 = [0.0001*dt; 0; 0; arot(eul2rot([0.05*dt,0,0.005*dt]))];%arot(eul2rot([0.05*dt,0,0.005*dt]))
 primitiveTrajectory = ConstantMotionDiscretePoseTrajectory(t,primitiveInitialPose_R3xso3,primitiveMotion_R3xso3,'R3xso3');
 
 % construct  robot trajectories
@@ -112,20 +118,23 @@ config.set('constantSE3Motion',constantSE3ObjectMotion);
     measurementsNoSE3Cell = graphFileToCell(config,config.measurementsFileName);
     
     %% 5.2 For test (with SE3)
-    config.set('pointMotionMeasurement','velocity');
+    if objectAware
+        config.set('pointMotionMeasurement','point2DataAssociation');
+    else
+        config.set('pointMotionMeasurement','velocity');
+    end
     config.set('pointsDataAssociationLabel','2PointsDataAssociation');
     config.set('measurementsFileName','app5_measurements.graph');
     config.set('groundTruthFileName','app5_groundTruth.graph');
     sensor.generateMeasurements(config);
     
-%     writeDataAssociationObjectIndices(config,1)
-%     config.set('measurementsFileName',...
-%         strcat(config.measurementsFileName(1:end-6),'Test.graph'));
-%     config.set('groundTruthFileName',...
-%         strcat(config.groundTruthFileName(1:end-6),'Test.graph')); 
-%     measurementsCell = graphFileToCell(config,config.measurementsFileName);
-%     groundTruthCell  = graphFileToCell(config,config.groundTruthFileName);
-    
+    if objectAware
+        writeDataAssociationObjectIndices(config,1)
+        config.set('measurementsFileName',...
+            strcat(config.measurementsFileName(1:end-6),'Test.graph'));
+        config.set('groundTruthFileName',...
+            strcat(config.groundTruthFileName(1:end-6),'Test.graph')); 
+    end
 %     writeDataAssociationVerticesEdges_constantSE3Motion(config,constantSE3ObjectMotion);
     measurementsCell = graphFileToCell(config,config.measurementsFileName);
     groundTruthCell  = graphFileToCell(config,config.groundTruthFileName);

@@ -4,9 +4,9 @@
 %--------------------------------------------------------------------------
 % vKitti main
 % 1. Config
-objectPosesMatrix = 'objectCameraPoses_vKittiScene0001.mat';
-[objectsGTMotion, objectsGTFrames] = vKitti_objectMotion(objectPosesMatrix);
-constantSE3ObjectMotion = vKitti_objectMotionAveraged(objectPosesMatrix);
+% objectPosesMatrix = 'objectCameraPoses_vKittiScene0001.mat';
+% [objectsGTMotion, objectsGTFrames] = vKitti_objectMotion(objectPosesMatrix);
+% constantSE3ObjectMotion = vKitti_objectMotionAveraged(objectPosesMatrix);
 % nObjects = size(constantSE3ObjectMotion,2);
 
 config = CameraConfig();
@@ -34,8 +34,8 @@ config.set('newMotionVertexPerNObjectPoses',inf);
 %% 5.2 For test (with SE3)
 config.set('pointMotionMeasurement','point2DataAssociation');
 config.set('pointsDataAssociationLabel','2PointsDataAssociation');
-config.set('measurementsFileName','finalNoiseSequence0001_final_Meas.graph');
-config.set('groundTruthFileName','finalNoiseSequence0001_final_GT.graph'); 
+config.set('measurementsFileName','Sequence0001_334to426_objectMotion_Meas.graph');
+config.set('groundTruthFileName','Sequence0001_334to426_objectMotion_GT.graph'); 
 % Check for wrong data associations and fix if necessary
 % dataAssociationTest(config,config.measurementsFileName,nObjects);
 % dataAssociationTest(config,config.groundTruthFileName,nObjects);
@@ -77,7 +77,7 @@ fprintf('\nTotal time solving: %f\n',totalTime)
 graph0  = solverEnd.graphs(1);
 graphN  = solverEnd.graphs(end);
 %save results to graph file
-graphN.saveGraphFile(config,'finalNoiseSequence0001_final_results.graph');
+graphN.saveGraphFile(config,'Sequence0001_334to426_objectMotion_results.graph');
 
 %% 7. Error analysis
 %load ground truth into graph, sort if required
@@ -112,7 +112,7 @@ view([-50,25])
 plotGraphFileICRA(config,groundTruthCell,'groundTruth');
 %plot results
 % resultsNoSE3Cell = graphFileToCell(config,'vKitti_resultsNoSE3.graph');
-resultsCell = graphFileToCell(config,'finalNoiseSequence0001_final_results.graph');
+resultsCell = graphFileToCell(config,'Sequence0001_334to426_objectMotion_results.graph');
 % plotGraphFileICRA(config,resultsNoSE3Cell,'initial',...
 %     resultsNoSE3.relPose.get('R3xso3Pose'),resultsNoSE3.posePointsN.get('R3xso3Pose'))
 plotGraphFileICRA(config,resultsCell,'solverResults',...

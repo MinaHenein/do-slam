@@ -138,21 +138,39 @@ for i = 1:nSteps
                 obj = obj.construct2PointsSE3MotionEdge(config,jRow);
           case config.pointsDataAssociationLabel
                 %edge label
-                jRow{1} = config.pointSE3MotionEdgeLabel;
+                if strcmp(config.motionModel,'constantSE3MotionDA')
+                    jRow{1} = config.pointSE3MotionEdgeLabel;
+                elseif strcmp(config.motionModel,'constantVelocity')
+                    %no notion of object
+                    jRow{1} = config.pointVelocityEdgeLabel;
+                end
                 %edge index
                 jRow{2} = obj.nEdges+1;
                 %create velocity vertex if it doesn't exist
                 if jRow{4} > obj.nVertices || isempty(obj.vertices(jRow{4}).type)
-                    %find all point vertices connected to this SE3 vertex
                     pointRows = iRows([measurementsCell{iRows,4}]==jRow{4});
                     pointVertices = [measurementsCell{pointRows,3}]';
-                    obj = obj.constructSE3MotionVertex(config,jRow,pointVertices);
+                    if strcmp(config.motionModel,'constantSE3MotionDA')
+                        %find all point vertices connected to this SE3 vertex
+                        obj = obj.constructSE3MotionVertex(config,jRow,pointVertices);
+                    elseif strcmp(config.motionModel,'constantVelocity')
+                        obj = obj.constructVelocityVertex_v2(config,jRow,unique(pointVertices));
+                    end
                 end
                 pointVertices = jRow{3};
-                jRow{5} = (obj.vertices(pointVertices(2)).value - ...
+                if strcmp(config.motionModel,'constantSE3MotionDA')
+                    value = [obj.vertices(pointVertices(2)).value;1] - ...
+                    poseToTransformationMatrix(obj.vertices(jRow{4}).value)*...
+                    [obj.vertices(pointVertices(1)).value;1];
+                    jRow{5} = value(1:3,1)'; 
+                    jRow{6} = covToUpperTriVec(config.cov2PointsSE3Motion);
+                    obj = obj.construct2PointsSE3MotionEdge(config,jRow); 
+                elseif strcmp(config.motionModel,'constantVelocity')
+                    jRow{5} = obj.vertices(jRow{4}).value - (obj.vertices(pointVertices(2)).value - ...
                     obj.vertices(pointVertices(1)).value)'; 
-                jRow{6} = covToUpperTriVec(config.cov2PointsSE3Motion);
-                obj = obj.construct2PointsSE3MotionEdge(config,jRow);      
+                    jRow{6} = covToUpperTriVec(config.cov2PointsVelocity);
+                    obj = obj.construct2PointsVelocityEdge_v2(config,jRow); 
+                end
             case config.planePriorEdgeLabel
                 %edge index
                 jRow{2} = obj.nEdges+1;

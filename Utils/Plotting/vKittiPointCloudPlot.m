@@ -1,78 +1,48 @@
-filepath = '/home/mina/workspace/src/Git/do-slam/Data/GraphFiles/staticDynamic20ImagesGT.graph';
-fileID = fopen(filepath,'r');
-poses = [];
-line = fgetl(fileID);
-while ischar(line)
-    if strcmp(line(1:length('VERTEX_POSE')),'VERTEX_POSE')
-        splitLine = strsplit(line,' ');
-        poses = [poses, str2double(splitLine(3:end))'];
-    end
-    line = fgetl(fileID);
-end
-fclose(fileID);
+function vKittiPointCloudPlot(i)
 
-for k = 1:size(poses,2)
-% Camera Transformation Matrix
-% R = [0 0 1 0; -1 0 0 0; 0 -1 0 0; 0 0 0 1];
-cameraPose = [rot(poses(4:6,k)), poses(1:3,k); 0 0 0 1];
-cameraToWorld = cameraPose;
-
-% Camera Intrinsics
+dir = '/home/mina/Downloads/vKitti/';
+cameraExtrinsicsFile = strcat(dir,'vkitti_1.3.1_extrinsicsgt/0001_clone.txt');
+% camera intrinsics
 K = [725,      0,     620.5;
        0,    725,     187.0;
        0,      0,        1];
-
-fx = K(1,1);
-fy = K(2,2);
-cx = K(1,3);
-cy = K(2,3);
-
-rgbFilePath = '/home/mina/Downloads/vKitti/rgbImages';
-depthFilePath = '/home/mina/Downloads/vKitti/depthImages';
-
-imgID = 333+k;
-I = imread(strcat(rgbFilePath,'/00',num2str(imgID),'.png'));
-depth = imread(strcat(depthFilePath,'/00',num2str(imgID),'.png'));
-
-[imgH, imgW, ~] = size(I);
-
-nPoints=imgH*imgW;
-PWorld = zeros(nPoints,3);
-pcloud = zeros(imgH,imgW,3);
-ptCount = 0;
-
+% read rgb image
+rgbI = imread(strcat(dir,'rgbImages/00',num2str(i),'.png'));
+% read depth image
+depthI = imread(strcat(dir,'depthImages/00',num2str(i),'.png'));
+% read camera pose
+fid = fopen(cameraExtrinsicsFile);
+lineCell = textscan(fid,'%s',1,'delimiter','\n','headerlines',i+1);
+fclose(fid);
+lineArray = str2num(cell2mat(lineCell{1,1}));
+assert(lineArray(1)==i);
+cameraPoseMatrix = inv(reshape(lineArray(2:end),[4,4])');
+% preallocate memory
+[imgH, imgW, ~] = size(rgbI);
+pcloud  = zeros(imgH,imgW,3);
 
 for i=1:imgH
     for j=1:imgW
-        
-        Z = depth(i,j)/100;
-        
-        if(Z > 150)
-            Z = 0;
+        pixelRow = i;
+        pixelCol = j;
+        pixelDepth = double(depthI(pixelRow,pixelCol));
+        if pixelDepth/100>400
+           continue
         end
-        
-        X = (j-cx) * Z  / fx;
-        Y = (i-cy) * Z  / fy;
-        
-        ptCount = ptCount + 1;
-        P3D =  cameraToWorld*double([X;Y;Z;1]);
-        PWorld(ptCount,:) = P3D(1:3,1)';
-        pcloud(i,j,:) = PWorld(ptCount,:);
-        
+        camera3DPoint = K\[pixelRow;pixelCol;1];
+        camera3DPoint(2) = -camera3DPoint(2);
+        camera3DPoint(3) = pixelDepth/100;
+        world3DPoint = cameraPoseMatrix * [camera3DPoint;1];
+        pcloud(i,j,:) = world3DPoint(1:3,1);
     end
 end
 
+ptCloud = pointCloud(pcloud,'Color',rgbI);
 
-ptCloud = pointCloud(pcloud,'Color',I);
-if k==1
-    figure;
-end
 pcshow(ptCloud);
 xlabel('x');
 ylabel('y');
 zlabel('z');
-% axis([-inf inf -inf inf -10 300])
-% view([1 1 1])
 hold on
-    
+
 end

@@ -141,9 +141,7 @@ while ischar(tline)
             %store
             graphCell{end+1,1} = lineCell;
         case config.pointsDataAssociationLabel
-            if strcmp(config.motionModel,'constantSE3MotionDA')
-                lineCell = {label,[],values(1:2),values(3),[],[]};
-            end
+            lineCell = {label,[],values(1:2),values(3),[],[]};
             %store
             graphCell{end+1,1} = lineCell;
         case config.pointPlaneEdgeLabel 
