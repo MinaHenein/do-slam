@@ -124,4 +124,6 @@ vKittiPointCloudPlot(i);
         % cameraPoseMatrix = inv(cameraExtrinsics);
         % world3DPoint = cameraPoseMatrix * [camera3DPoint;1];
 %% 3.1 Check Test_projectMovingObjectPoints_vKITTI.m in /Tests
-%% 3.2
+%% 3.2 Check plotObjectPoses_vKITTI.m in /Utils/Plotting
+imageRange = 334:426;
+plotObjectPoses_vKITTI(imageRange)

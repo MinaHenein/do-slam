@@ -20,7 +20,7 @@ for i=1:nObjects
     for j=1:size(objectPoses,1)/4
         cameraPoseWorldFrame = Rot/cameraPoses(mapping(j,4),:)/Rot;
         objectPosesWorldFrame(mapping(j,4),:) = ...
-            objectPoses(mapping(j,4),:)*cameraPoseWorldFrame;
+            cameraPoseWorldFrame*objectPoses(mapping(j,4),:);
     end
     objectMotion = AbsoluteToRelativePoseR3xso3(...
         transformationMatrixToPose(objectPosesWorldFrame(mapping(1,4),:)),...
@@ -44,7 +44,7 @@ end
    
 
 % testing with the average motion transformation
-constantSE3ObjectMotion = vKitti_objectMotion(objectPosesMatrix);
+constantSE3ObjectMotion = vKitti_objectMotionAveraged(objectPosesMatrix);
 for i=1:nObjects
     figure;
     objectPoses = objectCameraPoses(i).obPose;
@@ -53,7 +53,7 @@ for i=1:nObjects
     for j=1:size(objectPoses,1)/4
         cameraPoseWorldFrame = Rot/cameraPoses(mapping(j,4),:)/Rot;
         objectPosesWorldFrame(mapping(j,4),:) = ...
-            objectPoses(mapping(j,4),:)*cameraPoseWorldFrame;
+            cameraPoseWorldFrame*objectPoses(mapping(j,4),:);
     end
     objectMotion = constantSE3ObjectMotion(:,i); 
     objectPoseFromMotion(:,1) = ...

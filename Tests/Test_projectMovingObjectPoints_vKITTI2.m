@@ -22,7 +22,7 @@ depthI = imread(strcat(dir,'depthImages/00',num2str(i),'.png'));
 % read segmentation image
 segmentationI = imread(strcat(segmentationGTFile,'00',num2str(i),'.png'));
 % n- features to track
-nFeatures = 10;
+nFeatures = 1;
 % get centroids of all objects in frame
 fid = fopen(maskRCNNCentroidFile);
 Data = textscan(fid,'%s','Delimiter','\n');
@@ -51,11 +51,11 @@ objectRGB = [segmentationI(centroidY,centroidX,1),segmentationI(centroidY,centro
 % get object bounding box
 boundingBox = getObjectBoundingBox(objectDetectionFile,i,classGT);
 % project n-randomly selected features on object j onto next frame
-features = [randi([boundingBox(1) boundingBox(3)],nFeatures,1),...
-    randi([boundingBox(2) boundingBox(4)],nFeatures,1)];
+features = [randi([boundingBox(2) boundingBox(4)],nFeatures,1),...
+    randi([boundingBox(1) boundingBox(3)],nFeatures,1)];
 if display
     figure
-    imshow(segmentationI)
+    imshow(rgbI)
     hold on
     scatter(centroidX,centroidY,'filled','bo','LineWidth',10);
     hold on
@@ -67,8 +67,8 @@ if display
     hold on
     plot([boundingBox(3),boundingBox(1)],[boundingBox(2),boundingBox(2)],'r-','LineWidth',2)
     hold on
-    scatter(features(:,1),features(:,2),'rx','LineWidth',2)
-    hold on
+    scatter(features(:,2),features(:,1),'rx','LineWidth',2)
+    hold off
 end
 
 % read camera pose
@@ -77,27 +77,28 @@ lineCell = textscan(fid,'%s',1,'delimiter','\n','headerlines',i+1);
 fclose(fid);
 lineArray = str2num(cell2mat(lineCell{1,1}));
 assert(lineArray(1)==i);
-cameraPoseMatrix = inv(reshape(lineArray(2:end),[4,4])');
+cameraPoseMatrix = reshape(lineArray(2:end),[4,4])';
 fid = fopen(cameraExtrinsicsFile);
 lineCell = textscan(fid,'%s',1,'delimiter','\n','headerlines',i+2);
 fclose(fid);
 lineArray = str2num(cell2mat(lineCell{1,1}));
 assert(lineArray(1)==i+1);
-nextCameraPoseMatrix = inv(reshape(lineArray(2:end),[4,4])');
+nextCameraPoseMatrix = reshape(lineArray(2:end),[4,4])';
 
 nextFrameFeatures = zeros(nFeatures,2);
+skip =0;
 for k=1:size(features,1)
     % get world 3D point
-    pixelRow = features(k,2);
-    pixelCol = features(k,1);
+    pixelRow = features(k,1);
+    pixelCol = features(k,2);
     camera3DPoint = K\[pixelRow;pixelCol;1];
-    camera3DPoint(3) = double(depthI(pixelRow,pixelCol))/100;
-    world3DPoint = cameraPoseMatrix * [camera3DPoint;1];
-    % get object pose in camera frame
+    camera3DPoint = camera3DPoint * double(depthI(pixelRow,pixelCol))/100;
+    world3DPoint = cameraPoseMatrix \ [camera3DPoint;1];
+    % get object pose in last camera frame
     fid = fopen(objectDetectionFile);
     Data = textscan(fid,'%s','delimiter','\n','whitespace',' ');
     cellData = Data{1};
-    cellIndex = strfind(cellData, strcat({num2str(i)},{' '},{classGT(5:end)},{' '},{'Car'}));
+    cellIndex = strfind(cellData, strcat({num2str(i-1)},{' '},{classGT(5:end)},{' '},{'Car'}));
     fclose(fid);
     lineIndex = find(~cellfun('isempty', cellIndex));
     fid = fopen(objectDetectionFile);
@@ -115,12 +116,12 @@ for k=1:size(features,1)
     objectRotationCameraFrame = angle2dcm(yaw,pitch,roll);
     objectPoseCameraFrame = [objectRotationCameraFrame, objectTranslationCameraFrame; 0 0 0 1];
     % transform object pose to world frame
-    objectPoseWorldFrame = cameraPoseMatrix * objectPoseCameraFrame;
-    % extract object pose in next frame
+    objectPoseWorldFrame = cameraPoseMatrix \ objectPoseCameraFrame;
+    % extract object pose in current camera frame
     fid = fopen(objectDetectionFile);
     Data = textscan(fid,'%s','delimiter','\n','whitespace',' ');
     cellData = Data{1};
-    cellIndex = strfind(cellData, strcat({num2str(i+1)},{' '},{classGT(5:end)},{' '},{'Car'}));
+    cellIndex = strfind(cellData, strcat({num2str(i)},{' '},{classGT(5:end)},{' '},{'Car'}));
     fclose(fid);
     lineIndex = find(~cellfun('isempty', cellIndex));
     fid = fopen(objectDetectionFile);
@@ -137,7 +138,7 @@ for k=1:size(features,1)
     nextObjectTranslationCameraFrame = [x3d;y3d;z3d];
     nextObjectRotationCameraFrame = angle2dcm(yaw,pitch,roll);
     nextObjectPoseCameraFrame = [nextObjectRotationCameraFrame, nextObjectTranslationCameraFrame; 0 0 0 1];
-    nextObjectPoseWorldFrame =  nextCameraPoseMatrix * nextObjectPoseCameraFrame;
+    nextObjectPoseWorldFrame =  nextCameraPoseMatrix \ nextObjectPoseCameraFrame;
     % object motion in object Frame
     objectMotionObjectFrame =  objectPoseWorldFrame \ nextObjectPoseWorldFrame;
     % object motion in world frame
@@ -147,23 +148,25 @@ for k=1:size(features,1)
     if objectRGB(1) ~= segmentationI(pixelRow,pixelCol,1)  || ...
         objectRGB(2) ~= segmentationI(pixelRow,pixelCol,2) || ...
         objectRGB(3) ~= segmentationI(pixelRow,pixelCol,3)
-        objectMotionWorldFrame = eye(4);
+        disp('Background pixel, skipping!')
+        skip = 1;
         continue
     end
     movedWorld3DPoint = objectMotionWorldFrame * world3DPoint;
     % project onto next frame
-    nextCamera3DPoint = nextCameraPoseMatrix \ movedWorld3DPoint;
+    nextCamera3DPoint = nextCameraPoseMatrix * movedWorld3DPoint;
     nextCamera3DPoint = nextCamera3DPoint(1:3,1);
     % camera --> image
-    nextImagePoint = K * [nextCamera3DPoint(1);nextCamera3DPoint(2);1];
+    nextImagePoint = K * nextCamera3DPoint;
+    nextImagePoint = nextImagePoint/nextImagePoint(3);
     nextFrameFeatures(k,:) = round(nextImagePoint(1:2,1)'); 
 end
 
-if display
-    nextSegmentationI = imread(strcat(segmentationGTFile,'00',num2str(i+1),'.png'));
+if display && ~skip
+    nextrgbI = imread(strcat(dir,'rgbImages/00',num2str(i+1),'.png'));
     figure
-    imshow(nextSegmentationI)
+    imshow(nextrgbI)
     hold on
-    scatter(nextFrameFeatures(:,1),nextFrameFeatures(:,2),'rx','LineWidth',2)
+    scatter(nextFrameFeatures(:,2),nextFrameFeatures(:,1),'rx','LineWidth',2)
     hold off
 end
