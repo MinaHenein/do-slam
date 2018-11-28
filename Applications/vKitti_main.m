@@ -4,10 +4,11 @@
 %--------------------------------------------------------------------------
 % vKitti main
 % 1. Config
+objectPosesMatrix = 'objPose_0001_334_425.mat';
 % objectPosesMatrix = 'objectCameraPoses_vKittiScene0001.mat';
-% [objectsGTMotion, objectsGTFrames] = vKitti_objectMotion(objectPosesMatrix);
-% constantSE3ObjectMotion = vKitti_objectMotionAveraged(objectPosesMatrix);
-% nObjects = size(constantSE3ObjectMotion,2);
+[objectsGTMotion, objectsGTFrames] = vKitti_objectMotion(objectPosesMatrix);
+constantSE3ObjectMotion = vKitti_objectMotionAveraged(objectPosesMatrix);
+nObjects = size(constantSE3ObjectMotion,2);
 
 config = CameraConfig();
 config = setAppConfig(config);

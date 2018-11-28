@@ -2,7 +2,6 @@ function [residual] = computeResidual(obj,config,iEdge,measurement)
 %COMPUTERESIDUAL computes residual from an edge
 %   Depends on edge type. Residual computed from edge value and observation
 %   value.
-
 switch obj.edges(iEdge).type
     case 'posePrior'
         residual = config.absoluteToRelativePoseHandle(measurement,obj.edges(iEdge).value);
@@ -33,7 +32,7 @@ switch obj.edges(iEdge).type
         residual = zeros(3,1) - obj.edges(iEdge).value;
     case '2points-SE3Motion'
 %         residual = measurement - obj.edges(iEdge).value;
-        residual = zeros(3,1) - obj.edges(iEdge).value;   
+        residual = zeros(3,1) - obj.edges(iEdge).value;
     case 'point-plane'
         residual = measurement - obj.edges(iEdge).value;
     case 'point-rectangle'

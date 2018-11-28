@@ -4,36 +4,36 @@ GTFileName = config.groundTruthFileName;
 filepath = strcat(config.folderPath,config.sep,'Data',...
     config.sep,config.graphFileFolderName,config.sep,GTFileName);
 
-% re-order data association entries by object
-fileID = fopen(filepath,'r');
-Data = textscan(fileID, '%s', 'delimiter', '\n', 'whitespace',' ');
-CStr = Data{1};
-fclose(fileID);
-IndexC = strfind(CStr, 'DataAssociation');
-Index = find(~cellfun('isempty', IndexC));
-DataAssociation = CStr(Index);
-tempFilePath = 'Data/Temp/rearrangeVertices.txt';
-tempFileID = fopen(tempFilePath,'w');
-for i=1:numel(DataAssociation)
-    fprintf(tempFileID,[DataAssociation{i} '\n']);
-end
-fclose(tempFileID);
-tempFileID = fopen(tempFilePath,'r');
-a = textscan(tempFileID,'%s %d %d %d','delimiter',' ');
-b = cell2mat(a(2:end));
-fclose(tempFileID);
-c = sortrows(b,3);
-CStr(Index) = [];
-fileID = fopen(filepath, 'w');
-fprintf(fileID, '%s\n', CStr{:});
-fclose(fileID);
-fileID = fopen(filepath,'a');
-for i=1:size(c,1)
-    fprintf(fileID,'%s %d %d %d \n','2POINTS_DataAssociation',...
-        c(i,1),c(i,2),c(i,3));
-end
-fclose(fileID);
-delete Data/Temp/rearrangeVertices.txt;
+% % re-order data association entries by object
+% fileID = fopen(filepath,'r');
+% Data = textscan(fileID, '%s', 'delimiter', '\n', 'whitespace',' ');
+% CStr = Data{1};
+% fclose(fileID);
+% IndexC = strfind(CStr, 'DataAssociation');
+% Index = find(~cellfun('isempty', IndexC));
+% DataAssociation = CStr(Index);
+% tempFilePath = 'Data/Temp/rearrangeVertices.txt';
+% tempFileID = fopen(tempFilePath,'w');
+% for i=1:numel(DataAssociation)
+%     fprintf(tempFileID,[DataAssociation{i} '\n']);
+% end
+% fclose(tempFileID);
+% tempFileID = fopen(tempFilePath,'r');
+% a = textscan(tempFileID,'%s %d %d %d','delimiter',' ');
+% b = cell2mat(a(2:end));
+% fclose(tempFileID);
+% c = sortrows(b,3);
+% CStr(Index) = [];
+% fileID = fopen(filepath, 'w');
+% fprintf(fileID, '%s\n', CStr{:});
+% fclose(fileID);
+% fileID = fopen(filepath,'a');
+% for i=1:size(c,1)
+%     fprintf(fileID,'%s %d %d %d \n','2POINTS_DataAssociation',...
+%         c(i,1),c(i,2),c(i,3));
+% end
+% fclose(fileID);
+% delete Data/Temp/rearrangeVertices.txt;
 
 fileID = fopen(filepath,'r');
 Data = textscan(fileID,'%s','delimiter','\n','whitespace',' ');
@@ -157,21 +157,21 @@ MeasurementsFileName = config.measurementsFileName;
 filepath = strcat(config.folderPath,config.sep,'Data',...
     config.sep,config.graphFileFolderName,config.sep,MeasurementsFileName);
 
-fileID = fopen(filepath,'r');
-Data = textscan(fileID, '%s', 'delimiter', '\n', 'whitespace', '');
-CStr = Data{1};
-fclose(fileID);
-IndexC = strfind(CStr, 'DataAssociation');
-% find lines with a DataAssociation entry
-Index = find(~cellfun('isempty', IndexC));
-IndexOriginal = find(cellfun('isempty',IndexC));
-DataNew = Data{1}([IndexOriginal; Index]); % new data with resorted vertexes
-% rewrite file with  new indexes
-fileID = fopen(filepath,'w');
-for i=1:numel(DataNew)
-    fprintf(fileID,[DataNew{i} '\n']);
-end
-fclose(fileID);
+% fileID = fopen(filepath,'r');
+% Data = textscan(fileID, '%s', 'delimiter', '\n', 'whitespace', '');
+% CStr = Data{1};
+% fclose(fileID);
+% IndexC = strfind(CStr, 'DataAssociation');
+% % find lines with a DataAssociation entry
+% Index = find(~cellfun('isempty', IndexC));
+% IndexOriginal = find(cellfun('isempty',IndexC));
+% DataNew = Data{1}([IndexOriginal; Index]); % new data with resorted vertexes
+% % rewrite file with  new indexes
+% fileID = fopen(filepath,'w');
+% for i=1:numel(DataNew)
+%     fprintf(fileID,[DataNew{i} '\n']);
+% end
+% fclose(fileID);
 
 fileID = fopen(filepath,'r');
 Data = textscan(fileID,'%s','delimiter','\n','whitespace',' ');

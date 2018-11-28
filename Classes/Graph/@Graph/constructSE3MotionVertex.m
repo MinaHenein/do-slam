@@ -64,7 +64,7 @@ else
     SE3Motion = [0 0 0 0 0 0]';
     disp('using default motion vertex initialization as eye')
 end
-    
+
 %% 3. vertex properties
 value = SE3Motion;
 covariance = []; %not using this property yet

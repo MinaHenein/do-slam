@@ -102,7 +102,7 @@ assert(all(abs(round(lastImagePoint(1:2,1))-[pixelRow;pixelCol])<tol))
 assert(abs(lastImagePointDepth-pixelDepth/100)<tol)
 
 if display
-   figure(3);
+   figure(4);
    imshow(rgbI)
    hold on
    scatter(lastImagePoint(2),lastImagePoint(1),'rx','LineWidth',4);

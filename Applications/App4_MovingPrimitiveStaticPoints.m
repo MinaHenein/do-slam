@@ -51,22 +51,22 @@ sensor.setVisibility(config,environment);
 % spy(sensor.get('pointVisibility'));
 
 %% 4. Plot Environment
-% figure
-% hold on
-% grid on
-% axis equal
-% viewPoint = [-50,25];
-% axisLimits = [-5,30,-5,20,-5,20];
-% axis equal
-% xlabel('x')
-% ylabel('y')
-% zlabel('z')
-% view(viewPoint)
-% axis(axisLimits)
-% primitiveTrajectory.plot(t,[0 0 0],'axesOFF')
-% cameraTrajectory.plot(t,[0 1 1],'axesOFF')
-% frames = sensor.plot(t(1),environment);
-% % implay(frames);
+figure
+hold on
+grid on
+axis equal
+viewPoint = [-50,25];
+axisLimits = [-5,30,-5,20,-5,20];
+axis equal
+xlabel('x')
+ylabel('y')
+zlabel('z')
+view(viewPoint)
+axis(axisLimits)
+primitiveTrajectory.plot(t,[0 0 0],'axesOFF')
+cameraTrajectory.plot(t,[0 1 1],'axesOFF')
+frames = sensor.plot(t,environment);
+implay(frames);
 
     %% 4.a output video
     % add code here for that

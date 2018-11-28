@@ -1,4 +1,4 @@
-function results = computeStaticMapError(graphGT,graphN)
+function results = computeDynamicMapError(graphGT,graphN)
 % poses
 posesN = [graphN.vertices(graphN.identifyVertices('pose')).value];
 posesGT = [graphGT.vertices(graphGT.identifyVertices('pose')).value];
@@ -9,32 +9,31 @@ SE3MotionVertices = [graphN.identifyVertices('SE3Motion')];
 edgesConnectedToMotionVertices = [graphN.vertices(SE3MotionVertices).iEdges];
 dynamicPointsMotionIndices = [graphN.edges(edgesConnectedToMotionVertices).iVertices]';
 dynamicPointsIndices = setdiff(dynamicPointsMotionIndices,SE3MotionVertices);
-allPointsIndices = [graphN.identifyVertices('point')];
-staticPointsN = [graphN.vertices(setdiff(allPointsIndices,dynamicPointsIndices))];
+dynamicPointsN = graphN.vertices(dynamicPointsIndices);
 
-staticPointsGT = zeros(3,length(staticPointsN));
-for i=1:length(staticPointsN)
-   staticPointsGT(:,i) = [graphGT.vertices(staticPointsN(i).index).value];
+dynamicPointsGT = zeros(3,length(dynamicPointsN));
+for i=1:length(dynamicPointsN)
+   dynamicPointsGT(:,i) = [graphGT.vertices(dynamicPointsN(i).index).value];
 end
-staticPointsN = [graphN.vertices(setdiff(allPointsIndices,dynamicPointsIndices)).value];
+dynamicPointsN = [graphN.vertices(dynamicPointsIndices).value];
 
 T_point = poseToTransformationMatrix(v_rel_pose);
-for i= 1:size(staticPointsN,2)
-    point = T_point * [staticPointsN(1:3,i);1];
-    staticPointsN(1:3,i) = point(1:3,1);
+for i= 1:size(dynamicPointsN,2)
+    point = T_point * [dynamicPointsN(1:3,i);1];
+    dynamicPointsN(1:3,i) = point(1:3,1);
 end
 
 %% 1. Point Error
 %ASE
 [ASE_translation_error,ASE_squared_translation_error] = ...
-    Compute_AbsoluteStructurePointsError(staticPointsN,staticPointsGT);
+    Compute_AbsoluteStructurePointsError(dynamicPointsN,dynamicPointsGT);
 %RPTE
 n_delta = 1;
 [RPTE_translation_error, RPTE_squared_translation_error] = ...
-    Compute_RelativePointError(staticPointsN,staticPointsGT,n_delta);
+    Compute_RelativePointError(dynamicPointsN,dynamicPointsGT,n_delta);
 %AARPTE
 [AARPTE_translation_error,AARPTE_squared_translation_error] = ...
-    Compute_RelativePointError_AllToAll(staticPointsN,staticPointsGT);
+    Compute_RelativePointError_AllToAll(dynamicPointsN,dynamicPointsGT);
 
 
 results.ASE_translation_error               = ASE_translation_error;

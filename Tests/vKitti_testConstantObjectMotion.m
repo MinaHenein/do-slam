@@ -5,7 +5,7 @@
 % VKITTI_TESTCONSTANTOBJECTMOTION
 % Testing if the object motion of the objects in vKitti is constant
 %--------------------------------------------------------------------------
-objectPosesMatrix = 'objectCameraPoses_vKittiScene0001.mat';
+objectPosesMatrix = 'objPose_0001_334_425.mat';
 objectCameraPoses = load(objectPosesMatrix);
 objectCameraPoses = objectCameraPoses.objPose;
 
@@ -18,7 +18,7 @@ for i=1:nObjects
     cameraPoses = objectCameraPoses(i).cameraPose;
     objectPosesWorldFrame = zeros(size(objectPoses));
     for j=1:size(objectPoses,1)/4
-        cameraPoseWorldFrame = Rot/cameraPoses(mapping(j,4),:)/Rot;
+        cameraPoseWorldFrame = inv(cameraPoses(mapping(j,4),:));
         objectPosesWorldFrame(mapping(j,4),:) = ...
             cameraPoseWorldFrame*objectPoses(mapping(j,4),:);
     end
@@ -51,7 +51,7 @@ for i=1:nObjects
     cameraPoses = objectCameraPoses(i).cameraPose;
     objectPosesWorldFrame = zeros(size(objectPoses));
     for j=1:size(objectPoses,1)/4
-        cameraPoseWorldFrame = Rot/cameraPoses(mapping(j,4),:)/Rot;
+        cameraPoseWorldFrame = inv(cameraPoses(mapping(j,4),:));
         objectPosesWorldFrame(mapping(j,4),:) = ...
             cameraPoseWorldFrame*objectPoses(mapping(j,4),:);
     end

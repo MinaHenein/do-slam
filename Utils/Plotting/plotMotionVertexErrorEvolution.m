@@ -24,7 +24,7 @@ for i=1:nObjects
         graph = solver(j).graphs(end);
         motionVertices = [graph.vertices(graph.identifyVertices('SE3Motion')).value];
         objectMotion = motionVertices(:,i);
-        indx = find(cell2mat(objectsGTFrames(i))==j);
+        indx = find(cell2mat(objectsGTFrames(i))==j+334);
         if j > size(objectGTMotion,2) 
             relativeMotion = AbsoluteToRelativePoseR3xso3(objectMotion,objectGTMotion(:,end));
         else

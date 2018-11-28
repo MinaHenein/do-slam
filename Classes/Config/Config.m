@@ -141,6 +141,7 @@ classdef Config < ArrayGetSet
         intrinsicVertexLabel
         
         % general settings
+        mode
         displayProgress
         plotPlanes
         plotIncremental

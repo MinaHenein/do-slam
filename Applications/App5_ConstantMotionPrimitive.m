@@ -48,7 +48,7 @@ end
 
 % construct primitive trajectory
 primitiveInitialPose_R3xso3 = [10 0 0 0 0 0.2]';
-primitiveMotion_R3xso3 = [0.0001*dt; 0; 0; arot(eul2rot([0.05*dt,0,0.005*dt]))];%arot(eul2rot([0.05*dt,0,0.005*dt]))
+primitiveMotion_R3xso3 = [1.5*dt; 0; 0; arot(eul2rot([0.05*dt,0,0.005*dt]))];
 primitiveTrajectory = ConstantMotionDiscretePoseTrajectory(t,primitiveInitialPose_R3xso3,primitiveMotion_R3xso3,'R3xso3');
 
 % construct  robot trajectories
@@ -107,7 +107,6 @@ sensor.setVisibility(config,environment);
 % close(v)
 
 %% 5. Generate Measurements & Save to Graph File, load graph file as well
-
 config.set('constantSE3Motion',constantSE3ObjectMotion);
     %% 5.1 For initial (without SE3)
     config.set('pointMotionMeasurement','Off')
