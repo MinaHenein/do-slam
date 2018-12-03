@@ -11,8 +11,8 @@ loopClosure = 1;
 % time
 t0 = 0;
 if loopClosure
-    nSteps = 151;
-    tN = 150;
+    nSteps = 11;
+    tN = 10;
 else
     nSteps = 121;
     tN = 120;
@@ -36,7 +36,7 @@ config.set('newMotionVertexPerNLandmarks',inf);
 config.set('landmarksSlidingWindowSize',inf);
 config.set('objectPosesSlidingWindow',false);
 config.set('objectPosesSlidingWindowSize',inf);
-config.set('newMotionVertexPerNObjectPoses',2);
+config.set('newMotionVertexPerNObjectPoses',inf);
 config.set('pointMotionMeasurement','point2DataAssociation');
 config.set('pointsDataAssociationLabel','2PointsDataAssociation');
 
@@ -147,11 +147,16 @@ resultsCell = graphFileToCell(config,'Test_DynamciSLAM_results.graph');
 plotGraphFile(config,resultsCell,[1 0 0])
 
 % plot motion vertices errors in Global and Body-fixed frames
+plotMotionErrorvsEye = 1;
+
 motionIndices = graphN.identifyVertices('SE3Motion');
 GTObjectMotion = primitiveTrajectory.RelativePoseGlobalFrameR3xso3(t(1),t(2));
 % global frame
 for i=1:length(motionIndices)
    motionVertexValue = graphN.vertices(motionIndices(i)).value;
+   if plotMotionErrorvsEye
+      motionVertexValue =  zeros(6,1);
+   end
    [tr_error, rot_error] = computeObjectTrajectoryError(GTObjectMotion,motionVertexValue);
    translation_error(i) = tr_error;
    rotation_error(i) = rot_error;
@@ -163,6 +168,9 @@ for i=1:length(motionIndices)
    motionVertexValue = graphN.vertices(motionIndices(i)).value;
    objectPose = poseToTransformationMatrix(primitiveTrajectory.get('R3xso3Pose',t(i+1)));
    objectMotionInObjectFrame = objectPose\poseToTransformationMatrix(motionVertexValue)*objectPose;
+   if plotMotionErrorvsEye
+       objectMotionInObjectFrame =  eye(4);
+   end
    [tr_error, rot_error] = computeObjectTrajectoryError(GTObjectMotionObjectFrame,...
       transformationMatrixToPose(objectMotionInObjectFrame));
    translation_error(i) = tr_error;
@@ -195,6 +203,9 @@ for i=1:length(motionIndices)
    motionVertexValue = graphN.vertices(motionIndices(i)).value;
    objectPose = poseToTransformationMatrix(objPoses(:,i+1));
    objectMotionInObjectFrame = objectPose\poseToTransformationMatrix(motionVertexValue)*objectPose;
+   if plotMotionErrorvsEye
+       objectMotionInObjectFrame =  eye(4);
+   end
    [tr_error, rot_error] = computeObjectTrajectoryError(GTObjectMotionObjectFrame,...
       transformationMatrixToPose(objectMotionInObjectFrame));
    translation_error(i) = tr_error;

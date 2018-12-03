@@ -6,10 +6,10 @@ function [obj] = constructPointVertex(obj,config,edgeRow)
 edgeLabel = edgeRow{1};
 edgeIndex = edgeRow{2};
 if strcmp(config.landmarkErrorToMinimize,'reprojection')
-posePointVertexes = edgeRow{3};
-poseVertex = posePointVertexes(1);
-pointVertex = posePointVertexes(2);
-intrinsicVertex = edgeRow{4};
+    posePointVertexes = edgeRow{3};
+    poseVertex = posePointVertexes(1);
+    pointVertex = posePointVertexes(2);
+    intrinsicVertex = edgeRow{4};
 else
     poseVertex = edgeRow{3};
     pointVertex = edgeRow{4};
@@ -29,12 +29,15 @@ edgeCovariance = edgeRow{6};
 %% 2. compute point position
 pose = obj.vertices(poseVertex).value;
 if strcmp(config.landmarkErrorToMinimize,'reprojection')
-intrinsics = obj.vertices(intrinsicVertex).value;
+    intrinsics = obj.vertices(intrinsicVertex).value;
+elseif strcmp(config.landmarkErrorToMinimize,'reprojectionKnownIntrinsics')
+    intrinsics = config.intrinsics;
 end
 positionRelative = edgeValue;
 switch config.cameraPointParameterisation
     case 'euclidean'
-          if strcmp(config.landmarkErrorToMinimize,'reprojection')
+          if strcmp(config.landmarkErrorToMinimize,'reprojection') || ...
+                  strcmp(config.landmarkErrorToMinimize,'reprojectionKnownIntrinsics')
             positionAbsolute = config.relativeToAbsolutePointHandle(pose,positionRelative,intrinsics);
           else
             positionAbsolute = config.relativeToAbsolutePointHandle(pose,positionRelative);

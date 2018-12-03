@@ -90,14 +90,15 @@ for k=1:size(features,1)
     % get world 3D point
     pixelRow = features(k,1);
     pixelCol = features(k,2);
-    camera3DPoint = K\[pixelRow;pixelCol;1];
+    camera3DPoint = K\[pixelCol;pixelRow;1];
+    camera3DPoint(3) = 1;   
     camera3DPoint(3) = double(depthI(pixelRow,pixelCol))/100;
     world3DPoint = cameraPoseMatrix * [camera3DPoint;1];
     % get object pose in last camera frame
     fid = fopen(objectDetectionFile);
     Data = textscan(fid,'%s','delimiter','\n','whitespace',' ');
     cellData = Data{1};
-    cellIndex = strfind(cellData, strcat({num2str(i-1)},{' '},{classGT(5:end)},{' '},{'Car'}));
+    cellIndex = strfind(cellData, strcat({num2str(i)},{' '},{classGT(5:end)},{' '},{'Car'}));
     fclose(fid);
     lineIndex = find(~cellfun('isempty', cellIndex));
     fid = fopen(objectDetectionFile);
@@ -120,7 +121,7 @@ for k=1:size(features,1)
     fid = fopen(objectDetectionFile);
     Data = textscan(fid,'%s','delimiter','\n','whitespace',' ');
     cellData = Data{1};
-    cellIndex = strfind(cellData, strcat({num2str(i)},{' '},{classGT(5:end)},{' '},{'Car'}));
+    cellIndex = strfind(cellData, strcat({num2str(i+1)},{' '},{classGT(5:end)},{' '},{'Car'}));
     fclose(fid);
     lineIndex = find(~cellfun('isempty', cellIndex));
     fid = fopen(objectDetectionFile);
@@ -154,7 +155,8 @@ for k=1:size(features,1)
     nextCamera3DPoint = nextCameraPoseMatrix \ movedWorld3DPoint;
     nextCamera3DPoint = nextCamera3DPoint(1:3,1);
     % camera --> image
-    nextImagePoint = K * [nextCamera3DPoint(1);nextCamera3DPoint(2);1];
+    nextImagePoint = K * nextCamera3DPoint;
+    nextImagePoint = nextImagePoint/nextImagePoint(3);
     nextFrameFeatures(k,:) = round(nextImagePoint(1:2,1)'); 
 end
 

@@ -9,6 +9,9 @@ function [solver, solverDynamic] = processIncrementalParallelStatic(obj,config,m
 
 
 [~, dynamicPointIndices] = staticDynamicPointIndices(config);
+if strcmp(config.mode,'parallel')
+     graphDynamic = Graph();
+end
 %% 1. Plot incrementally
 if config.plotIncremental
     %movie
@@ -73,9 +76,14 @@ edgeCount = 0;
 
 %store each step
 solver = [];
+solverDynamic = [];
+
+%% only missing thing is to copy poses from static to dynamic graphs
 
 %loop over nSteps
 nSteps = numel(odometryRows) + 1;
+staticMeasurementsCell = measurementsCell;
+nDeleted = 0;
 for i = 1:nSteps
     %identify rows from this time step
     %add elements so formula for iRows works for first and last steps
@@ -85,8 +93,7 @@ for i = 1:nSteps
     
     %loop over rows
     for j = 1:nRows
-        jRow = measurementsCell(iRows(j),:);
-        
+        jRow = measurementsCell(iRows(j),:);        
         switch jRow{1}
             case config.posePriorEdgeLabel %posePrior
                 %edge index
@@ -100,14 +107,36 @@ for i = 1:nSteps
                 jRow{2} = obj.nEdges+1;
                 %construct pose vertex
                 obj = obj.constructPoseVertex(config,jRow);
+                %copy last pose vertex from obj to graphDynamic
+                staticGraphPosesIndices  = obj.identifyVertices('pose');
+                lastPoseVertex = obj.vertices(staticGraphPosesIndices(end));
+                graphDynamic.vertices(lastPoseVertex.index) = lastPoseVertex;
+                % update poses vertices values in graphDynamic
+                for m = 1:length(staticGraphPosesIndices)-1
+                    graphDynamic.vertices(staticGraphPosesIndices(m)).value = ...
+                        obj.vertices(staticGraphPosesIndices(m)).value; 
+                end
                 %construct pose-pose edge
                 obj = obj.constructPosePoseEdge(config,jRow);
             case config.posePointEdgeLabel
                 if ismember(jRow{4},dynamicPointIndices)
+                    staticMeasurementsCell(iRows(j)-nDeleted,:) = [];
+                    nDeleted = nDeleted + 1;
                     measurementsCellDynamic{end+1,1} = jRow;
+                else
+                    %edge index
+                    jRow{2} = obj.nEdges+1;
+                    %create point vertex if it doesn't exist
+                    if jRow{4} > obj.nVertices || isempty(obj.vertices(jRow{4}).type)
+                        obj = obj.constructPointVertex(config,jRow);
+                    end
+                    %construct pose-point edge
+                    obj = obj.constructPosePointEdge(config,jRow);
                 end  
             case config.pointPointEdgeLabel
                  if ismember(jRow{3},dynamicPointIndices) || ismember(jRow{4},dynamicPointIndices)
+                    staticMeasurementsCell(iRows(j)-nDeleted,:) = [];
+                    nDeleted = nDeleted + 1;
                     measurementsCellDynamic{end+1,1} = jRow;
                  else
                     %edgeIndex
@@ -117,6 +146,8 @@ for i = 1:nSteps
                  end
             case config.pointPlaneEdgeLabel
                 if ismember(jRow{3},dynamicPointIndices)
+                    staticMeasurementsCell(iRows(j)-nDeleted,:) = [];
+                    nDeleted = nDeleted + 1;
                     measurementsCellDynamic{end+1,1} = jRow;
                 else
                     %edge index
@@ -132,14 +163,18 @@ for i = 1:nSteps
                     obj = obj.constructPointPlaneEdge(config,jRow);
                 end
             case config.pointSE3MotionEdgeLabel
-            dynamicPoints = jRow{3};
+                dynamicPoints = jRow{3};
                 assert(ismember(dynamicPoints(1),dynamicPointIndices));
                 assert(ismember(dynamicPoints(2),dynamicPointIndices));
+                staticMeasurementsCell(iRows(j)-nDeleted,:) = [];
+                nDeleted = nDeleted + 1;
                 measurementsCellDynamic{end+1,1} = jRow;
             case config.pointsDataAssociationLabel
                 dynamicPoints = jRow{3};
                 assert(ismember(dynamicPoints(1),dynamicPointIndices));
                 assert(ismember(dynamicPoints(2),dynamicPointIndices));
+                staticMeasurementsCell(iRows(j)-nDeleted,:) = [];
+                nDeleted = nDeleted + 1;
                 measurementsCellDynamic{end+1,1} = jRow;
             case config.planePriorEdgeLabel
                 %edge index
@@ -208,7 +243,7 @@ for i = 1:nSteps
         end
 
         %reorder vertices and edges
-        measurementsCellCurrent = measurementsCell;
+        measurementsCellCurrent = staticMeasurementsCell;
         if config.sortVertices
             [obj,newToOldVertices,measurementsCellCurrent] = sortVertices(obj,measurementsCellCurrent);
         end
@@ -242,7 +277,8 @@ for i = 1:nSteps
         storePlot = 1;
 %         solver = iSolver; %if memory is problem
         if ~isempty(measurementsCellDynamic)
-            [solverDynamic] = processIncrementalParallelDynamic(obj,config,measurementsCellDynamic,groundTruthCell)
+            [iSolverDynamic] = graphDynamic.processIncrementalParallelDynamic(config,measurementsCellDynamic,groundTruthCell);
+            solverDynamic = [solverDynamic iSolverDynamic];
         end
     else
         skipCount = skipCount + 1;

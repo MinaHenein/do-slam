@@ -12,7 +12,7 @@ for i = 1:obj.nEdges
         case 'pose-point'
             edgeUpdater = @updatePosePointEdge;
         case 'pose-point-intrinsic'
-            edgeUpdater = @updatePosePointIntrinsicEdge; 
+            edgeUpdater = @updatePosePointIntrinsicEdge;
         case 'point-point'
             edgeUpdater = @updatePointPointEdge;
         case 'point-pointSE3'

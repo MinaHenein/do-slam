@@ -1,4 +1,4 @@
-function [solver, solverDynamic] = process(obj,config,measurementsCell,groundTruthCell,varargin)
+function [solver] = process(obj,config,measurementsCell,groundTruthCell,varargin)
 %PROCESS processes measurements in batch or incremental and solves
 %   processing is decided either by user input or config
 %   allowing user to quickly change processing without altering config is
@@ -19,7 +19,8 @@ switch processing
         solver = obj.processBatch(config,measurementsCell,groundTruthCell);
     case 'incremental'
         if strcmp(config.mode,'parallel')
-            [solver, solverDynamic] = obj.processIncrementalParallelStatic(config,measurementsCell,groundTruthCell);
+            [solverStatic, solverDynamic] = obj.processIncrementalParallelStatic(config,measurementsCell,groundTruthCell);
+            solver = [solverStatic, solverDynamic];
         else
             solver = obj.processIncremental(config,measurementsCell,groundTruthCell);
         end

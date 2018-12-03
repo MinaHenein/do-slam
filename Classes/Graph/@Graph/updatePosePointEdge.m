@@ -14,7 +14,12 @@ if obj.edges(iEdge).active
             pose          = obj.vertices(poseVertex).value;
             pointPosition = obj.vertices(pointVertex).value;
             %edge value - expected measurement from vertices
-            pointPositionRelative = config.absoluteToRelativePointHandle(pose,pointPosition);
+            if strcmp(config.landmarkErrorToMinimize,'reprojectionKnownIntrinsics')
+                pointPositionRelative = AbsoluteToRelativePositionR3xso3Image(pose,...
+                    pointPosition, config.intrinsics);
+            else
+                pointPositionRelative = config.absoluteToRelativePointHandle(pose,pointPosition);
+            end
             %         pointPositionRelative = AbsoluteToRelativePosition(pose,pointPosition);
             %         pointPositionRelative = AbsolutePoint2RelativePoint3D(pose,pointPosition);
             value = pointPositionRelative;

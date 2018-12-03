@@ -3,10 +3,11 @@
 % Testing dynamic parallel SLAM + MOT
 %--------------------------------------------------------------------------
 %% 1. Config
+loopClosure = 1;
 % time
 t0 = 0;
-nSteps = 151;
-tN = 150;
+nSteps = 21;
+tN = 20;
 dt = (tN-t0)/(nSteps-1);
 t  = linspace(t0,tN,nSteps);
 
@@ -107,11 +108,12 @@ totalTime = toc(timeStart);
 fprintf('\nTotal time solving: %f\n',totalTime)
 
 %get desired graphs & systems
+graph0  = solverEnd.graphs(1);
 graphNStatic  = solverStaticEnd.graphs(end);
 graphNDynamic = solverDynamicEnd.graphs(end);
 
-posesStatic  = [graphNStatic.vertices(graphNStatic.identifyVertices('pose')).value];
-posesDynamic  = [graphNDynamic.vertices(graphNDynamic.identifyVertices('pose')).value];
+posesStatic  = graphNStatic.identifyVertices('pose')
+
 %save results to graph file
 graphN.saveGraphFile(config,'Test_DynamciSLAM_results.graph');
 

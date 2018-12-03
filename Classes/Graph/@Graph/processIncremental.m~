@@ -153,7 +153,7 @@ for i = 1:nSteps
                     jRow{1} = config.pointVelocityEdgeLabel;
                 end
                 %edge index
-                jRow{2} = obj.nEdges + 1;
+                jRow{2} = obj.nEdges + 1 + nMotionEdgesToBeInitialised;
                 %create velocity vertex if it doesn't exist
                 if jRow{4} > obj.nVertices || isempty(obj.vertices(jRow{4}).type)
                     %find all point vertices connected to this SE3 vertex
@@ -184,9 +184,10 @@ for i = 1:nSteps
                     jRow{6} = covToUpperTriVec(config.cov2PointsSE3Motion);
                     % save edges to initialise later
                     if nDataAssociationEdgesWithinThisTimeStep == 1
-                        nMotionEdgesToBeInitialised = 1; 
+                        nMotionEdgesToBeInitialised = nMotionEdgesToBeInitialised+1; 
                         motionEdgesToInitialise = jRow;
                     else
+                        nMotionEdgesToBeInitialised = nMotionEdgesToBeInitialised+1;
                         motionEdgesToInitialise = [motionEdgesToInitialise;jRow];
                     end
                     if nReobservedDynamicPoints(jRow{4}) == 3
@@ -246,7 +247,7 @@ for i = 1:nSteps
                 obj = constructDistanceEdge(config,jRow);
             case config.fixedDistanceEdgeLabel
                 %edge index
-                jRow{2} = obj.nEdges+1+ nMotionEdgesToBeInitialised;
+                jRow{2} = obj.nEdges+1;
                 obj = obj.constructFixedDistanceEdge(config,jRow);
             otherwise; error('%s type invalid',label)
         end

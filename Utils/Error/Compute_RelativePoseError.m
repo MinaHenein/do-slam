@@ -1,5 +1,5 @@
 function [r_f_translation_error,r_f_rotation_error,...
-    r_f_squared_translation_error,r_f_squared_rotation_error, rotError] = ...
+    r_f_squared_translation_error,r_f_squared_rotation_error,trError,rotError] = ...
     Compute_RelativePoseError(est_vertices,gt_vertices,v_rel_pose,n_delta)
 
 assert(n_delta > 0); 
@@ -17,7 +17,8 @@ f_deg_per_rad = 180/pi;
 assert(isequal(size(est_vertices),size(gt_vertices)));
 n = size(est_vertices,2);
 
-rotError = zeros(n,1);
+trError  = zeros(n-1,1);
+rotError = zeros(n-1,1);
 
 for i = 1:n
     
@@ -38,9 +39,10 @@ for i = 1:n
         v_error = AbsoluteToRelativePoseR3xso3(v_edge_est, v_edge_gt);
         f_trans_error2 = norm(v_error(1:3))^2;
         r_f_translation_error = r_f_translation_error + sqrt(f_trans_error2);
+        trError(i-1,1) = sqrt(f_trans_error2);
         r_f_squared_translation_error = r_f_squared_translation_error + f_trans_error2;
         f_rot_error_degrees = wrapToPi(norm(v_error(4:6))) * f_deg_per_rad;
-        rotError(i,1) = f_rot_error_degrees;
+        rotError(i-1,1) = f_rot_error_degrees;
         r_f_rotation_error = r_f_rotation_error + f_rot_error_degrees;
         r_f_squared_rotation_error = r_f_squared_rotation_error + f_rot_error_degrees * f_rot_error_degrees;
         

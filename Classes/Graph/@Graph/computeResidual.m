@@ -5,20 +5,20 @@ function [residual] = computeResidual(obj,config,iEdge,measurement)
 switch obj.edges(iEdge).type
     case 'posePrior'
         residual = config.absoluteToRelativePoseHandle(measurement,obj.edges(iEdge).value);
-%         residual = AbsoluteToRelativePose(measurement,obj.edges(iEdge).value);
-%         residual = Absolute2RelativeSE3(measurement,obj.edges(iEdge).value);
+        %         residual = AbsoluteToRelativePose(measurement,obj.edges(iEdge).value);
+        %         residual = Absolute2RelativeSE3(measurement,obj.edges(iEdge).value);
     case 'pose-pose'
         pose1 = obj.vertices(obj.edges(iEdge).iVertices(1)).value;
         pose2 = obj.vertices(obj.edges(iEdge).iVertices(2)).value;
         measurementPredicted = config.absoluteToRelativePoseHandle(pose1,pose2);
-%         pose2Predicted = config.relativeToAbsolutePoseHandle(pose1,measurement);
-%         pose2Predicted = RelativeToAbsolutePose(pose1,measurement);
-%         pose2Predicted = Relative2AbsoluteSE3(pose1,measurement);
-%         residual = config.absoluteToRelativePoseHandle(pose2Predicted,pose2);
-%         residual = AbsoluteToRelativePose(pose2Predicted,pose2);
-%         residual = Absolute2RelativeSE3(pose2Predicted,pose2);
+        %         pose2Predicted = config.relativeToAbsolutePoseHandle(pose1,measurement);
+        %         pose2Predicted = RelativeToAbsolutePose(pose1,measurement);
+        %         pose2Predicted = Relative2AbsoluteSE3(pose1,measurement);
+        %         residual = config.absoluteToRelativePoseHandle(pose2Predicted,pose2);
+        %         residual = AbsoluteToRelativePose(pose2Predicted,pose2);
+        %         residual = Absolute2RelativeSE3(pose2Predicted,pose2);
         residual = config.absoluteToRelativePoseHandle(measurementPredicted,measurement);
-%         residual = config.absoluteToRelativePoseHandle(measurement,measurementPredicted);
+        %         residual = config.absoluteToRelativePoseHandle(measurement,measurementPredicted);
     case {'pose-point','pose-point-intrinsic'}
         residual = measurement - obj.edges(iEdge).value;
     case 'point-point'
@@ -28,10 +28,10 @@ switch obj.edges(iEdge).type
     case '3-points'
         residual = measurement - obj.edges(iEdge).value;
     case '2points-velocity'
-%         residual = measurement - obj.edges(iEdge).value;
+        %         residual = measurement - obj.edges(iEdge).value;
         residual = zeros(3,1) - obj.edges(iEdge).value;
     case '2points-SE3Motion'
-%         residual = measurement - obj.edges(iEdge).value;
+        %         residual = measurement - obj.edges(iEdge).value;
         residual = zeros(3,1) - obj.edges(iEdge).value;
     case 'point-plane'
         residual = measurement - obj.edges(iEdge).value;
@@ -57,6 +57,4 @@ switch obj.edges(iEdge).type
     otherwise
         error('error: %s edge type not implemented',obj.edges(iEdge).type)
 end
-
 end
-    
