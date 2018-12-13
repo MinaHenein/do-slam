@@ -29,6 +29,9 @@ classdef Config < ArrayGetSet
         % landmark error to minimize
         landmarkErrorToMinimize
         
+        %computer visiion to robotics rotation matrix
+        R
+        
         % motion model
         motionModel
         
@@ -42,6 +45,7 @@ classdef Config < ArrayGetSet
         stdPointPrior
         stdPosePose
         stdPosePoint
+        stdPosePixel
         stdPointPoint
         std3Points
         std2PointsVelocity

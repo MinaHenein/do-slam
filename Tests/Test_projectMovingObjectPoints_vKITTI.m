@@ -91,8 +91,7 @@ for k=1:size(features,1)
     pixelRow = features(k,1);
     pixelCol = features(k,2);
     camera3DPoint = K\[pixelCol;pixelRow;1];
-    camera3DPoint(3) = 1;   
-    camera3DPoint(3) = double(depthI(pixelRow,pixelCol))/100;
+    camera3DPoint = camera3DPoint* double(depthI(pixelRow,pixelCol))/100;
     world3DPoint = cameraPoseMatrix * [camera3DPoint;1];
     % get object pose in last camera frame
     fid = fopen(objectDetectionFile);
@@ -165,6 +164,6 @@ if display
     figure
     imshow(nextrgbI)
     hold on
-    scatter(nextFrameFeatures(:,2),nextFrameFeatures(:,1),'rx','LineWidth',2)
+    scatter(nextFrameFeatures(:,1),nextFrameFeatures(:,2),'rx','LineWidth',2)
     hold off
 end

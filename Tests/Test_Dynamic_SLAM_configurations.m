@@ -11,8 +11,8 @@ loopClosure = 1;
 % time
 t0 = 0;
 if loopClosure
-    nSteps = 11;
-    tN = 10;
+    nSteps = 151;
+    tN = 150;
 else
     nSteps = 121;
     tN = 120;
@@ -66,11 +66,11 @@ environment.addStaticPoints([-30*ones(1,80); 20*rand(2,80)]);
 %% 3. Initialise Sensor
 cameraTrajectory = RelativePoseTrajectory(robotTrajectory,config.cameraRelativePose);
 % occlusion sensor
-% sensor = SimulatedEnvironmentOcclusionSensor();
-sensor = SimulatedEnvironmentSensor();
+sensor = SimulatedEnvironmentOcclusionSensor();
+% sensor = SimulatedEnvironmentSensor();
 sensor.addEnvironment(environment);
 sensor.addCamera(config.fieldOfView,cameraTrajectory);
-sensor.setVisibility(config);
+sensor.setVisibility(config,environment);
 
 % figure
 % spy(sensor.get('pointVisibility'));

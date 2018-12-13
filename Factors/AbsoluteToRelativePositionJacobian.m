@@ -9,12 +9,13 @@ function [H1, H2] = AbsoluteToRelativePositionJacobian(config,poseAbsolute,posit
 eps_ = sqrt(eps);
 eps_2 = 0.5 * eps_;
 dofPose = length(poseAbsolute);
-dofPoint = length(positionRelative);
+dofPoint = length(positionAbsolute);
+dofEdge = length(positionRelative);
 EpsPose = eye(dofPose)*eps_2;
 EpsPoint = eye(dofPoint)*eps_2;
 
-H1 = zeros(dofPoint,dofPose);
-H2 = zeros(dofPoint,dofPoint);
+H1 = zeros(dofEdge,dofPose);
+H2 = zeros(dofEdge,dofPoint);
 d = positionRelative;
 for j=1:dofPose
     perturbedAbsPose1 = config.relativeToAbsolutePoseHandle(poseAbsolute,EpsPose(:,j));
@@ -22,7 +23,7 @@ for j=1:dofPose
     %           perturbedAbsPose1 = Relative2AbsoluteSE3(poseAbsolute,EpsPose(:,j));
     if strcmp(config.landmarkErrorToMinimize,'reprojectionKnownIntrinsics')
         d1 = AbsoluteToRelativePositionR3xso3Image(perturbedAbsPose1,...
-            positionAbsolute, config.intrinsics);
+            positionAbsolute,config.intrinsics,config.R);
     else
         d1 = config.absoluteToRelativePointHandle(perturbedAbsPose1, positionAbsolute);
     end
@@ -33,7 +34,7 @@ end
 for j=1:dofPoint
     if strcmp(config.landmarkErrorToMinimize,'reprojectionKnownIntrinsics')
         d2 = AbsoluteToRelativePositionR3xso3Image(poseAbsolute,...
-            positionAbsolute+EpsPoint(:,j), config.intrinsics);
+            positionAbsolute+EpsPoint(:,j),config.intrinsics,config.R);
     else
         d2 = config.absoluteToRelativePointHandle(poseAbsolute, positionAbsolute+EpsPoint(:,j));
     end

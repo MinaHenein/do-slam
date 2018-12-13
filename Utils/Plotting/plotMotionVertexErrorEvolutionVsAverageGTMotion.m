@@ -1,6 +1,6 @@
 function plotMotionVertexErrorEvolutionVsAverageGTMotion(solver, GTObjectMotion)
 
- nObjects = size(GTObjectMotion,2);
+nObjects = size(GTObjectMotion,2);
 
 relativeTranslation = zeros(length(solver)-1,nObjects);
 relativeRotation = zeros(length(solver)-1,nObjects);

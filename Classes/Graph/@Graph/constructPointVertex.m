@@ -30,14 +30,13 @@ edgeCovariance = edgeRow{6};
 pose = obj.vertices(poseVertex).value;
 if strcmp(config.landmarkErrorToMinimize,'reprojection')
     intrinsics = obj.vertices(intrinsicVertex).value;
-elseif strcmp(config.landmarkErrorToMinimize,'reprojectionKnownIntrinsics')
-    intrinsics = config.intrinsics;
 end
 positionRelative = edgeValue;
 switch config.cameraPointParameterisation
     case 'euclidean'
-          if strcmp(config.landmarkErrorToMinimize,'reprojection') || ...
-                  strcmp(config.landmarkErrorToMinimize,'reprojectionKnownIntrinsics')
+          if strcmp(config.landmarkErrorToMinimize,'reprojection') 
+            % should be called only if positionRelative is in image frame
+            % would give wrong results if positonRelative is in camera frame
             positionAbsolute = config.relativeToAbsolutePointHandle(pose,positionRelative,intrinsics);
           else
             positionAbsolute = config.relativeToAbsolutePointHandle(pose,positionRelative);

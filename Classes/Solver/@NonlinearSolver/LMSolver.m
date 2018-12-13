@@ -3,6 +3,9 @@ function [obj] = LMSolver(obj,config,graph0,measurementsCell)
 %LM solver combines gradient descent and gauss-newton
 
 done      = 0;
+if strcmp(config.mode,'initialisation')
+    done = 1;
+end
 iteration = 1;
 lambda     = 1e-8; %initial value
 lambdaUp   = 8;

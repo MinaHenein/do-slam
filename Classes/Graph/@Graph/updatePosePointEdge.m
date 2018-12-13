@@ -16,7 +16,8 @@ if obj.edges(iEdge).active
             %edge value - expected measurement from vertices
             if strcmp(config.landmarkErrorToMinimize,'reprojectionKnownIntrinsics')
                 pointPositionRelative = AbsoluteToRelativePositionR3xso3Image(pose,...
-                    pointPosition, config.intrinsics);
+                    pointPosition, config.intrinsics, config.R);
+                pointPositionRelative = pointPositionRelative(1:2,:);
             else
                 pointPositionRelative = config.absoluteToRelativePointHandle(pose,pointPosition);
             end

@@ -60,6 +60,8 @@ if strcmp(config.SE3MotionVertexInitialization,'eye')
     SE3Motion = [0 0 0 0 0 0]';
 elseif strcmp(config.SE3MotionVertexInitialization,'translation') && ~isempty(varargin)
     SE3Motion = SE3MotionValue;
+elseif strcmp(config.SE3MotionVertexInitialization,'GT')
+    SE3Motion = config.constantSE3Motion;
 else
     SE3Motion = [0 0 0 0 0 0]';
     disp('using default motion vertex initialization as eye')

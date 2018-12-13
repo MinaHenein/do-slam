@@ -2,7 +2,7 @@
 % Author: Mina Henein - mina.henein@anu.edu.au - 30/11/2018
 % Contributors:
 %--------------------------------------------------------------------------
-% Test static only reprojectioin error minimization
+% Test static only vKITTI reprojectioin error minimization
 %--------------------------------------------------------------------------
 % vKitti main
 config = CameraConfig();
@@ -12,15 +12,21 @@ K = [725,   0,     620.5;
 config.set('focalLength',725);
 config.set('opticalCentreX',620.5);
 config.set('opticalCentreY',187.0);
+config.set('R',[0,0,1,0; -1,0,0,0; 0,-1,0,0;0,0,0,1]);
 config = setAppConfig(config);
 config.absoluteToRelativePointHandle = @AbsoluteToRelativePositionR3xso3Image;
 config.relativeToAbsolutePointHandle = @RelativeToAbsolutePositionR3xso3Image; 
 config.set('landmarkErrorToMinimize' ,'reprojectionKnownIntrinsics');
+config.set('stdPosePixel',[0.002;0.002]);
 
 %% 5. Generate Measurements & Save to Graph File, load graph file as well
 config.set('pointMotionMeasurement','Off')
-config.set('measurementsFileName','finalNoiseSequence0001_334to426_final_MeasStaticOnly.graph')
-config.set('groundTruthFileName','finalNoiseSequence0001_334to426_final_GTStaticOnly.graph')
+config.set('measurementsFileName','Sequence0001_334to426_reprojection_Meas.graph')
+config.set('groundTruthFileName','Sequence0001_334to426_reprojection_GT.graph')
+
+writeGraphFileImagePlane(config)
+config.set('posePointEdgeLabel','EDGE_2D_PIXEL');
+config.set('measurementsFileName',strcat(config.measurementsFileName(1:end-6),'_Test.graph'))
 groundTruthCellStaticOnly = graphFileToCell(config,config.groundTruthFileName);
 measurementsCellStaticOnly = graphFileToCell(config,config.measurementsFileName);
  
@@ -36,7 +42,7 @@ fprintf('\nTotal time solving: %f\n',totalTime)
 initialGraph0  = initialSolverEnd.graphs(1);
 initialGraphN  = initialSolverEnd.graphs(end);
 %save results to graph file
-initialGraphN.saveGraphFile(config,'finalNoiseSequence0001_334to426_final_resultsStaticOnly.graph');
+initialGraphN.saveGraphFile(config,'finalNoiseSequence0001_334to426_final_results_reprojection.graph');
 
 %% 7. Error analysis
 % load ground truth into graph, sort if required
@@ -56,8 +62,8 @@ axis equal
 % axis(axisLimits)
 view([-50,25])
 %plot groundtruth
-% plotGraphFileICRA(config,groundTruthCellStaticOnly,'groundTruth');
+plotGraphFileICRA(config,groundTruthCellStaticOnly,'groundTruth');
 %plot results
-resultsNoSE3Cell = graphFileToCell(config,'finalNoiseSequence0001_334to426_final_resultsStaticOnly.graph');
+resultsNoSE3Cell = graphFileToCell(config,'finalNoiseSequence0001_334to426_final_results_reprojection.graph');
 plotGraphFileICRA(config,resultsNoSE3Cell,'initial',...
     resultsNoSE3.relPose.get('R3xso3Pose'),resultsNoSE3.posePointsN.get('R3xso3Pose'))

@@ -27,7 +27,9 @@ for i = 1:nActiveEdges
     iStart = sum(edgeHeights(1:iEdge-1)) + 1;
     iEnd   = iStart + edgeHeights(iEdge) - 1;
     iBlock = iStart:iEnd;
-    b(iBlock,1) = obj.computeResidual(config,iEdge,edgeRow{5});
+    if ~isempty(obj.edges(iEdge).type)
+        b(iBlock,1) = obj.computeResidual(config,iEdge,edgeRow{5});
+    end
 end
 
 end

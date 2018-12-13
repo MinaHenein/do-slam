@@ -42,12 +42,14 @@ for i = 1:nActiveEdges
         jBlock = blockMap(obj,iVertices(j),'vertex');
         obj.A(iBlock,jBlock) = graph.edges(iEdge).jacobians{j};
     end
-        
-    %covariance in covSqrtInv
-    obj.covariance(iBlock,iBlock) = graph.edges(iEdge).covariance;
-    obj.covSqrtInv(iBlock,iBlock) = graph.edges(iEdge).covariance^-0.5;
-    %compute residuals
-    obj.b(iBlock,1) = graph.computeResidual(config,iEdge,edgeRow{5});
+    
+    if ~isempty(graph.edges(iEdge).type)    
+        %covariance in covSqrtInv
+        obj.covariance(iBlock,iBlock) = graph.edges(iEdge).covariance;
+        obj.covSqrtInv(iBlock,iBlock) = graph.edges(iEdge).covariance^-0.5;
+        %compute residuals
+        obj.b(iBlock,1) = graph.computeResidual(config,iEdge,edgeRow{5});
+    end
     
     if ~isempty(config.robustCostFunction)
         if length(weight)==1
