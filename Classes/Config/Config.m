@@ -60,6 +60,9 @@ classdef Config < ArrayGetSet
         % or velocity - ONLY affects the pre-measurements file stage.
         pointMotionMeasurement
         
+        % point initialisation
+        pointInitialisation
+        
         % function handles moved to public temporarily
         
         %% TODO: both shouldnt be here!!

@@ -1,4 +1,4 @@
-function [tx,ty,tz,ox,oy,oz] = computeDistanceAndRotation(gtFilePath)
+function [tx,ty,tz,ox,oy,oz,translation,rotation] = computeDistanceAndRotation(gtFilePath)
 % GT
 fileID = fopen(strcat(pwd,'/Data/GraphFiles/',gtFilePath),'r');
 Data = textscan(fileID, '%s', 'delimiter', '\n', 'whitespace', '');
@@ -18,8 +18,14 @@ end
 
 tx = 0; ty = 0; tz = 0;
 ox = 0; oy = 0; oz = 0;
+translation = 0;
+rotation = 0;
+deg_per_rad = 180/pi;
+
 for i=1:nPoses-1
     relativePose = AbsoluteToRelativePoseR3xso3(poses(:,i),poses(:,i+1));
+    translation = translation + norm(relativePose(1:3));
+    rotation = rotation + wrapToPi(norm(relativePose(4:6))) * deg_per_rad;
     tx = tx + norm(relativePose(1));
     ty = ty + norm(relativePose(2));
     tz = tz + norm(relativePose(3));

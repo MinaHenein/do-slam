@@ -14,7 +14,7 @@ staticPointsN = [graphN.vertices(setdiff(allPointsIndices,dynamicPointsIndices))
 
 staticPointsGT = zeros(3,length(staticPointsN));
 for i=1:length(staticPointsN)
-   staticPointsGT(:,i) = [graphGT.vertices(staticPointsN(i).index).value];
+   staticPointsGT(:,i) = graphGT.vertices([graphGT.vertices.index] == staticPointsN(i).index).value;
 end
 staticPointsN = [graphN.vertices(setdiff(allPointsIndices,dynamicPointsIndices)).value];
 

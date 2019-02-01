@@ -14,8 +14,8 @@ config.set('sortEdges',0);
 config.set('pointMotionMeasurement','Off')
 % config.set('measurementsFileName','staticOnlyNoiseMeas2.graph')
 % config.set('groundTruthFileName','staticOnlyNoiseGT2.graph')
-config.set('measurementsFileName','finalNoiseSequence0001_newNrmrnd_MeasStaticOnly.graph')
-config.set('groundTruthFileName','finalNoiseSequence0001_newNrmrnd_GTStaticOnly.graph')
+config.set('measurementsFileName','finalNoiseSequence0001_334to426_final_MeasStaticOnly.graph')
+config.set('groundTruthFileName','finalNoiseSequence0001_334to426_final_GTStaticOnly.graph')
 % config.set('measurementsFileName','vKitti_Meas_staticOnlyTest.graph')
 % config.set('groundTruthFileName','vKitti_GT_staticOnlyTest.graph')
 groundTruthNoSE3Cell = graphFileToCell(config,config.groundTruthFileName);
@@ -33,7 +33,7 @@ fprintf('\nTotal time solving: %f\n',totalTime)
 initialGraph0  = initialSolverEnd.graphs(1);
 initialGraphN  = initialSolverEnd.graphs(end);
 %save results to graph file
-initialGraphN.saveGraphFile(config,'finalNoiseSequence0001_newNrmrnd_resultsStaticOnly.graph');
+initialGraphN.saveGraphFile(config,'finalNoiseSequence0001_resultsStaticOnly.graph');
 
 %% 7. Error analysis
 %load ground truth into graph, sort if required
@@ -52,6 +52,6 @@ view([-50,25])
 %plot groundtruth
 plotGraphFileICRA(config,groundTruthNoSE3Cell,'groundTruth');
 %plot results
-resultsNoSE3Cell = graphFileToCell(config,'finalNoiseSequence0001_newNrmrnd_resultsStaticOnly.graph');
+resultsNoSE3Cell = graphFileToCell(config,'finalNoiseSequence0001_resultsStaticOnly.graph');
 plotGraphFileICRA(config,resultsNoSE3Cell,'initial',...
     resultsNoSE3.relPose.get('R3xso3Pose'),resultsNoSE3.posePointsN.get('R3xso3Pose'))

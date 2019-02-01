@@ -31,7 +31,7 @@ pose = obj.vertices(poseVertex).value;
 if strcmp(config.landmarkErrorToMinimize,'reprojection')
     intrinsics = obj.vertices(intrinsicVertex).value;
 end
-positionRelative = edgeValue;
+positionRelative = edgeValue(1:3);
 switch config.cameraPointParameterisation
     case 'euclidean'
           if strcmp(config.landmarkErrorToMinimize,'reprojection') 

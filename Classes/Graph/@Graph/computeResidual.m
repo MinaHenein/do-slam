@@ -20,7 +20,11 @@ switch obj.edges(iEdge).type
         residual = config.absoluteToRelativePoseHandle(measurementPredicted,measurement);
         %         residual = config.absoluteToRelativePoseHandle(measurement,measurementPredicted);
     case {'pose-point','pose-point-intrinsic'}
-        residual = measurement - obj.edges(iEdge).value;
+        if strcmp(config.landmarkErrorToMinimize,'reprojectionKnownIntrinsics')
+            residual = measurement(4:5) - obj.edges(iEdge).value;
+        else
+            residual = measurement - obj.edges(iEdge).value;
+        end
     case 'point-point'
         residual = measurement - obj.edges(iEdge).value;
     case {'point-pointSE3','point-pointSE3_Mina'}

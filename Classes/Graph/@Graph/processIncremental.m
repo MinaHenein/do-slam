@@ -74,7 +74,6 @@ solver = [];
 %loop over nSteps
 nSteps = numel(odometryRows) + 1;
 nPointEdgesToBeInitialised = 0;
-nTimesReobservedPoint = [];
 nPointsOnDynamicObject = [];
 nMotionEdgesToBeInitialised = 0;
 for i = 1:nSteps
@@ -107,65 +106,14 @@ for i = 1:nSteps
                 newPose = 1;
                 nMotionEdgesToBeInitialised = 0;
             case config.posePointEdgeLabel
-                if strcmp(config.posePointEdgeLabel,'EDGE_2D_PIXEL')
-                    if newPose
-                        jRow{2} = obj.nEdges+1;
-                        if length(nTimesReobservedPoint) < jRow{4} 
-                            nTimesReobservedPoint(jRow{4}) = 1;
-                            pointEdgesToInitialise = jRow;
-                        else
-                            nTimesReobservedPoint(jRow{4}) = nTimesReobservedPoint(jRow{4})+1;
-                            pointEdgesToInitialise = [pointEdgesToInitialise;jRow];
-                        end
-                        newPose = 0;
-                    else
-                        jRow{2} = obj.nEdges+1+nPointEdgesToBeInitialised;
-                        if length(nTimesReobservedPoint) < jRow{4}
-                            nTimesReobservedPoint(jRow{4}) = 1;
-                        else
-                            nTimesReobservedPoint(jRow{4}) = nTimesReobservedPoint(jRow{4})+1;
-                        end
-                        pointEdgesToInitialise = [pointEdgesToInitialise;jRow];
-                    end
-                    if nTimesReobservedPoint(jRow{4}) == 1
-                        camPose1 = config.R'*poseToTransformationMatrix(obj.vertices(jRow{3}).value)*config.R;
-                        cameraMatrix1 = [camPose1(1:3,1:3);camPose1(1:3,4)']*intrinsicsVecToMatrix(config.intrinsics)';
-                        matchedPoint1 = jRow{5}';
-                    end
-                    if nTimesReobservedPoint(jRow{4}) == 2
-                        camPose2 = config.R'*poseToTransformationMatrix(obj.vertices(jRow{3}).value)*config.R;
-                        cameraMatrix2 = [camPose2(1:3,1:3);camPose2(1:3,4)']*intrinsicsVecToMatrix(config.intrinsics)';
-                        matchedPoint2 = jRow{5}';
-                        % initialisation from 2 pixel locations and camera
-                        % poses is terribly bad -- use initialisation from
-                        % 3D measurements instead
-                        worldPoint = [config.R(1,:);-config.R(2,:);-config.R(3,:);config.R(4,:)]*...
-                            [triangulate(matchedPoint1,matchedPoint2,cameraMatrix1,cameraMatrix2)';1];
-                        
-                        worldPoint = groundTruthCell{jRow{4},1}{1,3};
-                        % no need to call constructPointVertex - do it here
-                        obj.vertices(jRow{4}) = Vertex(worldPoint(1:3),[],'point',jRow{2},jRow{4});
-                        [m,~] = find(cell2mat(pointEdgesToInitialise(:,4))==jRow{4});
-                        for k=1:length(m)
-                            obj = obj.constructPosePointEdge(config,...
-                                pointEdgesToInitialise(m(k),:));
-                        end
-                        pointEdgesToInitialise(cell2mat(pointEdgesToInitialise(:,4))==jRow{4},:) = [];
-                    elseif nTimesReobservedPoint(jRow{4}) > 2
-                        obj = obj.constructPosePointEdge(config,jRow);
-                    end
-                    [l,~] = find(cell2mat(pointEdgesToInitialise(:,3))==jRow{3});
-                    nPointEdgesToBeInitialised = length(l);
-                else
-                    %edge index
-                    jRow{2} = obj.nEdges+1+nMotionEdgesToBeInitialised+nPointEdgesToBeInitialised;
-                    %create point vertex if it doesn't exist
-                    if jRow{4} > obj.nVertices || isempty(obj.vertices(jRow{4}).type)
-                        obj = obj.constructPointVertex(config,jRow);
-                    end
-                    %construct pose-point edge
-                    obj = obj.constructPosePointEdge(config,jRow);
+                %edge index
+                jRow{2} = obj.nEdges+1+nMotionEdgesToBeInitialised+nPointEdgesToBeInitialised;
+                %create point vertex if it doesn't exist
+                if jRow{4} > obj.nVertices || isempty(obj.vertices(jRow{4}).type)
+                    obj = obj.constructPointVertex(config,jRow);
                 end
+                %construct pose-point edge
+                obj = obj.constructPosePointEdge(config,jRow);
                 newPose = 0;
                 nMotionEdgesToBeInitialised = 0;
             case config.pointPointEdgeLabel
@@ -256,9 +204,10 @@ for i = 1:nSteps
                     if strcmp(config.motionModel,'constantSE3MotionDA')
                         % only initialise a new motion vertex if 3 or more
                         % dynamic points are re-obsered at the same time step
-                        if nPointsOnDynamicObject(jRow{4}) > 2 && jRow{4} > obj.nVertices
+                        if nPointsOnDynamicObject(jRow{4}) > 2 && (jRow{4} > obj.nVertices || isempty(obj.vertices(jRow{4}).type))
+                            [m,~] = find(cell2mat(motionEdgesToInitialise(:,4))==jRow{4});
                             obj = obj.constructSE3MotionVertex(config,...
-                                motionEdgesToInitialise(1,:),pointVertices);
+                                motionEdgesToInitialise(m(1),:),pointVertices);
                         end
                     elseif strcmp(config.motionModel,'constantVelocity')
                         obj = obj.constructVelocityVertex_v2(config,jRow,unique(pointVertices));
@@ -380,9 +329,9 @@ for i = 1:nSteps
         end
                 
         %store iSolver
-        solver = [solver iSolver];
+%         solver = [solver iSolver];
         storePlot = 1;
-%         solver = iSolver; %if memory is problem
+        solver = iSolver; %if memory is problem
     else
         skipCount = skipCount + 1;
         storePlot = 0;

@@ -12,7 +12,7 @@ end
 
 %% 1. write vertices
 for i = 1:obj.nVertices
-    if ~isempty(obj.vertices(i).type)
+        if ~isempty(obj.vertices(i).type)
         switch obj.vertices(i).type
             case 'pose';        vertexLabel = config.poseVertexLabel;
             case 'point';       vertexLabel = config.pointVertexLabel;
@@ -28,12 +28,13 @@ for i = 1:obj.nVertices
         vertexValue = obj.vertices(i).value;
         formatSpec = strcat('%s %d ',repmat(' %6.6f',1,numel(vertexValue)),'\n');
         fprintf(fileID,formatSpec,vertexLabel,vertexIndex(end),vertexValue);
-    end
+        end
 end
 
 %% 2. write edges
 for i = 1:obj.nEdges
     writeEdge = 1;
+    if ~isempty(obj.edges(i).type)
     switch obj.edges(i).type
         case 'pose-pose'
             edgeLabel = config.posePoseEdgeLabel;
@@ -104,6 +105,7 @@ for i = 1:obj.nEdges
             writeEdge = 0;
         otherwise
             error('type invalid')
+    end
     end
     if writeEdge
         %edgeIndex = obj.edges(i).index;

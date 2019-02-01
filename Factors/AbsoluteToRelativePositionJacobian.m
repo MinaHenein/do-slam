@@ -42,4 +42,5 @@ for j=1:dofPoint
     %           d2 = AbsolutePoint2RelativePoint3D(poseAbsolute,positionAbsolute+EpsPoint(:,j));
     H2(:,j)= (d2-d)/(eps_2);
 end
+
 end

@@ -94,7 +94,9 @@ while ischar(tline)
                     strcmp(config.motionModel,'constantSE3')
                 lineCell = {label,[],values(1),values(2),values(3:6)',values(7:16)};
             elseif strcmp(config.landmarkErrorToMinimize ,'reprojectionKnownIntrinsics')
-                lineCell = {label,[],values(1),values(2),values(3:4)',values(5:7)};
+                if strcmp(config.pointInitialisation,'3DMeasurement')
+                    lineCell = {label,[],values(1),values(2),values(3:7)',values(14:16)};
+                end
             else
                 lineCell = {label,[],values(1),values(2),values(3:5)',values(6:11)};
             end

@@ -75,12 +75,12 @@ config.set('stdPosePrior',[0.01,0.01,0.01,orientation(1),orientation(2),orientat
 config.set('stdPointPrior',[0.01,0.01,0.1]');
 
 % set odometry error
-rot = eul2rot([pi/100,pi/100,pi/100]); % 1 degree position error
+rot = eul2rot([pi/180,pi/180,pi/180]); % 1 degree position error
 orientation = arot(rot);
 config.set('stdPosePose'  ,[0.03,0.03,0.03,orientation']');
 
 % measurement errors
-config.set('stdPosePoint' ,[0.06,0.06,0.06]');
+config.set('stdPosePoint' ,[0.02,0.02,0.02]');
 config.set('stdPointPlane',0.001);
 % set properties of CameraConfig
 config.set('fieldOfView',[-pi/2,pi/2,-pi/3,pi/3,1,40]); %az,el,r limits

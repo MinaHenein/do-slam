@@ -13,7 +13,7 @@ dynamicPointsN = graphN.vertices(dynamicPointsIndices);
 
 dynamicPointsGT = zeros(3,length(dynamicPointsN));
 for i=1:length(dynamicPointsN)
-   dynamicPointsGT(:,i) = [graphGT.vertices(dynamicPointsN(i).index).value];
+   dynamicPointsGT(:,i) = graphGT.vertices([graphGT.vertices.index] == dynamicPointsN(i).index).value;
 end
 dynamicPointsN = [graphN.vertices(dynamicPointsIndices).value];
 

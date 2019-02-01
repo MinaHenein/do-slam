@@ -151,7 +151,7 @@ for i = 1:nEdges
     %add edge index to vertices
     for j = 1:numel(iVertices)
         obj.vertices(iVertices(j)).iEdges = ...
-            unique([obj.vertices(iVertices(j)).iEdges index]); %order doesn't matter here
+            unique([obj.vertices([obj.vertices.index]==iVertices(j)).iEdges index]);%order doesn't matter here
         %and colour
         if strcmp(edgesCell{i}{1},config.pointRGBVertexLabel)
             iPointVertex = iVertices(1);

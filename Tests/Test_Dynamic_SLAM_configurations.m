@@ -11,8 +11,8 @@ loopClosure = 1;
 % time
 t0 = 0;
 if loopClosure
-    nSteps = 151;
-    tN = 150;
+    nSteps = 21;
+    tN = 20;
 else
     nSteps = 121;
     tN = 120;
@@ -117,7 +117,7 @@ fprintf('\nTotal time solving: %f\n',totalTime)
 graph0  = solverEnd.graphs(1);
 graphN  = solverEnd.graphs(end);
 %save results to graph file
-graphN.saveGraphFile(config,'Test_DynamciSLAM_results.graph');
+graphN.saveGraphFile(config,'Test_DynamicSLAM_results.graph');
 
 %% 8. Error analysis
 %load ground truth into graph, sort if required
@@ -143,7 +143,7 @@ view([-50,25])
 %plot groundtruth
 plotGraphFile(config,groundTruthCell,[0 0 1]);
 %plot results
-resultsCell = graphFileToCell(config,'Test_DynamciSLAM_results.graph');
+resultsCell = graphFileToCell(config,'Test_DynamicSLAM_results.graph');
 plotGraphFile(config,resultsCell,[1 0 0])
 
 % plot motion vertices errors in Global and Body-fixed frames
@@ -178,39 +178,40 @@ for i=1:length(motionIndices)
 end
 
 % body-fixed frame -- using estimated object poses (transparent object)
-primitiveInitPose = [0 0 0 0 0 0]';
-primitiveMotion_R3xso3 = [1.5*dt; 0; 0; arot(eul2rot([0.05*dt,0,0.005*dt]))];
-primitiveTrajectory = ConstantMotionDiscretePoseTrajectory(t,primitiveInitPose,primitiveMotion_R3xso3,'R3xso3');
-environment = Environment();
-environment.addEllipsoid([5 2 3],8,'R3',primitiveTrajectory);
-pts = environment.get('environmentPoints');
-ptsT1 = pts.get('R3Position',1);
-
-objPoses = zeros(6,nSteps);
-for i=1:nSteps
-    graph = solver(i).graphs(end);   
-    SE3MotionVertices = [graph.identifyVertices('SE3Motion')];
-    edgesConnectedToMotionVertices = [graph.vertices(SE3MotionVertices).iEdges];
-    dynamicPointsMotionIndices = [graph.edges(edgesConnectedToMotionVertices).iVertices]';
-    dynamicPointsIndices = setdiff(dynamicPointsMotionIndices,SE3MotionVertices);
-    if ~isempty(dynamicPointsIndices)
-        pts = [graphN.vertices(dynamicPointsIndices(end-10:end)).value];
-        [objectRot, objectTr,~] = Kabsch(ptsT1,pts);
-        objPoses(:,i) = [objectTr;arot(objectRot)];
-    end
-end
-for i=1:length(motionIndices)
-   motionVertexValue = graphN.vertices(motionIndices(i)).value;
-   objectPose = poseToTransformationMatrix(objPoses(:,i+1));
-   objectMotionInObjectFrame = objectPose\poseToTransformationMatrix(motionVertexValue)*objectPose;
-   if plotMotionErrorvsEye
-       objectMotionInObjectFrame =  eye(4);
-   end
-   [tr_error, rot_error] = computeObjectTrajectoryError(GTObjectMotionObjectFrame,...
-      transformationMatrixToPose(objectMotionInObjectFrame));
-   translation_error(i) = tr_error;
-   rotation_error(i) = rot_error;
-end
+% primitiveInitPose = [0 0 0 0 0 0]';
+% primitiveMotion_R3xso3 = [1.5*dt; 0; 0; arot(eul2rot([0.05*dt,0,0.005*dt]))];
+% primitiveTrajectory = ConstantMotionDiscretePoseTrajectory(t,primitiveInitPose,primitiveMotion_R3xso3,'R3xso3');
+% environment = Environment();
+% environment.addEllipsoid([5 2 3],8,'R3',primitiveTrajectory);
+% pts = environment.get('environmentPoints');
+% ptsT1 = pts.get('R3Position',1);
+% 
+% objPoses = zeros(6,nSteps);
+% for i=1:nSteps
+%     graph = solver(i).graphs(end);   
+%     SE3MotionVertices = [graph.identifyVertices('SE3Motion')];
+%     edgesConnectedToMotionVertices = [graph.vertices(SE3MotionVertices).iEdges];
+%     dynamicPointsMotionIndices = [graph.edges(edgesConnectedToMotionVertices).iVertices]';
+%     dynamicPointsIndices = setdiff(dynamicPointsMotionIndices,SE3MotionVertices);
+%     if ~isempty(dynamicPointsIndices)
+%         pts = [graphN.vertices(dynamicPointsIndices(end-10:end)).value];
+%         [objectRot, objectTr,~] = Kabsch(ptsT1,pts);
+%         objPoses(:,i) = [objectTr;arot(objectRot)];
+%     end
+% end
+% 
+% for i=1:length(motionIndices)
+%    motionVertexValue = graphN.vertices(motionIndices(i)).value;
+%    objectPose = poseToTransformationMatrix(objPoses(:,i+1));
+%    objectMotionInObjectFrame = objectPose\poseToTransformationMatrix(motionVertexValue)*objectPose;
+%    if plotMotionErrorvsEye
+%        objectMotionInObjectFrame =  eye(4);
+%    end
+%    [tr_error, rot_error] = computeObjectTrajectoryError(GTObjectMotionObjectFrame,...
+%       transformationMatrixToPose(objectMotionInObjectFrame));
+%    translation_error(i) = tr_error;
+%    rotation_error(i) = rot_error;
+% end
 
 j = 1:length(motionIndices);
 figure

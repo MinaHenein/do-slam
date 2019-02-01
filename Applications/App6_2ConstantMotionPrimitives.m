@@ -19,7 +19,7 @@ config = setAppConfig(config); % copy same settings for error Analysis
 % config = setLowErrorAppConfig(config);
 % config = setHighErrorAppConfig(config);
 config.set('t',t);
-config.set('noiseModel','Off');
+config.set('noiseModel','Gaussian');
 config.set('groundTruthFileName','app6_groundTruth.graph');
 config.set('measurementsFileName','app6_measurements.graph');
 
@@ -27,6 +27,12 @@ config.set('measurementsFileName','app6_measurements.graph');
 config.set('pointMotionMeasurement','point2DataAssociation');
 config.set('motionModel','constantSE3MotionDA');
 config.set('std2PointsSE3Motion', [0.05,0.05,0.05]');
+config.set('SE3MotionVertexInitialization','eye');
+config.set('newMotionVertexPerNLandmarks',inf);
+config.set('landmarksSlidingWindowSize',inf);
+config.set('objectPosesSlidingWindow',false);
+config.set('objectPosesSlidingWindowSize',inf);
+config.set('newMotionVertexPerNObjectPoses',inf);
 
 % config.set('sortVertices',1);
 % config.set('sortEdges', 1);
@@ -57,6 +63,8 @@ constantSE3ObjectMotion(:,2) = primitive2Trajectory.RelativePoseGlobalFrameR3xso
 environment = Environment();
 environment.addEllipsoid([1 1 2.5],8,'R3',primitive1Trajectory);
 environment.addEllipsoid([1 1 2.5],8,'R3',primitive2Trajectory);
+% environment.addStaticPoints([30*ones(1,50); 10*rand(2,50)]);
+% environment.addStaticPoints([ 40.*rand(1,150)-20; 30*ones(1,150); 10*rand(1,150)]);
 
 %% 3. Initialise Sensor
 cameraTrajectory = RelativePoseTrajectory(robotTrajectory,config.cameraRelativePose);
@@ -73,13 +81,13 @@ sensor.addEnvironment(environment);
 sensor.addCamera(config.fieldOfView,cameraTrajectory);
 sensor.setVisibility(config,environment);
 
-figure
-spy(sensor.get('pointVisibility'));
-%% 4. Plot Environment
+% figure
+% spy(sensor.get('pointVisibility'));
+% % %% 4. Plot Environment
 figure
 viewPoint = [-35,35];
 axisLimits = [-30,30,-5,30,-10,10];
-% title('Environment')
+title('Environment')
 axis equal
 xlabel('x (m)')
 ylabel('y (m)')
@@ -91,12 +99,12 @@ grid on
 primitive1Trajectory.plot(t,[0 0 0],'axesOFF')
 primitive2Trajectory.plot(t,[0 0 0],'axesOFF')
 cameraTrajectory.plot(t,[0 0 1],'axesOFF')
-% set(gcf,'Position',[0 0 1024 768]);
+set(gcf,'Position',[0 0 1024 768]);
 frames = sensor.plot(t,environment);
-% implay(frames);
+% %implay(frames);
 
-    %% 4.a output video
-% v = VideoWriter('Data/Videos/App6_sensor_environment.mp4','MPEG-4');
+%     %% 4.a output video
+% v = VideoWriter('Data/Videos/App6_sensor_environment');
 % open(v)
 % writeVideo(v,frames);
 % close(v)
@@ -113,17 +121,41 @@ config.set('constantSE3Motion',constantSE3ObjectMotion);
     
     %% 5.2 For test (with SE3)
     config.set('pointMotionMeasurement','point2DataAssociation');
+    config.set('pointsDataAssociationLabel','2PointsDataAssociation');
     config.set('measurementsFileName','app6_measurements.graph');
     config.set('groundTruthFileName','app6_groundTruth.graph');
-    sensor.generateMeasurements(config);
-    writeDataAssociationVerticesEdges_constantSE3Motion(config,constantSE3ObjectMotion);
+    %sensor.generateMeasurements(config);
+    
+%     writeDataAssociationVerticesEdges_constantSE3Motion(config,constantSE3ObjectMotion);
+%     writeDataAssociationObjectIndices(config,2)
+        config.set('measurementsFileName',...
+            strcat(config.measurementsFileName(1:end-6),'Test.graph'));
+        config.set('groundTruthFileName',...
+            strcat(config.groundTruthFileName(1:end-6),'Test.graph')); 
     measurementsCell = graphFileToCell(config,config.measurementsFileName);
     groundTruthCell  = graphFileToCell(config,config.groundTruthFileName);
 
 %% 6. Solve
 % config.set('sortVertices',1);
 % config.set('sortEdges',1);
+    %% 6.0 Initialisation
+    config.set('mode','initialisation');
+    initializationGraph0 = Graph();
+    initializationSolver = initializationGraph0.process(config,measurementsCell,groundTruthCell);
+    initializationSolverEnd = initializationSolver(end);
+    totalTime = toc(timeStart);
+    fprintf('\nTotal time solving: %f\n',totalTime)
+
+    %get desired graphs & systems
+    initializationGraph0  = initializationSolverEnd.graphs(1);
+    initializationGraphN  = initializationSolverEnd.graphs(end);
+    %save results to graph file
+    initializationGraphN.saveGraphFile(config,'app6_initialization.graph');
+    initializationCell = graphFileToCell(config,'app6_initialization.graph');
+
+
     %% 6.1 Without SE3
+    config.set('mode','optimization');
     timeStart = tic;
     initialGraph0 = Graph();
     initialSolver = initialGraph0.process(config,measurementsNoSE3Cell,groundTruthNoSE3Cell);
@@ -154,21 +186,24 @@ config.set('constantSE3Motion',constantSE3ObjectMotion);
 
 %% 7. Error analysis
 %load ground truth into graph, sort if required
-graphGT = Graph(config,groundTruthCell);
 graphGTNoSE3 = Graph(config,groundTruthNoSE3Cell);
 fprintf('\nInitial results for without SE(3) Transform:\n')
 resultsNoSE3 = errorAnalysis(config,graphGTNoSE3,initialGraphN);
+
+graphGT = Graph(config,groundTruthCell);
 fprintf('\nFinal results for SE(3) Transform:\n')
 resultsSE3 = errorAnalysis(config,graphGT,graphN);
 
+fprintf('\nInitialization results:\n')
+resultsInitialization = errorAnalysis(config,graphGT,initializationGraphN);
 %% 8. Plot
     %% 8.1 Plot initial, final and ground-truth solutions
 %no constraints
 figure
 spy(solverEnd.systems(end).H)
 
-figure
-spy(chol(solverEnd.systems(end).H))
+%figure
+%spy(chol(solverEnd.systems(end).H))
 
 h = figure; 
 xlabel('x (m)')
@@ -177,7 +212,7 @@ zlabel('z (m)')
 hold on
 grid on
 axis equal
-axisLimits = [-25,25,0,30,-5,15];
+axisLimits = [-25,25,0,35,-10,10];
 axis(axisLimits)
 view([-50,25])
 %plot groundtruth
@@ -186,4 +221,19 @@ plotGraphFileICRA(config,groundTruthCell,'groundTruth');
 resultsNoSE3Cell = graphFileToCell(config,'app6_resultsNoSE3.graph');
 resultsCell = graphFileToCell(config,'app6_results.graph');
 plotGraphFileICRA(config,resultsNoSE3Cell,'initial',resultsNoSE3.relPose.get('R3xso3Pose'),resultsNoSE3.posePointsN.get('R3xso3Pose'))
-plotGraphFileICRA(config,resultsCell,'solverResults',resultsSE3.relPose.get('R3xso3Pose'),resultsSE3.posePointsN.get('R3xso3Pose'))
+
+% get indices of static and dynamic points per object
+dynamicPointsVertices = {};
+allDynamicPointsVertices = [];
+SE3MotionVertices = [graphN.identifyVertices('SE3Motion')];
+pointVertices = [graphN.vertices(graphN.identifyVertices('point'))];
+pointIndices = [graphN.identifyVertices('point')];
+for i=1:numel(SE3MotionVertices)
+    edgesConnectedToMotionVertex = [graphN.vertices(SE3MotionVertices(i)).iEdges];
+    dynamicPointsMotionIndices = [graphN.edges(edgesConnectedToMotionVertex).iVertices]';
+    dynamicPointsIndices = setdiff(dynamicPointsMotionIndices,SE3MotionVertices);
+    dynamicPointsVertices{i} = dynamicPointsIndices;
+    allDynamicPointsVertices = [allDynamicPointsVertices,dynamicPointsIndices'];
+end
+staticPointsIndices = setdiff(pointIndices,allDynamicPointsVertices);
+plotGraphFileICRA(config,resultsCell,'solverResults',resultsSE3.relPose.get('R3xso3Pose'),resultsSE3.posePointsN.get('R3xso3Pose'),graphN,[staticPointsIndices dynamicPointsVertices])

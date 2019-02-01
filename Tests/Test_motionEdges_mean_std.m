@@ -5,8 +5,8 @@
 %% 1. Config
 % time
 t0 = 0;
-nSteps = 301;
-tN = 300;
+nSteps = 51;
+tN = 50;
 dt = (tN-t0)/(nSteps-1);
 t  = linspace(t0,tN,nSteps);
  

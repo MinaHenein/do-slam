@@ -25,8 +25,8 @@ obj.edges(edgeIndex) = Edge(value,covariance,jacobians,type,iVertices,index);
 %computes value & jacobians
 obj = obj.updatePosePointEdge(config,edgeIndex);
 
-%% 5. add index to pose vertex
+%% 5. add index to pose & point vertices
 obj.vertices(poseVertex).iEdges = [obj.vertices(poseVertex).iEdges edgeIndex];
-
+obj.vertices(pointVertex).iEdges = unique([obj.vertices(pointVertex).iEdges edgeIndex]);
 end
 

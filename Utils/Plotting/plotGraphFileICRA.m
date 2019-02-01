@@ -51,13 +51,12 @@ switch setting
         relPose = varargin{1};
         posePoints = varargin{2};
         graphN = varargin{3};
-        SE3MotionVertices = [graphN.identifyVertices('SE3Motion')];
+        staticDynamicPointIndices = varargin{4};
+        staticPointsIndices = staticDynamicPointIndices{1,1};
         pointVertices = [graphN.vertices(graphN.identifyVertices('point'))];   
-        pointIndices = [graphN.identifyVertices('point')];
-        edgesConnectedToMotionVertices = [graphN.vertices(SE3MotionVertices).iEdges];
-        dynamicPointsMotionIndices = [graphN.edges(edgesConnectedToMotionVertices).iVertices]';
-        dynamicPointsIndices = setdiff(dynamicPointsMotionIndices,SE3MotionVertices);
-        staticPointsIndices = setdiff(pointIndices,dynamicPointsIndices);
+        
+        colors = {'magenta','leather','red','blue','green','black','sapphire','swamp','light bluish green',...
+    'butterscotch','cinnamon','radioactive green','chartreuse'}; 
         
         for i = 1:sum(poseVertices)
             iPose = poses(:,i);
@@ -84,13 +83,13 @@ switch setting
              end
          end   
         end
-        
-        if ~isempty(dynamicPointsIndices)
+        nDynamicObjects = length(staticDynamicPointIndices)-1; % first cell are static points
         for i=1:size(points,2)
-            if ismember(pointVertices(i).index,dynamicPointsIndices)
-                plot3(points(1,i),points(2,i),points(3,i),'m.','MarkerSize',5);
+            for j=1:nDynamicObjects
+                if ismember(pointVertices(i).index,staticDynamicPointIndices{1,j+1})
+                    plot3(points(1,i),points(2,i),points(3,i),'.','Color',rgb(colors(j)),'MarkerSize',5);
+                end
             end
-        end
         end
         
     case 'initial'

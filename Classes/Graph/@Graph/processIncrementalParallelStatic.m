@@ -84,6 +84,8 @@ solverDynamic = [];
 nSteps = numel(odometryRows) + 1;
 staticMeasurementsCell = measurementsCell;
 nDeleted = 0;
+nDynamicGraphEdges = 0;
+
 for i = 1:nSteps
     %identify rows from this time step
     %add elements so formula for iRows works for first and last steps
@@ -107,14 +109,18 @@ for i = 1:nSteps
                 jRow{2} = obj.nEdges+1;
                 %construct pose vertex
                 obj = obj.constructPoseVertex(config,jRow);
-                %copy last pose vertex from obj to graphDynamic
+                % add a prior to last pose added to graphDynamic
                 staticGraphPosesIndices  = obj.identifyVertices('pose');
                 lastPoseVertex = obj.vertices(staticGraphPosesIndices(end));
-                graphDynamic.vertices(lastPoseVertex.index) = lastPoseVertex;
-                % update poses vertices values in graphDynamic
+                nDynamicGraphEdges = nDynamicGraphEdges+1;
+                measurementsCellDynamic{end+1,1} = {config.posePriorEdgeLabel,...
+                    nDynamicGraphEdges,[],lastPoseVertex.index,lastPoseVertex.value,startPoseCovariance};
+%                 %copy last pose vertex from obj to graphDynamic
+%                 graphDynamic.vertices(lastPoseVertex.index) = lastPoseVertex;
+%                 % update poses vertices values in graphDynamic
                 for m = 1:length(staticGraphPosesIndices)-1
-                    graphDynamic.vertices(staticGraphPosesIndices(m)).value = ...
-                        obj.vertices(staticGraphPosesIndices(m)).value; 
+                   graphDynamic.vertices(staticGraphPosesIndices(m)).value = ...
+                       obj.vertices(staticGraphPosesIndices(m)).value; 
                 end
                 %construct pose-pose edge
                 obj = obj.constructPosePoseEdge(config,jRow);
@@ -123,6 +129,7 @@ for i = 1:nSteps
                     staticMeasurementsCell(iRows(j)-nDeleted,:) = [];
                     nDeleted = nDeleted + 1;
                     measurementsCellDynamic{end+1,1} = jRow;
+                    nDynamicGraphEdges = nDynamicGraphEdges+1;
                 else
                     %edge index
                     jRow{2} = obj.nEdges+1;
@@ -138,6 +145,7 @@ for i = 1:nSteps
                     staticMeasurementsCell(iRows(j)-nDeleted,:) = [];
                     nDeleted = nDeleted + 1;
                     measurementsCellDynamic{end+1,1} = jRow;
+                    nDynamicGraphEdges = nDynamicGraphEdges+1;
                  else
                     %edgeIndex
                     jRow{2} = obj.nEdges+1;
@@ -149,6 +157,7 @@ for i = 1:nSteps
                     staticMeasurementsCell(iRows(j)-nDeleted,:) = [];
                     nDeleted = nDeleted + 1;
                     measurementsCellDynamic{end+1,1} = jRow;
+                    nDynamicGraphEdges = nDynamicGraphEdges+1;
                 else
                     %edge index
                     jRow{2} = obj.nEdges+1;
@@ -169,6 +178,7 @@ for i = 1:nSteps
                 staticMeasurementsCell(iRows(j)-nDeleted,:) = [];
                 nDeleted = nDeleted + 1;
                 measurementsCellDynamic{end+1,1} = jRow;
+                nDynamicGraphEdges = nDynamicGraphEdges+1;
             case config.pointsDataAssociationLabel
                 dynamicPoints = jRow{3};
                 assert(ismember(dynamicPoints(1),dynamicPointIndices));
@@ -176,6 +186,7 @@ for i = 1:nSteps
                 staticMeasurementsCell(iRows(j)-nDeleted,:) = [];
                 nDeleted = nDeleted + 1;
                 measurementsCellDynamic{end+1,1} = jRow;
+                nDynamicGraphEdges = nDynamicGraphEdges+1;
             case config.planePriorEdgeLabel
                 %edge index
                 jRow{2} = obj.nEdges+1;

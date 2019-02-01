@@ -83,7 +83,7 @@ for i = 1:nSteps
             label = config.poseVertexLabel;
             index = cameraVertexIndexes(i);
             writeVertex(label,index,value,gtFileID);
-        elseif (i > 1) && ~any(value == prevValue)
+        elseif (i > 1) && ~prod(value == prevValue)
             vertexCount = vertexCount + 1;
             cameraVertexIndexes(i) = vertexCount;
             %WRITE VERTEX TO FILE
@@ -110,7 +110,7 @@ for i = 1:nSteps
             otherwise
                 error('Error: unsupported pose parameterisation')
         end
-        if valueGT ~= zeros(6,1)
+        if ~prod(valueGT == zeros(6,1))
             covariance = config.covPosePose;
             index1 = cameraVertexIndexes(i-1);
             index2 = cameraVertexIndexes(i);

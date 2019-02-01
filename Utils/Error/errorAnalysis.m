@@ -5,6 +5,7 @@ function [results] = errorAnalysis(config,graphGT,graphN)
 %poses
 posesN = [graphN.vertices(graphN.identifyVertices('pose')).value];
 posesGT = [graphGT.vertices(graphGT.identifyVertices('pose')).value];
+
 %convert to R3xSO3
 if strcmp(config.poseParameterisation,'SE3')
     for i = 1:size(posesN,2)
@@ -29,8 +30,7 @@ v_rel_pose = AbsoluteToRelativePoseR3xso3(posesGT(:,1),posesN(:,1));
 pointsN = [graphN.vertices(graphN.identifyVertices('point'))];
 pointsGT = zeros(3,length(pointsN));
 for i=1:length(pointsN)
-    indx = find([graphGT.vertices.index]==pointsN(i).index);
-    pointsGT(:,i) = [graphGT.vertices(indx).value];
+    pointsGT(:,i) = [graphGT.vertices([graphGT.vertices.index]==pointsN(i).index).value];
  end
 % pointsGT = [graphGT.vertices(graphGT.identifyVertices('point')).value];
 pointsN = [graphN.vertices(graphN.identifyVertices('point')).value];
@@ -176,7 +176,12 @@ results.relRotationErrorVector = relRotError;
 fprintf('Absolute Trajectory Translation Error: %.3f \n',results.ATE_translation_error)
 fprintf('Absolute Trajectory Rotation Error: %.3f \n',results.ATE_rotation_error)
 if ~isempty(pointsGT)
-fprintf('Absolute Structure Points Error: %.3f \n',results.ASE_translation_error);
+    fprintf('Absolute Structure Points Error: %.3f \n',results.ASE_translation_error);
+end
+fprintf('Relative Trajectory Translation Error: %.3f \n',results.RPE_translation_error)
+fprintf('Relative Trajectory Rotation Error: %.3f \n',results.RPE_rotation_error)
+if ~isempty(pointsGT)
+    fprintf('Relative Structure Points Error: %.3f \n',results.RPTE_translation_error);
 end
 fprintf('All to All Relative Pose Translation Error: %.3f \n',results.AARPE_translation_error)
 fprintf('All to All Relative Pose Rotation Error: %.3f \n',results.AARPE_rotation_error)

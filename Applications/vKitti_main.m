@@ -4,11 +4,10 @@
 %--------------------------------------------------------------------------
 % vKitti main
 % 1. Config
-objectPosesMatrix = 'objPose_0001_334_425.mat';
-% objectPosesMatrix = 'objectCameraPoses_vKittiScene0001.mat';
-[objectsGTMotion, objectsGTFrames] = vKitti_objectMotion(objectPosesMatrix);
-constantSE3ObjectMotion = vKitti_objectMotionAveraged(objectPosesMatrix);
-nObjects = size(constantSE3ObjectMotion,2);
+% objectPosesMatrix = 'objPose_0001_334_425.mat';
+% [objectsGTMotion, objectsGTFrames] = vKitti_objectMotion(objectPosesMatrix);
+% constantSE3ObjectMotion = vKitti_objectMotionAveraged(objectPosesMatrix);
+% nObjects = size(constantSE3ObjectMotion,2);
 
 config = CameraConfig();
 config = setAppConfig(config);
@@ -35,8 +34,8 @@ config.set('newMotionVertexPerNObjectPoses',inf);
 %% 5.2 For test (with SE3)
 config.set('pointMotionMeasurement','point2DataAssociation');
 config.set('pointsDataAssociationLabel','2PointsDataAssociation');
-config.set('measurementsFileName','Sequence0001_334to426_objectMotion_Meas.graph');
-config.set('groundTruthFileName','Sequence0001_334to426_objectMotion_GT.graph'); 
+config.set('measurementsFileName','finalNoiseSequence0001_334to426_final_Meas.graph');
+config.set('groundTruthFileName','finalNoiseSequence0001_334to426_final_GT.graph'); 
 % Check for wrong data associations and fix if necessary
 % dataAssociationTest(config,config.measurementsFileName,nObjects);
 % dataAssociationTest(config,config.groundTruthFileName,nObjects);

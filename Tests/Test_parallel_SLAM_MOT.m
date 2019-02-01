@@ -5,8 +5,8 @@
 %% 1. Config
 % time
 t0 = 0;
-nSteps = 151;
-tN = 150;
+nSteps = 21;
+tN = 20;
 dt = (tN-t0)/(nSteps-1);
 t  = linspace(t0,tN,nSteps);
 
@@ -16,8 +16,8 @@ config.set('mode','parallel');
 config.set('t',t);
 config.set('nSteps',nSteps);
 % config.set('noiseModel','Off');
-config.set('groundTruthFileName','Test_DynamciSLAM_groundTruth.graph');
-config.set('measurementsFileName','Test_DynamciSLAM_measurements.graph');
+config.set('groundTruthFileName','Test_DynamciSLAM_parallel_groundTruth.graph');
+config.set('measurementsFileName','Test_DynamciSLAM_parallel_measurements.graph');
 
 % SE3 Motion
 config.set('motionModel','constantSE3MotionDA');
@@ -27,7 +27,7 @@ config.set('newMotionVertexPerNLandmarks',inf);
 config.set('landmarksSlidingWindowSize',inf);
 config.set('objectPosesSlidingWindow',false);
 config.set('objectPosesSlidingWindowSize',inf);
-config.set('newMotionVertexPerNObjectPoses',2);
+config.set('newMotionVertexPerNObjectPoses',inf);
 config.set('pointMotionMeasurement','point2DataAssociation');
 config.set('pointsDataAssociationLabel','2PointsDataAssociation');
 
@@ -113,21 +113,30 @@ graphNDynamic = solverDynamicEnd.graphs(end);
 posesStatic  = [graphNStatic.vertices(graphNStatic.identifyVertices('pose')).value];
 posesDynamic  = [graphNDynamic.vertices(graphNDynamic.identifyVertices('pose')).value];
 %save results to graph file
-graphN.saveGraphFile(config,'Test_DynamciSLAM_results.graph');
+graphNStatic.saveGraphFile(config,'Test_DynamciSLAM_parallel_staticResults.graph');
+graphNDynamic.saveGraphFile(config,'Test_DynamciSLAM_parallel_dynamicResults.graph');
 
 %% 8. Error analysis
 %load ground truth into graph, sort if required
 graphGT = Graph(config,groundTruthCell);
-fprintf('Results error: \n');
-results = errorAnalysis(config,graphGT,graphNStatic);
+fprintf('Static results error: \n');
+staticResults = errorAnalysis(config,graphGT,graphNStatic);
+fprintf('Dynamic results error: \n');
+dynamicResults = errorAnalysis(config,graphGT,graphNDynamic);
 
 %% 9. Plot
     %% 10.1 Plot intial, final and ground-truth solutions
 figure
 subplot(1,2,1)
-spy(solverEnd.systems(end).A)
+spy(solverStaticEnd.systems(end).A)
 subplot(1,2,2)
-spy(solverEnd.systems(end).H)
+spy(solverStaticEnd.systems(end).H)
+
+figure
+subplot(1,2,1)
+spy(solverDynamicEnd.systems(end).A)
+subplot(1,2,2)
+spy(solverDynamicEnd.systems(end).H)
 
 h = figure; 
 xlabel('x')
@@ -139,5 +148,10 @@ view([-50,25])
 %plot groundtruth
 plotGraphFile(config,groundTruthCell,[0 0 1]);
 %plot results
-resultsCell = graphFileToCell(config,'Test_DynamciSLAM_results.graph');
-plotGraphFile(config,resultsCell,[1 0 0])
+staticResultsCell = graphFileToCell(config,'Test_DynamciSLAM_parallel_staticResults.graph');
+plotGraphFile(config,staticResultsCell,[1 0 0])
+hold on
+dynamicPoints = [graphNDynamic.vertices(graphNDynamic.identifyVertices('point')).value];
+plotPoints = plot3(dynamicPoints(1,:),dynamicPoints(2,:),dynamicPoints(3,:),'.');
+set(plotPoints,'MarkerEdgeColor',[0 1 0])
+set(plotPoints,'MarkerSize',8)
