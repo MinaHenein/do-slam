@@ -14,7 +14,6 @@ config.set('opticalCentreX',620.5);
 config.set('opticalCentreY',187.0);
 config.set('R',[0,0,1,0; -1,0,0,0; 0,-1,0,0;0,0,0,1]);
 config = setAppConfig(config);
-
 config.set('motionModel','constantSE3MotionDA');
 config.set('std2PointsSE3Motion', [1,1,1]');
 config.set('SE3MotionVertexInitialization','eye');
@@ -25,54 +24,76 @@ config.set('objectPosesSlidingWindowSize',inf);
 config.set('newMotionVertexPerNObjectPoses',inf);
 config.absoluteToRelativePointHandle = @AbsoluteToRelativePositionR3xso3Image;
 config.set('landmarkErrorToMinimize' ,'reprojectionKnownIntrinsics');
+% config.set('noiseModel','Off');
+config.set('stdPosePixel',[0.02;0.02]);
 
 
 %% 5. Generate Measurements & Save to Graph File, load graph file as well
-config.set('pointMotionMeasurement','Off')
-config.set('measurementsFileName','Sequence0001_350to370_pixelValues_dynamic_weight_Meas.graph')
-config.set('groundTruthFileName','Sequence0001_350to370_pixelValues_dynamic_weight_GT.graph')
+config.set('pointMotionMeasurement','point2DataAssociation');
+config.set('pointsDataAssociationLabel','2PointsDataAssociation');
+config.set('measurementsFileName','finalNoiseSequence0001_short_reprojection_Meas.graph')
+config.set('groundTruthFileName','finalNoiseSequence0001_short_reprojection_GT.graph')
 
 writeGraphFileImagePlane(config)
 config.set('posePointEdgeLabel','EDGE_2D_PIXEL');
 config.set('pointInitialisation','3DMeasurement');
 config.set('measurementsFileName',strcat(config.measurementsFileName(1:end-6),'_Test.graph'))
+config.set('groundTruthFileName',strcat(config.groundTruthFileName(1:end-6),'_Test.graph'))
+groundTruthCellReprojection = graphFileToCell(config,config.groundTruthFileName);
+measurementsCellReprojection = graphFileToCell(config,config.measurementsFileName);
+%% 6. Solve
+%% 6.1 Reprojection error minimization
+timeStartReprojection = tic;
+reprojectionGraph0 = Graph();
+reprojectionSolver = reprojectionGraph0.process(config,measurementsCellReprojection,groundTruthCellReprojection);
+reprojectionSolverEnd = reprojectionSolver(end);
+totalTimeReprojection = toc(timeStartReprojection);
+%get desired graphs & systems
+reprojectionGraph0  = reprojectionSolverEnd.graphs(1);
+reprojectionGraphN  = reprojectionSolverEnd.graphs(end);
+%save results to graph file
+reprojectionGraphN.saveGraphFile(config,'finalNoiseSequence0001_short_reprojection_results.graph');
+
+%% 6.2 3D error minimization
+config.set('landmarkErrorToMinimize' ,'3D');
+config.set('posePointEdgeLabel','EDGE_3D');
+config.absoluteToRelativePointHandle = @AbsoluteToRelativePositionR3xso3;
+config.set('measurementsFileName','finalNoiseSequence0001_short_reprojection_Meas.graph')
+config.set('groundTruthFileName','finalNoiseSequence0001_short_reprojection_GT.graph')
 groundTruthCell = graphFileToCell(config,config.groundTruthFileName);
 measurementsCell = graphFileToCell(config,config.measurementsFileName);
- 
-%% 6. Solve
-%% 6.1 Without SE3
 timeStart = tic;
-graph0 = Graph();
-solver = graph0.process(config,measurementsCell,groundTruthCell);
-solverEnd = solver(end);
+Graph0 = Graph();
+Solver = Graph0.process(config,measurementsCell,groundTruthCell);
+SolverEnd = Solver(end);
 totalTime = toc(timeStart);
-fprintf('\nTotal time solving: %f\n',totalTime)
 %get desired graphs & systems
-graph0  = solverEnd.graphs(1);
-graphN  = solverEnd.graphs(end);
+Graph0  = SolverEnd.graphs(1);
+GraphN  = SolverEnd.graphs(end);
 %save results to graph file
-graphN.saveGraphFile(config,'Sequence0001_350to370_pixelValues_dynamic_weight_results.graph');
+GraphN.saveGraphFile(config,'finalNoiseSequence0001_short_3D_results.graph');
 
 %% 7. Error analysis
-% load ground truth into graph, sort if required
-graphGT = Graph(config,groundTruthCell);
-fprintf('\nInitial results for without SE(3) Transform:\n')
-results = errorAnalysis(config,graphGT,graphN);
+fprintf('\nTotal time solving (reprojection error minimization): %f\n',totalTimeReprojection)
+fprintf('\nTotal time solving (3D error minimization): %f\n',totalTime)
 
-%% 8. Plot
+% load ground truth into graph, sort if required
+graphGTReprojection = Graph(config,groundTruthCellReprojection);
+fprintf('\nReprojection error minimization results:\n')
+resultsReprojection = errorAnalysis(config,graphGTReprojection,reprojectionGraphN);
+fprintf('\nReprojection error:\n')
+reprojectionError = calculate_reprojection_error(config,graphGTReprojection,reprojectionGraphN);
+
+graphGT = Graph(config,groundTruthCell);
+fprintf('\n3D error minimization results:\n')
+results3D = errorAnalysis(config,graphGT,GraphN);
+
+%% 8. GT Plot 
 figure('units','normalized','color','w');
 xlabel('x (m)')
 ylabel('y (m)')
 zlabel('z (m)')
-hold on
 grid on
 axis equal
-% axisLimits = [-30,50,-10,60,-25,25];
-% axis(axisLimits)
 view([-50,25])
-%plot groundtruth
 plotGraphFileICRA(config,groundTruthCell,'groundTruth');
-%plot results
-resultsCell = graphFileToCell(config,'Sequence0001_350to370_pixelValues_dynamic_weight_results.graph');
-plotGraphFileICRA(config,resultsNoSE3Cell,'initial',...
-    results.relPose.get('R3xso3Pose'),results.posePointsN.get('R3xso3Pose'))

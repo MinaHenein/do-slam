@@ -22,7 +22,7 @@ switch processing
             [solverStatic, solverDynamic] = obj.processIncrementalParallelStatic(config,measurementsCell,groundTruthCell);
             solver = [solverStatic, solverDynamic];
         else
-            solver = obj.processIncremental(config,measurementsCell,groundTruthCell);
+            solver = obj.processIncrementalOld(config,measurementsCell,groundTruthCell);
         end
     case 'incrementalSolveHessian'
         solver = obj.solveIncremental(config,measurementsCell,groundTruthCell);

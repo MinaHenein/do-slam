@@ -13,7 +13,7 @@ DataMeas = textscan(fileMeasID,'%s','delimiter','\n','whitespace',' ');
 CStrMeas = DataMeas{1};
 fclose(fileMeasID);
 
-IndexC = strfind(CStrMeas, config.posePointEdgeLabel);
+IndexC = strfind(CStrMeas,config.posePointEdgeLabel);
 Index = find(~cellfun('isempty', IndexC));
 
 pointPixels = [];

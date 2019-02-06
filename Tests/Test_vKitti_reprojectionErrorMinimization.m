@@ -16,7 +16,7 @@ config.set('R',[0,0,1,0; -1,0,0,0; 0,-1,0,0;0,0,0,1]);
 config = setAppConfig(config);
 config.absoluteToRelativePointHandle = @AbsoluteToRelativePositionR3xso3Image;
 config.set('landmarkErrorToMinimize' ,'reprojectionKnownIntrinsics');
-config.set('noiseModel','Off');
+% config.set('noiseModel','Off');
 config.set('stdPosePixel',[1;1]);
 
 %% 5. Generate Measurements & Save to Graph File, load graph file as well
@@ -43,7 +43,7 @@ totalTimeReprojection = toc(timeStartReprojection);
 reprojectionGraph0  = reprojectionSolverEnd.graphs(1);
 reprojectionGraphN  = reprojectionSolverEnd.graphs(end);
 %save results to graph file
-reprojectionGraphN.saveGraphFile(config,'finalNoiseSequence0001_short_reprojection_results.graph');
+reprojectionGraphN.saveGraphFile(config,'finalNoiseSequence0001_short_reprojection_resultsStaticOnly.graph');
 
 %% 6.2 3D error minimization
 config.set('landmarkErrorToMinimize' ,'3D');
@@ -62,7 +62,7 @@ totalTime = toc(timeStart);
 Graph0  = SolverEnd.graphs(1);
 GraphN  = SolverEnd.graphs(end);
 %save results to graph file
-GraphN.saveGraphFile(config,'finalNoiseSequence0001_short_3D_results.graph');
+GraphN.saveGraphFile(config,'finalNoiseSequence0001_short_3D_resultsStaticOnly.graph');
 
 %% 7. Error analysis
 fprintf('\nTotal time solving (reprojection error minimization): %f\n',totalTimeReprojection)
@@ -78,3 +78,13 @@ reprojectionError = calculate_reprojection_error(config,graphGTReprojection,repr
 graphGT = Graph(config,groundTruthCellStaticOnly);
 fprintf('\n3D error minimization results:\n')
 results3D = errorAnalysis(config,graphGT,GraphN);
+
+%% 8. GT Plot 
+figure('units','normalized','color','w');
+xlabel('x (m)')
+ylabel('y (m)')
+zlabel('z (m)')
+grid on
+axis equal
+view([-50,25])
+plotGraphFileICRA(config,groundTruthCellStaticOnly,'groundTruth');
