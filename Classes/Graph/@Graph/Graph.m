@@ -70,9 +70,8 @@ classdef Graph
         
         %% declare
         solver = process(obj,camera,measurements,tree,processing);
-        obj = obj.buildGraph(map,camera,tree);
-        obj.saveGraphFile(fileName);
+        obj = buildGraph(obj,map,camera,tree);
+        saveGraphFile(obj,config,fileName);
     end
-    
 end
 
