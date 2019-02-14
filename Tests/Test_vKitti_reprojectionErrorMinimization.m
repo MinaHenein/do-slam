@@ -78,13 +78,3 @@ reprojectionError = calculate_reprojection_error(config,graphGTReprojection,repr
 graphGT = Graph(config,groundTruthCellStaticOnly);
 fprintf('\n3D error minimization results:\n')
 results3D = errorAnalysis(config,graphGT,GraphN);
-
-%% 8. GT Plot 
-figure('units','normalized','color','w');
-xlabel('x (m)')
-ylabel('y (m)')
-zlabel('z (m)')
-grid on
-axis equal
-view([-50,25])
-plotGraphFileICRA(config,groundTruthCellStaticOnly,'groundTruth');

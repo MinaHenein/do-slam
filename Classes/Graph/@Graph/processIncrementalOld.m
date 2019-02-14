@@ -269,9 +269,9 @@ for i = 1:nSteps
         end
                 
         %store iSolver
-%         solver = [solver iSolver];
+        solver = [solver iSolver];
         storePlot = 0;
-        solver = iSolver; %if memory is problem
+%         solver = iSolver; %if memory is problem
     else
         skipCount = skipCount + 1;
         storePlot = 0;

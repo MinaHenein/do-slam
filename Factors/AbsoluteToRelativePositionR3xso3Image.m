@@ -35,8 +35,8 @@ for i = 1:size(positionsAbsolute,2)
         cy = intrinsics(3);
         intrinsicMatrix = [f 0 cx; 0 f cy; 0 0 1];
     end
-    positionRelative = intrinsicMatrix * ...
-        (normalisedPositionRelative(1:3,:)/normalisedPositionRelative(3,:));
+    positionRelative = intrinsicMatrix * normalisedPositionRelative(1:3,:);
+    positionRelative = positionRelative/positionRelative(3);
     positionsRelative(:,i) = positionRelative(1:2);
 end
 

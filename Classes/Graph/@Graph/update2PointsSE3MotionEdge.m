@@ -39,4 +39,3 @@ if obj.edges(iEdge).active
     
 end
 end
-
