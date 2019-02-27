@@ -269,16 +269,16 @@ for i = 1:nSteps
         end
                 
         %store iSolver
-        solver = [solver iSolver];
+%         solver = [solver iSolver];
         storePlot = 0;
-%         solver = iSolver; %if memory is problem
+        solver = iSolver; %if memory is problem
     else
         skipCount = skipCount + 1;
         storePlot = 0;
     end
        
     %plot while solving
-    obj.saveGraphFile(config,strcat('app6_results_',num2str(i),'.graph'));
+    obj.saveGraphFile(config,strcat('Sequence0002_IROS_results_',num2str(i),'.graph'));
     if config.plotIncremental
         if any(strcmp(who,'currentPlotHandle'))
             for j = 1:numel(currentPlotHandle)
@@ -288,10 +288,23 @@ for i = 1:nSteps
 
         end
         view([-50,25])
-%         currentPlotHandle = plotGraph(config,obj,[0 0 1]);
-        obj.saveGraphFile(config,strcat('app6_results_',num2str(i),'.graph'));
-        resultsCell = graphFileToCell(config,strcat('app6_results_',num2str(i),'.graph'));
-        plotGraphFileICRA(config,resultsCell,'solverResults', zeros(6,1),zeros(6,1),obj);
+        %         currentPlotHandle = plotGraph(config,obj,[0 0 1]);
+        obj.saveGraphFile(config,strcat('Sequence0002_IROS_results_',num2str(i),'.graph'));
+        resultsCell = graphFileToCell(config,strcat('Sequence0002_IROS_results_',num2str(i),'.graph'));
+        dynamicPointsVertices = {};
+        allDynamicPointsVertices = [];
+        SE3MotionVertices = [obj.identifyVertices('SE3Motion')];
+        pointIndices = [obj.identifyVertices('point')];
+        for i=1:numel(SE3MotionVertices)
+            edgesConnectedToMotionVertex = [obj.vertices(SE3MotionVertices(i)).iEdges];
+            dynamicPointsMotionIndices = [obj.edges(edgesConnectedToMotionVertex).iVertices]';
+            dynamicPointsIndices = setdiff(dynamicPointsMotionIndices,SE3MotionVertices);
+            dynamicPointsVertices{i} = dynamicPointsIndices;
+            allDynamicPointsVertices = [allDynamicPointsVertices,dynamicPointsIndices'];
+        end
+        staticPointsIndices = setdiff(pointIndices,allDynamicPointsVertices);
+        plotGraphFileICRA(config,resultsCell,'solverResults', zeros(6,1),zeros(6,1),...
+            obj,[staticPointsIndices, dynamicPointsVertices]);
         frames(i) = getframe(fig);
         if storePlot
             solver(end).frames = frames;

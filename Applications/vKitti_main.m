@@ -13,7 +13,7 @@ config = CameraConfig();
 config = setAppConfig(config);
 % config.set('noiseModel','Off');
 config.set('motionModel','constantSE3MotionDA');
-config.set('std2PointsSE3Motion', [1,1,1]');
+config.set('std2PointsSE3Motion', [1.65,1.65,1.65]');
 config.set('SE3MotionVertexInitialization','eye');
 config.set('newMotionVertexPerNLandmarks',inf);
 config.set('landmarksSlidingWindowSize',inf);
@@ -34,8 +34,8 @@ config.set('newMotionVertexPerNObjectPoses',inf);
 %% 5.2 For test (with SE3)
 config.set('pointMotionMeasurement','point2DataAssociation');
 config.set('pointsDataAssociationLabel','2PointsDataAssociation');
-config.set('measurementsFileName','finalNoiseSequence0001_334to426_final_Meas.graph');
-config.set('groundTruthFileName','finalNoiseSequence0001_334to426_final_GT.graph'); 
+config.set('measurementsFileName','Sequence0002_IROS_Meas.graph');
+config.set('groundTruthFileName','Sequence0002_IROS_GT.graph'); 
 % Check for wrong data associations and fix if necessary
 % dataAssociationTest(config,config.measurementsFileName,nObjects);
 % dataAssociationTest(config,config.groundTruthFileName,nObjects);
@@ -77,7 +77,7 @@ fprintf('\nTotal time solving: %f\n',totalTime)
 graph0  = solverEnd.graphs(1);
 graphN  = solverEnd.graphs(end);
 %save results to graph file
-graphN.saveGraphFile(config,'Sequence0001_334to426_objectMotion_results.graph');
+graphN.saveGraphFile(config,'Sequence0002_IROS_results.graph');
 
 %% 7. Error analysis
 %load ground truth into graph, sort if required
@@ -112,7 +112,7 @@ view([-50,25])
 plotGraphFileICRA(config,groundTruthCell,'groundTruth');
 %plot results
 % resultsNoSE3Cell = graphFileToCell(config,'vKitti_resultsNoSE3.graph');
-resultsCell = graphFileToCell(config,'Sequence0001_334to426_objectMotion_results.graph');
+resultsCell = graphFileToCell(config,'Sequence0002_IROS_results.graph');
 % plotGraphFileICRA(config,resultsNoSE3Cell,'initial',...
 %     resultsNoSE3.relPose.get('R3xso3Pose'),resultsNoSE3.posePointsN.get('R3xso3Pose'))
 plotGraphFileICRA(config,resultsCell,'solverResults',...

@@ -116,7 +116,7 @@ config.set('constantSE3Motion',constantSE3ObjectMotion);
     groundTruthNoSE3Cell = graphFileToCell(config,config.groundTruthFileName);
     measurementsNoSE3Cell = graphFileToCell(config,config.measurementsFileName);
     
-    %% 5.2 For test (with SE3)
+    %% 5.2 For test (with SE3)    
     if objectAware
         config.set('pointMotionMeasurement','point2DataAssociation');
     else
@@ -186,20 +186,33 @@ spy(solverEnd.systems(end).A)
 subplot(1,2,2)
 spy(solverEnd.systems(end).H)
 
-% h = figure; 
-% xlabel('x (m)')
-% ylabel('y (m)')
-% zlabel('z (m)')
-% hold on
-% grid on
-% axis equal
-% axisLimits = [-30,50,-10,60,-25,25];
-% axis(axisLimits)
-% view([-50,25])
-% %plot groundtruth
-% plotGraphFileICRA(config,groundTruthCell,'groundTruth');
-% %plot results
-% resultsNoSE3Cell = graphFileToCell(config,'app5_resultsNoSE3.graph');
-% resultsCell = graphFileToCell(config,'app5_results.graph');
+h = figure; 
+xlabel('x (m)')
+ylabel('y (m)')
+zlabel('z (m)')
+hold on
+grid on
+axis equal
+axisLimits = [-30,50,-10,60,-25,25];
+axis(axisLimits)
+view([-50,25])
+%plot groundtruth
+plotGraphFileICRA(config,groundTruthCell,'groundTruth');
+%plot results
+resultsNoSE3Cell = graphFileToCell(config,'app5_resultsNoSE3.graph');
+resultsCell = graphFileToCell(config,'app5_results.graph');
 % plotGraphFileICRA(config,resultsNoSE3Cell,'initial',resultsNoSE3.relPose.get('R3xso3Pose'),resultsNoSE3.posePointsN.get('R3xso3Pose'))
-% plotGraphFileICRA(config,resultsCell,'solverResults',resultsSE3.relPose.get('R3xso3Pose'),resultsSE3.posePointsN.get('R3xso3Pose'))
+% get indices of static and dynamic points per object
+dynamicPointsVertices = {};
+allDynamicPointsVertices = [];
+SE3MotionVertices = [graphN.identifyVertices('SE3Motion')];
+pointIndices = [graphN.identifyVertices('point')];
+for i=1:numel(SE3MotionVertices)
+    edgesConnectedToMotionVertex = [graphN.vertices(SE3MotionVertices(i)).iEdges];
+    dynamicPointsMotionIndices = [graphN.edges(edgesConnectedToMotionVertex).iVertices]';
+    dynamicPointsIndices = setdiff(dynamicPointsMotionIndices,SE3MotionVertices);
+    dynamicPointsVertices{i} = dynamicPointsIndices;
+    allDynamicPointsVertices = [allDynamicPointsVertices,dynamicPointsIndices'];
+end
+staticPointsIndices = setdiff(pointIndices,allDynamicPointsVertices);
+plotGraphFileICRA(config,resultsCell,'solverResults',resultsSE3.relPose.get('R3xso3Pose'),resultsSE3.posePointsN.get('R3xso3Pose'),graphN,[staticPointsIndices dynamicPointsVertices])

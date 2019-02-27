@@ -1,5 +1,5 @@
 function [obj] = update2PointsSE3MotionEdge(obj,config,iEdge)
-%UPDATEPOINTVELOCITYEDGE recomputes edge value, jacobian, covariance and switch
+%UPDATE2POINTSSE3MOTIONEDGE recomputes edge value, jacobian, covariance and switch
 %properties from connected vertices.
 
 if obj.edges(iEdge).active

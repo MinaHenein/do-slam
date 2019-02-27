@@ -5,20 +5,10 @@ function [residual] = computeResidual(obj,config,iEdge,measurement)
 switch obj.edges(iEdge).type
     case 'posePrior'
         residual = config.absoluteToRelativePoseHandle(measurement,obj.edges(iEdge).value);
-        %         residual = AbsoluteToRelativePose(measurement,obj.edges(iEdge).value);
-        %         residual = Absolute2RelativeSE3(measurement,obj.edges(iEdge).value);
     case 'pose-pose'
-        pose1 = obj.vertices(obj.edges(iEdge).iVertices(1)).value;
-        pose2 = obj.vertices(obj.edges(iEdge).iVertices(2)).value;
-        measurementPredicted = config.absoluteToRelativePoseHandle(pose1,pose2);
-        %         pose2Predicted = config.relativeToAbsolutePoseHandle(pose1,measurement);
-        %         pose2Predicted = RelativeToAbsolutePose(pose1,measurement);
-        %         pose2Predicted = Relative2AbsoluteSE3(pose1,measurement);
-        %         residual = config.absoluteToRelativePoseHandle(pose2Predicted,pose2);
-        %         residual = AbsoluteToRelativePose(pose2Predicted,pose2);
-        %         residual = Absolute2RelativeSE3(pose2Predicted,pose2);
-        residual = config.absoluteToRelativePoseHandle(measurementPredicted,measurement);
-        %         residual = config.absoluteToRelativePoseHandle(measurement,measurementPredicted);
+        residual = config.absoluteToRelativePoseHandle(obj.edges(iEdge).value,measurement);
+    case 'SE3Motion-SE3Motion'
+        residual = config.absoluteToRelativePoseHandle(obj.edges(iEdge).value,zeros(6,1));
     case {'pose-point','pose-point-intrinsic'}
         if strcmp(config.landmarkErrorToMinimize,'reprojectionKnownIntrinsics')
             residual = measurement(4:5) - obj.edges(iEdge).value;

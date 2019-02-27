@@ -1,4 +1,5 @@
-function [tx,ty,tz,ox,oy,oz,translation,rotation] = computeDistanceAndRotation(gtFilePath)
+function [tx,ty,tz,ox,oy,oz,translation,rotation,tx_points,ty_points,tz_points,...
+    translation_points] = computeDistanceAndRotation(gtFilePath)
 % GT
 fileID = fopen(strcat(pwd,'/Data/GraphFiles/',gtFilePath),'r');
 Data = textscan(fileID, '%s', 'delimiter', '\n', 'whitespace', '');
@@ -34,6 +35,33 @@ for i=1:nPoses-1
     ox = ox + norm(eulXYZ(1));
     oy = oy + norm(eulXYZ(2));
     oz = oz + norm(eulXYZ(3));
+end
+
+fileID = fopen(strcat(pwd,'/Data/GraphFiles/',gtFilePath),'r');
+Data = textscan(fileID, '%s', 'delimiter', '\n', 'whitespace', '');
+CStr = Data{1};
+fclose(fileID);
+
+nPoints = 0;
+for i=1:1:length(CStr)
+    splitLine = strsplit(CStr{i,1},' ');
+    label = splitLine{1,1};
+    if strcmp(label(1:length('VERTEX_POINT')),'VERTEX_POINT')
+        nPoints = nPoints+1;
+        value = str2double(splitLine(3:end));
+        points(:,nPoints) = value'; 
+    end
+end
+
+tx_points = 0; ty_points = 0; tz_points = 0;
+translation_points = 0;
+
+for i=1:nPoints-1
+    distance = points(:,i+1)-points(:,i);
+    translation_points = translation_points + norm(distance);
+    tx_points = tx_points + norm(distance(1));
+    ty_points = ty_points + norm(distance(2));
+    tz_points = tz_points + norm(distance(3));
 end
 
 end

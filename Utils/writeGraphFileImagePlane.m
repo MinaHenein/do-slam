@@ -65,26 +65,26 @@ fileID = fopen(filepath,'w');
 fprintf(fileID, '%s\n', CStrMeas{:});
 fclose(fileID);
 
-IndexC = strfind(CStrGT, config.pointVertexLabel);
-Index = find(~cellfun('isempty', IndexC));
-for i=1:length(Index)
-    line   = strsplit(CStrGT{Index(i),1},' ');
-    label  = line{1,1};
-    pointVertex = str2double(line{1,2});
-    pointVertexValue  = str2double(line(1,3:end))';
-    pointImagePlane = pointPixels(pointPixels(:,1)==pointVertex,2:3);
-    if length(line)== 5 % pixel value not provided
-        CStrGT(Index(i)) = cellstr(sprintf('%s %d %f %f %f %f %f',...
-            label,pointVertex,pointVertexValue,pointImagePlane));
-    end
-end
-% Save in a different file
-filepath = strcat(config.folderPath,config.sep,'Data',...
-    config.sep,config.graphFileFolderName,config.sep,...
-    config.groundTruthFileName(1:end-6),'_Test.graph');
-fileID = fopen(filepath,'w');
-fprintf(fileID, '%s\n', CStrGT{:});
-fclose(fileID);
+% IndexC = strfind(CStrGT, config.pointVertexLabel);
+% Index = find(~cellfun('isempty', IndexC));
+% for i=1:length(Index)
+%     line   = strsplit(CStrGT{Index(i),1},' ');
+%     label  = line{1,1};
+%     pointVertex = str2double(line{1,2});
+%     pointVertexValue  = str2double(line(1,3:end))';
+%     pointImagePlane = pointPixels(pointPixels(:,1)==pointVertex,2:3);
+%     if length(line)== 5 % pixel value not provided
+%         CStrGT(Index(i)) = cellstr(sprintf('%s %d %f %f %f %f %f',...
+%             label,pointVertex,pointVertexValue,pointImagePlane));
+%     end
+% end
+% % Save in a different file
+% filepath = strcat(config.folderPath,config.sep,'Data',...
+%     config.sep,config.graphFileFolderName,config.sep,...
+%     config.groundTruthFileName(1:end-6),'_Test.graph');
+% fileID = fopen(filepath,'w');
+% fprintf(fileID, '%s\n', CStrGT{:});
+% fclose(fileID);
 
 
 end

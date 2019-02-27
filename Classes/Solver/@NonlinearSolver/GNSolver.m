@@ -11,15 +11,16 @@ function [obj] = GNSolver(obj,config,graph0,measurementsCell)
 done = 0;
 iteration = 1;
 dXPrev = inf;
+weight = 1;
 
 obj.dX      = [];
 obj.graphs  = [graph0];
-obj.systems = [System(config,graph0,measurementsCell)];
+obj.systems = [System(config,graph0,measurementsCell,weight)];
 
 timeStart = tic;
 while (~done)
     %   build system
-    system = System(config,graph0,measurementsCell);
+    system = System(config,graph0,measurementsCell,weight);
     
     %   solve linear system       
     if config.displaySPPARMS

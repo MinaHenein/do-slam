@@ -1,13 +1,13 @@
 for i = 1:nSteps+50
     
     if i > nSteps
-        deleteMotionVerticesFromGraphFile(strcat(pwd,'/Data/GraphFiles/app6_results_',num2str(nSteps),'.graph'));
-        deleteEdgesFromGraphFile(strcat(pwd,'/Data/GraphFiles/app6_results_',num2str(nSteps),'.graph'));
-        resultsCell = graphFileToCell(config,strcat('app6_results_',num2str(nSteps),'.graph'));
+        deleteMotionVerticesFromGraphFile(strcat(pwd,'/Data/GraphFiles/app5_results_',num2str(nSteps),'.graph'));
+        deleteEdgesFromGraphFile(strcat(pwd,'/Data/GraphFiles/app5_results_',num2str(nSteps),'.graph'));
+        resultsCell = graphFileToCell(config,strcat('app5_results_',num2str(nSteps),'.graph'));
     else
-        deleteMotionVerticesFromGraphFile(strcat(pwd,'/Data/GraphFiles/app6_results_',num2str(i),'.graph'));
-        deleteEdgesFromGraphFile(strcat(pwd,'/Data/GraphFiles/app6_results_',num2str(i),'.graph'));
-        resultsCell = graphFileToCell(config,strcat('app6_results_',num2str(i),'.graph'));
+        deleteMotionVerticesFromGraphFile(strcat(pwd,'/Data/GraphFiles/app5_results_',num2str(i),'.graph'));
+        deleteEdgesFromGraphFile(strcat(pwd,'/Data/GraphFiles/app5_results_',num2str(i),'.graph'));
+        resultsCell = graphFileToCell(config,strcat('app5_results_',num2str(i),'.graph'));
     end
     
     fig = figure;
