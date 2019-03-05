@@ -4,7 +4,7 @@ objectCameraPoses = load(objectPosesMatrix);
 objectCameraPoses = objectCameraPoses.objPose;
 
 nObjects = size(objectCameraPoses,2);
-Rot = [0 0 1 0;-1 0 0 0;0 -1 0 0;0 0 0 1];
+Rot = eye(4);%[0 0 1 0;-1 0 0 0;0 -1 0 0;0 0 0 1];
 
 objectsGTMotion = {};
 frames = {};

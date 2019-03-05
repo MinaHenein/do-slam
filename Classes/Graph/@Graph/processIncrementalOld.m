@@ -278,19 +278,17 @@ for i = 1:nSteps
     end
        
     %plot while solving
-    obj.saveGraphFile(config,strcat('Sequence0002_IROS_results_',num2str(i),'.graph'));
+    obj.saveGraphFile(config,strcat('Sequence0020_IROS_637to700_results_',num2str(i),'.graph'));
     if config.plotIncremental
         if any(strcmp(who,'currentPlotHandle'))
             for j = 1:numel(currentPlotHandle)
                 delete(currentPlotHandle{j});
             end
-        else
-
         end
         view([-50,25])
         %         currentPlotHandle = plotGraph(config,obj,[0 0 1]);
-        obj.saveGraphFile(config,strcat('Sequence0002_IROS_results_',num2str(i),'.graph'));
-        resultsCell = graphFileToCell(config,strcat('Sequence0002_IROS_results_',num2str(i),'.graph'));
+        obj.saveGraphFile(config,strcat('Sequence0020_IROS_637to700_results_',num2str(i),'.graph'));
+        resultsCell = graphFileToCell(config,strcat('Sequence0020_IROS_637to700_results_',num2str(i),'.graph'));
         dynamicPointsVertices = {};
         allDynamicPointsVertices = [];
         SE3MotionVertices = [obj.identifyVertices('SE3Motion')];

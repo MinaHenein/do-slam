@@ -1,5 +1,7 @@
 function [tx,ty,tz,ox,oy,oz,translation,rotation,tx_points,ty_points,tz_points,...
-    translation_points] = computeDistanceAndRotation(gtFilePath)
+    translation_points,tx_pointsStatic,ty_pointsStatic,tz_pointsStatic,...
+    translation_pointsStatic,tx_pointsDynamic,ty_pointsDynamic,tz_pointsDynamic,...
+    translation_pointsDynamic] = computeDistanceAndRotation(gtFilePath, staticPointIndices, dynamicPointIndices)
 % GT
 fileID = fopen(strcat(pwd,'/Data/GraphFiles/',gtFilePath),'r');
 Data = textscan(fileID, '%s', 'delimiter', '\n', 'whitespace', '');
@@ -43,13 +45,23 @@ CStr = Data{1};
 fclose(fileID);
 
 nPoints = 0;
+nStaticPoints = 0;
+nDynamicPoints = 0;
 for i=1:1:length(CStr)
     splitLine = strsplit(CStr{i,1},' ');
     label = splitLine{1,1};
     if strcmp(label(1:length('VERTEX_POINT')),'VERTEX_POINT')
         nPoints = nPoints+1;
         value = str2double(splitLine(3:end));
+        id = str2double(splitLine(2));
         points(:,nPoints) = value'; 
+        if ismember(id,staticPointIndices)
+            nStaticPoints = nStaticPoints +1;
+            staticPoints(:,nStaticPoints) = value';
+        elseif ismember(id,dynamicPointIndices)
+            nDynamicPoints = nDynamicPoints +1;
+            dynamicPoints(:,nDynamicPoints) = value';
+        end
     end
 end
 
@@ -64,4 +76,27 @@ for i=1:nPoints-1
     tz_points = tz_points + norm(distance(3));
 end
 
+% static
+nStaticPoints = length(staticPointIndices);
+tx_pointsStatic = 0; ty_pointsStatic = 0; tz_pointsStatic = 0;
+translation_pointsStatic = 0;
+for i=1:nStaticPoints-1
+    distance = staticPoints(:,i+1)-staticPoints(:,i);
+    translation_pointsStatic = translation_pointsStatic + norm(distance);
+    tx_pointsStatic = tx_pointsStatic + norm(distance(1));
+    ty_pointsStatic = ty_pointsStatic + norm(distance(2));
+    tz_pointsStatic = tz_pointsStatic + norm(distance(3));
+end
+
+% dynamic
+nDynamicPoints = length(dynamicPointIndices);
+tx_pointsDynamic = 0; ty_pointsDynamic = 0; tz_pointsDynamic = 0;
+translation_pointsDynamic = 0;
+for i=1:nDynamicPoints-1
+    distance = dynamicPoints(:,i+1)-dynamicPoints(:,i);
+    translation_pointsDynamic = translation_pointsDynamic + norm(distance);
+    tx_pointsDynamic = tx_pointsDynamic + norm(distance(1));
+    ty_pointsDynamic = ty_pointsDynamic + norm(distance(2));
+    tz_pointsDynamic = tz_pointsDynamic + norm(distance(3));
+end
 end

@@ -6,7 +6,7 @@ objectCameraPoses = objectCameraPoses.objPose;
 nObjects = size(objectCameraPoses,2);
 constantSE3ObjectMotion = zeros(6,nObjects);
 
-Rot = [0 0 1 0;-1 0 0 0;0 -1 0 0;0 0 0 1];
+Rot = eye(4);%[0 0 1 0;-1 0 0 0;0 -1 0 0;0 0 0 1];
 % average transformation
 for i=1:nObjects
     objectPoses = objectCameraPoses(i).obPose;
@@ -29,9 +29,13 @@ for i=1:nObjects
         rotations{k-1} = rotM;
         translations(:,k-1) = t;
     end
-    R = rotationAveraging(rotations);
-    t = mean(translations,2);
-    SE3Motion = [t;arot(R)];
+    if ~isempty(rotations)
+        R = rotationAveraging(rotations);
+        t = mean(translations,2);
+        SE3Motion = [t;arot(R)];
+    else
+        SE3Motion = zeros(6,1);
+    end
     constantSE3ObjectMotion(:,i) = SE3Motion;
 end
 

@@ -4,10 +4,10 @@
 %--------------------------------------------------------------------------
 % vKitti main
 % 1. Config
-% objectPosesMatrix = 'objPose_0001_334_425.mat';
-% [objectsGTMotion, objectsGTFrames] = vKitti_objectMotion(objectPosesMatrix);
-% constantSE3ObjectMotion = vKitti_objectMotionAveraged(objectPosesMatrix);
-% nObjects = size(constantSE3ObjectMotion,2);
+objectPosesMatrix = 'objPose_Sequence0020_637to700.mat';
+[objectsGTMotion, objectsGTFrames] = vKitti_objectMotion(objectPosesMatrix);
+constantSE3ObjectMotion = vKitti_objectMotionAveraged(objectPosesMatrix);
+nObjects = size(constantSE3ObjectMotion,2);
 
 config = CameraConfig();
 config = setAppConfig(config);
@@ -20,8 +20,8 @@ config.set('landmarksSlidingWindowSize',inf);
 config.set('objectPosesSlidingWindow',false);
 config.set('objectPosesSlidingWindowSize',inf);
 config.set('newMotionVertexPerNObjectPoses',inf);
-% config.set('robustCostFunction','GemanMcClure')
-% config.set('robustCostFunctionWidth',3)
+config.set('robustCostFunction','GemanMcClure')
+config.set('robustCostFunctionWidth',4)
 
 %% 5. Generate Measurements & Save to Graph File, load graph file as well
 %% 5.1 For initial (without SE3)
@@ -34,8 +34,8 @@ config.set('newMotionVertexPerNObjectPoses',inf);
 %% 5.2 For test (with SE3)
 config.set('pointMotionMeasurement','point2DataAssociation');
 config.set('pointsDataAssociationLabel','2PointsDataAssociation');
-config.set('measurementsFileName','Sequence0002_IROS_Meas.graph');
-config.set('groundTruthFileName','Sequence0002_IROS_GT.graph'); 
+config.set('measurementsFileName','Sequence0020_IROS_637to700_Meas.graph');
+config.set('groundTruthFileName','Sequence0020_IROS_637to700_GT.graph'); 
 % Check for wrong data associations and fix if necessary
 % dataAssociationTest(config,config.measurementsFileName,nObjects);
 % dataAssociationTest(config,config.groundTruthFileName,nObjects);
@@ -77,7 +77,7 @@ fprintf('\nTotal time solving: %f\n',totalTime)
 graph0  = solverEnd.graphs(1);
 graphN  = solverEnd.graphs(end);
 %save results to graph file
-graphN.saveGraphFile(config,'Sequence0002_IROS_results.graph');
+graphN.saveGraphFile(config,'Sequence0020_IROS_637to700_results.graph');
 
 %% 7. Error analysis
 %load ground truth into graph, sort if required
@@ -112,11 +112,25 @@ view([-50,25])
 plotGraphFileICRA(config,groundTruthCell,'groundTruth');
 %plot results
 % resultsNoSE3Cell = graphFileToCell(config,'vKitti_resultsNoSE3.graph');
-resultsCell = graphFileToCell(config,'Sequence0002_IROS_results.graph');
+resultsCell = graphFileToCell(config,'Sequence0020_IROS_637to700_results.graph');
 % plotGraphFileICRA(config,resultsNoSE3Cell,'initial',...
 %     resultsNoSE3.relPose.get('R3xso3Pose'),resultsNoSE3.posePointsN.get('R3xso3Pose'))
-plotGraphFileICRA(config,resultsCell,'solverResults',...
-resultsSE3.relPose.get('R3xso3Pose'),resultsSE3.posePointsN.get('R3xso3Pose'),graphN)
+
+% get indices of static and dynamic points per object
+dynamicPointsVertices = {};
+allDynamicPointsVertices = [];
+SE3MotionVertices = [graphN.identifyVertices('SE3Motion')];
+pointVertices = [graphN.vertices(graphN.identifyVertices('point'))];
+pointIndices = [graphN.identifyVertices('point')];
+for i=1:numel(SE3MotionVertices)
+    edgesConnectedToMotionVertex = [graphN.vertices(SE3MotionVertices(i)).iEdges];
+    dynamicPointsMotionIndices = [graphN.edges(edgesConnectedToMotionVertex).iVertices]';
+    dynamicPointsIndices = setdiff(dynamicPointsMotionIndices,SE3MotionVertices);
+    dynamicPointsVertices{i} = dynamicPointsIndices;
+    allDynamicPointsVertices = [allDynamicPointsVertices,dynamicPointsIndices'];
+end
+staticPointsIndices = setdiff(pointIndices,allDynamicPointsVertices);
+plotGraphFileICRA(config,resultsCell,'solverResults',resultsSE3.relPose.get('R3xso3Pose'),resultsSE3.posePointsN.get('R3xso3Pose'),graphN,[staticPointsIndices dynamicPointsVertices])
 
 % %plot heat map style points error
 % pointsGT = [graphGT.vertices(graphGT.identifyVertices('point')).value];
