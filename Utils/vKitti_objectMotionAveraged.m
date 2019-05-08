@@ -15,7 +15,7 @@ for i=1:nObjects
     for j=1:size(objectPoses,1)/4
         cameraPoseWorldFrame = Rot/cameraPoses(mapping(j,4),:)/Rot;
         objectPosesWorldFrame(mapping(j,4),:) = ...
-            objectPoses(mapping(j,4),:)*cameraPoseWorldFrame;
+            cameraPoseWorldFrame*objectPoses(mapping(j,4),:);
     end
     rotations= {};
     translations = [];

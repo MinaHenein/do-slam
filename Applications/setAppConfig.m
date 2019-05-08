@@ -80,7 +80,7 @@ orientation = arot(rot);
 config.set('stdPosePose'  ,[0.03,0.03,0.03,orientation']');
 
 % measurement errors
-config.set('stdPosePoint' ,[0.02,0.02,0.02]');
+config.set('stdPosePoint' ,[0.03,0.03,0.03]');
 config.set('stdPointPlane',0.001);
 % set properties of CameraConfig
 config.set('fieldOfView',[-pi/2,pi/2,-pi/3,pi/3,1,40]); %az,el,r limits
@@ -104,7 +104,7 @@ config.set('staticDataAssociation','On'); % set this to 'Off' to change object i
 %   solver settings
 config.set('sortVertices',0);
 config.set('sortEdges',0);
-config.set('processing','incremental');
+config.set('processing','batch');
 config.set('plotIncremental',0);
 config.set('nVerticesThreshold',inf);
 config.set('nEdgesThreshold',inf);

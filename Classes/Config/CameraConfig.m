@@ -42,7 +42,8 @@ classdef CameraConfig < Config
     % Dependent properties
     methods
         function intrinsics = get.intrinsics(obj)
-            intrinsics = [obj.focalLength;obj.opticalCentreX;obj.opticalCentreY];
+            intrinsics = [obj.focalLength 0 obj.opticalCentreX;
+                0 obj.focalLength obj.opticalCentreY; 0 0 1];
         end
     end
 end

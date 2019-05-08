@@ -23,13 +23,13 @@ config.set('nSteps',nSteps);
 % config.set('noiseModel','Off');
 config.set('groundTruthFileName','app5_groundTruth.graph');
 config.set('measurementsFileName','app5_measurements.graph');
-
+%config.set('mode','initialisation');
 objectAware = 1;
 
 % SE3 Motion
 if objectAware
     config.set('motionModel','constantSE3MotionDA');
-    config.set('std2PointsSE3Motion', [0.1,0.1,0.1]');
+    config.set('std2PointsSE3Motion', [0.01,0.01,0.01]');
     config.set('SE3MotionVertexInitialization','eye');
     config.set('newMotionVertexPerNLandmarks',inf);
     config.set('landmarksSlidingWindowSize',inf);
@@ -38,7 +38,7 @@ if objectAware
     config.set('newMotionVertexPerNObjectPoses',inf);
 else
     config.set('motionModel','constantVelocity');
-    config.set('std2PointsVelocity', [0.1,0.1,0.1]');    
+    config.set('std2PointsVelocity', [0.01,0.01,0.01]');    
 end
 
 %% 2. Generate Environment
@@ -73,9 +73,11 @@ cameraTrajectory = RelativePoseTrajectory(robotTrajectory,config.cameraRelativeP
 
 % occlusion sensor
 sensor = SimulatedEnvironmentOcclusionSensor();
+% for a transparent object use:
+% sensor = SimulatedEnvironmentSensor();
 sensor.addEnvironment(environment);
 sensor.addCamera(config.fieldOfView,cameraTrajectory);
-sensor.setVisibility(config,environment);
+sensor.setVisibility(config, environment);
 
 % figure
 % spy(sensor.get('pointVisibility'));
@@ -112,6 +114,9 @@ config.set('constantSE3Motion',constantSE3ObjectMotion);
     config.set('pointMotionMeasurement','Off')
     config.set('measurementsFileName','app5_measurementsNoSE3.graph')
     config.set('groundTruthFileName','app5_groundTruthNoSE3.graph')
+    if config.rngSeed
+        rng(config.rngSeed); 
+    end
     sensor.generateMeasurements(config);
     groundTruthNoSE3Cell = graphFileToCell(config,config.groundTruthFileName);
     measurementsNoSE3Cell = graphFileToCell(config,config.measurementsFileName);
@@ -125,6 +130,9 @@ config.set('constantSE3Motion',constantSE3ObjectMotion);
     config.set('pointsDataAssociationLabel','2PointsDataAssociation');
     config.set('measurementsFileName','app5_measurements.graph');
     config.set('groundTruthFileName','app5_groundTruth.graph');
+    if config.rngSeed
+        rng(config.rngSeed); 
+    end
     sensor.generateMeasurements(config);
     
     if objectAware
@@ -135,6 +143,10 @@ config.set('constantSE3Motion',constantSE3ObjectMotion);
             strcat(config.groundTruthFileName(1:end-6),'Test.graph')); 
     end
 %     writeDataAssociationVerticesEdges_constantSE3Motion(config,constantSE3ObjectMotion);
+%     config.set('measurementsFileName',...
+%             strcat(config.measurementsFileName(1:end-6),'Test.graph'));
+%         config.set('groundTruthFileName',...
+%             strcat(config.groundTruthFileName(1:end-6),'Test.graph'));
     measurementsCell = graphFileToCell(config,config.measurementsFileName);
     groundTruthCell  = graphFileToCell(config,config.groundTruthFileName);
 
@@ -201,7 +213,7 @@ plotGraphFileICRA(config,groundTruthCell,'groundTruth');
 %plot results
 resultsNoSE3Cell = graphFileToCell(config,'app5_resultsNoSE3.graph');
 resultsCell = graphFileToCell(config,'app5_results.graph');
-% plotGraphFileICRA(config,resultsNoSE3Cell,'initial',resultsNoSE3.relPose.get('R3xso3Pose'),resultsNoSE3.posePointsN.get('R3xso3Pose'))
+plotGraphFileICRA(config,resultsNoSE3Cell,'initial',resultsNoSE3.relPose.get('R3xso3Pose'),resultsNoSE3.posePointsN.get('R3xso3Pose'))
 % get indices of static and dynamic points per object
 dynamicPointsVertices = {};
 allDynamicPointsVertices = [];

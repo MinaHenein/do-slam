@@ -34,6 +34,8 @@ config.set('objectPosesSlidingWindow',false);
 config.set('objectPosesSlidingWindowSize',inf);
 config.set('newMotionVertexPerNObjectPoses',inf);
 
+config.set('mode','initialisation')
+
 % config.set('sortVertices',1);
 % config.set('sortEdges', 1);
 
@@ -101,7 +103,7 @@ primitive2Trajectory.plot(t,[0 0 0],'axesOFF')
 cameraTrajectory.plot(t,[0 0 1],'axesOFF')
 set(gcf,'Position',[0 0 1024 768]);
 frames = sensor.plot(t,environment);
-% %implay(frames);
+%implay(frames);
 
 %     %% 4.a output video
 % v = VideoWriter('Data/Videos/App6_sensor_environment');
@@ -140,6 +142,7 @@ config.set('constantSE3Motion',constantSE3ObjectMotion);
 % config.set('sortEdges',1);
     %% 6.0 Initialisation
     config.set('mode','initialisation');
+    timeStart = tic;
     initializationGraph0 = Graph();
     initializationSolver = initializationGraph0.process(config,measurementsCell,groundTruthCell);
     initializationSolverEnd = initializationSolver(end);

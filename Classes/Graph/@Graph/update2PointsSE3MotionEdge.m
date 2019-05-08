@@ -33,6 +33,13 @@ if obj.edges(iEdge).active
     jacobian3 = J; %computed numerically
     jacobians   = {jacobian1,jacobian2,jacobian3};
     
+    
+%     Rtr = SE3MotionTransformationMatrix(1:3,1:3)';
+%     l2 = pointPositions(:,2);
+%     t = SE3MotionTransformationMatrix(1:3,4);
+%     jac = [Rtr,skew_symmetric(l2-t)*-Rtr*Rtr];
+%     jacobians   = {jacobian1,jacobian2,jac};
+    
     %% 3. update properties
     obj.edges(iEdge).value       = value;
     obj.edges(iEdge).jacobians   = jacobians;

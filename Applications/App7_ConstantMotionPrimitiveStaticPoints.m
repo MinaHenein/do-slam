@@ -47,10 +47,10 @@ robotWaypoints = [linspace(0,tN+5,7); 0 sampleWaypoints(1,:); 0 (sampleWaypoints
 robotTrajectory = PositionModelPoseTrajectory(robotWaypoints,'R3','smoothingspline');
 
 environment = Environment();
-environment.addEllipsoid([1.25 1.25 3],4,'R3',primitiveTrajectory);
-nPoints = 5;
-environment.addStaticPoints([30*ones(1,nPoints); 40*rand(1,nPoints); 20*rand(1,nPoints)]);
-environment.addStaticPoints([30*rand(1,nPoints); 40*ones(1,nPoints); 20*rand(1,nPoints)]);
+environment.addEllipsoid([1.25 1.25 3],8,'R3',primitiveTrajectory);
+% nPoints = 5;
+% environment.addStaticPoints([30*ones(1,nPoints); 40*rand(1,nPoints); 20*rand(1,nPoints)]);
+% environment.addStaticPoints([30*rand(1,nPoints); 40*ones(1,nPoints); 20*rand(1,nPoints)]);
 
 %% 3. Initialise Sensor
 cameraTrajectory = RelativePoseTrajectory(robotTrajectory,config.cameraRelativePose);

@@ -26,7 +26,7 @@ label = splitLine{1};
 switch label
     case config.poseVertexLabel
         g2oLabel = 'VERTEX_SE3:QUAT';
-        index = str2double(splitLine{1,2});
+        index = str2double(splitLine{1,2})-1;
         value= [];
         for j=1:config.dimPose
             value = [value,str2double(splitLine{1,3+j-1})];
@@ -36,36 +36,39 @@ switch label
         CStrOutput(i) =  cellstr(sprintf(poseVertexFormat,g2oLabel,index,value(1:3),xyzw));
     case config.pointVertexLabel
         g2oLabel = 'VERTEX_TRACKXYZ';
-        index = str2double(splitLine{1,2});
+        index = str2double(splitLine{1,2})-1;
         value = [];
         for j=1:config.dimPoint
             value = [value,str2double(splitLine{1,3+j-1})];
         end
         CStrOutput(i) =  cellstr(sprintf(pointVertexFormat,g2oLabel,index,value));
     case config.posePoseEdgeLabel
-        %% To fix quaternion covariance
         g2oLabel = 'EDGE_SE3:QUAT';
-        index1 = str2double(splitLine{1,2});
-        index2 = str2double(splitLine{1,3});
+        index1 = str2double(splitLine{1,2})-1;
+        index2 = str2double(splitLine{1,3})-1;
         value  = [];
         for j=1:config.dimPose
             value = [value,str2double(splitLine{1,4+j-1})];
         end
-        axisAngle = value(4:end)';
-        wxyz = a2q(axisAngle);
-        xyzw = [wxyz(2),wxyz(3),wxyz(4),wxyz(1)];
-        covarianceVec = [];
+        covariance = [];
         for j=1:config.dimPose*(config.dimPose+1)/2
-            covarianceVec = [covarianceVec,str2double(splitLine{1,4+config.dimPose+j-1})];
+            covariance = [ covariance,str2double(splitLine{1,4+config.dimPose+j-1})];
         end
-        covAxisAngle = upperTriVecToCov(covarianceVec);
-        covQuat = covAxisAngleToCovQuat(axisAngle, covAxisAngle);
-        CStrOutput(i) =  cellstr(sprintf(poseEdgeFormat,g2oLabel,index1,index2,value(1:3),...
-            xyzw,covToUpperTriVec(inv(covQuat))));
+        cov = upperTriVecToCov(covariance);
+        poseAxisAngle = [value(4:6) value(1:3)]';
+        covPoseAxisAngle = [cov(4:6,4:6) zeros(3);zeros(3) cov(1:3,1:3)];
+        [poseQuat, covQuat] = covAxisAngleToCovQuat (poseAxisAngle, covPoseAxisAngle);
+        covQuat_t = covQuat(5:7,5:7);
+        covQuat_R = covQuat(1:4,1:4);
+        infQuat_t = inv(covQuat_t);
+        infQuat_R = inv(covQuat_R);
+        infQuat = [infQuat_t zeros(3,4); zeros(4,3) infQuat_R];
+        CStrOutput(i) =  cellstr(sprintf(poseEdgeFormat,g2oLabel,index1,index2,poseQuat(5:7),...
+            poseQuat(1:4),covToUpperTriVec(infQuat)));
     case config.posePointEdgeLabel
         g2oLabel = 'EDGE_TRACKXYZ';
-        index1 = str2double(splitLine{1,2});
-        index2 = str2double(splitLine{1,3});
+        index1 = str2double(splitLine{1,2})-1;
+        index2 = str2double(splitLine{1,3})-1;
         value  = [];
         for j=1:config.dimPoint
             value = [value,str2double(splitLine{1,4+j-1})];

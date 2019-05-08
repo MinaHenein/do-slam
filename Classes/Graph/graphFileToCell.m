@@ -181,6 +181,8 @@ while ischar(tline)
             lineCell = {label,[],values(1:2),[],values(3)',values(4)};
             %store
             graphCell{end+1,1} = lineCell;
+        case '2PointsDataAssociation'
+            %do nothing
         otherwise; error('%s type invalid',label)
     end
      

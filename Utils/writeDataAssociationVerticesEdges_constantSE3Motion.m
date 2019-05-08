@@ -44,7 +44,7 @@ fprintf(fileID, '%s\n', CStr{:});
 fclose(fileID);
 fileID = fopen(filepath,'a');
 for i=1:size(c,1)
-    fprintf(fileID,'%s %d %d %d \n','2POINTS_DataAssociation',...
+    fprintf(fileID,'%s %d %d %d \n','2PointsDataAssociation',...
         c(i,1),c(i,2),c(i,3));
 end
 fclose(fileID);
@@ -269,7 +269,7 @@ fprintf(fileID, '%s\n', CStr{:});
 fclose(fileID);
 fileID = fopen(filepath,'a');
 for i=1:size(c,1)
-    fprintf(fileID,'%s %d %d %d \n','2POINTS_DataAssociation',...
+    fprintf(fileID,'%s %d %d %d \n','2PointsDataAssociation',...
         c(i,1),c(i,2),c(i,3));
 end
 fclose(fileID);
