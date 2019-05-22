@@ -3,7 +3,7 @@
 % Test_projectMovingObjectPoint_vKITTI - Sequence0001 frames 00334-00426
 %--------------------------------------------------------------------------
 % setup
-dir = '/home/mina/Downloads/vKitti/';
+dir = '/media/mina/Data/mina/Downloads/Virtual_KITTI/';
 display = 1;
 i = randi([334 426],1); %random image index
 cameraExtrinsicsFile = strcat(dir,'vkitti_1.3.1_extrinsicsgt/0001_clone.txt');
@@ -16,9 +16,9 @@ K = [725,   0,     620.5;
     0,    725,     187.0;
     0,      0,        1];
 % read rgb image
-rgbI = imread(strcat(dir,'rgbImages/00',num2str(i),'.png'));
+rgbI = imread(strcat(dir,'vkitti_1.3.1_rgb/0001/clone/00',num2str(i),'.png'));
 % read depth image
-depthI = imread(strcat(dir,'depthImages/00',num2str(i),'.png'));
+depthI = imread(strcat(dir,'vkitti_1.3.1_depthgt/0001/clone/00',num2str(i),'.png'));
 % read segmentation image
 segmentationI = imread(strcat(segmentationGTFile,'00',num2str(i),'.png'));
 % n- features to track
@@ -112,7 +112,11 @@ for k=1:size(features,1)
     pitch = splitLine(18);
     roll = splitLine(19);
     objectTranslationCameraFrame = [x3d;y3d;z3d];
-    objectRotationCameraFrame = angle2dcm(yaw,pitch,roll);
+    Ry = eul2Rot([0, yaw + pi/2, 0]);
+    Rx = eul2Rot([0, 0, pitch]);
+    Rz = eul2Rot([roll, 0, 0]);
+    R =  Ry * Rx * Rz ;
+    objectRotationCameraFrame = R; %angle2dcm(yaw,pitch,roll);
     objectPoseCameraFrame = [objectRotationCameraFrame, objectTranslationCameraFrame; 0 0 0 1];
     % transform object pose to world frame
     objectPoseWorldFrame = cameraPoseMatrix * objectPoseCameraFrame;

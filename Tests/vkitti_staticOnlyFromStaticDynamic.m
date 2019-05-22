@@ -1,6 +1,6 @@
-clear; clc;
+function vkitti_staticOnlyFromStaticDynamic(groundTruthFileName,measurementsFileName)
 % Measurements
-filepath = strcat(pwd,'/Data/GraphFiles/finalNoiseSequence0001_334to426_reprojection_Meas.graph');
+filepath = strcat(pwd,'/Data/GraphFiles/',measurementsFileName);
 fileID = fopen(filepath,'r');
 Data = textscan(fileID, '%s', 'delimiter', '\n', 'whitespace', '');
 CStr = Data{1};
@@ -40,7 +40,7 @@ points = unique(points);
 dynamicPoints = unique(dynamicPoints);
 
 %vKitti_OcclusionWorkingMeas_staticOnlyTest
-fileToWritepath = strcat(pwd,'/Data/GraphFiles/finalNoiseSequence0001_334to426_reprojection_MeasStaticOnly.graph');
+fileToWritepath = strcat(pwd,'/Data/GraphFiles/',measurementsFileName(1:end-6),'_staticOnly.graph');
 fileToWriteID = fopen(fileToWritepath,'w');
 
 if size(pointSeenByCamera,1) < poses(end)
@@ -87,14 +87,14 @@ fclose(fileToWriteID);
 % GT
 %vKitti_dynamicStaticGT_1_v5
 %occlusionWorking_v1
-filepath = strcat(pwd,'/Data/GraphFiles/finalNoiseSequence0001_334to426_reprojection_GT.graph');
+filepath = strcat(pwd,'/Data/GraphFiles/',groundTruthFileName);
 fileID = fopen(filepath,'r');
 Data = textscan(fileID, '%s', 'delimiter', '\n', 'whitespace', '');
 CStr = Data{1};
 fclose(fileID);
 
 %vKitti_OcclusionWorkingGT_staticOnlyTest
-fileToWritepath = strcat(pwd,'/Data/GraphFiles/finalNoiseSequence0001_334to426_reprojection_GTStaticOnly.graph');
+fileToWritepath = strcat(pwd,'/Data/GraphFiles/',groundTruthFileName(1:end-6),'_staticOnly.graph');
 fileToWriteID = fopen(fileToWritepath,'w');
 
 pointWritten = [];
@@ -130,3 +130,5 @@ for i=1:length(poses)
     end
 end
 fclose(fileToWriteID);
+
+end
