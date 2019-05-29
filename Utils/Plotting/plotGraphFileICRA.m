@@ -103,6 +103,7 @@ switch setting
             end
             iPose = RelativeToAbsolutePoseR3xso3(iPose,relPose);
             poses(:,i) = iPose;
+            %plotCoordinates(iPose(1:3,:),rot(iPose(4:6,1)))
         end
         
         for i=1:size(points,2)

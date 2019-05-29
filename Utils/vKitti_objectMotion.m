@@ -1,7 +1,7 @@
 function [objectsGTMotion,frames] = vKitti_objectMotion(objectPosesMatrix)
 
 objectCameraPoses = load(objectPosesMatrix);
-objectCameraPoses = objectCameraPoses.objPose;
+objectCameraPoses = objectCameraPoses.objPoses;
 
 nObjects = size(objectCameraPoses,2);
 Rot = eye(4);%[0 0 1 0;-1 0 0 0;0 -1 0 0;0 0 0 1];

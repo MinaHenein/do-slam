@@ -231,7 +231,7 @@ if constantMotionAssumption
                 gtCentroid = mean(pointFrameGTPositions,2);
                 speed = norm(motionValue(1:3)' - (eye(3)-rot(motionValue(4:6)'))*centroid);
                 gtSpeed = norm(gtMotionValue(1:3) - (eye(3)-rot(gtMotionValue(4:6)))*gtCentroid);
-                objectSpeedErrors = [objectSpeedErrors, abs(gtSpeed-speed)/gtSpeed];
+                objectSpeedErrors = [objectSpeedErrors, (gtSpeed-speed)/gtSpeed];
             end
         end        
         averageObjectSpeedErrors(1,i) = mean(objectSpeedErrors);
@@ -279,7 +279,7 @@ else
                     gtCentroid = mean(pointFrameGTPositions,2);
                     speed = norm(motionValue(1:3) - (eye(3)-rot(motionValue(4:6)))*centroid);
                     gtSpeed = norm(gtMotionValue(1:3) - (eye(3)-rot(gtMotionValue(4:6)))*gtCentroid);
-                    currentObjectSpeedErrors = [currentObjectSpeedErrors, abs(gtSpeed-speed)/gtSpeed];
+                    currentObjectSpeedErrors = [currentObjectSpeedErrors, (gtSpeed-speed)/gtSpeed];
                 end
             end
             averageObjectSpeedErrors(1,j) = mean(currentObjectSpeedErrors);

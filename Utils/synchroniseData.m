@@ -16,9 +16,8 @@ fclose(gpsFileID);
 gpsTimeStamps = zeros(size(gpsCStr,1)-1,1);
 for i= 2:size(gpsCStr,1)
      splitLine = strsplit(gpsCStr{i},' ');
-     gpsTimeStamps(i,1) = str2double(splitLine(end));
+     gpsTimeStamps(i-1,1) = str2double(splitLine(end));
 end
-
 
 % for every stereo image, find the closest time stamp in gps reading
 nImages = size(stereoCStr,1);

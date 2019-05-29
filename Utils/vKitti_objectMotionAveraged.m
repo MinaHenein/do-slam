@@ -1,7 +1,7 @@
 function constantSE3ObjectMotion = vKitti_objectMotionAveraged(objectPosesMatrix)
 
 objectCameraPoses = load(objectPosesMatrix);
-objectCameraPoses = objectCameraPoses.objPose;
+objectCameraPoses = objectCameraPoses.objPoses;
 
 nObjects = size(objectCameraPoses,2);
 constantSE3ObjectMotion = zeros(6,nObjects);
