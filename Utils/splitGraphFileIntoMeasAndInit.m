@@ -10,7 +10,7 @@ IndexC = strfind(CStr, 'VERTEX');
 Index = find(not(cellfun('isempty', IndexC)));
 
 % Save in a different file
-filepath = strcat(filePath(1:end-6),'_init.graph');
+filepath = strcat(filePath(1:end-6),'_initialisation.graph');
 fid = fopen(filepath,'w');
 if fid == -1, error('Cannot open file'), end
 fprintf(fid, '%s\n', CStr{Index});

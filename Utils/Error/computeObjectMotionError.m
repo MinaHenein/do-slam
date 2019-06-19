@@ -67,7 +67,7 @@ for i=1:length(dataAssociationIndex)
     objectIndices = [objectIndices,objectId];
 end
 objectIndices = unique(objectIndices);
-
+ 
 for i=1:length(objectIndexCell)
     objectIds = objectIndexCell(i).entry;
     toBeDeleted = [];
@@ -132,75 +132,87 @@ objectMotionGTTranslation = zeros(1,length(objectIndexCell));
 if constantMotionAssumption
     objectMotionError = zeros(6,length(objectIndexCell));
     for i=1:length(objectIndexCell)
-        error = AbsoluteToRelativePoseR3xso3(averageSE3ObjectMotions(:,i),averageGTObjectMotions(:,i));
+        gtMotion = averageGTObjectMotions(:,i);
+        currentMotion = averageSE3ObjectMotions(:,i);
+        error = AbsoluteToRelativePoseR3xso3(currentMotion,gtMotion);
         objectMotionError(:,i) = error;
+        averageObjectMotionTranslationError(1,i) = norm(error(1:3))/norm(gtMotion(1:3));
+        averageObjectMotionRotationError(1,i) = norm(error(4:6))/norm(gtMotion(1:3));
+        % for speed calculation
         objectGTMotion = averageGTObjectMotions(:,i);
         objectMotionGTTranslation(1,i) = norm(objectGTMotion(1:3));
     end
 else
     objectMotionError = {};
-    for i=1:length(objectIndexCell)
+    %% wrong!!
+    for i=1:min(length(objectIndexCell),length(gtObjectMotions))
         currentObjectMotions = objectMotions{i};
+        currentObjectMotions = currentObjectMotions(:,2:end);
+        %currentObjectMotionFrames = objectMotionFrames{i};
+        %currentObjectMotionFrames = currentObjectMotionFrames(2:end); 
+        
         currentGTObjectMotions = gtObjectMotions{i};
-        currentObjectMotionFrames = objectMotionFrames{i};
-        currentGTObjectFrames = gtObjectFrames{i}; 
-        currentGTObjectMotionFrames = currentGTObjectFrames(2:end)-1;
+        %currentGTObjectFrames = gtObjectFrames{i}; 
+        %currentGTObjectMotionFrames = currentGTObjectFrames(2:end);
+        
         currentObjectMotionError =  zeros(6,size(currentObjectMotions,2));
+        currentObjectMotionTranslationError =  zeros(1,size(currentObjectMotions,2));
+        currentObjectMotionRotationError =  zeros(1,size(currentObjectMotions,2));
+        
         for j = 1:size(currentObjectMotions,2)
             %get gt object motion at frame number
-            indx = find(currentGTObjectMotionFrames == startFrame+currentObjectMotionFrames(j)-1);
-            if isempty(indx)
-                continue
-            end
-            currentGTObjectMotion = currentGTObjectMotions(:,indx);
-            error = AbsoluteToRelativePoseR3xso3(currentObjectMotions(:,j),currentGTObjectMotion);
+%             indx = find(currentGTObjectMotionFrames == startFrame+currentObjectMotionFrames(j)-1);
+%             if isempty(indx)
+%                 continue
+%             end
+%             currentGTObjectMotion = currentGTObjectMotions(:,indx);
+            currentGTObjectMotion = currentGTObjectMotions(:,j);
+            currentObjectMotion = currentObjectMotions(:,j);
+            error = AbsoluteToRelativePoseR3xso3(currentObjectMotion,currentGTObjectMotion);
             currentObjectMotionError(:,j) = error;
+            currentObjectMotionTranslationError(1,j) = norm(error(1:3))/norm(currentGTObjectMotion(1:3));
+            currentObjectMotionRotationError(1,j) = norm(error(4:6))/norm(currentGTObjectMotion(1:3));
         end
         objectMotionError{i} = currentObjectMotionError;
+        averageObjectMotionTranslationError(1,i) = mean(currentObjectMotionTranslationError);
+        averageObjectMotionRotationError(1,i) = mean(currentObjectMotionRotationError);
         objectMotionGTTranslation(1,i) = mean(norm(currentGTObjectMotions(1:3)));
     end
 end
 
-if ~constantMotionAssumption
-    for i=1:length(objectMotionError)
-        objectMotionErrors = objectMotionError{i};
-        objectMotionErrors(:,~any(objectMotionErrors,1))=[];
-        objectMotionError{i} = objectMotionErrors;
-    end
-end
-
-%% per object average of object motions error
-averageObjectMotionTranslationError = zeros(1,length(objectIndexCell));
-averageObjectMotionRotationError = zeros(1,length(objectIndexCell));
-if constantMotionAssumption
-    for i=1:size(objectMotionError,2)
-        error = objectMotionError(:,i);
-        averageObjectMotionTranslationError(1,i) = norm(error(1:3));
-        averageObjectMotionRotationError(1,i) = norm(error(4:6));
-    end
-else
-    for i=1:length(objectIndexCell)
-        currentObjectMotionErros = objectMotionError{i};
-        objectTranslationError = zeros(1,size(currentObjectMotionErros,2));
-        objectRotationError = zeros(1,size(currentObjectMotionErros,2));
-        for j = 1:size(currentObjectMotionErros,2)
-            error = currentObjectMotionErros(:,j);
-            objectTranslationError(1,j) = norm(error(1:3));
-            objectRotationError(1,j) = norm(error(4:6));
-        end
-        averageObjectMotionTranslationError(1,i) = mean(objectTranslationError);
-        averageObjectMotionRotationError(1,i) = mean(objectRotationError);
-    end
-end
+% if ~constantMotionAssumption
+%     for i=1:length(objectMotionError)
+%         objectMotionErrors = objectMotionError{i};
+%         objectMotionErrors(:,~any(objectMotionErrors,1))=[];
+%         objectMotionError{i} = objectMotionErrors;
+%     end
+% end
+% %% per object average of object motions error
+% if ~constantMotionAssumption
+%     for i=1:length(objectIndexCell)
+%         currentObjectMotionErros = objectMotionError{i};
+%         objectTranslationError = zeros(1,size(currentObjectMotionErros,2));
+%         objectRotationError = zeros(1,size(currentObjectMotionErros,2));
+%         for j = 1:size(currentObjectMotionErros,2)
+%             error = currentObjectMotionErros(:,j);
+%             objectTranslationError(1,j) = norm(error(1:3));
+%             objectRotationError(1,j) = norm(error(4:6));
+%         end
+%         averageObjectMotionTranslationError(1,i) = mean(objectTranslationError);
+%         averageObjectMotionRotationError(1,i) = mean(objectRotationError);
+%     end
+% end
 
 %% average of (per object average of object motions error)
-translationError = mean(averageObjectMotionTranslationError)/mean(objectMotionGTTranslation);
-rotationError = mean(averageObjectMotionRotationError)/mean(objectMotionGTTranslation);
+% translationError = mean(averageObjectMotionTranslationError)/mean(objectMotionGTTranslation);
+% rotationError = mean(averageObjectMotionRotationError)/mean(objectMotionGTTranslation);
 
+translationError = mean(averageObjectMotionTranslationError);
+rotationError = mean(averageObjectMotionRotationError);
 %% object speeds errors
 if constantMotionAssumption
     for i=1:length(objectIndexCell)
-        averageObjectSpeedErrors = zeros(1,length(objectIndexCell));
+        %averageObjectSpeedErrors = zeros(1,length(objectIndexCell));
         currentObjectIndex = objectIndexCell(i).entry;
         IndexC = strfind(resultCStr, strcat({'VERTEX_SE3Motion'},{' '},...
             {num2str(currentObjectIndex)},{' '}));
@@ -210,76 +222,82 @@ if constantMotionAssumption
         gtMotionValue = averageGTObjectMotions(:,i);
         objectSpeedErrors = [];
         for j = 1:endFrame-(startFrame-1)
-            objectFramePoints = objectPoints{i,j};
-            if ~isempty(objectFramePoints)
-                pointFramePositions = zeros(3,length(objectFramePoints));
-                pointFrameGTPositions = zeros(3,length(objectFramePoints));
-                for k=1:length(objectFramePoints)
-                    IndexC = strfind(resultCStr, strcat({'VERTEX_POINT_3D'},{' '},...
-                        {num2str(objectFramePoints(k))},{' '}));
-                    lineIndex = find(~cellfun('isempty', IndexC));
-                    splitLine = strsplit(resultCStr{lineIndex,1},' ');
-                    pointFramePositions(:,k) = str2double(splitLine(3:end))';
-                    
-                    IndexC = strfind(gtCStr, strcat({'VERTEX_POINT_3D'},{' '},...
-                        {num2str(objectFramePoints(k))},{' '}));
-                    lineIndex = find(~cellfun('isempty', IndexC));
-                    splitLine = strsplit(gtCStr{lineIndex,1},' ');
-                    pointFrameGTPositions(:,k) = str2double(splitLine(3:end))';
+            if size(objectPoints,2) >= j
+                objectFramePoints = objectPoints{i,j};
+                if ~isempty(objectFramePoints)
+                    pointFramePositions = zeros(3,length(objectFramePoints));
+                    pointFrameGTPositions = zeros(3,length(objectFramePoints));
+                    for k=1:length(objectFramePoints)
+                        IndexC = strfind(resultCStr, strcat({'VERTEX_POINT_3D'},{' '},...
+                            {num2str(objectFramePoints(k))},{' '}));
+                        lineIndex = find(~cellfun('isempty', IndexC));
+                        splitLine = strsplit(resultCStr{lineIndex,1},' ');
+                        pointFramePositions(:,k) = str2double(splitLine(3:end))';
+                        
+                        IndexC = strfind(gtCStr, strcat({'VERTEX_POINT_3D'},{' '},...
+                            {num2str(objectFramePoints(k))},{' '}));
+                        lineIndex = find(~cellfun('isempty', IndexC));
+                        splitLine = strsplit(gtCStr{lineIndex,1},' ');
+                        pointFrameGTPositions(:,k) = str2double(splitLine(3:end))';
+                    end
+                    centroid = mean(pointFramePositions,2);
+                    gtCentroid = mean(pointFrameGTPositions,2);
+                    speed = norm(motionValue(1:3)' - (eye(3)-rot(motionValue(4:6)'))*centroid);
+                    gtSpeed = norm(gtMotionValue(1:3) - (eye(3)-rot(gtMotionValue(4:6)))*gtCentroid);
+                    objectSpeedErrors = [objectSpeedErrors, abs(gtSpeed-speed)/gtSpeed];
                 end
-                centroid = mean(pointFramePositions,2);
-                gtCentroid = mean(pointFrameGTPositions,2);
-                speed = norm(motionValue(1:3)' - (eye(3)-rot(motionValue(4:6)'))*centroid);
-                gtSpeed = norm(gtMotionValue(1:3) - (eye(3)-rot(gtMotionValue(4:6)))*gtCentroid);
-                objectSpeedErrors = [objectSpeedErrors, abs(gtSpeed-speed)/gtSpeed];
             end
-        end        
+        end
         averageObjectSpeedErrors(1,i) = mean(objectSpeedErrors);
     end
 else
     objectSpeedErrors = {};
-    for i=1:length(objectIndexCell)
+    %% wrong!!
+    for i=1:min(length(objectIndexCell),length(gtObjectMotions))    
         currentObjectIds = objectIndexCell(i).entry;
         currentObjectMotions = objectMotions{i};
+        currentObjectMotions = currentObjectMotions(:,2:end);
         currentObjectMotionFrames = objectMotionFrames{i};
         currentGTObjectMotions = gtObjectMotions{i};
         currentGTObjectFrames = gtObjectFrames{i}; 
         currentGTObjectMotionFrames = currentGTObjectFrames(2:end)-1;
         for j = 1:size(currentObjectMotions,2)
-            averageObjectSpeedErrors = zeros(1,size(currentObjectMotions,2));
+            %averageObjectSpeedErrors = zeros(1,size(currentObjectMotions,2));
             motionValue = currentObjectMotions(:,j);
             %get gt object motion at frame number
-            indx = find(currentGTObjectMotionFrames == startFrame+currentObjectMotionFrames(j)-1);
-            if isempty(indx)
-                continue
-            end
-            gtMotionValue = currentGTObjectMotions(:,indx);
-            %gtMotionValue = currentGTObjectMotions(:,j);
+%             indx = find(currentGTObjectMotionFrames == startFrame+currentObjectMotionFrames(j)-1);
+%             if isempty(indx)
+%                 continue
+%             end
+%             gtMotionValue = currentGTObjectMotions(:,indx);
+            gtMotionValue = currentGTObjectMotions(:,j);
             currentObjectSpeedErrors = [];
             for k = 1:endFrame-(startFrame-1)
-                objectIndx = find(objectIndices == currentObjectIds(j));
-                objectFramePoints = objectPoints{objectIndx,k};
-                if ~isempty(objectFramePoints)
-                    pointFramePositions = zeros(3,length(objectFramePoints));
-                    pointFrameGTPositions = zeros(3,length(objectFramePoints));
-                    for m = 1:length(objectFramePoints)
-                        IndexC = strfind(resultCStr, strcat({'VERTEX_POINT_3D'},{' '},...
-                            {num2str(objectFramePoints(m))},{' '}));
-                        lineIndex = find(~cellfun('isempty', IndexC));
-                        splitLine = strsplit(resultCStr{lineIndex,1},' ');
-                        pointFramePositions(:,m) = str2double(splitLine(3:end))';
-                        
-                        IndexC = strfind(gtCStr, strcat({'VERTEX_POINT_3D'},{' '},...
-                            {num2str(objectFramePoints(m))},{' '}));
-                        lineIndex = find(~cellfun('isempty', IndexC));
-                        splitLine = strsplit(gtCStr{lineIndex,1},' ');
-                        pointFrameGTPositions(:,m) = str2double(splitLine(3:end))';
+                if size(objectPoints,2) >= k
+                    objectIndx = find(objectIndices == currentObjectIds(j));
+                    objectFramePoints = objectPoints{objectIndx,k};
+                    if ~isempty(objectFramePoints)
+                        pointFramePositions = zeros(3,length(objectFramePoints));
+                        pointFrameGTPositions = zeros(3,length(objectFramePoints));
+                        for m = 1:length(objectFramePoints)
+                            IndexC = strfind(resultCStr, strcat({'VERTEX_POINT_3D'},{' '},...
+                                {num2str(objectFramePoints(m))},{' '}));
+                            lineIndex = find(~cellfun('isempty', IndexC));
+                            splitLine = strsplit(resultCStr{lineIndex,1},' ');
+                            pointFramePositions(:,m) = str2double(splitLine(3:end))';
+                            
+                            IndexC = strfind(gtCStr, strcat({'VERTEX_POINT_3D'},{' '},...
+                                {num2str(objectFramePoints(m))},{' '}));
+                            lineIndex = find(~cellfun('isempty', IndexC));
+                            splitLine = strsplit(gtCStr{lineIndex,1},' ');
+                            pointFrameGTPositions(:,m) = str2double(splitLine(3:end))';
+                        end
+                        centroid = mean(pointFramePositions,2);
+                        gtCentroid = mean(pointFrameGTPositions,2);
+                        speed = norm(motionValue(1:3) - (eye(3)-rot(motionValue(4:6)))*centroid);
+                        gtSpeed = norm(gtMotionValue(1:3) - (eye(3)-rot(gtMotionValue(4:6)))*gtCentroid);
+                        currentObjectSpeedErrors = [currentObjectSpeedErrors, abs(gtSpeed-speed)/gtSpeed];
                     end
-                    centroid = mean(pointFramePositions,2);
-                    gtCentroid = mean(pointFrameGTPositions,2);
-                    speed = norm(motionValue(1:3) - (eye(3)-rot(motionValue(4:6)))*centroid);
-                    gtSpeed = norm(gtMotionValue(1:3) - (eye(3)-rot(gtMotionValue(4:6)))*gtCentroid);
-                    currentObjectSpeedErrors = [currentObjectSpeedErrors, abs(gtSpeed-speed)/gtSpeed];
                 end
             end
             averageObjectSpeedErrors(1,j) = mean(currentObjectSpeedErrors);
@@ -290,7 +308,8 @@ end
 
 if ~constantMotionAssumption
     averageObjectSpeedErrors = zeros(1,length(objectIndexCell));
-    for i=1:length(objectIndexCell)
+    %% wrong!!
+    for i=1:min(length(objectIndexCell),length(gtObjectMotions))    
         averageObjectSpeedError = objectSpeedErrors{i};
         averageObjectSpeedErrors(1,i) = mean(averageObjectSpeedError);
     end

@@ -25,7 +25,7 @@ for i=1:length(pointsDataAssociationIndex)
     else
         indx = find(seenObjects == objectId);
         if frame >  length(objectPoints(indx,:))
-            objectPoints{indx,frame-1} = pointId1;
+            objectPoints{indx,frame-1} = [objectPoints{indx,frame-1} pointId1];
             objectPoints{indx,frame} = pointId2;
         else
         if ~ismember(pointId1,[objectPoints{indx,frame-1}])

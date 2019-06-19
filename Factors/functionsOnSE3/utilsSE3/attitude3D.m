@@ -10,7 +10,11 @@ c = dot([1 0 0],d);
 a =  cross([1 0 0],d)'; % axis of rotation
 s = norm(a);
 ax = skew_symmetric(a);
-R = eye(3) + ax + ax^2 * (1 - c)/(s^2);
+if s == 0
+    R = eye(3);
+else
+    R = eye(3) + ax + ax^2 * (1 - c)/(s^2);
+end
 
 aa = arot(R);
 

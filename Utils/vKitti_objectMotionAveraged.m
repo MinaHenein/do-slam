@@ -6,14 +6,13 @@ objectCameraPoses = objectCameraPoses.objPoses;
 nObjects = size(objectCameraPoses,2);
 constantSE3ObjectMotion = zeros(6,nObjects);
 
-Rot = eye(4);%[0 0 1 0;-1 0 0 0;0 -1 0 0;0 0 0 1];
 % average transformation
 for i=1:nObjects
     objectPoses = objectCameraPoses(i).obPose;
     cameraPoses = objectCameraPoses(i).cameraPose;
     objectPosesWorldFrame = zeros(size(objectPoses));
     for j=1:size(objectPoses,1)/4
-        cameraPoseWorldFrame = Rot/cameraPoses(mapping(j,4),:)/Rot;
+        cameraPoseWorldFrame = inv(cameraPoses(mapping(j,4),:));
         objectPosesWorldFrame(mapping(j,4),:) = ...
             cameraPoseWorldFrame*objectPoses(mapping(j,4),:);
     end

@@ -61,6 +61,7 @@ for i= 1:size(syncedData,1)-1
      
      cameraPoses(:,i) = pose1;
      cameraPoses(:,i+1) = pose2;
+     
      odometry(:,i) = AbsoluteToRelativePoseR3xso3(pose1, pose2);
 end
 

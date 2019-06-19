@@ -4,12 +4,12 @@
 %--------------------------------------------------------------------------
 function plotObjectPoses_vKITTI(imageRange)
 % setup
-dir = '/home/mina/Downloads/vKitti/';
+dir = '/media/mina/Data/mina/Downloads/Virtual_KITTI/';
 cameraExtrinsicsFile = strcat(dir,'vkitti_1.3.1_extrinsicsgt/0001_clone.txt');
 objectDetectionFile = strcat(dir,'vkitti_1.3.1_motgt/0001_clone.txt');
 
 colors = {'red','green','blue','black','leather','swamp','plum',...
-    'dark red','magenta','sapphire'};
+    'dark red','magenta','orange'};
 ids = [75,78,79,80,81,83,84,85,86,88];
 for i = imageRange 
     % read camera pose
@@ -19,6 +19,7 @@ for i = imageRange
     lineArray = str2num(cell2mat(lineCell{1,1}));
     assert(lineArray(1)==i);
     cameraPoseMatrix = inv(reshape(lineArray(2:end),[4,4])');
+    iPose = transformationMatrixToPose(cameraPoseMatrix);
     % get all objects in frame i
     fid = fopen(objectDetectionFile);
     Data = textscan(fid,'%s','Delimiter','\n');
@@ -36,8 +37,14 @@ for i = imageRange
             yaw = str2double(splitLine{1,17});
             pitch = str2double(splitLine{1,18});
             roll = str2double(splitLine{1,19});
+            
+            Ry = eul2Rot([0, yaw + pi/2, 0]);
+            Rx = eul2Rot([0, 0, pitch]);
+            Rz = eul2Rot([roll, 0, 0]);
+            R =  Ry * Rx * Rz ;
+            
             objectTranslationCameraFrame = [x3d;y3d;z3d];
-            objectRotationCameraFrame = angle2dcm(yaw,pitch,roll);
+            objectRotationCameraFrame = R;%angle2dcm(yaw,pitch,roll);
             objectPoseCameraFrame = [objectRotationCameraFrame, objectTranslationCameraFrame; 0 0 0 1];
             % transform object pose to world frame
             objectPoseWorldFrame = cameraPoseMatrix * objectPoseCameraFrame;
@@ -45,6 +52,9 @@ for i = imageRange
                 objectPoseWorldFrame(3,4),'MarkerEdgeColor',rgb(colors(ids == id)),...
                 'MarkerFaceColor',rgb(colors(ids == id)))
             hold on
+            if ismember(i,[imageRange(1):5:imageRange(end)])
+                plotCamera('Location',iPose(1:3),'Orientation',rot(-iPose(4:6)));
+            end
         end
     end
 end

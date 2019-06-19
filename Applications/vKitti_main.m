@@ -15,7 +15,7 @@ config = CameraConfig();
 config = setAppConfig(config);
 % config.set('noiseModel','Off');
 config.set('motionModel','constantSE3MotionDA');
-config.set('std2PointsSE3Motion', [1.65,1.65,1.65]');
+config.set('std2PointsSE3Motion', [0.01,0.01,0.01]');
 config.set('SE3MotionVertexInitialization','eye');
 config.set('newMotionVertexPerNLandmarks',inf);
 config.set('landmarksSlidingWindowSize',inf);

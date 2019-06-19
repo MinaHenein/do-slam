@@ -1,6 +1,7 @@
 function axis=q2a(q)
 
-theta=2*acos(q(1));
+mag = norm(q(2:4));
+theta=2*atan2(mag,q(1));
 
 if theta==0
     axis=[0,0,0];
