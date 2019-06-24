@@ -11,12 +11,10 @@ globalFeatures.weight = [];
 globalFeatures.frame = [];
 globalFeatures.cameraLocation = [];
 globalFeatures.static = [];
-globalFeatures.objectId = [];
 
 for i = 1:numel(imageRange)
-    %pbar(i,numel(imageRange),[],['frame #',num2str(i),'/',num2str(numel(imageRange))],'off');
-    pbar(i,numel(imageRange));
-    
+    pbar(i,numel(imageRange));%pbar(i,numel(imageRange),[],,'off');['Processing frame #',num2str(i),'/',num2str(numel(imageRange))]
+
     % frame i
     frameNumber = imageRange(i);
     frames(i).number = imageRange(i);

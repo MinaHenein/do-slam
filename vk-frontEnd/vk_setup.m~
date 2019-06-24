@@ -1,7 +1,7 @@
 % variables
 sequence = '0001';
 variation = 'clone';
-imageRange = 335:350;
+imageRange = 335:338;%426;
 nFeaturesPerFrame = 1000; % number of features per frame
 maxBackgroundFeaturesPerFrame = 500; % max number of static background features per frame
 nFeaturesPerObject = 100; % number of features per object
@@ -26,5 +26,9 @@ extrinsicsFile = strcat(dir,extrinsicsDir,sequence,'_',variation,'.txt');
 cameraPoses = preprocessExtrinsics(extrinsicsFile,imageRange);
 odometry = extractOdometry(cameraPoses);
 
-[frames,globalFeatures] = featureExtractionTracking(imageRange,K,rgbI,depthI,maskI,...
+%% to add
+% 1- global features
+% 2- global objects
+
+frames = featureExtractionTracking(imageRange,K,rgbI,depthI,maskI,...
     motFile,cameraPoses,nFeaturesPerFrame,nFeaturesPerObject,maxBackgroundFeaturesPerFrame);

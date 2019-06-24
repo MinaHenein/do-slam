@@ -111,7 +111,6 @@ for i=1:size(frameFeatures.location,1)
         globalFrame(end+1,1) = frameFeatures.originFrame(i);
         globalCameraLocation = [globalCameraLocation, camera3DPoint(1:3)];
         globalStatic(end+1,1) = 0;
-        globalObjectId(end+1,1) = frameFeatures.objectId(i);
     end
 end
 frameFeatures.location3D = featuresLocation3D;
@@ -122,6 +121,5 @@ globalFeatures.weight = globalWeight;
 globalFeatures.frame = globalFrame;
 globalFeatures.cameraLocation = globalCameraLocation;
 globalFeatures.static = globalStatic;
-globalFeatures.objectId = globalObjectId;
 
 end
