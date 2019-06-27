@@ -1,13 +1,14 @@
-function [globalCamerasGraphFileIndx, globalFeaturesGraphFileIndx] = writeGTGraphFile(frames,...
-    globalFeatures,imageRange,sequence)
+function [globalCamerasGraphFileIndx, globalFeaturesGraphFileIndx, globalObjectsGraphFileIndx] = ...
+    writeGTGraphFile(frames, globalFeatures, imageRange, sequence)
 
 gtFileName = ['vk-',num2str(sequence),'-',num2str(imageRange(1)),'-',...
-    num2str(imageRange(end)),'-GT.graph'];
+    num2str(imageRange(end)),'_GT.graph'];
 fileID = fopen(strcat(pwd,'/vk-frontEnd/GraphFiles/',gtFileName),'w');
 
 vertexCount = 0;
 globalFeaturesGraphFileIndx = zeros(size(globalFeatures.location3D,2),1);
 globalCamerasGraphFileIndx = zeros(length(frames),1);
+globalObjectsGraphFileIndx= [];
 
 for i = 1:length(frames)
     % camera pose vertex
@@ -32,14 +33,15 @@ for i = 1:length(frames)
         lastFrameObjectIds =  [frames(i-1).objects.id];
         for k = 1:length(frames(i).objects)
             objectId = frames(i).objects(k).id;
-            [found,indx] = find(lastFrameObjectIds ==objectId);
-            if found
+            [found,indx] = find(lastFrameObjectIds == objectId);
+            if ~isempty(found) && frames(i).objects(k).moving
                 label = 'VERTEX_SE3Motion';
                 vertexCount = vertexCount + 1;
                 index = vertexCount;
                 currentObjectPoseWorldFrame = poseToTransformationMatrix(frames(i).objects(k).poseWorldFrame);
                 lastObjectPoseWorldFrame = poseToTransformationMatrix(frames(i-1).objects(indx).poseWorldFrame);
                 value = transformationMatrixToPose(currentObjectPoseWorldFrame/lastObjectPoseWorldFrame);
+                globalObjectsGraphFileIndx = [globalObjectsGraphFileIndx; objectId, imageRange(i), vertexCount];
                 writeVertex(label,index,value,fileID);
             end
         end

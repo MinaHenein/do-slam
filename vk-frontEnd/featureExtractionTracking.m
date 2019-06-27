@@ -7,15 +7,16 @@ frames(1).features.objectId = [];
 % global features
 globalFeatures.location3D = [];
 globalFeatures.weight = [];
-%globalFeatures.id = [];
+globalFeatures.id = [];
 globalFeatures.frame = [];
 globalFeatures.cameraLocation = [];
 globalFeatures.static = [];
 globalFeatures.objectId = [];
+% dynamic features associations
+globalFeatures.dynamicAssociation = {};
 
 for i = 1:numel(imageRange)
-    %pbar(i,numel(imageRange),[],['frame #',num2str(i),'/',num2str(numel(imageRange))],'off');
-    pbar(i,numel(imageRange));
+    pbar(i,numel(imageRange),[],[num2str(i),'/',num2str(numel(imageRange))],'off');
     
     % frame i
     frameNumber = imageRange(i);

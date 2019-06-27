@@ -10,7 +10,8 @@ featuresId = [];
 % extract features within objects' masks
 for i = 1:length(frameObjects)
     objectMask = frameObjects(i).mask;
-    I = rgbI.*repmat(uint8(objectMask),[1,1,3]);
+    shrankObjectMask = bwmorph(objectMask,'thin',6);
+    I = rgbI.*repmat(uint8(shrankObjectMask),[1,1,3]);
     corners = detectFASTFeatures(rgb2gray(I));
     nFeaturesOnCurrentObject = sum([frame.features.objectId]==frameObjects(i).id);
     if nFeaturesPerObject - nFeaturesOnCurrentObject > 0
@@ -36,7 +37,8 @@ if nFeaturesToExtract > 0
     rgbICopy = rgbI;
     for i = 1:length(frameObjects)
         objectMask = frameObjects(i).mask;
-        I = rgbICopy.*repmat(uint8(~objectMask),[1,1,3]);
+        thickenedObjectMask = bwmorph(objectMask,'thicken',6);
+        I = rgbICopy.*repmat(uint8(~thickenedObjectMask),[1,1,3]);
         rgbICopy = I;
     end
     corners = detectFASTFeatures(rgb2gray(rgbICopy));
@@ -54,11 +56,12 @@ frameFeatures.id = featuresId;
 
 globalLocation3D = globalFeatures.location3D;
 globalWeight = globalFeatures.weight;
-%globalId = globalFeatures.id;
+globalId = globalFeatures.id;
 globalFrame = globalFeatures.frame;
 globalCameraLocation = globalFeatures.cameraLocation;
 globalStatic = globalFeatures.static;
 globalObjectId = globalFeatures.objectId;
+globalAssociation = globalFeatures.dynamicAssociation;
 
 featuresLocation3D = zeros(3,length(frameFeatures.location));
 for i=1:size(frameFeatures.location,1)
@@ -77,8 +80,8 @@ for i=1:size(frameFeatures.location,1)
         if isempty(globalLocation3D)
             globalLocation3D(:,1) = world3DPoint(1:3,1);
             globalWeight(1,1) = 1;
-            %globalId(1,1) = frameFeatures.id(i);
-            globalFrame(1,1) = [globalFrame, frameFeatures.originFrame(i)];
+            globalId(1,1) = frameFeatures.id(i);
+            globalFrame(1,1) = frameFeatures.originFrame(i);
             globalCameraLocation(:,1) = camera3DPoint;
             globalStatic(1,1) = 1;
             globalObjectId(1,1) = -1;
@@ -96,7 +99,7 @@ for i=1:size(frameFeatures.location,1)
             else
                 globalLocation3D = [globalLocation3D, world3DPoint(1:3)];
                 globalWeight(end+1,1) = 1;
-                %globalId(end+1,1) = length(globalLocation3D);
+                globalId(end+1,1) = length(globalLocation3D);
                 globalFrame(end+1,1) = frameFeatures.originFrame(i);
                 globalCameraLocation = [globalCameraLocation, camera3DPoint(1:3)];
                 globalStatic(end+1,1) = 1;
@@ -104,24 +107,69 @@ for i=1:size(frameFeatures.location,1)
             end
         end
     else
-        % dynamic
-        globalLocation3D = [globalLocation3D, world3DPoint(1:3,1)];
-        globalWeight(end+1,1) = 1;
-        %globalId(end+1,1) = length(globalLocation3D);
-        globalFrame(end+1,1) = frameFeatures.originFrame(i);
-        globalCameraLocation = [globalCameraLocation, camera3DPoint(1:3)];
-        globalStatic(end+1,1) = 0;
-        globalObjectId(end+1,1) = frameFeatures.objectId(i);
+        % dynamic point
+        if isempty(globalLocation3D)
+            globalLocation3D(:,1) = world3DPoint(1:3,1);
+            globalWeight(1,1) = 1;
+            globalId(1,1) = frameFeatures.id(i);
+            globalFrame(1,1) = frameFeatures.originFrame(i);
+            globalCameraLocation(:,1) = camera3DPoint;
+            globalStatic(1,1) = 0;
+            globalObjectId(1,1) = frameFeatures.objectId(i);
+        else
+            % compute distance to all 3D points
+            distances = sqrt(bsxfun(@plus,bsxfun(@plus,...
+                (globalLocation3D(1,:).'-world3DPoint(1,1)).^2,...
+                (globalLocation3D(2,:).'-world3DPoint(2,1)).^2),...
+                (globalLocation3D(3,:).'-world3DPoint(3,1)).^2))';
+            % find min distant point
+            [~,index] = find(distances == min(distances));
+            % if closest point is within 1 mm in 3D
+            if(norm(world3DPoint(1:3,1) - globalLocation3D(:,index)) < 0.001)
+                assert(globalStatic(index,1) == 0);
+                assert(globalObjectId(index,1) == frameFeatures.objectId(i));
+            else
+                globalLocation3D = [globalLocation3D, world3DPoint(1:3)];
+                globalWeight(end+1,1) = 1;
+                globalId(end+1,1) = length(globalLocation3D);
+                globalFrame(end+1,1) = frameFeatures.originFrame(i);
+                globalCameraLocation = [globalCameraLocation, camera3DPoint(1:3)];
+                globalStatic(end+1,1) = 0;
+                globalObjectId(end+1,1) = frameFeatures.objectId(i);
+            end
+        end
+        % globalAssociation: each row contains a unique object id and its tracklets of points
+        if isempty(globalAssociation)
+            globalAssociation{1,1} = frameFeatures.objectId(i);
+            globalAssociation{1,2} = length(globalLocation3D);
+        else
+            % new dynamic 3D point - start new tracklet
+            if(norm(world3DPoint(1:3,1) - globalLocation3D(:,index)) > 0.001)
+                objectIds = [globalAssociation{:,1}];
+                idx = find(objectIds == frameFeatures.objectId(i));
+                % new tracklet on an existing object
+                if ~isempty(idx)
+                    l = size(globalAssociation(idx,:),2);
+                    globalAssociation{idx,l+1} = length(globalLocation3D);
+                % new tracklet on a new object
+                else
+                    l = size(globalAssociation,1);
+                    globalAssociation{l+1,1} = frameFeatures.objectId(i);
+                    globalAssociation{l+1,2} = length(globalLocation3D);
+                end
+            end
+        end 
     end
 end
 frameFeatures.location3D = featuresLocation3D;
 
 globalFeatures.location3D = globalLocation3D;
 globalFeatures.weight = globalWeight;
-%globalFeatures.id = globalId;
+globalFeatures.id = globalId;
 globalFeatures.frame = globalFrame;
 globalFeatures.cameraLocation = globalCameraLocation;
 globalFeatures.static = globalStatic;
 globalFeatures.objectId = globalObjectId;
+globalFeatures.dynamicAssociation = globalAssociation;
 
 end

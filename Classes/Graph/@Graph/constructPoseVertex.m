@@ -61,8 +61,8 @@ switch edgeLabel
                     pose2(:,i) = config.relativeToAbsolutePoseHandle(pose2(:,i),config.stdPosePose(:,i));
                 end
             end
-            disp(strcat({'camera'},{' '},num2str(find(poseIndexes == inputVertices)),...
-                {' '},' initialized'))
+            %disp(strcat({'camera'},{' '},num2str(find(poseIndexes == inputVertices)),...
+            %c    {' '},' initialized'))
         else
             pose2 =  [0;0;0;0;0;0];
         end
