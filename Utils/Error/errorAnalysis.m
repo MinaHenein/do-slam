@@ -188,5 +188,18 @@ fprintf('All to All Relative Pose Rotation Error: %.3f \n',results.AARPE_rotatio
 if ~isempty(pointsGT)
 fprintf('All to All Relative Point Translation Error: %.3f \n',results.AARPTE_translation_error)
 end
+
+[staticPointIndices, dynamicPointIndices] = staticDynamicPointIndices(config);
+[~,~,~,~,~,~,translation,~,~,~,~,translation_points,~,~,~,~,~,~,~,~] = ...
+    computeDistanceAndRotation(config.groundTruthFileName,staticPointIndices,dynamicPointIndices);
+averageCameraTranslation = translation/(size(posesN,2)-1);
+averagePointTranslation = translation_points/size(pointsN,2);
+fprintf('Relative Trajectory Percentage Translation Error: %.3f \n',...
+    100*results.RPE_translation_error/averageCameraTranslation)
+fprintf('Relative Trajectory Rotation Error (deg/m): %.3f \n',...
+    results.RPE_rotation_error/averageCameraTranslation)
+fprintf('Relative Structure Percentage Points Error: %.3f \n',...
+    100*results.RPTE_translation_error/averagePointTranslation);
+
 end
 

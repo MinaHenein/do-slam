@@ -58,38 +58,40 @@ for i = 1:length(frames)
                 value = value + pointMeasNoise;
             end
             writeEdge(label,vIn,vOut,value,covariance,fileID);
-             % dynamic point
-             if ~globalFeatures.static(possibleFrameFeaturesIndx(j),1)
-                 objectIds = [globalFeatures.dynamicAssociation{:,1}];
-                 objectIndx = find(objectIds == globalFeatures.objectId(possibleFrameFeaturesIndx(j)));
-                 id2 = globalFeatures.id(possibleFrameFeaturesIndx(j));
-                 for k = 2:size(globalFeatures.dynamicAssociation(objectIndx,:),2)
-                     associations = globalFeatures.dynamicAssociation{objectIndx,k};
-                     index = find(associations ==  id2);
-                     if ~isempty(index)
-                         if index > 1
-                             id1 = associations(index-1);
-                             label = '2PointsDataAssociation';
-                             vIn1 = globalFeaturesGraphFileIndx(id1);
-                             vIn2 = globalFeaturesGraphFileIndx(possibleFrameFeaturesIndx(j));
-                             % features are 1 frame apart
-                             %assert(globalFeatures.frame(id1)+1 == globalFeatures.frame(possibleFrameFeaturesIndx(j)));
-                             idx1 = find(globalObjectsGraphFileIndx(:,1) == ...
-                                 globalFeatures.objectId(possibleFrameFeaturesIndx(j)));
-                             idx2 = find(globalObjectsGraphFileIndx(:,2) == imageRange(i));
-                             vOut = globalObjectsGraphFileIndx(intersect(idx1,idx2),3);
-                             formatSpec = strcat('%s',repmat(' %d',1,numel(vIn1)),...
-                                 repmat(' %d',1,numel(vIn2)),repmat(' %d',1,numel(vOut)),'\n');
-                             % vIn1, vIn2 and vOut are not empty
-                             assert(~isempty(vIn1) &&  ~isempty(vIn2) && ~isempty(vOut))
-                             fprintf(fileID,formatSpec,label,vIn1,vIn2,vOut);
-                         end
-                     end
-                 end
-             end
+            % dynamic point
+            if ~globalFeatures.static(possibleFrameFeaturesIndx(j),1)
+                objectIds = [globalFeatures.dynamicAssociation{:,1}];
+                objectIndx = find(objectIds == globalFeatures.objectId(possibleFrameFeaturesIndx(j)));
+                id2 = globalFeatures.id(possibleFrameFeaturesIndx(j));
+                for k = 2:size(globalFeatures.dynamicAssociation(objectIndx,:),2)
+                    associations = globalFeatures.dynamicAssociation{objectIndx,k};
+                    index = find(associations ==  id2);
+                    if ~isempty(index)
+                        if index > 1
+                            id1 = associations(index-1);
+                            label = '2PointsDataAssociation';
+                            vIn1 = globalFeaturesGraphFileIndx(id1);
+                            vIn2 = globalFeaturesGraphFileIndx(possibleFrameFeaturesIndx(j));
+                            % features are 1 frame apart
+                            assert(globalFeatures.frame(id1)+1 == globalFeatures.frame(possibleFrameFeaturesIndx(j)));
+                            assert(globalFeatures.static(id1)==0)
+                            assert(globalFeatures.static(possibleFrameFeaturesIndx(j))==0)
+                            idx1 = find(globalObjectsGraphFileIndx(:,1) == ...
+                                globalFeatures.objectId(possibleFrameFeaturesIndx(j)));
+                            idx2 = find(globalObjectsGraphFileIndx(:,2) == imageRange(i));
+                            vOut = globalObjectsGraphFileIndx(intersect(idx1,idx2),3);
+                            formatSpec = strcat('%s',repmat(' %d',1,numel(vIn1)),...
+                                repmat(' %d',1,numel(vIn2)),repmat(' %d',1,numel(vOut)),'\n');
+                            % vIn1, vIn2 and vOut are not empty
+                            assert(~isempty(vIn1) &&  ~isempty(vIn2) && ~isempty(vOut))
+                            fprintf(fileID,formatSpec,label,vIn1,vIn2,vOut);
+                        end
+                    end
+                end
+            end
         end
     end
 end
-            
+
 
 end

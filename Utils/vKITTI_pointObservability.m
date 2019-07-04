@@ -1,18 +1,23 @@
-function objectPoints = vKITTI_pointObservability(filePath)
+function objectPoints = vKITTI_pointObservability(gtFilePath,measFilePath)
 
-fid = fopen(filePath, 'r');
-Data = textscan(fid,'%s','Delimiter','\n');
-CStr = Data{1};
+fid = fopen(gtFilePath, 'r');
+gtData = textscan(fid,'%s','Delimiter','\n');
+gtCStr = gtData{1};
 fclose(fid);
 
-pointsDataAssociationIndex = find(contains(CStr, '2PointsDataAssociation')==1);
-posesIndex = find(contains(CStr, 'VERTEX_POSE_R3_SO3')==1);
+fid = fopen(measFilePath, 'r');
+measData = textscan(fid,'%s','Delimiter','\n');
+measCStr = measData{1};
+fclose(fid);
+
+pointsDataAssociationIndex = find(contains(measCStr, '2PointsDataAssociation')==1);
+posesIndex = find(contains(gtCStr, 'VERTEX_POSE_R3_SO3')==1);
 
 objectPoints = {};
 seenObjects = [];
 
 for i=1:length(pointsDataAssociationIndex)
-    line = strsplit(CStr{pointsDataAssociationIndex(i),1},' ');
+    line = strsplit(measCStr{pointsDataAssociationIndex(i),1},' ');
     pointId1 = str2double(line{1,2});
     pointId2 = str2double(line{1,3});
     objectId =  str2double(line{1,4});

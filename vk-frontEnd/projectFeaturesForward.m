@@ -41,10 +41,13 @@ for i=1:size(frame.features.location,1)
             featuresOriginFrame = [featuresOriginFrame; frame.features.originFrame(i)];
             featuresId = [featuresId; frame.features.id(i)];
             % if closest point is within 1 mm in 3D
-            if(norm(world3DPoint(1:3,1) - globalLocation3D(:,index)) < 0.001)
+            if(norm(world3DPoint(1:3,1) - globalLocation3D(:,index)) == 0)
                 globalWeight(index,1) = globalWeight(index,1) + 1;
-                assert(globalStatic(index,1) == 1);
-                assert(globalObjectId(index,1) == -1);
+                if(globalStatic(index,1) ~= 1 || globalObjectId(index,1) ~= -1)
+                    continue;
+                end
+                %assert(globalStatic(index,1) == 1);
+                %assert(globalObjectId(index,1) == -1);
             else
                 disp('error!'); 
                 disp('static point detected in previous frame should already be in global features structure');
@@ -82,7 +85,7 @@ for i=1:size(frame.features.location,1)
                 featuresMoving = [featuresMoving;nextFrame.objects(nextIndx).moving];
                 featuresLocation3D = [featuresLocation3D, movedWorld3DPoint(1:3)];
                 featuresOriginFrame = [featuresOriginFrame; nextFrame.number];
-                featuresId = [featuresId; length(globalLocation3D)+1];
+                featuresId = [featuresId; size(globalLocation3D,2)+1];
                 globalLocation3D = [globalLocation3D, movedWorld3DPoint(1:3)];
                 globalWeight(end+1,1) = 1;
                 globalId(end+1,1) = featuresId(end);
@@ -94,7 +97,7 @@ for i=1:size(frame.features.location,1)
                 objectIds = [globalAssociation{:,1}];
                 idx = find(objectIds == featuresObjectId(end));
                 if ~isempty(idx)
-                    if(norm(world3DPoint(1:3,1) - globalLocation3D(:,index)) < 0.001)
+                    if(norm(world3DPoint(1:3,1) - globalLocation3D(:,index)) < 0.0001)
                         assert(globalStatic(index,1) == 0);
                         assert(globalObjectId(index,1) == featuresObjectId(end));
                     else
@@ -105,7 +108,7 @@ for i=1:size(frame.features.location,1)
                     originFeatureId = globalId(index,1);
                     for j = 2:size(globalAssociation(idx,:),2)
                         if ismember(originFeatureId, [globalAssociation{idx,j}])
-                            globalAssociation{idx,j} = [globalAssociation{idx,j}, length(globalLocation3D)+1];
+                            globalAssociation{idx,j} = [globalAssociation{idx,j}, size(globalLocation3D,2)];
                             break;
                         end
                     end

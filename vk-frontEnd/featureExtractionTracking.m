@@ -33,7 +33,7 @@ for i = 1:numel(imageRange)
     rgbIm = imread(strcat(rgbI,frameName));
     depthIm = imread(strcat(depthI,frameName));
     [frameFeatures,globalFeatures] = extractFrameFeatures(K,rgbIm,depthIm,frames(i).objects,...
-        frames(i),nFeaturesPerFrame-length(frames(i).features.location),nFeaturesPerObject,globalFeatures);
+        frames(i),nFeaturesPerFrame-size(frames(i).features.location,1),nFeaturesPerObject,globalFeatures);
     if isempty(frames(i).features.location)
         frames(i).features = frameFeatures;
     else

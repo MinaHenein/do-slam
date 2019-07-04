@@ -30,19 +30,21 @@ for i = 1:length(frames)
     end
     % rigid objects motion
     if i > 1
-        lastFrameObjectIds =  [frames(i-1).objects.id];
-        for k = 1:length(frames(i).objects)
-            objectId = frames(i).objects(k).id;
-            [found,indx] = find(lastFrameObjectIds == objectId);
-            if ~isempty(found) && frames(i).objects(k).moving
-                label = 'VERTEX_SE3Motion';
-                vertexCount = vertexCount + 1;
-                index = vertexCount;
-                currentObjectPoseWorldFrame = poseToTransformationMatrix(frames(i).objects(k).poseWorldFrame);
-                lastObjectPoseWorldFrame = poseToTransformationMatrix(frames(i-1).objects(indx).poseWorldFrame);
-                value = transformationMatrixToPose(currentObjectPoseWorldFrame/lastObjectPoseWorldFrame);
-                globalObjectsGraphFileIndx = [globalObjectsGraphFileIndx; objectId, imageRange(i), vertexCount];
-                writeVertex(label,index,value,fileID);
+        if ~isempty(frames(i-1).objects)
+            lastFrameObjectIds =  [frames(i-1).objects.id];
+            for k = 1:length(frames(i).objects)
+                objectId = frames(i).objects(k).id;
+                [found,indx] = find(lastFrameObjectIds == objectId);
+                if ~isempty(found) && frames(i).objects(k).moving
+                    label = 'VERTEX_SE3Motion';
+                    vertexCount = vertexCount + 1;
+                    index = vertexCount;
+                    currentObjectPoseWorldFrame = poseToTransformationMatrix(frames(i).objects(k).poseWorldFrame);
+                    lastObjectPoseWorldFrame = poseToTransformationMatrix(frames(i-1).objects(indx).poseWorldFrame);
+                    value = transformationMatrixToPose(currentObjectPoseWorldFrame/lastObjectPoseWorldFrame);
+                    globalObjectsGraphFileIndx = [globalObjectsGraphFileIndx; objectId, imageRange(i), vertexCount];
+                    writeVertex(label,index,value,fileID);
+                end
             end
         end
     end

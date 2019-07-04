@@ -94,12 +94,12 @@ for i=1:size(frameFeatures.location,1)
             % find min distant point
             [~,index] = find(distances == min(distances));
             % if closest point is within 1 mm in 3D
-            if(norm(world3DPoint(1:3,1) - globalLocation3D(:,index)) < 0.001)
+            if(norm(world3DPoint(1:3,1) - globalLocation3D(:,index)) == 0)
                 globalWeight(index,1) = globalWeight(index,1) + 1;
             else
                 globalLocation3D = [globalLocation3D, world3DPoint(1:3)];
                 globalWeight(end+1,1) = 1;
-                globalId(end+1,1) = length(globalLocation3D);
+                globalId(end+1,1) = size(globalLocation3D,2);
                 globalFrame(end+1,1) = frameFeatures.originFrame(i);
                 globalCameraLocation = [globalCameraLocation, camera3DPoint(1:3)];
                 globalStatic(end+1,1) = 1;
@@ -125,13 +125,13 @@ for i=1:size(frameFeatures.location,1)
             % find min distant point
             [~,index] = find(distances == min(distances));
             % if closest point is within 1 mm in 3D
-            if(norm(world3DPoint(1:3,1) - globalLocation3D(:,index)) < 0.001)
+            if(norm(world3DPoint(1:3,1) - globalLocation3D(:,index)) == 0)
                 assert(globalStatic(index,1) == 0);
                 assert(globalObjectId(index,1) == frameFeatures.objectId(i));
             else
                 globalLocation3D = [globalLocation3D, world3DPoint(1:3)];
                 globalWeight(end+1,1) = 1;
-                globalId(end+1,1) = length(globalLocation3D);
+                globalId(end+1,1) = size(globalLocation3D,2);
                 globalFrame(end+1,1) = frameFeatures.originFrame(i);
                 globalCameraLocation = [globalCameraLocation, camera3DPoint(1:3)];
                 globalStatic(end+1,1) = 0;
@@ -141,7 +141,7 @@ for i=1:size(frameFeatures.location,1)
         % globalAssociation: each row contains a unique object id and its tracklets of points
         if isempty(globalAssociation)
             globalAssociation{1,1} = frameFeatures.objectId(i);
-            globalAssociation{1,2} = length(globalLocation3D);
+            globalAssociation{1,2} = size(globalLocation3D,2);
         else
             % new dynamic 3D point - start new tracklet
             if(norm(world3DPoint(1:3,1) - globalLocation3D(:,index)) > 0.001)
@@ -150,12 +150,12 @@ for i=1:size(frameFeatures.location,1)
                 % new tracklet on an existing object
                 if ~isempty(idx)
                     l = size(globalAssociation(idx,:),2);
-                    globalAssociation{idx,l+1} = length(globalLocation3D);
+                    globalAssociation{idx,l+1} = size(globalLocation3D,2);
                 % new tracklet on a new object
                 else
                     l = size(globalAssociation,1);
                     globalAssociation{l+1,1} = frameFeatures.objectId(i);
-                    globalAssociation{l+1,2} = length(globalLocation3D);
+                    globalAssociation{l+1,2} = size(globalLocation3D,2);
                 end
             end
         end 
