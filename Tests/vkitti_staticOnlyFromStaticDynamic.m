@@ -6,6 +6,14 @@ Data = textscan(fileID, '%s', 'delimiter', '\n', 'whitespace', '');
 CStr = Data{1};
 fclose(fileID);
 
+IndexC = strfind(CStr, '2PointsDataAssociation');
+Index = find(~cellfun('isempty', IndexC));
+if isempty(Index)
+    copyfile(strcat(pwd,'/Data/GraphFiles/',measurementsFileName),strcat(filepath(1:end-10),'staticOnly_Meas.graph'));
+    copyfile(strcat(pwd,'/Data/GraphFiles/',groundTruthFileName),strcat(filepath(1:end-10),'staticOnly_GT.graph'));
+    return;
+end
+
 poses = [];
 points = [];
 dynamicPoints = [];
@@ -40,7 +48,7 @@ points = unique(points);
 dynamicPoints = unique(dynamicPoints);
 
 %vKitti_OcclusionWorkingMeas_staticOnlyTest
-fileToWritepath = strcat(pwd,'/Data/GraphFiles/',measurementsFileName(1:end-6),'_staticOnly.graph');
+fileToWritepath = strcat(pwd,'/Data/GraphFiles/',measurementsFileName(1:end-10),'staticOnly_Meas.graph');
 fileToWriteID = fopen(fileToWritepath,'w');
 
 if size(pointSeenByCamera,1) < poses(end)
@@ -94,7 +102,7 @@ CStr = Data{1};
 fclose(fileID);
 
 %vKitti_OcclusionWorkingGT_staticOnlyTest
-fileToWritepath = strcat(pwd,'/Data/GraphFiles/',groundTruthFileName(1:end-6),'_staticOnly.graph');
+fileToWritepath = strcat(pwd,'/Data/GraphFiles/',groundTruthFileName(1:end-8),'staticOnly_GT.graph');
 fileToWriteID = fopen(fileToWritepath,'w');
 
 pointWritten = [];

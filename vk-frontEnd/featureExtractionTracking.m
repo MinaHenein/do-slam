@@ -15,6 +15,8 @@ globalFeatures.objectId = [];
 % dynamic features associations
 globalFeatures.dynamicAssociation = {};
 
+firstCamPose = cameraPoses(:,1);
+
 for i = 1:numel(imageRange)
     pbar(i,numel(imageRange),[],[num2str(i),'/',num2str(numel(imageRange))],'off');
     
@@ -22,7 +24,8 @@ for i = 1:numel(imageRange)
     frameNumber = imageRange(i);
     frames(i).number = imageRange(i);
     frameName = strcat(repmat('0',1,5-numel(num2str(frameNumber))),num2str(frameNumber),'.png');
-    frames(i).cameraPose = cameraPoses(:,i);
+    frames(i).cameraPose = transformationMatrixToPose(poseToTransformationMatrix(firstCamPose)\...
+        poseToTransformationMatrix(cameraPoses(:,i)));
     if i == 1
         % extract objects
         maskIm = imread(strcat(maskI, frameName));
@@ -56,7 +59,8 @@ for i = 1:numel(imageRange)
         nextFrameNumber = imageRange(i+1);
         frames(i+1).number = imageRange(i+1);
         nextFrameName = strcat(repmat('0',1,5-numel(num2str(nextFrameNumber))),num2str(nextFrameNumber),'.png');
-        frames(i+1).cameraPose = cameraPoses(:,i+1);
+        frames(i+1).cameraPose = transformationMatrixToPose(poseToTransformationMatrix(firstCamPose)\...
+        poseToTransformationMatrix(cameraPoses(:,i+1)));
         % extract objects
         nextMaskIm = imread(strcat(maskI, nextFrameName));
         nextFrameObjects = extractFrameObjects(nextMaskIm,motFile,frames(i+1));

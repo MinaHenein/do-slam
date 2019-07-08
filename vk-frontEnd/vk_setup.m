@@ -1,13 +1,14 @@
 % variables
 sequence = '0001';
 variation = 'clone';
-imageRange = 423:424;
+imageRange = 121:154;
 nFeaturesPerFrame = 600; % number of features per frame
 maxBackgroundFeaturesPerFrame = 200; % max number of static background features per frame
 nFeaturesPerObject = 100; % number of features per object
 
 noiseArray = [0.1 0.1 0.1 0.05 0.05 0.05 0.04 0.04 0.04];
-applyNoise = 0;
+applyNoise = 1;
+rng(12);
 
 % setup
 cd /home/mina/workspace/src/Git/do-slam
