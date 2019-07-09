@@ -1,6 +1,6 @@
-function  deleteMotionVerticesFromGraphFile(FileName)
+function  deleteMotionVerticesFromGraphFile(FilePath)
 
-FID = fopen(FileName, 'r');
+FID = fopen(FilePath, 'r');
 if FID == -1, error('Cannot open file'), end
 Data = textscan(FID,'%s','Delimiter','\n');
 CStr = Data{1};
@@ -16,7 +16,7 @@ if ~isempty(Index)
 end
 
 % Save the file again:
-FID = fopen(FileName, 'w');
+FID = fopen(strcat(FilePath(1:end-6),'_noMotionVertices.graph'), 'w');
 if FID == -1, error('Cannot open file'), end
 fprintf(FID, '%s\n', CStr{:});
 fclose(FID);

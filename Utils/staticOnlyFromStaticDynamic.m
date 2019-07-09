@@ -147,7 +147,7 @@ initFileToWriteID = fopen(initFileToWritePath,'w');
 
 pointWritten = [];
 for i=1:length(poses)
-    IndexC = strfind(gtCStr, strcat({config.poseVertexLabel},{' '},{num2str(poses(i))},{' '}));
+    IndexC = strfind(initCStr, strcat({config.poseVertexLabel},{' '},{num2str(poses(i))},{' '}));
     lineIndex = find(~cellfun('isempty', IndexC));
     fileID = fopen(initFilePath,'r');
     line = textscan(fileID,'%s',1,'delimiter','\n','headerlines',lineIndex-1);
@@ -161,7 +161,7 @@ for i=1:length(poses)
         for j=1:length(pointSeen)
             if ~ismember(pointSeen(j),dynamicPoints)
                 if isempty(pointWritten) || ~ismember(pointSeen(j),pointWritten)
-                    IndexC = strfind(gtCStr, strcat({config.pointVertexLabel},{' '},{num2str(pointSeen(j))},{' '}));
+                    IndexC = strfind(initCStr, strcat({config.pointVertexLabel},{' '},{num2str(pointSeen(j))},{' '}));
                     lineIndex = find(~cellfun('isempty', IndexC));
                     fileID = fopen(initFilePath,'r');
                     line = textscan(fileID,'%s',1,'delimiter','\n','headerlines',lineIndex-1);
