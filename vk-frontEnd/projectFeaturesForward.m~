@@ -35,17 +35,18 @@ for i=1:size(frame.features.location,1)
                 % camera --> image
                 nextImagePoint = K * nextCamera3DPoint;
                 nextImagePoint = nextImagePoint/nextImagePoint(3);
-                corners = detectFASTFeatures(rgb2gray(nextRGBI),'ROI',[max(1,nextImagePoint(1)-30),...
-                    max(1,nextImagePoint(2)-30),...
-                    min(60,size(nextRGBI,2)-nextImagePoint(1)),min(60,size(nextRGBI,1)-nextImagePoint(2))]);
-                if corners.Count ~=0
-                    distances = sqrt(bsxfun(@plus,...
-                        (corners.Location(:,1).'-nextImagePoint(1,1)).^2,...
-                        (corners.Location(:,2).'-nextImagePoint(2,1)).^2))';
-                    cornerIndex = find(distances == min(distances));
-                    nextImagePoint = corners.Location(cornerIndex,:);
-                    if isPointWithinImageSize(nextImagePoint,size(nextRGBI))
-                        featuresLocation = [featuresLocation; nextImagePoint(1:2)'];
+                if isPointWithinImageSize(nextImagePoint,size(nextRGBI))
+                    corners = detectFASTFeatures(rgb2gray(nextRGBI),'ROI',[max(1,nextImagePoint(1)-30),...
+                        max(1,nextImagePoint(2)-30),...
+                        min(60,size(nextRGBI,2)-nextImagePoint(1)),min(60,size(nextRGBI,1)-nextImagePoint(2))]);
+                    if corners.Count ~=0
+                        distances = sqrt(bsxfun(@plus,...
+                            (corners.Location(:,1).'-nextImagePoint(1,1)).^2,...
+                            (corners.Location(:,2).'-nextImagePoint(2,1)).^2))';
+                        cornerIndex = find(distances == min(distances));
+                        nextImagePoint = corners.Location(cornerIndex,:);
+                        
+                        featuresLocation = [featuresLocation; nextImagePoint(1:2)];
                         featuresObjectId = [featuresObjectId; -1];
                         featuresMoving = [featuresMoving;0];
                         featuresLocation3D = [featuresLocation3D, frame.features.location3D(:,i)];
@@ -91,17 +92,18 @@ for i=1:size(frame.features.location,1)
                     % camera --> image
                     nextImagePoint = K * nextCamera3DPoint;
                     nextImagePoint = nextImagePoint/nextImagePoint(3);
-                    corners = detectFASTFeatures(rgb2gray(nextRGBI),'ROI',[max(1,nextImagePoint(1)-30),...
-                        max(1,nextImagePoint(2)-30),...
-                        min(60,size(nextRGBI,2)-nextImagePoint(1)),min(60,size(nextRGBI,1)-nextImagePoint(2))]);
-                    if corners.Count ~=0
-                        distances = sqrt(bsxfun(@plus,...
-                            (corners.Location(:,1).'-nextImagePoint(1,1)).^2,...
-                            (corners.Location(:,2).'-nextImagePoint(2,1)).^2))';
-                        cornerIndex = find(distances == min(distances));
-                        nextImagePoint = corners.Location(cornerIndex,:);
-                        if isPointWithinImageSize(nextImagePoint,size(nextRGBI))
-                            featuresLocation = [featuresLocation; nextImagePoint(1:2)'];
+                    if isPointWithinImageSize(nextImagePoint,size(nextRGBI))
+                        corners = detectFASTFeatures(rgb2gray(nextRGBI),'ROI',[max(1,nextImagePoint(1)-30),...
+                            max(1,nextImagePoint(2)-30),...
+                            min(60,size(nextRGBI,2)-nextImagePoint(1)),min(60,size(nextRGBI,1)-nextImagePoint(2))]);
+                        if corners.Count ~=0
+                            distances = sqrt(bsxfun(@plus,...
+                                (corners.Location(:,1).'-nextImagePoint(1,1)).^2,...
+                                (corners.Location(:,2).'-nextImagePoint(2,1)).^2))';
+                            cornerIndex = find(distances == min(distances));
+                            nextImagePoint = corners.Location(cornerIndex,:);
+                            
+                            featuresLocation = [featuresLocation; nextImagePoint(1:2)];
                             featuresObjectId = [featuresObjectId; objectId];
                             featuresMoving = [featuresMoving;nextFrame.objects(nextIndx).moving];
                             featuresLocation3D = [featuresLocation3D, movedWorld3DPoint(1:3)];
@@ -147,80 +149,78 @@ for i=1:size(frame.features.location,1)
             pixelCol = frameFeatures.location(i,1);
             pixelFlow = double(flowI(pixelRow,pixelCol));
             nextImagePoint = imagePixel + pixelFlow;
-            corners = detectFASTFeatures(rgb2gray(nextRGBI),'ROI',[max(1,nextImagePoint(1)-30),...
-                max(1,nextImagePoint(2)-30),...
-                min(60,size(nextRGBI,2)-nextImagePoint(1)),min(60,size(nextRGBI,1)-nextImagePoint(2))]);
-            if corners.Count ~=0
-                distances = sqrt(bsxfun(@plus,...
-                    (corners.Location(:,1).'-nextImagePoint(1,1)).^2,...
-                    (corners.Location(:,2).'-nextImagePoint(2,1)).^2))';
-                cornerIndex = find(distances == min(distances));
-                nextImagePoint = corners.Location(cornerIndex,:);
-            end
-            % static point
-            if ~frame.features.moving(i)
-                if isPointWithinImageSize(nextImagePoint,size(nextRGBI))
-                    featuresLocation = [featuresLocation; nextImagePoint(1:2)'];
-                    featuresObjectId = [featuresObjectId; -1];
-                    featuresMoving = [featuresMoving;0];
-                    featuresLocation3D = [featuresLocation3D, frame.features.location3D(:,i)];
-                    featuresOriginFrame = [featuresOriginFrame; frame.features.originFrame(i)];
-                    featuresId = [featuresId; frame.features.id(i)];
-                    % if closest point is within 1 mm in 3D
-                    if(norm(world3DPoint(1:3,1) - globalLocation3D(:,index)) == 0)
-                        globalWeight(index,1) = globalWeight(index,1) + 1;
-                        if(globalStatic(index,1) ~= 1 || globalObjectId(index,1) ~= -1)
-                            continue;
+            if isPointWithinImageSize(nextImagePoint,size(nextRGBI))
+                corners = detectFASTFeatures(rgb2gray(nextRGBI),'ROI',[max(1,nextImagePoint(1)-30),...
+                    max(1,nextImagePoint(2)-30),...
+                    min(60,size(nextRGBI,2)-nextImagePoint(1)),min(60,size(nextRGBI,1)-nextImagePoint(2))]);
+                if corners.Count ~=0
+                    distances = sqrt(bsxfun(@plus,...
+                        (corners.Location(:,1).'-nextImagePoint(1,1)).^2,...
+                        (corners.Location(:,2).'-nextImagePoint(2,1)).^2))';
+                    cornerIndex = find(distances == min(distances));
+                    nextImagePoint = corners.Location(cornerIndex,:);
+                    % static point
+                    if ~frame.features.moving(i)
+                        featuresLocation = [featuresLocation; nextImagePoint(1:2)];
+                        featuresObjectId = [featuresObjectId; -1];
+                        featuresMoving = [featuresMoving;0];
+                        featuresLocation3D = [featuresLocation3D, frame.features.location3D(:,i)];
+                        featuresOriginFrame = [featuresOriginFrame; frame.features.originFrame(i)];
+                        featuresId = [featuresId; frame.features.id(i)];
+                        % if closest point is within 1 mm in 3D
+                        if(norm(world3DPoint(1:3,1) - globalLocation3D(:,index)) == 0)
+                            globalWeight(index,1) = globalWeight(index,1) + 1;
+                            if(globalStatic(index,1) ~= 1 || globalObjectId(index,1) ~= -1)
+                                continue;
+                            end
+                            %assert(globalStatic(index,1) == 1);
+                            %assert(globalObjectId(index,1) == -1);
+                        else
+                            disp('error!');
+                            disp('static point detected in previous frame should already be in global features structure');
                         end
-                        %assert(globalStatic(index,1) == 1);
-                        %assert(globalObjectId(index,1) == -1);
+                        
                     else
-                        disp('error!');
-                        disp('static point detected in previous frame should already be in global features structure');
-                    end
-                end
-            else
-                % dynamic point
-                if isPointWithinImageSize(nextImagePoint,size(nextRGBI))
-                    featuresLocation = [featuresLocation; nextImagePoint(1:2)'];
-                    featuresObjectId = [featuresObjectId; objectId];
-                    featuresMoving = [featuresMoving;nextFrame.objects(nextIndx).moving];
-                    featuresLocation3D = [featuresLocation3D, movedWorld3DPoint(1:3)];
-                    featuresOriginFrame = [featuresOriginFrame; nextFrame.number];
-                    featuresId = [featuresId; size(globalLocation3D,2)+1];
-                    globalLocation3D = [globalLocation3D, movedWorld3DPoint(1:3)];
-                    globalWeight(end+1,1) = 1;
-                    globalId(end+1,1) = featuresId(end);
-                    globalFrame(end+1,1) = featuresOriginFrame(end);
-                    globalCameraLocation = [globalCameraLocation, nextCamera3DPoint];
-                    globalStatic(end+1,1) = 0;
-                    globalObjectId(end+1,1) = featuresObjectId(end);
-                    % global associations
-                    objectIds = [globalAssociation{:,1}];
-                    idx = find(objectIds == featuresObjectId(end));
-                    if ~isempty(idx)
-                        if(norm(world3DPoint(1:3,1) - globalLocation3D(:,index)) < 0.0001)
-                            assert(globalStatic(index,1) == 0);
-                            assert(globalObjectId(index,1) == featuresObjectId(end));
+                        % dynamic point
+                        featuresLocation = [featuresLocation; nextImagePoint(1:2)];
+                        featuresObjectId = [featuresObjectId; objectId];
+                        featuresMoving = [featuresMoving;nextFrame.objects(nextIndx).moving];
+                        featuresLocation3D = [featuresLocation3D, movedWorld3DPoint(1:3)];
+                        featuresOriginFrame = [featuresOriginFrame; nextFrame.number];
+                        featuresId = [featuresId; size(globalLocation3D,2)+1];
+                        globalLocation3D = [globalLocation3D, movedWorld3DPoint(1:3)];
+                        globalWeight(end+1,1) = 1;
+                        globalId(end+1,1) = featuresId(end);
+                        globalFrame(end+1,1) = featuresOriginFrame(end);
+                        globalCameraLocation = [globalCameraLocation, nextCamera3DPoint];
+                        globalStatic(end+1,1) = 0;
+                        globalObjectId(end+1,1) = featuresObjectId(end);
+                        % global associations
+                        objectIds = [globalAssociation{:,1}];
+                        idx = find(objectIds == featuresObjectId(end));
+                        if ~isempty(idx)
+                            if(norm(world3DPoint(1:3,1) - globalLocation3D(:,index)) < 0.0001)
+                                assert(globalStatic(index,1) == 0);
+                                assert(globalObjectId(index,1) == featuresObjectId(end));
+                            else
+                                disp('error!')
+                                disp('dynamic point detected in previous frame should already be in global features structure')
+                            end
+                            % find index of world3DPoint in globalLocation3D
+                            originFeatureId = globalId(index,1);
+                            for j = 2:size(globalAssociation(idx,:),2)
+                                if ismember(originFeatureId, [globalAssociation{idx,j}])
+                                    globalAssociation{idx,j} = [globalAssociation{idx,j}, size(globalLocation3D,2)];
+                                    break;
+                                end
+                            end
                         else
                             disp('error!')
-                            disp('dynamic point detected in previous frame should already be in global features structure')
+                            disp('dynamic point detected in previous frame, object id should already be in global associations structure')
                         end
-                        % find index of world3DPoint in globalLocation3D
-                        originFeatureId = globalId(index,1);
-                        for j = 2:size(globalAssociation(idx,:),2)
-                            if ismember(originFeatureId, [globalAssociation{idx,j}])
-                                globalAssociation{idx,j} = [globalAssociation{idx,j}, size(globalLocation3D,2)];
-                                break;
-                            end
-                        end
-                    else
-                        disp('error!')
-                        disp('dynamic point detected in previous frame, object id should already be in global associations structure')
                     end
                 end
             end
-            
     end
 end
 nextFrameFeatures.location = featuresLocation;

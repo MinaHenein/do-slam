@@ -35,17 +35,18 @@ for i=1:size(frame.features.location,1)
                 % camera --> image
                 nextImagePoint = K * nextCamera3DPoint;
                 nextImagePoint = nextImagePoint/nextImagePoint(3);
-                corners = detectFASTFeatures(rgb2gray(nextRGBI),'ROI',[max(1,nextImagePoint(1)-30),...
-                    max(1,nextImagePoint(2)-30),...
-                    min(60,size(nextRGBI,2)-nextImagePoint(1)),min(60,size(nextRGBI,1)-nextImagePoint(2))]);
-                if corners.Count ~=0
-                    distances = sqrt(bsxfun(@plus,...
-                        (corners.Location(:,1).'-nextImagePoint(1,1)).^2,...
-                        (corners.Location(:,2).'-nextImagePoint(2,1)).^2))';
-                    cornerIndex = find(distances == min(distances));
-                    nextImagePoint = corners.Location(cornerIndex,:);
-                    if isPointWithinImageSize(nextImagePoint,size(nextRGBI))
-                        featuresLocation = [featuresLocation; nextImagePoint(1:2)'];
+                if isPointWithinImageSize(nextImagePoint,size(nextRGBI))
+                    corners = detectFASTFeatures(rgb2gray(nextRGBI),'ROI',[max(1,nextImagePoint(1)-30),...
+                        max(1,nextImagePoint(2)-30),...
+                        min(60,size(nextRGBI,2)-nextImagePoint(1)),min(60,size(nextRGBI,1)-nextImagePoint(2))]);
+                    if corners.Count ~=0
+                        distances = sqrt(bsxfun(@plus,...
+                            (corners.Location(:,1).'-nextImagePoint(1,1)).^2,...
+                            (corners.Location(:,2).'-nextImagePoint(2,1)).^2))';
+                        cornerIndex = find(distances == min(distances));
+                        nextImagePoint = corners.Location(cornerIndex,:);
+                        
+                        featuresLocation = [featuresLocation; nextImagePoint(1:2)];
                         featuresObjectId = [featuresObjectId; -1];
                         featuresMoving = [featuresMoving;0];
                         featuresLocation3D = [featuresLocation3D, frame.features.location3D(:,i)];
@@ -91,17 +92,18 @@ for i=1:size(frame.features.location,1)
                     % camera --> image
                     nextImagePoint = K * nextCamera3DPoint;
                     nextImagePoint = nextImagePoint/nextImagePoint(3);
-                    corners = detectFASTFeatures(rgb2gray(nextRGBI),'ROI',[max(1,nextImagePoint(1)-30),...
-                        max(1,nextImagePoint(2)-30),...
-                        min(60,size(nextRGBI,2)-nextImagePoint(1)),min(60,size(nextRGBI,1)-nextImagePoint(2))]);
-                    if corners.Count ~=0
-                        distances = sqrt(bsxfun(@plus,...
-                            (corners.Location(:,1).'-nextImagePoint(1,1)).^2,...
-                            (corners.Location(:,2).'-nextImagePoint(2,1)).^2))';
-                        cornerIndex = find(distances == min(distances));
-                        nextImagePoint = corners.Location(cornerIndex,:);
-                        if isPointWithinImageSize(nextImagePoint,size(nextRGBI))
-                            featuresLocation = [featuresLocation; nextImagePoint(1:2)'];
+                    if isPointWithinImageSize(nextImagePoint,size(nextRGBI))
+                        corners = detectFASTFeatures(rgb2gray(nextRGBI),'ROI',[max(1,nextImagePoint(1)-30),...
+                            max(1,nextImagePoint(2)-30),...
+                            min(60,size(nextRGBI,2)-nextImagePoint(1)),min(60,size(nextRGBI,1)-nextImagePoint(2))]);
+                        if corners.Count ~=0
+                            distances = sqrt(bsxfun(@plus,...
+                                (corners.Location(:,1).'-nextImagePoint(1,1)).^2,...
+                                (corners.Location(:,2).'-nextImagePoint(2,1)).^2))';
+                            cornerIndex = find(distances == min(distances));
+                            nextImagePoint = corners.Location(cornerIndex,:);
+                            
+                            featuresLocation = [featuresLocation; nextImagePoint(1:2)];
                             featuresObjectId = [featuresObjectId; objectId];
                             featuresMoving = [featuresMoving;nextFrame.objects(nextIndx).moving];
                             featuresLocation3D = [featuresLocation3D, movedWorld3DPoint(1:3)];
@@ -147,19 +149,19 @@ for i=1:size(frame.features.location,1)
             pixelCol = frameFeatures.location(i,1);
             pixelFlow = double(flowI(pixelRow,pixelCol));
             nextImagePoint = imagePixel + pixelFlow;
-            corners = detectFASTFeatures(rgb2gray(nextRGBI),'ROI',[max(1,nextImagePoint(1)-30),...
-                max(1,nextImagePoint(2)-30),...
-                min(60,size(nextRGBI,2)-nextImagePoint(1)),min(60,size(nextRGBI,1)-nextImagePoint(2))]);
-            if corners.Count ~=0
-                distances = sqrt(bsxfun(@plus,...
-                    (corners.Location(:,1).'-nextImagePoint(1,1)).^2,...
-                    (corners.Location(:,2).'-nextImagePoint(2,1)).^2))';
-                cornerIndex = find(distances == min(distances));
-                nextImagePoint = corners.Location(cornerIndex,:);
-                % static point
-                if ~frame.features.moving(i)
-                    if isPointWithinImageSize(nextImagePoint,size(nextRGBI))
-                        featuresLocation = [featuresLocation; nextImagePoint(1:2)'];
+            if isPointWithinImageSize(nextImagePoint,size(nextRGBI))
+                corners = detectFASTFeatures(rgb2gray(nextRGBI),'ROI',[max(1,nextImagePoint(1)-30),...
+                    max(1,nextImagePoint(2)-30),...
+                    min(60,size(nextRGBI,2)-nextImagePoint(1)),min(60,size(nextRGBI,1)-nextImagePoint(2))]);
+                if corners.Count ~=0
+                    distances = sqrt(bsxfun(@plus,...
+                        (corners.Location(:,1).'-nextImagePoint(1,1)).^2,...
+                        (corners.Location(:,2).'-nextImagePoint(2,1)).^2))';
+                    cornerIndex = find(distances == min(distances));
+                    nextImagePoint = corners.Location(cornerIndex,:);
+                    % static point
+                    if ~frame.features.moving(i)
+                        featuresLocation = [featuresLocation; nextImagePoint(1:2)];
                         featuresObjectId = [featuresObjectId; -1];
                         featuresMoving = [featuresMoving;0];
                         featuresLocation3D = [featuresLocation3D, frame.features.location3D(:,i)];
@@ -177,11 +179,10 @@ for i=1:size(frame.features.location,1)
                             disp('error!');
                             disp('static point detected in previous frame should already be in global features structure');
                         end
-                    end
-                else
-                    % dynamic point
-                    if isPointWithinImageSize(nextImagePoint,size(nextRGBI))
-                        featuresLocation = [featuresLocation; nextImagePoint(1:2)'];
+                        
+                    else
+                        % dynamic point
+                        featuresLocation = [featuresLocation; nextImagePoint(1:2)];
                         featuresObjectId = [featuresObjectId; objectId];
                         featuresMoving = [featuresMoving;nextFrame.objects(nextIndx).moving];
                         featuresLocation3D = [featuresLocation3D, movedWorld3DPoint(1:3)];
