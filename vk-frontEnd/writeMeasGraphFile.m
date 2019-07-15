@@ -22,11 +22,12 @@ for i = 1:length(frames)
         cameraPose = poseToTransformationMatrix(frames(i).cameraPose);
         odometry = transformationMatrixToPose(lastCameraPose\cameraPose);
         value = odometry';
-        covariance = odomMeasCov;
         % vIn and vOut are not empty
         assert(~isempty(vIn) && ~isempty(vOut))
         % edge noise
-        odomMeasNoise = normrnd([0 0 0 0 0 0],abs(odomMeasSig.*value),size([0 0 0 0 0 0]));
+%         odomMeasNoise = normrnd([0 0 0 0 0 0],abs(odomMeasSig.*value),size([0 0 0 0 0 0]));
+        odomMeasNoise = normrnd([0 0 0 0 0 0],odomMeasSig,size([0 0 0 0 0 0]));
+        covariance = odomMeasCov;
         % apply noise
         if applyNoise == true
             value = RelativeToAbsolutePoseR3xso3(value',odomMeasNoise');

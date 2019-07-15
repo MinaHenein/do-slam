@@ -1,5 +1,5 @@
 function [frames,globalFeatures] = featureExtractionTracking(imageRange,K,rgbI,depthI,maskI,...
-    motFile,cameraPoses,nFeaturesPerFrame,nFeaturesPerObject,maxBackgroundFeaturesPerFrame)
+    motFile,cameraPoses,nFeaturesPerFrame,nFeaturesPerObject,maxBackgroundFeaturesPerFrame,settings)
 
 % setup 
 frames(1).features.location = [];
@@ -66,8 +66,9 @@ for i = 1:numel(imageRange)
         nextFrameObjects = extractFrameObjects(nextMaskIm,motFile,frames(i+1));
         frames(i+1).objects = nextFrameObjects;
         % project last frame features
+        nextRGBIm = imread(strcat(rgbI,nextFrameName));
         [nextFrameFeatures,globalFeatures] = projectFeaturesForward(frames(i),K,...
-            frames(i+1),size(rgbIm),globalFeatures);
+            frames(i+1),nextRGBIm,globalFeatures,settings);
         frames(i+1).features = nextFrameFeatures;
     end
     

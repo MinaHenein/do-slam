@@ -21,9 +21,9 @@ for i=1:numel(CStr)-1
             b = str2double(lineCell{1,10});
             % object binary mask
             objectMask = getObjectMask(l,t,r,b,maskI);
-            [nRows, nCols] = size(maskI);
+            [nRows, nCols, ~] = size(maskI);
             % object occupies more than 5% of image
-            if 100*sum(sum(objectMask))/(nRows*nCols) > 5
+            if 100*sum(sum(objectMask))/(nRows*nCols) > 6
                 nObjects = nObjects+1;
                 % assign object bounding box
                 frameObjects(nObjects).boundingBox = [l,t,r,b];
