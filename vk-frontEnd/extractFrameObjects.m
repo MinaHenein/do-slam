@@ -1,4 +1,4 @@
-function frameObjects = extractFrameObjects(maskI, motFile, frame)
+function frameObjects = extractFrameObjects(maskI, motFile, frame, settings)
 
 % read mot file
 fileID = fopen(motFile,'r');
@@ -20,9 +20,9 @@ for i=1:numel(CStr)-1
             r = str2double(lineCell{1,9});
             b = str2double(lineCell{1,10});
             % object binary mask
-            objectMask = getObjectMask(l,t,r,b,maskI);
+            objectMask = getObjectMask(l,t,r,b,maskI, settings);
             [nRows, nCols, ~] = size(maskI);
-            % object occupies more than 5% of image
+            % object occupies more than 6% of image
             if 100*sum(sum(objectMask))/(nRows*nCols) > 6
                 nObjects = nObjects+1;
                 % assign object bounding box
@@ -34,14 +34,25 @@ for i=1:numel(CStr)-1
                 % object unique tracking id
                 frameObjects(nObjects).id = str2double(lineCell{1,2});
                 % moving or static
-                frameObjects(nObjects).moving = str2double(lineCell{1,23});
+                % no motion segmentation provided for kitti - consider all
+                % moveable objects
+                if strcmp(settings.dataset,'kitti')
+                   frameObjects(nObjects).moving = 1; 
+                elseif strcmp(settings.dataset,'vkitti')
+                   frameObjects(nObjects).moving = str2double(lineCell{1,23});
+                end
                 % object pose in camera frame
                 x3d = str2double(lineCell{1,14});
                 y3d = str2double(lineCell{1,15});
                 z3d = str2double(lineCell{1,16});
                 yaw = str2double(lineCell{1,17});
-                pitch = str2double(lineCell{1,18});
-                roll = str2double(lineCell{1,19});
+                if strcmp(settings.dataset,'kitti')
+                    pitch = 0;
+                    roll = 0;
+                elseif strcmp(settings.dataset,'vkitti')
+                    pitch = str2double(lineCell{1,18});
+                    roll = str2double(lineCell{1,19});
+                end
                 Ry = eul2Rot([0, yaw + pi/2, 0]);
                 Rx = eul2Rot([0, 0, pitch]);
                 Rz = eul2Rot([roll, 0, 0]);

@@ -1,5 +1,5 @@
 function [frameFeatures,globalFeatures] = extractFrameFeatures(K,rgbI,depthI,frameObjects,...
-    frame,nFeaturesPerFrame,nFeaturesPerObject,globalFeatures)
+    frame,nFeaturesPerFrame,nFeaturesPerObject,globalFeatures,settings)
 
 featuresLocation = [];
 featuresObjectId = [];
@@ -67,10 +67,21 @@ featuresLocation3D = zeros(3,length(frameFeatures.location));
 for i=1:size(frameFeatures.location,1)
     pixelRow = frameFeatures.location(i,2);
     pixelCol = frameFeatures.location(i,1);
-    pixelDepth = double(depthI(pixelRow,pixelCol));
+    if strcmp(settings.depth,'SPSS')
+        %kitti
+        pixelDisparity = double(depthI(pixelRow,pixelCol))/256;
+        if pixelDisparity == 0
+            continue;
+        else
+            pixelDepth = K(1,1)*0.537/pixelDisparity;
+        end
+    elseif strcmp(settings.depth,'GT')
+        % vkitti
+        pixelDepth = double(depthI(pixelRow,pixelCol))/100;
+    end
     % image--> camera
     camera3DPoint = K\[pixelCol;pixelRow;1];
-    camera3DPoint = camera3DPoint * pixelDepth/100;
+    camera3DPoint = camera3DPoint * pixelDepth;
     % camera --> world
     cameraPoseMatrix = poseToTransformationMatrix(frame.cameraPose);
     world3DPoint = cameraPoseMatrix * [camera3DPoint;1];
@@ -93,8 +104,8 @@ for i=1:size(frameFeatures.location,1)
                 (globalLocation3D(3,:).'-world3DPoint(3,1)).^2))';
             % find min distant point
             [~,index] = find(distances == min(distances));
-            % if closest point is within 1 mm in 3D
-            if(norm(world3DPoint(1:3,1) - globalLocation3D(:,index)) == 0)
+            % if closest point is within distance threshold in 3D
+            if(norm(world3DPoint(1:3,1) - globalLocation3D(:,index)) <= settings.distanceThreshold)
                 globalWeight(index,1) = globalWeight(index,1) + 1;
             else
                 globalLocation3D = [globalLocation3D, world3DPoint(1:3)];
@@ -124,10 +135,14 @@ for i=1:size(frameFeatures.location,1)
                 (globalLocation3D(3,:).'-world3DPoint(3,1)).^2))';
             % find min distant point
             [~,index] = find(distances == min(distances));
-            % if closest point is within 1 mm in 3D
-            if(norm(world3DPoint(1:3,1) - globalLocation3D(:,index)) == 0)
-                assert(globalStatic(index,1) == 0);
-                assert(globalObjectId(index,1) == frameFeatures.objectId(i));
+            % if closest point is within distance threshold in 3D
+            if(norm(world3DPoint(1:3,1) - globalLocation3D(:,index)) <= settings.distanceThreshold)
+                for m = 1:length(index)
+                    % if point has changed object or is no longer moving, skip 
+                    if globalStatic(index(m),1) ~= 0 || globalObjectId(index(m),1) ~= frameFeatures.objectId(i)
+                        continue;
+                    end 
+                end
             else
                 globalLocation3D = [globalLocation3D, world3DPoint(1:3)];
                 globalWeight(end+1,1) = 1;
@@ -144,7 +159,7 @@ for i=1:size(frameFeatures.location,1)
             globalAssociation{1,2} = size(globalLocation3D,2);
         else
             % new dynamic 3D point - start new tracklet
-            if(norm(world3DPoint(1:3,1) - globalLocation3D(:,index)) > 0.001)
+            if(norm(world3DPoint(1:3,1) - globalLocation3D(:,index)) > settings.distanceThreshold+0.001)
                 objectIds = [globalAssociation{:,1}];
                 idx = find(objectIds == frameFeatures.objectId(i));
                 % new tracklet on an existing object

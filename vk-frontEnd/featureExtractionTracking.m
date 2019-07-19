@@ -1,4 +1,4 @@
-function [frames,globalFeatures] = featureExtractionTracking(imageRange,K,rgbI,depthI,maskI,...
+function [frames,globalFeatures] = featureExtractionTracking(imageRange,K,rgbI,depthI,flowI,maskI,...
     motFile,cameraPoses,nFeaturesPerFrame,nFeaturesPerObject,maxBackgroundFeaturesPerFrame,settings)
 
 % setup 
@@ -23,20 +23,26 @@ for i = 1:numel(imageRange)
     % frame i
     frameNumber = imageRange(i);
     frames(i).number = imageRange(i);
-    frameName = strcat(repmat('0',1,5-numel(num2str(frameNumber))),num2str(frameNumber),'.png');
+    if strcmp(settings.dataset,'kitti')
+        frameName = strcat(repmat('0',1,6-numel(num2str(frameNumber))),num2str(frameNumber),'.png');
+        flowFileName = strcat(repmat('0',1,6-numel(num2str(frameNumber))),num2str(frameNumber),'.flo');
+    elseif strcmp(settings.dataset,'vkitti')
+        frameName = strcat(repmat('0',1,5-numel(num2str(frameNumber))),num2str(frameNumber),'.png');
+        
+    end
     frames(i).cameraPose = transformationMatrixToPose(poseToTransformationMatrix(firstCamPose)\...
         poseToTransformationMatrix(cameraPoses(:,i)));
     if i == 1
         % extract objects
         maskIm = imread(strcat(maskI, frameName));
-        frameObjects = extractFrameObjects(maskIm,motFile,frames(1));
+        frameObjects = extractFrameObjects(maskIm,motFile,frames(1),settings);
         frames(1).objects = frameObjects;
     end
     % extract features
     rgbIm = imread(strcat(rgbI,frameName));
     depthIm = imread(strcat(depthI,frameName));
     [frameFeatures,globalFeatures] = extractFrameFeatures(K,rgbIm,depthIm,frames(i).objects,...
-        frames(i),nFeaturesPerFrame-size(frames(i).features.location,1),nFeaturesPerObject,globalFeatures);
+        frames(i),nFeaturesPerFrame-size(frames(i).features.location,1),nFeaturesPerObject,globalFeatures,settings);
     if isempty(frames(i).features.location)
         frames(i).features = frameFeatures;
     else
@@ -58,17 +64,27 @@ for i = 1:numel(imageRange)
         % frame i+1
         nextFrameNumber = imageRange(i+1);
         frames(i+1).number = imageRange(i+1);
-        nextFrameName = strcat(repmat('0',1,5-numel(num2str(nextFrameNumber))),num2str(nextFrameNumber),'.png');
+        if strcmp(settings.dataset,'kitti')
+            nextFrameName = strcat(repmat('0',1,6-numel(num2str(nextFrameNumber))),num2str(nextFrameNumber),'.png');
+        elseif strcmp(settings.dataset,'vkitti')
+            nextFrameName = strcat(repmat('0',1,5-numel(num2str(nextFrameNumber))),num2str(nextFrameNumber),'.png');
+        end
         frames(i+1).cameraPose = transformationMatrixToPose(poseToTransformationMatrix(firstCamPose)\...
         poseToTransformationMatrix(cameraPoses(:,i+1)));
         % extract objects
         nextMaskIm = imread(strcat(maskI, nextFrameName));
-        nextFrameObjects = extractFrameObjects(nextMaskIm,motFile,frames(i+1));
+        nextFrameObjects = extractFrameObjects(nextMaskIm,motFile,frames(i+1),settings);
         frames(i+1).objects = nextFrameObjects;
         % project last frame features
         nextRGBIm = imread(strcat(rgbI,nextFrameName));
-        [nextFrameFeatures,globalFeatures] = projectFeaturesForward(frames(i),K,...
-            frames(i+1),nextRGBIm,globalFeatures,settings);
+        nextDepthIm = imread(strcat(depthI,nextFrameName));
+        if strcmp(settings.dataset,'kitti')
+            flowIm = readFlowFile(strcat(flowI,flowFileName));
+        elseif strcmp(settings.dataset,'vkitti')
+            flowIm = '';
+        end
+        [nextFrameFeatures,globalFeatures] = projectFeaturesForward(frames(i),flowIm,K,...
+            frames(i+1),nextRGBIm,nextDepthIm,globalFeatures,settings);
         frames(i+1).features = nextFrameFeatures;
     end
     

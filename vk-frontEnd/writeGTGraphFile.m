@@ -1,8 +1,14 @@
 function [globalCamerasGraphFileIndx, globalFeaturesGraphFileIndx, globalObjectsGraphFileIndx] = ...
-    writeGTGraphFile(frames, globalFeatures, imageRange, sequence)
+    writeGTGraphFile(frames, globalFeatures, imageRange, sequence, settings)
 
-gtFileName = ['vk-',num2str(sequence),'-',num2str(imageRange(1)),'-',...
-    num2str(imageRange(end)),'_GT.graph'];
+if strcmp(settings.dataset,'kitti')
+    gtFileName = ['kitti-',num2str(sequence),'-',num2str(imageRange(1)),'-',...
+        num2str(imageRange(end)),'_GT.graph'];
+elseif strcmp(settings.dataset,'vkitti')
+    gtFileName = ['vk-',num2str(sequence),'-',num2str(imageRange(1)),'-',...
+        num2str(imageRange(end)),'_GT.graph'];
+end
+
 fileID = fopen(strcat(pwd,'/vk-frontEnd/GraphFiles/',gtFileName),'w');
 
 vertexCount = 0;
@@ -14,18 +20,26 @@ for i = 1:length(frames)
     % camera pose vertex
     label = 'VERTEX_POSE_R3_SO3';
     vertexCount = vertexCount + 1;
-    index = vertexCount;  
+    index = vertexCount;
     value = frames(i).cameraPose';
     globalCamerasGraphFileIndx(i,1) = vertexCount;
     writeVertex(label,index,value,fileID);
+    
     % features extracted in this frame
     frameFeaturesIndx = find(globalFeatures.frame == imageRange(i));
     for j = 1:length(frameFeaturesIndx)
         label = 'VERTEX_POINT_3D';
-        vertexCount = vertexCount + 1;
-        index = vertexCount;  
         value = globalFeatures.location3D(:,frameFeaturesIndx(j))';
-        globalFeaturesGraphFileIndx(frameFeaturesIndx(j),1) = vertexCount;   
+        % do not write points further than 100 m
+        cameraPose = poseToTransformationMatrix(frames(i).cameraPose);
+        pointWorldFrame = value;
+        pointCameraFrame = cameraPose\ [pointWorldFrame';1];
+        if pointCameraFrame(3) > 100
+            continue
+        end
+        vertexCount = vertexCount + 1;
+        index = vertexCount;
+        globalFeaturesGraphFileIndx(frameFeaturesIndx(j),1) = vertexCount;
         writeVertex(label,index,value,fileID);
     end
     % rigid objects motion

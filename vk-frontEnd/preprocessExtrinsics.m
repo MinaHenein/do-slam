@@ -1,4 +1,4 @@
-function cameraPoses = preprocessExtrinsics(extrinsicsFile,imageRange)
+function cameraPoses = preprocessExtrinsics(extrinsicsFile,imageRange, settings)
 
 cameraPoses = zeros(6,numel(imageRange));
 
@@ -12,7 +12,14 @@ for i=1:numel(imageRange)
     lineArray = str2double(strsplit(lineCell,' '));
     % assert frame number
     assert(lineArray(1)==imageRange(i));
-    cameraPoseMatrix = inv(reshape(lineArray(2:end),[4,4])');
+    if strcmp(settings.dataset,'kitti')
+        R = [0 0 1 0; -1 0 0 0; 0 -1 0 0; 0 0 0 1]';
+        cameraPoseMatrix = R*reshape(lineArray(2:end),[4,4])';
+    elseif strcmp(settings.dataset,'vkitti')
+        cameraPoseMatrix = inv(reshape(lineArray(2:end),[4,4])');
+    end
+    
+    
     cameraPoses(:,i) = transformationMatrixToPose(cameraPoseMatrix);
 end
 

@@ -1,4 +1,5 @@
 % variables
+dataset = 'vkitti'; %choose from {kitti,vkitti}
 sequence = '0001';
 variation = 'clone';
 imageRange = 335:426;
@@ -6,42 +7,84 @@ nFeaturesPerFrame = 600; % number of features per frame
 maxBackgroundFeaturesPerFrame = 200; % max number of static background features per frame
 nFeaturesPerObject = 100; % number of features per object
 
-settings.depth = 'GT';% choose from {GT, estmated}
-settings.featureMatchingMethod = 'GT';% choose from {GT, opticalFlow}
+settings.depth = 'GT';% choose from {GT, SPSS}
+settings.featureMatchingMethod = 'GT';% choose from {GT, PWC-Net}
 
-%noiseArray = [0.1 0.02 0.1 0.015 0.015 0.015 0.04 0.04 0.04];
-noiseArray = [0.001 0.001 0.037 0.0017 0.0017 0.0017 0.02 0.02 0.02];
-applyNoise = 1;
+%[0.001 0.001 0.037 0.0017 0.0017 0.0017 0.02 0.02 0.02];
+settings.noiseArray = [0.001 0.001 0.037 0.0017 0.0017 0.0017 0.02 0.02 0.02];
+%[0.002 0.002 0.002 0.01 0.01 0.01 0.2 0.2 0.2];
+settings.applyNoise = 1;
 rng(12);
 
 % setup
 cd /home/mina/workspace/src/Git/do-slam
-dir = '/media/mina/Data/mina/Downloads/Virtual_KITTI/';
-K = [725, 0, 620.5; 0, 725, 187.0; 0, 0, 1];
-% directories
-rgbDir = 'vkitti_1.3.1_rgb/';
-depthDir = 'vkitti_1.3.1_depthgt/';
-objSegDir = 'vkitti_1.3.1_scenegt/';
-motDir = 'vkitti_1.3.1_motgt/';
-extrinsicsDir = 'vkitti_1.3.1_extrinsicsgt/';
-% data
-rgbI = strcat(dir,rgbDir,sequence,'/',variation,'/');
-depthI = strcat(dir,depthDir,sequence,'/',variation,'/');
-maskI = strcat(dir,objSegDir,sequence,'/',variation,'/');
-motFile = strcat(dir,motDir,sequence,'_',variation,'.txt');
-extrinsicsFile = strcat(dir,extrinsicsDir,sequence,'_',variation,'.txt');
-
+if strcmp(dataset,'kitti')
+    dir = '/media/mina/ACRV Samsung SSD T5/KITTI dataset/';
+    settings.dataset = 'kitti';
+    settings.depth = 'SPSS';
+    settings.featureMatchingMethod = 'PWC-Net';
+    settings.distanceThreshold = 0.0001;
+    settings.applyNoise = 0;
+    switch sequence
+        case{'0000','0001','0002','0003','0004','0005','0006','0007','0008','0009','0010','0011','0012','0013'}
+            K = [7.215377000000e+02 0.000000000000e+00 6.095593000000e+02; 
+                0.000000000000e+00 7.215377000000e+02 1.728540000000e+02;
+                0.000000000000e+00 0.000000000000e+00 1.000000000000e+00];
+        case{'0014','0015','0016','0017'}
+            K = [7.070493000000e+02 0.000000000000e+00 6.040814000000e+02; 
+                0.000000000000e+00 7.070493000000e+02 1.805066000000e+02;
+                0.000000000000e+00 0.000000000000e+00 1.000000000000e+00];
+        case{'0018','0019','0020'}
+            K = [7.183351000000e+02 0.000000000000e+00 6.003891000000e+02;
+                0.000000000000e+00 7.183351000000e+02 1.815122000000e+02;
+                0.000000000000e+00 0.000000000000e+00 1.000000000000e+00];
+    end
+    settings.K = K;
+    % directories
+    rgbDir = 'tracking/data_tracking_image_2/training/image_02/';
+    depthDir = 'tracking/depth/';
+    flowDir = 'tracking/flow/';
+    objSegDir = 'mots/instances/';
+    motDir = 'tracking/data_tracking_label_2/training/label_02/';
+    extrinsicsDir = 'tracking/extrinsics/';
+    % data
+    rgbI = strcat(dir,rgbDir,sequence,'/');
+    depthI = strcat(dir,depthDir,sequence,'/');
+    flowI = strcat(dir,flowDir,sequence,'/');
+    maskI = strcat(dir,objSegDir,sequence,'/');
+    motFile = strcat(dir,motDir,sequence,'.txt');
+    extrinsicsFile = strcat(dir,extrinsicsDir,sequence,'.txt');
+elseif strcmp(dataset,'vkitti')
+    settings.dataset = 'vkitti';
+    settings.distanceThreshold = 0;
+    dir = '/media/mina/Data/mina/Downloads/Virtual_KITTI/';
+    settings.K = [725, 0, 620.5; 0, 725, 187.0; 0, 0, 1];
+    % directories
+    rgbDir = 'vkitti_1.3.1_rgb/';
+    depthDir = 'vkitti_1.3.1_depthgt/';
+    objSegDir = 'vkitti_1.3.1_scenegt/';
+    motDir = 'vkitti_1.3.1_motgt/';
+    extrinsicsDir = 'vkitti_1.3.1_extrinsicsgt/';
+    % data
+    rgbI = strcat(dir,rgbDir,sequence,'/',variation,'/');
+    depthI = strcat(dir,depthDir,sequence,'/',variation,'/');
+    flowI = '';
+    maskI = strcat(dir,objSegDir,sequence,'/',variation,'/');
+    motFile = strcat(dir,motDir,sequence,'_',variation,'.txt');
+    extrinsicsFile = strcat(dir,extrinsicsDir,sequence,'_',variation,'.txt');
+    
+end
 % pre-processing
 fprintf('Preprocessing data ...\n')
-cameraPoses = preprocessExtrinsics(extrinsicsFile,imageRange);
+cameraPoses = preprocessExtrinsics(extrinsicsFile,imageRange, settings);
 odometry = extractOdometry(cameraPoses);
 % feature extraction
 fprintf('Feature extraction and tracking ...\n')
-[frames,globalFeatures] = featureExtractionTracking(imageRange,K,rgbI,depthI,maskI,...
+[frames,globalFeatures] = featureExtractionTracking(imageRange,settings.K,rgbI,depthI,flowI,maskI,...
     motFile,cameraPoses,nFeaturesPerFrame,nFeaturesPerObject,maxBackgroundFeaturesPerFrame,settings);
 % graph files
 fprintf('Writing graph files ...\n')
 [globalCamerasGraphFileIndx, globalFeaturesGraphFileIndx, globalObjectsGraphFileIndx] = ...
-    writeGTGraphFile(frames, globalFeatures, imageRange, sequence);
-writeMeasGraphFile(frames, globalFeatures, imageRange, sequence,...
-    globalCamerasGraphFileIndx, globalFeaturesGraphFileIndx, globalObjectsGraphFileIndx, noiseArray, applyNoise);
+    writeGTGraphFile(frames, globalFeatures, imageRange, sequence, settings);
+writeMeasGraphFile(frames,globalFeatures,imageRange,sequence,...
+    globalCamerasGraphFileIndx,globalFeaturesGraphFileIndx,globalObjectsGraphFileIndx,settings); 

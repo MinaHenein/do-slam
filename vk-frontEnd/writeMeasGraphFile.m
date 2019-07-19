@@ -1,9 +1,20 @@
 function writeMeasGraphFile(frames,globalFeatures,imageRange,sequence,...
-    globalCamerasGraphFileIndx,globalFeaturesGraphFileIndx, globalObjectsGraphFileIndx, noiseArray, applyNoise)
+    globalCamerasGraphFileIndx,globalFeaturesGraphFileIndx,globalObjectsGraphFileIndx,settings)
 
-measFileName = ['vk-',num2str(sequence),'-',num2str(imageRange(1)),'-',...
-    num2str(imageRange(end)),'_Meas.graph'];
+if strcmp(settings.dataset,'kitti')
+    measFileName = ['kitti-',num2str(sequence),'-',num2str(imageRange(1)),'-',...
+        num2str(imageRange(end)),'_Meas.graph'];
+elseif strcmp(settings.dataset,'vkitti')
+    measFileName = ['vk-',num2str(sequence),'-',num2str(imageRange(1)),'-',...
+        num2str(imageRange(end)),'_Meas.graph'];
+end
+
+noiseArray = settings.noiseArray;
+applyNoise = settings.applyNoise;
+
 fileID = fopen(strcat(pwd,'/vk-frontEnd/GraphFiles/',measFileName),'w');
+
+
 
 odomMeasSig = [noiseArray(1) noiseArray(2) noiseArray(3) noiseArray(4) noiseArray(5) noiseArray(6)];
 odomMeasCov = [noiseArray(1)^2 0.0 0.0 0.0 0.0 0.0 noiseArray(2)^2 0.0 0.0 0.0 0.0 noiseArray(3)^2 0.0 0.0 0.0,...
@@ -47,8 +58,12 @@ for i = 1:length(frames)
             vOut = globalFeaturesGraphFileIndx(possibleFrameFeaturesIndx(j));
             cameraPose = poseToTransformationMatrix(frames(i).cameraPose);
             pointWorldFrame = globalFeatures.location3D(:,possibleFrameFeaturesIndx(j));
-            pointCameraFrame = cameraPose\ [pointWorldFrame;1];
+            pointCameraFrame = cameraPose\[pointWorldFrame;1];
             value = pointCameraFrame(1:3)';
+            pointDepth = value(3);
+            if pointDepth > 100 || vOut == 0
+                continue
+            end
             covariance = pointMeasCov;
             % vIn and vOut are not empty
             assert(~isempty(vIn) && ~isempty(vOut))
@@ -74,9 +89,17 @@ for i = 1:length(frames)
                             vIn1 = globalFeaturesGraphFileIndx(id1);
                             vIn2 = globalFeaturesGraphFileIndx(possibleFrameFeaturesIndx(j));
                             % features are 1 frame apart
-                            assert(globalFeatures.frame(id1)+1 == globalFeatures.frame(possibleFrameFeaturesIndx(j)));
-                            assert(globalFeatures.static(id1)==0)
-                            assert(globalFeatures.static(possibleFrameFeaturesIndx(j))==0)
+                            if strcmp(settings.dataset,'kitti')
+                                if globalFeatures.frame(id1)+1 ~= globalFeatures.frame(possibleFrameFeaturesIndx(j))...
+                                        || globalFeatures.static(id1)~=0 || ...
+                                        globalFeatures.static(possibleFrameFeaturesIndx(j))~=0 || vIn1 ==0 || vIn2==0
+                                    continue;
+                                end
+                            elseif strcmp(settings.dataset,'vkitti')
+                                assert(globalFeatures.frame(id1)+1 == globalFeatures.frame(possibleFrameFeaturesIndx(j)));
+                                assert(globalFeatures.static(id1)==0)
+                                assert(globalFeatures.static(possibleFrameFeaturesIndx(j))==0)
+                            end
                             idx1 = find(globalObjectsGraphFileIndx(:,1) == ...
                                 globalFeatures.objectId(possibleFrameFeaturesIndx(j)));
                             idx2 = find(globalObjectsGraphFileIndx(:,2) == imageRange(i));
