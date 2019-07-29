@@ -10,13 +10,17 @@ featuresId = [];
 % extract features within objects' masks
 for i = 1:length(frameObjects)
     objectMask = frameObjects(i).mask;
-    
     objectBoundingBox = frameObjects(i).boundingBox;
-    yCentroid = ceil((objectBoundingBox(2)+objectBoundingBox(4))/2);
-    aboveCentroidObjectMask = [objectMask(1:yCentroid,:);zeros(size(objectMask,1)-yCentroid,size(objectMask,2))];
-    shrankObjectMask = bwmorph(aboveCentroidObjectMask,'thin',6);
+    yCentroid = (objectBoundingBox(2)+objectBoundingBox(4))/2;
     
-    %shrankObjectMask = bwmorph(objectMask,'thin',6);
+    I = rgbI.*repmat(uint8(objectMask),[1,1,3]);
+    imshow(I);
+    
+    aboveCentroidObjectMask = objectMask(1:yCentroid,:);zeros(size(objectMask,1)-yCentroid,size(objectMask,2))]
+    I = rgbI.*repmat(uint8(aboveCentroidObjectMask),[1,1,3]);
+    imshow(I);
+    
+    shrankObjectMask = bwmorph(objectMask,'thin',6);
     I = rgbI.*repmat(uint8(shrankObjectMask),[1,1,3]);
     corners = detectFASTFeatures(rgb2gray(I));
     nFeaturesOnCurrentObject = sum([frame.features.objectId]==frameObjects(i).id);

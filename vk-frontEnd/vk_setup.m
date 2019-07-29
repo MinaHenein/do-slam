@@ -8,10 +8,11 @@ maxBackgroundFeaturesPerFrame = 200; % max number of static background features 
 nFeaturesPerObject = 100; % number of features per object
 
 settings.depth = 'GT';% choose from {GT, SPSS}
-settings.featureMatchingMethod = 'GT';% choose from {GT, PWC-Net}
+settings.applyDepthNoise = 0;
+settings.featureMatchingMethod = 'GT';% choose from {GT, PWC-Net, flow-Net}
 
-%[0.001 0.001 0.037 0.0017 0.0017 0.0017 0.02 0.02 0.02];
 settings.noiseArray = [0.001 0.001 0.037 0.0017 0.0017 0.0017 0.02 0.02 0.02];
+%[0.001 0.001 0.037 0.0017 0.0017 0.0017 0.04 0.04 0.04];
 %[0.002 0.002 0.002 0.01 0.01 0.01 0.2 0.2 0.2];
 settings.applyNoise = 1;
 rng(12);
@@ -56,7 +57,7 @@ if strcmp(dataset,'kitti')
     extrinsicsFile = strcat(dir,extrinsicsDir,sequence,'.txt');
 elseif strcmp(dataset,'vkitti')
     settings.dataset = 'vkitti';
-    settings.distanceThreshold = 0;
+    settings.distanceThreshold = 0.0001;
     dir = '/media/mina/Data/mina/Downloads/Virtual_KITTI/';
     settings.K = [725, 0, 620.5; 0, 725, 187.0; 0, 0, 1];
     % directories
@@ -65,14 +66,22 @@ elseif strcmp(dataset,'vkitti')
     objSegDir = 'vkitti_1.3.1_scenegt/';
     motDir = 'vkitti_1.3.1_motgt/';
     extrinsicsDir = 'vkitti_1.3.1_extrinsicsgt/';
+    if strcmp(settings.featureMatchingMethod,'PWC-Net')
+     flowDir = 'flow-PWC-Net/';
+    elseif strcmp(settings.featureMatchingMethod,'flow-Net')
+     flowDir = 'flow-FlowNet/';
+    end
     % data
     rgbI = strcat(dir,rgbDir,sequence,'/',variation,'/');
     depthI = strcat(dir,depthDir,sequence,'/',variation,'/');
-    flowI = '';
+    if strcmp(settings.featureMatchingMethod,'PWC-Net')
+        flowI = strcat(dir,flowDir,sequence,'/');
+    else
+        flowI = '';
+    end
     maskI = strcat(dir,objSegDir,sequence,'/',variation,'/');
     motFile = strcat(dir,motDir,sequence,'_',variation,'.txt');
     extrinsicsFile = strcat(dir,extrinsicsDir,sequence,'_',variation,'.txt');
-    
 end
 % pre-processing
 fprintf('Preprocessing data ...\n')

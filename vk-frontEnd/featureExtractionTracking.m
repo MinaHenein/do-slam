@@ -28,7 +28,9 @@ for i = 1:numel(imageRange)
         flowFileName = strcat(repmat('0',1,6-numel(num2str(frameNumber))),num2str(frameNumber),'.flo');
     elseif strcmp(settings.dataset,'vkitti')
         frameName = strcat(repmat('0',1,5-numel(num2str(frameNumber))),num2str(frameNumber),'.png');
-        
+        if strcmp(settings.featureMatchingMethod,'PWC-Net')
+            flowFileName = strcat(repmat('0',1,5-numel(num2str(frameNumber))),num2str(frameNumber),'.flo');
+        end
     end
     frames(i).cameraPose = transformationMatrixToPose(poseToTransformationMatrix(firstCamPose)\...
         poseToTransformationMatrix(cameraPoses(:,i)));
@@ -81,9 +83,13 @@ for i = 1:numel(imageRange)
         if strcmp(settings.dataset,'kitti')
             flowIm = readFlowFile(strcat(flowI,flowFileName));
         elseif strcmp(settings.dataset,'vkitti')
-            flowIm = '';
+            if strcmp(settings.featureMatchingMethod,'PWC-Net')
+                flowIm = readFlowFile(strcat(flowI,flowFileName));
+            else
+                flowIm = '';
+            end
         end
-        [nextFrameFeatures,globalFeatures] = projectFeaturesForward(frames(i),flowIm,K,...
+        [nextFrameFeatures,globalFeatures] = projectFeaturesForward(frames(i),rgbIm,flowIm,K,...
             frames(i+1),nextRGBIm,nextDepthIm,globalFeatures,settings);
         frames(i+1).features = nextFrameFeatures;
     end

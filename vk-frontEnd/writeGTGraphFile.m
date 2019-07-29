@@ -34,9 +34,9 @@ for i = 1:length(frames)
         cameraPose = poseToTransformationMatrix(frames(i).cameraPose);
         pointWorldFrame = value;
         pointCameraFrame = cameraPose\ [pointWorldFrame';1];
-        if pointCameraFrame(3) > 100
-            continue
-        end
+%         if pointCameraFrame(3) > 60
+%             continue
+%         end
         vertexCount = vertexCount + 1;
         index = vertexCount;
         globalFeaturesGraphFileIndx(frameFeaturesIndx(j),1) = vertexCount;

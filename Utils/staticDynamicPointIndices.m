@@ -1,7 +1,7 @@
 function [staticPointIndices, dynamicPointIndices] = staticDynamicPointIndices(config)
 
-folderPath = pwd;
-filepath = strcat(folderPath,'/Data/GraphFiles/',config.measurementsFileName);
+folder = pwd;
+filepath = strcat(folder,'/Data/GraphFiles/',config.measurementsFileName);
 
 pointIndices = [];
 dynamicPointIndices = [];
@@ -14,9 +14,9 @@ for i=1:length(CStr)
    line = strsplit(CStr{i,1},' ');
    label = line{1};
    switch label
-       case config.posePointEdgeLabel
+       case 'EDGE_3D'
             pointIndices = [pointIndices,str2double(line{3})];
-       case config.pointsDataAssociationLabel
+       case '2PointsDataAssociation'
             dynamicPointIndices = [dynamicPointIndices,str2double(line{2}),...
                 str2double(line{3})];
    end
