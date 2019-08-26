@@ -7,14 +7,17 @@ nFeaturesPerFrame = 600; % number of features per frame
 maxBackgroundFeaturesPerFrame = 200; % max number of static background features per frame
 nFeaturesPerObject = 100; % number of features per object
 
-settings.depth = 'GT';% choose from {GT, SPSS}
-settings.featureMatchingMethod = 'PWC-Net';% choose from {GT, PWC-Net}
-settings.applyDepthNoise = 1;
+settings.objectSegmentationMethod = 'MASK-RCNN'; % choose from {GT, MASK-RCNN, TRACK-RCNN}
 
-%[0.001 0.001 0.037 0.0017 0.0017 0.0017 0.02 0.02 0.02];
-settings.noiseArray = [0.001 0.001 0.037 0.0017 0.0017 0.0017 0.02 0.02 0.02];
+settings.depth = 'GT';% choose from {GT, SPSS}
+settings.applyDepthNoise = 0;
+settings.featureMatchingMethod = 'PWC-Net';% choose from {GT, PWC-Net, flow-Net}
+settings.applyMeasurementNoise = 0;
+
+settings.applyOdometryNoise = 1;
+settings.noiseArray = [0.001 0.001 0.037 0.0017 0.0017 0.0017 0.06 0.06 0.06];
+%[0.001 0.001 0.037 0.0017 0.0017 0.0017 0.04 0.04 0.04];
 %[0.002 0.002 0.002 0.01 0.01 0.01 0.2 0.2 0.2];
-settings.applyNoise = 0;
 rng(12);
 
 % setup
@@ -57,7 +60,7 @@ if strcmp(dataset,'kitti')
     extrinsicsFile = strcat(dir,extrinsicsDir,sequence,'.txt');
 elseif strcmp(dataset,'vkitti')
     settings.dataset = 'vkitti';
-    settings.distanceThreshold = 0;
+    settings.distanceThreshold = 0.0001;
     dir = '/media/mina/Data/mina/Downloads/Virtual_KITTI/';
     settings.K = [725, 0, 620.5; 0, 725, 187.0; 0, 0, 1];
     % directories
@@ -66,13 +69,18 @@ elseif strcmp(dataset,'vkitti')
     objSegDir = 'vkitti_1.3.1_scenegt/';
     motDir = 'vkitti_1.3.1_motgt/';
     extrinsicsDir = 'vkitti_1.3.1_extrinsicsgt/';
+    if strcmp(settings.objectSegmentationMethod,'MASK-RCNN')
+     objSegDir = 'vkitti_MASK-RCNN/';
+    end
     if strcmp(settings.featureMatchingMethod,'PWC-Net')
-     flowDir = 'flow/';
+     flowDir = 'flow-PWC-Net/';
+    elseif strcmp(settings.featureMatchingMethod,'flow-Net')
+     flowDir = 'flow-FlowNet/';
     end
     % data
     rgbI = strcat(dir,rgbDir,sequence,'/',variation,'/');
     depthI = strcat(dir,depthDir,sequence,'/',variation,'/');
-    if strcmp(settings.featureMatchingMethod,'PWC-Net')
+    if strcmp(settings.featureMatchingMethod,'PWC-Net') || strcmp(settings.featureMatchingMethod,'flow-Net')
         flowI = strcat(dir,flowDir,sequence,'/');
     else
         flowI = '';

@@ -25,6 +25,9 @@ nextFeaturesId = [];
 
 for i=1:size(frame.features.location,1)
     world3DPoint = frame.features.location3D(:,i);
+    if norm(world3DPoint) == 0
+        continue
+    end
     % compute distance to all 3D points
     distances = sqrt(bsxfun(@plus,bsxfun(@plus,...
         (globalLocation3D(1,:).'-world3DPoint(1,1)).^2,...
@@ -50,9 +53,6 @@ for i=1:size(frame.features.location,1)
                         distances = sqrt(bsxfun(@plus,...
                             (corners.Location(:,1).'-nextImagePoint(1,1)).^2,...
                             (corners.Location(:,2).'-nextImagePoint(2,1)).^2))';
-%                         if min(distances) > 3
-%                             continue;
-%                         end
                         cornerIndex = find(distances == min(distances));
                         nextImagePoint = corners.Location(cornerIndex,:);
                         
@@ -111,9 +111,6 @@ for i=1:size(frame.features.location,1)
                             distances = sqrt(bsxfun(@plus,...
                                 (corners.Location(:,1).'-nextImagePoint(1,1)).^2,...
                                 (corners.Location(:,2).'-nextImagePoint(2,1)).^2))';
-%                             if min(distances) > 3
-%                                 continue;
-%                             end
                             cornerIndex = find(distances == min(distances));
                             nextImagePoint = corners.Location(cornerIndex,:);
                             featuresLocation = [featuresLocation; nextImagePoint(1:2)];
@@ -173,25 +170,23 @@ for i=1:size(frame.features.location,1)
             imagePixel = frame.features.location(i,:);
             pixelRow = frame.features.location(i,2);
             pixelCol = frame.features.location(i,1);
-            pixelFlow = flowI(pixelRow,pixelCol,:);
+            pixelFlow = flowI(round(pixelRow),round(pixelCol),:);
             nextImagePoint = [imagePixel + [pixelFlow(:,:,1) pixelFlow(:,:,2)]]';
             if isPointWithinImageSize(nextImagePoint,size(nextRGBI))
-                corners = detectFASTFeatures(rgb2gray(nextRGBI),'ROI',[max(1,nextImagePoint(1)-30),...
-                    max(1,nextImagePoint(2)-30),...
-                    min(60,size(nextRGBI,2)-nextImagePoint(1)),min(60,size(nextRGBI,1)-nextImagePoint(2))]);
-                if corners.Count ~=0
-                    distances = sqrt(bsxfun(@plus,...
-                        (corners.Location(:,1).'-nextImagePoint(1,1)).^2,...
-                        (corners.Location(:,2).'-nextImagePoint(2,1)).^2))';
-                    cornerIndex = find(distances == min(distances));
-%                     if min(distances) > 3
-%                         continue;
-%                     end
-                    if size(cornerIndex,1) > 1
-                        continue
-                    end
-                    nextImagePoint = corners.Location(cornerIndex,:);
+                %corners = detectFASTFeatures(rgb2gray(nextRGBI),'ROI',[max(1,nextImagePoint(1)-3),...
+                %    max(1,nextImagePoint(2)-3),...
+                %    min(6,size(nextRGBI,2)-nextImagePoint(1)),min(6,size(nextRGBI,1)-nextImagePoint(2))]);
+                %if corners.Count ~=0
+                %    distances = sqrt(bsxfun(@plus,...
+                %        (corners.Location(:,1).'-nextImagePoint(1,1)).^2,...
+                %        (corners.Location(:,2).'-nextImagePoint(2,1)).^2))';
+                %    cornerIndex = find(distances == min(distances));
+                %    if size(cornerIndex,1) > 1
+                %        continue
+                %    end
+                %    nextImagePoint = corners.Location(cornerIndex,:);
                   
+                    nextImagePoint = reshape(nextImagePoint,[1,2]);
                     % static point
                     if ~frame.features.moving(i)
                         featuresLocation = [featuresLocation; nextImagePoint(1,1:2)];
@@ -241,15 +236,16 @@ for i=1:size(frame.features.location,1)
                             
                             if strcmp(settings.depth,'SPSS')
                                 %kitti
-                                nextPixelDisparity = double(nextDepthI(nextPixelRow,nextPixelCol))/256;
-                                if nextPixelDisparity == 0
-                                    continue;
-                                else
-                                    nextPixelDepth = K(1,1)*0.537/nextPixelDisparity;
-                                end
+                                nextPixelDisparity = double(nextDepthI(round(nextPixelRow),round(nextPixelCol)))/256;
+                                nextPixelDepth = K(1,1)*0.537/nextPixelDisparity;
+%                                 if nextPixelDisparity == 0
+%                                     continue;
+%                                 else
+%                                     nextPixelDepth = K(1,1)*0.537/nextPixelDisparity;
+%                                 end
                             elseif strcmp(settings.depth,'GT')
                                 % vkitti
-                                nextPixelDepth = double(nextDepthI(nextPixelRow,nextPixelCol))/100;
+                                nextPixelDepth = double(nextDepthI(round(nextPixelRow),round(nextPixelCol)))/100;
                                 % apply depth noise -- if vkitti, testing noisy depth
                                 if settings.applyDepthNoise
                                     depthNoiseSigma = (nextPixelDepth^2*0.15)/(settings.K(1,1)*0.54); % sigma = z^2*delta_d/f*b
@@ -316,18 +312,21 @@ for i=1:size(frame.features.location,1)
                             globalObjectId(end+1,1) = featuresObjectId(end);
                         end
                     end
-                end
+                %end
             end
     end
 end
 
 % A =  [RGBI;nextRGBI];
-% figure;
-% imshow(A);
-% hold on;
-% for i = 1:size(lastFeatures,1)
-% plot([lastFeatures(i,1) nextFeatures(i,1)],[lastFeatures(i,2) size(RGBI,1)+nextFeatures(i,2)]);
-% hold on
+% if ~isempty(lastFeatures) && ~isempty(nextFeatures)
+%     figure;
+%     imshow(A);
+%     h = gca;
+%     hold(h,'on')
+%     for i = 1:size(lastFeatures,1)
+%         plot(h,[lastFeatures(i,1) nextFeatures(i,1)],[lastFeatures(i,2) size(RGBI,1)+nextFeatures(i,2)]);
+%     end
+%     hold(h,'off')
 % end
 
 nextFrameFeatures.location = featuresLocation;

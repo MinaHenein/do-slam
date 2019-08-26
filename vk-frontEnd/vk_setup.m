@@ -1,5 +1,5 @@
 % variables
-dataset = 'vkitti'; %choose from {kitti,vkitti}
+dataset = 'kitti'; %choose from {kitti,vkitti}
 sequence = '0001';
 variation = 'clone';
 imageRange = 335:426;
@@ -7,14 +7,17 @@ nFeaturesPerFrame = 600; % number of features per frame
 maxBackgroundFeaturesPerFrame = 200; % max number of static background features per frame
 nFeaturesPerObject = 100; % number of features per object
 
+settings.objectSegmentationMethod = 'GT'; % choose from {GT, MASK-RCNN, TRACK-RCNN}
+
 settings.depth = 'GT';% choose from {GT, SPSS}
 settings.applyDepthNoise = 0;
 settings.featureMatchingMethod = 'GT';% choose from {GT, PWC-Net, flow-Net}
+settings.applyMeasurementNoise = 0;
 
-settings.noiseArray = [0.001 0.001 0.037 0.0017 0.0017 0.0017 0.02 0.02 0.02];
+settings.applyOdometryNoise = 1;
+settings.noiseArray = [0.001 0.001 0.037 0.0017 0.0017 0.0017 0.06 0.06 0.06];
 %[0.001 0.001 0.037 0.0017 0.0017 0.0017 0.04 0.04 0.04];
 %[0.002 0.002 0.002 0.01 0.01 0.01 0.2 0.2 0.2];
-settings.applyNoise = 1;
 rng(12);
 
 % setup
@@ -25,7 +28,6 @@ if strcmp(dataset,'kitti')
     settings.depth = 'SPSS';
     settings.featureMatchingMethod = 'PWC-Net';
     settings.distanceThreshold = 0.0001;
-    settings.applyNoise = 0;
     switch sequence
         case{'0000','0001','0002','0003','0004','0005','0006','0007','0008','0009','0010','0011','0012','0013'}
             K = [7.215377000000e+02 0.000000000000e+00 6.095593000000e+02; 
@@ -66,6 +68,9 @@ elseif strcmp(dataset,'vkitti')
     objSegDir = 'vkitti_1.3.1_scenegt/';
     motDir = 'vkitti_1.3.1_motgt/';
     extrinsicsDir = 'vkitti_1.3.1_extrinsicsgt/';
+    if strcmp(settings.objectSegmentationMethod,'MASK-RCNN')
+     objSegDir = 'vkitti_MASK-RCNN/';
+    end
     if strcmp(settings.featureMatchingMethod,'PWC-Net')
      flowDir = 'flow-PWC-Net/';
     elseif strcmp(settings.featureMatchingMethod,'flow-Net')
@@ -74,7 +79,7 @@ elseif strcmp(dataset,'vkitti')
     % data
     rgbI = strcat(dir,rgbDir,sequence,'/',variation,'/');
     depthI = strcat(dir,depthDir,sequence,'/',variation,'/');
-    if strcmp(settings.featureMatchingMethod,'PWC-Net')
+    if strcmp(settings.featureMatchingMethod,'PWC-Net') || strcmp(settings.featureMatchingMethod,'flow-Net')
         flowI = strcat(dir,flowDir,sequence,'/');
     else
         flowI = '';

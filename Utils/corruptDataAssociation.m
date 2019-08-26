@@ -1,8 +1,8 @@
 function corruptDataAssociation(config,percentage)
 
-GTFileName = config.groundTruthFileName;
+MeasurementsFileName = config.measurementsFileName;
 filepath = strcat(config.folderPath,config.sep,'Data',...
-    config.sep,config.graphFileFolderName,config.sep,GTFileName);
+    config.sep,config.graphFileFolderName,config.sep,MeasurementsFileName);
 
 fileID = fopen(filepath,'r');
 line = fgetl(fileID);

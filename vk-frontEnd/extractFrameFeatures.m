@@ -11,14 +11,17 @@ featuresId = [];
 for i = 1:length(frameObjects)
     objectMask = frameObjects(i).mask;
     
-    objectBoundingBox = frameObjects(i).boundingBox;
-    yCentroid = ceil((objectBoundingBox(2)+objectBoundingBox(4))/2);
-    aboveCentroidObjectMask = [objectMask(1:yCentroid,:);zeros(size(objectMask,1)-yCentroid,size(objectMask,2))];
-    shrankObjectMask = bwmorph(aboveCentroidObjectMask,'thin',6);
+%     objectBoundingBox = frameObjects(i).boundingBox;
+%     yCentroid = ceil((objectBoundingBox(2)+objectBoundingBox(4))/2);
+%     aboveCentroidObjectMask = [objectMask(1:yCentroid,:);zeros(size(objectMask,1)-yCentroid,size(objectMask,2))];
+%     shrankObjectMask = bwmorph(aboveCentroidObjectMask,'thin',6);
     
-    %shrankObjectMask = bwmorph(objectMask,'thin',6);
+    shrankObjectMask = bwmorph(objectMask,'thin',6);
     I = rgbI.*repmat(uint8(shrankObjectMask),[1,1,3]);
     corners = detectFASTFeatures(rgb2gray(I));
+%     figure;imshow(I);
+%     hold on;
+%     scatter(corners.Location(:,1),corners.Location(:,2))
     nFeaturesOnCurrentObject = sum([frame.features.objectId]==frameObjects(i).id);
     if nFeaturesPerObject - nFeaturesOnCurrentObject > 0
         strongestFeatures = corners.selectStrongest(nFeaturesPerObject - nFeaturesOnCurrentObject);

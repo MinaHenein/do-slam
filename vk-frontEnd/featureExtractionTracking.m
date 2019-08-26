@@ -3,6 +3,7 @@ function [frames,globalFeatures] = featureExtractionTracking(imageRange,K,rgbI,d
 
 % setup 
 frames(1).features.location = [];
+frames(1).features.location3D = [];
 frames(1).features.objectId = [];
 % global features
 globalFeatures.location3D = [];
@@ -43,6 +44,7 @@ for i = 1:numel(imageRange)
     % extract features
     rgbIm = imread(strcat(rgbI,frameName));
     depthIm = imread(strcat(depthI,frameName));
+    
     [frameFeatures,globalFeatures] = extractFrameFeatures(K,rgbIm,depthIm,frames(i).objects,...
         frames(i),nFeaturesPerFrame-size(frames(i).features.location,1),nFeaturesPerObject,globalFeatures,settings);
     if isempty(frames(i).features.location)

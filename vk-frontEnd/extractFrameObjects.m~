@@ -15,9 +15,7 @@ for i=1:numel(CStr)-1
         label = lineCell{3};
         if strcmp(settings.dataset,'kitti')
             id = str2double(lineCell{2});
-            maskColour = 1000 + id;
-        elseif strcmp(settings.dataset,'vkitti')
-            maskColour = [];
+            maskColour = 1000 
         end
         if strcmp(label,'Car')
             % object bounding box in pixels most left,top,right,bottom
@@ -26,7 +24,7 @@ for i=1:numel(CStr)-1
             r = str2double(lineCell{1,9});
             b = str2double(lineCell{1,10});
             % object binary mask
-            objectMask = getObjectMask(l,t,r,b,maskI,maskColour,settings);
+            objectMask = getObjectMask(l,t,r,b,maskI,settings);
             
             [nRows, nCols, ~] = size(maskI);
             % object occupies more than 6% of image

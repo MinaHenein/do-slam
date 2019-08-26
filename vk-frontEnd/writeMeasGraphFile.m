@@ -10,7 +10,8 @@ elseif strcmp(settings.dataset,'vkitti')
 end
 
 noiseArray = settings.noiseArray;
-applyNoise = settings.applyNoise;
+applyOdometryNoise = settings.applyOdometryNoise; 
+applyMeasurementNoise = settings.applyMeasurementNoise;
 
 fileID = fopen(strcat(pwd,'/vk-frontEnd/GraphFiles/',measFileName),'w');
 
@@ -38,7 +39,7 @@ for i = 1:length(frames)
         odomMeasNoise = normrnd([0 0 0 0 0 0],odomMeasSig,size([0 0 0 0 0 0]));
         covariance = odomMeasCov;
         % apply noise
-        if applyNoise == true
+        if applyOdometryNoise == true
             value = RelativeToAbsolutePoseR3xso3(value',odomMeasNoise');
         end
         writeEdge(label,vIn,vOut,value,covariance,fileID);
@@ -59,16 +60,16 @@ for i = 1:length(frames)
             pointCameraFrame = cameraPose\[pointWorldFrame;1];
             value = pointCameraFrame(1:3)';
             pointDepth = value(3);
-%             if pointDepth > 60 || vOut == 0
-%                 continue
-%             end
+            if pointDepth > 22 || vOut == 0 || isnan(norm(value))
+                continue
+            end
             covariance = pointMeasCov;
             % vIn and vOut are not empty
             assert(~isempty(vIn) && ~isempty(vOut))
             % edge noise
             pointMeasNoise = normrnd([0 0 0],pointMeasSig,size([0 0 0]));
             % apply noise
-            if applyNoise == true
+            if applyMeasurementNoise == true
                 value = value + pointMeasNoise;
             end
             writeEdge(label,vIn,vOut,value,covariance,fileID);
@@ -94,10 +95,10 @@ for i = 1:length(frames)
                                     continue;
                                 end
                             elseif strcmp(settings.dataset,'vkitti')
-%                                 if globalFeatures.frame(id1)+1 ~= globalFeatures.frame(possibleFrameFeaturesIndx(j)) || ...
-%                                     globalFeatures.static(id1)~=0 || globalFeatures.static(possibleFrameFeaturesIndx(j))==0
-%                                     continue
-%                                 end
+                                if globalFeatures.frame(id1)+1 ~= globalFeatures.frame(possibleFrameFeaturesIndx(j)) || ...
+                                    globalFeatures.static(id1)~=0 || globalFeatures.static(possibleFrameFeaturesIndx(j))~=0
+                                    continue
+                                end
                                 assert(globalFeatures.frame(id1)+1 == globalFeatures.frame(possibleFrameFeaturesIndx(j)));
                                 assert(globalFeatures.static(id1)==0)
                                 assert(globalFeatures.static(possibleFrameFeaturesIndx(j))==0)
