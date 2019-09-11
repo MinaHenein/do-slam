@@ -1,8 +1,8 @@
 % variables
 dataset = 'kitti'; %choose from {kitti,vkitti}
-sequence = '0001';
+sequence = '0006';
 variation = 'clone';
-imageRange = 335:426;
+imageRange = 40:140;
 nFeaturesPerFrame = 600; % number of features per frame
 maxBackgroundFeaturesPerFrame = 200; % max number of static background features per frame
 nFeaturesPerObject = 100; % number of features per object
@@ -11,13 +11,11 @@ settings.objectSegmentationMethod = 'GT'; % choose from {GT, MASK-RCNN, TRACK-RC
 
 settings.depth = 'GT';% choose from {GT, SPSS}
 settings.applyDepthNoise = 0;
-settings.featureMatchingMethod = 'GT';% choose from {GT, PWC-Net, flow-Net}
-settings.applyMeasurementNoise = 0;
+settings.featureMatchingMethod = 'PWC-Net';% choose from {GT, PWC-Net, flow-Net}
+settings.applyMeasurementNoise = 1;
 
 settings.applyOdometryNoise = 1;
-settings.noiseArray = [0.001 0.001 0.037 0.0017 0.0017 0.0017 0.06 0.06 0.06];
-%[0.001 0.001 0.037 0.0017 0.0017 0.0017 0.04 0.04 0.04];
-%[0.002 0.002 0.002 0.01 0.01 0.01 0.2 0.2 0.2];
+settings.noiseArray = [0.001 0.001 0.037 0.0017 0.0017 0.0017 0.012 0.012 0.012];
 rng(12);
 
 % setup
@@ -48,6 +46,7 @@ if strcmp(dataset,'kitti')
     depthDir = 'tracking/depth/';
     flowDir = 'tracking/flow/';
     objSegDir = 'mots/instances/';
+    %objSegDir = 'tracking/mask/0000-gt/';
     motDir = 'tracking/data_tracking_label_2/training/label_02/';
     extrinsicsDir = 'tracking/extrinsics/';
     % data
@@ -55,6 +54,7 @@ if strcmp(dataset,'kitti')
     depthI = strcat(dir,depthDir,sequence,'/');
     flowI = strcat(dir,flowDir,sequence,'/');
     maskI = strcat(dir,objSegDir,sequence,'/');
+    %maskI = strcat(dir,objSegDir,'/');
     motFile = strcat(dir,motDir,sequence,'.txt');
     extrinsicsFile = strcat(dir,extrinsicsDir,sequence,'.txt');
 elseif strcmp(dataset,'vkitti')
@@ -100,5 +100,6 @@ fprintf('Feature extraction and tracking ...\n')
 fprintf('Writing graph files ...\n')
 [globalCamerasGraphFileIndx, globalFeaturesGraphFileIndx, globalObjectsGraphFileIndx] = ...
     writeGTGraphFile(frames, globalFeatures, imageRange, sequence, settings);
+settings.globalObjectsGraphFileIndx = globalObjectsGraphFileIndx;
 writeMeasGraphFile(frames,globalFeatures,imageRange,sequence,...
     globalCamerasGraphFileIndx,globalFeaturesGraphFileIndx,globalObjectsGraphFileIndx,settings); 

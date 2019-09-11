@@ -28,6 +28,12 @@ for i = 1:length(frames)
     % features extracted in this frame
     frameFeaturesIndx = find(globalFeatures.frame == imageRange(i));
     for j = 1:length(frameFeaturesIndx)
+        featureWeight = globalFeatures.weight(frameFeaturesIndx(j),1);
+        % discard static features seen in less than 3 frames
+        if globalFeatures.static(frameFeaturesIndx(j),1) && featureWeight < 3
+            continue
+        end
+        
         label = 'VERTEX_POINT_3D';
         value = globalFeatures.location3D(:,frameFeaturesIndx(j))';
         % do not write points further than 100 m

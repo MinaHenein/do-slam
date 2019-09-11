@@ -10,7 +10,6 @@ featuresId = [];
 % extract features within objects' masks
 for i = 1:length(frameObjects)
     objectMask = frameObjects(i).mask;
-    imshow(objectMask)
     
 %     objectBoundingBox = frameObjects(i).boundingBox;
 %     yCentroid = ceil((objectBoundingBox(2)+objectBoundingBox(4))/2);
@@ -20,9 +19,9 @@ for i = 1:length(frameObjects)
     shrankObjectMask = bwmorph(objectMask,'thin',6);
     I = rgbI.*repmat(uint8(shrankObjectMask),[1,1,3]);
     corners = detectFASTFeatures(rgb2gray(I));
-    figure;imshow(I);
-    %hold on;
-    %scatter(corners.Location(:,1),corners.Location(:,2))
+%     figure;imshow(I);
+%     hold on;
+%     scatter(corners.Location(:,1),corners.Location(:,2))
     nFeaturesOnCurrentObject = sum([frame.features.objectId]==frameObjects(i).id);
     if nFeaturesPerObject - nFeaturesOnCurrentObject > 0
         strongestFeatures = corners.selectStrongest(nFeaturesPerObject - nFeaturesOnCurrentObject);
@@ -65,6 +64,7 @@ frameFeatures.originFrame = featuresOriginFrame;
 frameFeatures.id = featuresId;
 
 globalLocation3D = globalFeatures.location3D;
+globalLocation3DNoisyDepth = globalFeatures.location3DNoisyDepth;
 globalWeight = globalFeatures.weight;
 globalId = globalFeatures.id;
 globalFrame = globalFeatures.frame;
@@ -83,24 +83,26 @@ for i=1:size(frameFeatures.location,1)
         if pixelDisparity == 0
             continue;
         else
-            pixelDepth = K(1,1)*0.537/pixelDisparity;
+            gtPixelDepth = K(1,1)*0.537/pixelDisparity;
         end
     elseif strcmp(settings.depth,'GT')
         % vkitti
-        pixelDepth = double(depthI(pixelRow,pixelCol))/100;
+        gtPixelDepth = double(depthI(pixelRow,pixelCol))/100;
         % apply depth noise -- if vkitti testing noisy depth
          if settings.applyDepthNoise
-            depthNoiseSigma = (pixelDepth^2*0.15)/(settings.K(1,1)*0.54); % sigma = z^2*delta_d/f*b
+            depthNoiseSigma = (gtPixelDepth^2*0.15)/(settings.K(1,1)*0.54); % sigma = z^2*delta_d/f*b
             pixelDepthNoise = normrnd(0,depthNoiseSigma,[1 1]);
-            pixelDepth = pixelDepth + pixelDepthNoise;
+            pixelDepth = gtPixelDepth + pixelDepthNoise;
          end
     end
     % image--> camera
     camera3DPoint = K\[pixelCol;pixelRow;1];
-    camera3DPoint = camera3DPoint * pixelDepth;
+    camera3DPoint = camera3DPoint * gtPixelDepth;
+    camera3DPointNoisyDepth = camera3DPoint * pixelDepth;
     % camera --> world
     cameraPoseMatrix = poseToTransformationMatrix(frame.cameraPose);
     world3DPoint = cameraPoseMatrix * [camera3DPoint;1];
+    world3DPointNoisyDepth = cameraPoseMatrix * [camera3DPointNoisyDepth;1];
     featuresLocation3D(:,i) = world3DPoint(1:3);
     % global features
     if frameFeatures.moving(i) == 0

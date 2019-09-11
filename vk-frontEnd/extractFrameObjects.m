@@ -16,10 +16,12 @@ for i=1:numel(CStr)-1
         if strcmp(settings.dataset,'kitti')
             id = str2double(lineCell{2});
             maskColour = 1000 + id;
+            %maskColour = [];
         elseif strcmp(settings.dataset,'vkitti')
             maskColour = [];
         end
         if strcmp(label,'Car')
+        %if (strcmp(label,'Van') || strcmp(label,'Cyclist')) && str2double(lineCell{1,2})<3
             % object bounding box in pixels most left,top,right,bottom
             l = str2double(lineCell{1,7});
             t = str2double(lineCell{1,8});
@@ -27,10 +29,9 @@ for i=1:numel(CStr)-1
             b = str2double(lineCell{1,10});
             % object binary mask
             objectMask = getObjectMask(l,t,r,b,maskI,maskColour,settings);
-            
             [nRows, nCols, ~] = size(maskI);
             % object occupies more than 6% of image
-            if 100*sum(sum(objectMask))/(nRows*nCols) > 6
+            if 100*sum(sum(objectMask))/(nRows*nCols) > 1.5
                 nObjects = nObjects+1;
                 % assign object bounding box
                 frameObjects(nObjects).boundingBox = [l,t,r,b];
@@ -70,7 +71,9 @@ for i=1:numel(CStr)-1
                 frameObjects(nObjects).poseCameraFrame = transformationMatrixToPose(objectPoseCameraFrame);
                 % object pose in world frame
                 cameraPoseMatrix = poseToTransformationMatrix(frame.cameraPose);
-                objectPoseWorldFrame = cameraPoseMatrix * objectPoseCameraFrame;
+                str2double(lineCell{1,2})
+                frame.number
+                objectPoseWorldFrame = cameraPoseMatrix * objectPoseCameraFrame
                 frameObjects(nObjects).poseWorldFrame = transformationMatrixToPose(objectPoseWorldFrame);
             end
         end

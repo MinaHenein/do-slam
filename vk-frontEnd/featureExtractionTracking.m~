@@ -3,10 +3,12 @@ function [frames,globalFeatures] = featureExtractionTracking(imageRange,K,rgbI,d
 
 % setup 
 frames(1).features.location = [];
+frames(1).features.location3D = [];
+frames(1).features.location3DNoisyDepth = [];
 frames(1).features.objectId = [];
 % global features
 globalFeatures.location3D = [];
-%globalFeatures.location3DNoisyDepth = [];
+globalFeatures.location3DNoisyDepth = [];
 globalFeatures.weight = [];
 globalFeatures.id = [];
 globalFeatures.frame = [];
@@ -19,7 +21,7 @@ globalFeatures.dynamicAssociation = {};
 firstCamPose = cameraPoses(:,1);
 
 for i = 1:numel(imageRange)
-    %pbar(i,numel(imageRange),[],[num2str(i),'/',num2str(numel(imageRange))],'off');
+    pbar(i,numel(imageRange),[],[num2str(i),'/',num2str(numel(imageRange))],'off');
     
     % frame i
     frameNumber = imageRange(i);
@@ -58,7 +60,7 @@ for i = 1:numel(imageRange)
             frames(i).features.moving = [frames(i).features.moving; frameFeatures.moving];
             frames(i).features.objectId = [frames(i).features.objectId; frameFeatures.objectId];
             frames(i).features.location3D = [frames(i).features.location3D, frameFeatures.location3D];
-            %frames(i).features.location3DNoisyDepth = [frames(i).features.location3DNoisyDepth, frameFeatures.location3DNoisyDepth];
+            frames(i).features.location3DNoisyDepth = [frames(i).features.location3DNoisyDepth, frameFeatures.location3DNoisyDepth];
             frames(i).features.originFrame = [frames(i).features.originFrame; frameFeatures.originFrame];
             frames(i).features.id = [frames(i).features.id; frameFeatures.id];
         end

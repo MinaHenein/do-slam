@@ -38,25 +38,35 @@ switch setting
     case 'groundTruth'
         plotPoses = plot3(poses(1,:),poses(2,:),poses(3,:),'Color','g','Marker','.','LineStyle','none');
         set(plotPoses,'MarkerSize',7);
+%         for i = 1:sum(poseVertices)
+%             iPose = poses(:,i);            
+%             plotiCamera = plotCamera('Location',iPose(1:3),'Orientation',rot(-iPose(4:6))); %LHS invert pose
+%             scale = 0.5;
+%             %plotCoordinates(iPose(1:3),scale*rot(iPose(4:6)))
+%             plotiCamera.Opacity = 0.1;
+%             plotiCamera.Size = 0.1;
+%             plotiCamera.Color = 'g';
+%         end
+
         % uncomment to plot ground truth poses as coordinates
 %         for i = 1:sum(poseVertices)
 %         iPose = poses(:,i);
 %         plotCoordinates(iPose(1:3,:),rot(iPose(4:6,1)))
 %         end   
-        if ~isempty(points)
-            plotPoints = plot3(points(1,:),points(2,:),points(3,:),'g.');
-            set(plotPoints,'MarkerSize',5)
-        end
+%         if ~isempty(points)
+%             plotPoints = plot3(points(1,:),points(2,:),points(3,:),'g.');
+%             set(plotPoints,'MarkerSize',5)
+%         end
     case 'solverResults'
         relPose = varargin{1};
         posePoints = varargin{2};
         graphN = varargin{3};
-        staticDynamicPointIndices = varargin{4};
-        staticPointsIndices = staticDynamicPointIndices{1,1};
+        staticPointIndices = varargin{4};
+        dynamicPointIndicesPerObject = varargin{5};
         pointVertices = [graphN.vertices(graphN.identifyVertices('point'))];   
         
-        colors = {'magenta','leather','red','blue','green','black','sapphire','swamp','light bluish green',...
-    'butterscotch','cinnamon','radioactive green','chartreuse'}; 
+        colors = {'magenta','radioactive green','leather','red','green','black','sapphire','swamp','light bluish green',...
+    'butterscotch','cinnamon','chartreuse','blue'}; 
         
         for i = 1:sum(poseVertices)
             iPose = poses(:,i);
@@ -69,25 +79,26 @@ switch setting
             plotCoordinates(iPose(1:3,:),scale*rot(iPose(4:6,1))) % plots the trajectory as axes
         end
         
-        if ~isempty(points)
-        for i=1:size(points,2)
-            points(:,i) = RelativeToAbsolutePositionR3xso3(posePoints,points(:,i));
-        end
-        end
+%         if ~isempty(points)
+%         for i=1:size(points,2)
+%             points(:,i) = RelativeToAbsolutePositionR3xso3(posePoints,points(:,i));
+%         end
+%         end
 %         plotPoses = plot3(poses(1,:),poses(2,:),poses(3,:),'Color','b','Marker','.','LineStyle','none');
 %         set(plotPoses,'MarkerSize',8);
-        if ~isempty(staticPointsIndices)      
+        if ~isempty(staticPointIndices)      
          for i=1:size(points,2)
-            if ismember(pointVertices(i).index,staticPointsIndices)
+            if ismember(pointVertices(i).index,staticPointIndices)
                 plot3(points(1,i),points(2,i),points(3,i),'b.','MarkerSize',5);
              end
          end   
         end
-        nDynamicObjects = length(staticDynamicPointIndices)-1; % first cell are static points
+        nDynamicObjects = size(dynamicPointIndicesPerObject,1); % first cell are static points
         for i=1:size(points,2)
             for j=1:nDynamicObjects
-                if ismember(pointVertices(i).index,staticDynamicPointIndices{1,j+1})
+                if ismember(pointVertices(i).index,dynamicPointIndicesPerObject{j,1})
                     plot3(points(1,i),points(2,i),points(3,i),'.','Color',rgb(colors(j)),'MarkerSize',5);
+                    break
                 end
             end
         end

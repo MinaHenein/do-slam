@@ -1,21 +1,21 @@
 % variables
-dataset = 'vkitti'; %choose from {kitti,vkitti}
-sequence = '0001';
+dataset = 'kitti'; %choose from {kitti,vkitti}
+sequence = '0007';
 variation = 'clone';
-imageRange = 335:426;
+imageRange = 15:510;
 nFeaturesPerFrame = 600; % number of features per frame
 maxBackgroundFeaturesPerFrame = 200; % max number of static background features per frame
 nFeaturesPerObject = 100; % number of features per object
 
-settings.objectSegmentationMethod = 'MASK-RCNN'; % choose from {GT, MASK-RCNN, TRACK-RCNN}
+settings.objectSegmentationMethod = 'GT'; % choose from {GT, MASK-RCNN, TRACK-RCNN}
 
 settings.depth = 'GT';% choose from {GT, SPSS}
 settings.applyDepthNoise = 0;
-settings.featureMatchingMethod = 'PWC-Net';% choose from {GT, PWC-Net, flow-Net}
+settings.featureMatchingMethod = 'GT';% choose from {GT, PWC-Net, flow-Net}
 settings.applyMeasurementNoise = 0;
 
 settings.applyOdometryNoise = 1;
-settings.noiseArray = [0.001 0.001 0.037 0.0017 0.0017 0.0017 0.06 0.06 0.06];
+settings.noiseArray = [0.002 0.0015 0.018 0.0002 0.0014 0.00021 0.02 0.02 0.02];
 %[0.001 0.001 0.037 0.0017 0.0017 0.0017 0.04 0.04 0.04];
 %[0.002 0.002 0.002 0.01 0.01 0.01 0.2 0.2 0.2];
 rng(12);
@@ -28,7 +28,6 @@ if strcmp(dataset,'kitti')
     settings.depth = 'SPSS';
     settings.featureMatchingMethod = 'PWC-Net';
     settings.distanceThreshold = 0.0001;
-    settings.applyNoise = 0;
     switch sequence
         case{'0000','0001','0002','0003','0004','0005','0006','0007','0008','0009','0010','0011','0012','0013'}
             K = [7.215377000000e+02 0.000000000000e+00 6.095593000000e+02; 
@@ -49,6 +48,7 @@ if strcmp(dataset,'kitti')
     depthDir = 'tracking/depth/';
     flowDir = 'tracking/flow/';
     objSegDir = 'mots/instances/';
+    %objSegDir = 'tracking/mask/0000-gt/';
     motDir = 'tracking/data_tracking_label_2/training/label_02/';
     extrinsicsDir = 'tracking/extrinsics/';
     % data
@@ -56,6 +56,7 @@ if strcmp(dataset,'kitti')
     depthI = strcat(dir,depthDir,sequence,'/');
     flowI = strcat(dir,flowDir,sequence,'/');
     maskI = strcat(dir,objSegDir,sequence,'/');
+    %maskI = strcat(dir,objSegDir,'/');
     motFile = strcat(dir,motDir,sequence,'.txt');
     extrinsicsFile = strcat(dir,extrinsicsDir,sequence,'.txt');
 elseif strcmp(dataset,'vkitti')
@@ -101,5 +102,6 @@ fprintf('Feature extraction and tracking ...\n')
 fprintf('Writing graph files ...\n')
 [globalCamerasGraphFileIndx, globalFeaturesGraphFileIndx, globalObjectsGraphFileIndx] = ...
     writeGTGraphFile(frames, globalFeatures, imageRange, sequence, settings);
+settings.globalObjectsGraphFileIndx = globalObjectsGraphFileIndx;
 writeMeasGraphFile(frames,globalFeatures,imageRange,sequence,...
     globalCamerasGraphFileIndx,globalFeaturesGraphFileIndx,globalObjectsGraphFileIndx,settings); 

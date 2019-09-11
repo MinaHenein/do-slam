@@ -64,6 +64,7 @@ frameFeatures.originFrame = featuresOriginFrame;
 frameFeatures.id = featuresId;
 
 globalLocation3D = globalFeatures.location3D;
+%globalLocation3DNoisyDepth = globalFeatures.location3DNoisyDepth;
 globalWeight = globalFeatures.weight;
 globalId = globalFeatures.id;
 globalFrame = globalFeatures.frame;
@@ -73,6 +74,7 @@ globalObjectId = globalFeatures.objectId;
 globalAssociation = globalFeatures.dynamicAssociation;
 
 featuresLocation3D = zeros(3,length(frameFeatures.location));
+%featuresLocation3DNoisyDepth = zeros(3,length(frameFeatures.location));
 for i=1:size(frameFeatures.location,1)
     pixelRow = frameFeatures.location(i,2);
     pixelCol = frameFeatures.location(i,1);
@@ -82,29 +84,33 @@ for i=1:size(frameFeatures.location,1)
         if pixelDisparity == 0
             continue;
         else
-            pixelDepth = K(1,1)*0.537/pixelDisparity;
+            gtPixelDepth = K(1,1)*0.537/pixelDisparity;
         end
     elseif strcmp(settings.depth,'GT')
         % vkitti
-        pixelDepth = double(depthI(pixelRow,pixelCol))/100;
+        gtPixelDepth = double(depthI(pixelRow,pixelCol))/100;
         % apply depth noise -- if vkitti testing noisy depth
          if settings.applyDepthNoise
-            depthNoiseSigma = (pixelDepth^2*0.15)/(settings.K(1,1)*0.54); % sigma = z^2*delta_d/f*b
+            depthNoiseSigma = (gtPixelDepth^2*0.15)/(settings.K(1,1)*0.54); % sigma = z^2*delta_d/f*b
             pixelDepthNoise = normrnd(0,depthNoiseSigma,[1 1]);
-            pixelDepth = pixelDepth + pixelDepthNoise;
+            pixelDepth = gtPixelDepth + pixelDepthNoise;
          end
     end
     % image--> camera
     camera3DPoint = K\[pixelCol;pixelRow;1];
-    camera3DPoint = camera3DPoint * pixelDepth;
+    camera3DPoint = camera3DPoint * gtPixelDepth;
+    %camera3DPointNoisyDepth = camera3DPoint * pixelDepth;
     % camera --> world
     cameraPoseMatrix = poseToTransformationMatrix(frame.cameraPose);
     world3DPoint = cameraPoseMatrix * [camera3DPoint;1];
+    %world3DPointNoisyDepth = cameraPoseMatrix * [camera3DPointNoisyDepth;1];
     featuresLocation3D(:,i) = world3DPoint(1:3);
+    %featuresLocation3DNoisyDepth(:,i) = world3DPointNoisyDepth(1:3);
     % global features
     if frameFeatures.moving(i) == 0
         if isempty(globalLocation3D)
             globalLocation3D(:,1) = world3DPoint(1:3,1);
+            %globalLocation3DNoisyDepth(:,1) = world3DPointNoisyDepth(1:3,1);
             globalWeight(1,1) = 1;
             globalId(1,1) = frameFeatures.id(i);
             globalFrame(1,1) = frameFeatures.originFrame(i);
@@ -124,6 +130,7 @@ for i=1:size(frameFeatures.location,1)
                 globalWeight(index,1) = globalWeight(index,1) + 1;
             else
                 globalLocation3D = [globalLocation3D, world3DPoint(1:3)];
+                %globalLocation3DNoisyDepth = [globalLocation3DNoisyDepth, world3DPointNoisyDepth(1:3)];
                 globalWeight(end+1,1) = 1;
                 globalId(end+1,1) = size(globalLocation3D,2);
                 globalFrame(end+1,1) = frameFeatures.originFrame(i);
@@ -136,6 +143,7 @@ for i=1:size(frameFeatures.location,1)
         % dynamic point
         if isempty(globalLocation3D)
             globalLocation3D(:,1) = world3DPoint(1:3,1);
+            %globalLocation3DNoisyDepth(:,1) = world3DPointNoisyDepth(1:3,1);
             globalWeight(1,1) = 1;
             globalId(1,1) = frameFeatures.id(i);
             globalFrame(1,1) = frameFeatures.originFrame(i);
@@ -161,6 +169,7 @@ for i=1:size(frameFeatures.location,1)
                 end
             else
                 globalLocation3D = [globalLocation3D, world3DPoint(1:3)];
+                %globalLocation3DNoisyDepth = [globalLocation3DNoisyDepth, world3DPointNoisyDepth(1:3)];
                 globalWeight(end+1,1) = 1;
                 globalId(end+1,1) = size(globalLocation3D,2);
                 globalFrame(end+1,1) = frameFeatures.originFrame(i);
@@ -193,8 +202,10 @@ for i=1:size(frameFeatures.location,1)
     end
 end
 frameFeatures.location3D = featuresLocation3D;
+%frameFeatures.location3DNoisyDepth = featuresLocation3DNoisyDepth;
 
 globalFeatures.location3D = globalLocation3D;
+%globalFeatures.location3DNoisyDepth = globalLocation3DNoisyDepth;
 globalFeatures.weight = globalWeight;
 globalFeatures.id = globalId;
 globalFeatures.frame = globalFrame;

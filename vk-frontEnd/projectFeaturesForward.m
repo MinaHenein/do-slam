@@ -5,10 +5,12 @@ featuresLocation = [];
 featuresObjectId = [];
 featuresMoving = [];
 featuresLocation3D = [];
+%featuresLocation3DNoisyDepth = [];
 featuresOriginFrame = [];
 featuresId = [];
 
 globalLocation3D = globalFeatures.location3D;
+%globalLocation3DNoisyDepth = globalFeatures.location3DNoisyDepth;
 globalWeight = globalFeatures.weight;
 globalId = globalFeatures.id;
 globalFrame = globalFeatures.frame;
@@ -173,18 +175,18 @@ for i=1:size(frame.features.location,1)
             pixelFlow = flowI(round(pixelRow),round(pixelCol),:);
             nextImagePoint = [imagePixel + [pixelFlow(:,:,1) pixelFlow(:,:,2)]]';
             if isPointWithinImageSize(nextImagePoint,size(nextRGBI))
-                %corners = detectFASTFeatures(rgb2gray(nextRGBI),'ROI',[max(1,nextImagePoint(1)-3),...
-                %    max(1,nextImagePoint(2)-3),...
-                %    min(6,size(nextRGBI,2)-nextImagePoint(1)),min(6,size(nextRGBI,1)-nextImagePoint(2))]);
-                %if corners.Count ~=0
-                %    distances = sqrt(bsxfun(@plus,...
-                %        (corners.Location(:,1).'-nextImagePoint(1,1)).^2,...
-                %        (corners.Location(:,2).'-nextImagePoint(2,1)).^2))';
-                %    cornerIndex = find(distances == min(distances));
-                %    if size(cornerIndex,1) > 1
-                %        continue
-                %    end
-                %    nextImagePoint = corners.Location(cornerIndex,:);
+                corners = detectFASTFeatures(rgb2gray(nextRGBI),'ROI',[max(1,nextImagePoint(1)-3),...
+                    max(1,nextImagePoint(2)-3),...
+                    min(6,size(nextRGBI,2)-nextImagePoint(1)),min(6,size(nextRGBI,1)-nextImagePoint(2))]);
+                if corners.Count ~=0
+                    distances = sqrt(bsxfun(@plus,...
+                        (corners.Location(:,1).'-nextImagePoint(1,1)).^2,...
+                        (corners.Location(:,2).'-nextImagePoint(2,1)).^2))';
+                    cornerIndex = find(distances == min(distances));
+                    if size(cornerIndex,1) > 1
+                        continue
+                    end
+                    nextImagePoint = corners.Location(cornerIndex,:);
                   
                     nextImagePoint = reshape(nextImagePoint,[1,2]);
                     % static point
@@ -237,7 +239,7 @@ for i=1:size(frame.features.location,1)
                             if strcmp(settings.depth,'SPSS')
                                 %kitti
                                 nextPixelDisparity = double(nextDepthI(round(nextPixelRow),round(nextPixelCol)))/256;
-                                nextPixelDepth = K(1,1)*0.537/nextPixelDisparity;
+                                gtNextPixelDepth = K(1,1)*0.537/nextPixelDisparity;
 %                                 if nextPixelDisparity == 0
 %                                     continue;
 %                                 else
@@ -245,25 +247,28 @@ for i=1:size(frame.features.location,1)
 %                                 end
                             elseif strcmp(settings.depth,'GT')
                                 % vkitti
-                                nextPixelDepth = double(nextDepthI(round(nextPixelRow),round(nextPixelCol)))/100;
+                                gtNextPixelDepth = double(nextDepthI(round(nextPixelRow),round(nextPixelCol)))/100;
                                 % apply depth noise -- if vkitti, testing noisy depth
                                 if settings.applyDepthNoise
-                                    depthNoiseSigma = (nextPixelDepth^2*0.15)/(settings.K(1,1)*0.54); % sigma = z^2*delta_d/f*b
+                                    depthNoiseSigma = (gtNextPixelDepth^2*0.15)/(settings.K(1,1)*0.54); % sigma = z^2*delta_d/f*b
                                     pixelDepthNoise = normrnd(0,depthNoiseSigma,[1 1]);
-                                    nextPixelDepth = nextPixelDepth + pixelDepthNoise;
+                                    nextPixelDepth = gtNextPixelDepth + pixelDepthNoise;
                                 end
                             end
                             
                             nextCamera3DPoint = K\[nextPixelCol;nextPixelRow;1];
-                            nextCamera3DPoint = nextCamera3DPoint * nextPixelDepth;
+                            nextCamera3DPoint = nextCamera3DPoint * gtNextPixelDepth;
+                            %nextCamera3DPointNoisyDepth = nextCamera3DPoint * nextPixelDepth;
                             % camera --> world
                             nextCameraPoseMatrix = poseToTransformationMatrix(nextFrame.cameraPose);
                             movedWorld3DPoint = nextCameraPoseMatrix * [nextCamera3DPoint;1];
+                            %movedWorld3DPointNoisyDepth = nextCameraPoseMatrix * [nextCamera3DPointNoisyDepth;1];
                             featuresLocation3D = [featuresLocation3D, movedWorld3DPoint(1:3)];
+                            %featuresLocation3DNoisyDepth = [featuresLocation3DNoisyDepth, movedWorld3DPointNoisyDepth(1:3)];
                             featuresOriginFrame = [featuresOriginFrame; nextFrame.number];
                             featuresId = [featuresId; size(globalLocation3D,2)+1];
                             globalLocation3D = [globalLocation3D, movedWorld3DPoint(1:3)];
-                            
+                            %globalLocation3DNoisyDepth = [globalLocation3DNoisyDepth, movedWorld3DPointNoisyDepth(1:3)];
                             %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
                             lastCamera3DPoint = poseToTransformationMatrix(frame.cameraPose)\[world3DPoint;1];
                             lastCamera3DPoint = lastCamera3DPoint(1:3,1);
@@ -312,7 +317,7 @@ for i=1:size(frame.features.location,1)
                             globalObjectId(end+1,1) = featuresObjectId(end);
                         end
                     end
-                %end
+                end
             end
     end
 end
@@ -333,10 +338,12 @@ nextFrameFeatures.location = featuresLocation;
 nextFrameFeatures.objectId = featuresObjectId;
 nextFrameFeatures.moving = featuresMoving;
 nextFrameFeatures.location3D = featuresLocation3D;
+%nextFrameFeatures.location3DNoisyDepth = featuresLocation3DNoisyDepth;
 nextFrameFeatures.originFrame = featuresOriginFrame;
 nextFrameFeatures.id = featuresId;
  
 globalFeatures.location3D = globalLocation3D;
+%globalFeatures.location3DNoisyDepth = globalLocation3DNoisyDepth;
 globalFeatures.weight = globalWeight;
 globalFeatures.id = globalId;
 globalFeatures.frame = globalFrame;

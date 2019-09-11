@@ -54,13 +54,13 @@ for i = 1:length(Index)
         newLine{1,2} = num2str(objectVertices(1));
         gtCStrCopy{Index(i)} = char(join(newLine));
     end
-    if windowSize == inf
-        % Save in a different file
-        filepath = strcat(gtGraphFilePath(1:end-6),'_constantMotion.graph');
-        fileID = fopen(filepath,'w');
-        fprintf(fileID, '%s\n', gtCStrCopy{:});
-        fclose(fileID);
-    end
+end
+if windowSize == inf
+    % Save in a different file
+    filepath = strcat(gtGraphFilePath(1:end-6),'_constantMotion.graph');
+    fileID = fopen(filepath,'w');
+    fprintf(fileID, '%s\n', gtCStrCopy{:});
+    fclose(fileID);
 end
 % meas file
 measCStrCopy = measCStr;
@@ -76,64 +76,63 @@ for i = 1:length(Index)
         newLine = line;
         newLine{1,4} = num2str(objectVertices(1));
         measCStrCopy{Index(i)} = char(join(newLine));
-    end
-    if windowSize == inf
-        % Save in a different file
-        filepath = strcat(measGraphFilePath(1:end-6),'_constantMotion.graph');
-        fileID = fopen(filepath,'w');
-        fprintf(fileID, '%s\n', measCStrCopy{:});
-        fclose(fileID);
-        return
-    end
+    end    
+end
+if windowSize == inf
+    % Save in a different file
+    filepath = strcat(measGraphFilePath(1:end-6),'_constantMotion.graph');
+    fileID = fopen(filepath,'w');
+    fprintf(fileID, '%s\n', measCStrCopy{:});
+    fclose(fileID);
 end
 
-% produce variable window, shift size graph files
-% GT file
-gtCStrCopy2 = gtCStrCopy;
-objectWindows = zeros(size(objectIds,1),1);
-IndexC = strfind(gtCStrCopy2, 'VERTEX_SE3Motion');
-Index = find(not(cellfun('isempty',IndexC)));
-nVertices = size(gtCStr,1);
-objectIds = newObjectVertices;
-for i = 1:length(Index)
-    line = strsplit(gtCStrCopy2{Index(i),1});
-    vertexNumber = str2double(line(2));
-    indx = find(objectIds == vertexNumber);
-    objectWindows(indx,1) = objectWindows(indx,1) + 1;
-    
-    isObjectWithinWindow = (objectWindows(indx,1) < windowSize);
-    if ~isObjectWithinWindow
-        % new vertex
-        nVertices = nVertices + 1;
-        objectVertex = nVertices;
-        newLine = line;
-        newLine{1,2} = num2str(objectVertex);
-        gtCStrCopy2{Index(i)} = char(join(newLine));
-        
-        for j = i+1:length(Index)
-            line = strsplit(gtCStrCopy2{Index(j),1});
-            objectVertexNumber = str2double(line(2));
-            if objectVertexNumber == vertexNumber
-                newLine = line;
-                newLine{1,2} = num2str(objectVertex);
-                gtCStrCopy2{Index(j)} = char(join(newLine));
-            end
-        end
-        
-        % new objectWindows entry with 0 value
-        objectIds = [objectIds; objectVertex];
-        objectWindows(end+1, 1) = 1;
-    end
-    
-end
-% Save in a different file
-filepath = strcat(gtGraphFilePath(1:end-6),'_window',num2str(windowSize),'.graph');
-fileID = fopen(filepath,'w');
-fprintf(fileID, '%s\n', gtCStrCopy2{:});
-fclose(fileID);
-
-% meas file
-measCStrCopy2 = measCStrCopy;
+% % produce variable window, shift size graph files
+% % GT file
+% gtCStrCopy2 = gtCStrCopy;
+% objectWindows = zeros(size(objectIds,1),1);
+% IndexC = strfind(gtCStrCopy2, 'VERTEX_SE3Motion');
+% Index = find(not(cellfun('isempty',IndexC)));
+% nVertices = size(gtCStr,1);
+% objectIds = newObjectVertices;
+% for i = 1:length(Index)
+%     line = strsplit(gtCStrCopy2{Index(i),1});
+%     vertexNumber = str2double(line(2));
+%     indx = find(objectIds == vertexNumber);
+%     objectWindows(indx,1) = objectWindows(indx,1) + 1;
+%     
+%     isObjectWithinWindow = (objectWindows(indx,1) < windowSize);
+%     if ~isObjectWithinWindow
+%         % new vertex
+%         nVertices = nVertices + 1;
+%         objectVertex = nVertices;
+%         newLine = line;
+%         newLine{1,2} = num2str(objectVertex);
+%         gtCStrCopy2{Index(i)} = char(join(newLine));
+%         
+%         for j = i+1:length(Index)
+%             line = strsplit(gtCStrCopy2{Index(j),1});
+%             objectVertexNumber = str2double(line(2));
+%             if objectVertexNumber == vertexNumber
+%                 newLine = line;
+%                 newLine{1,2} = num2str(objectVertex);
+%                 gtCStrCopy2{Index(j)} = char(join(newLine));
+%             end
+%         end
+%         
+%         % new objectWindows entry with 0 value
+%         objectIds = [objectIds; objectVertex];
+%         objectWindows(end+1, 1) = 1;
+%     end
+%     
+% end
+% % Save in a different file
+% filepath = strcat(gtGraphFilePath(1:end-6),'_window',num2str(windowSize),'.graph');
+% fileID = fopen(filepath,'w');
+% fprintf(fileID, '%s\n', gtCStrCopy2{:});
+% fclose(fileID);
+% 
+% % meas file
+% measCStrCopy2 = measCStrCopy;
 %% to be implemented
 
 

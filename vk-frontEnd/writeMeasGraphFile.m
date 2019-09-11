@@ -10,8 +10,9 @@ elseif strcmp(settings.dataset,'vkitti')
 end
 
 noiseArray = settings.noiseArray;
-applyOdometryNoise = settings.applyOdometryNoise; 
+applyOdometryNoise = settings.applyOdometryNoise;
 applyMeasurementNoise = settings.applyMeasurementNoise;
+applyDepthNoise = settings.applyDepthNoise;
 
 fileID = fopen(strcat(pwd,'/vk-frontEnd/GraphFiles/',measFileName),'w');
 
@@ -35,7 +36,7 @@ for i = 1:length(frames)
         % vIn and vOut are not empty
         assert(~isempty(vIn) && ~isempty(vOut))
         % edge noise
-%         odomMeasNoise = normrnd([0 0 0 0 0 0],abs(odomMeasSig.*value),size([0 0 0 0 0 0]));
+        %odomMeasNoise = normrnd([0 0 0 0 0 0],abs(odomMeasSig.*value),size([0 0 0 0 0 0]));
         odomMeasNoise = normrnd([0 0 0 0 0 0],odomMeasSig,size([0 0 0 0 0 0]));
         covariance = odomMeasCov;
         % apply noise
@@ -49,6 +50,10 @@ for i = 1:length(frames)
     for j = 1:length(possibleFrameFeaturesIndx)
         % is feature seen in frame?
         possibleFeatureWeight = globalFeatures.weight(possibleFrameFeaturesIndx(j),1);
+        % discard static features seen in less than 3 frames
+        if globalFeatures.static(possibleFrameFeaturesIndx(j),1) && possibleFeatureWeight < 3
+            continue
+        end
         possibleFeatureFrame  = globalFeatures.frame(possibleFrameFeaturesIndx(j),1);
         featureLastFrame = possibleFeatureFrame + possibleFeatureWeight -1;
         if featureLastFrame >= imageRange(i)
@@ -57,8 +62,11 @@ for i = 1:length(frames)
             vOut = globalFeaturesGraphFileIndx(possibleFrameFeaturesIndx(j));
             cameraPose = poseToTransformationMatrix(frames(i).cameraPose);
             pointWorldFrame = globalFeatures.location3D(:,possibleFrameFeaturesIndx(j));
+            %pointWorldFrameNoisyDepth = globalFeatures.location3DNoisyDepth(:,possibleFrameFeaturesIndx(j));
             pointCameraFrame = cameraPose\[pointWorldFrame;1];
+            %pointCameraFrameNoisyDepth = cameraPose\[pointWorldFrameNoisyDepth;1];
             value = pointCameraFrame(1:3)';
+            %valueNoisyDepth = pointCameraFrameNoisyDepth(1:3)';
             pointDepth = value(3);
             if pointDepth > 22 || vOut == 0 || isnan(norm(value))
                 continue
@@ -71,6 +79,8 @@ for i = 1:length(frames)
             % apply noise
             if applyMeasurementNoise == true
                 value = value + pointMeasNoise;
+            elseif applyDepthNoise == true
+                value = valueNoisyDepth;
             end
             writeEdge(label,vIn,vOut,value,covariance,fileID);
             % dynamic point
