@@ -10,7 +10,7 @@ fclose(fileID);
 fileID = fopen(gtFilePath,'r');
 gtData = textscan(fileID,'%s','delimiter','\n','whitespace',' ');
 gtCStr = gtData{1};
-fclose(fileID);s
+fclose(fileID);
 
 fileID = fopen(resultFilePath,'r');
 Data = textscan(fileID,'%s','delimiter','\n','whitespace',' ');
@@ -68,3 +68,7 @@ axis equal
 view(0,0)
 lgd = legend({'initialisation','ground-truth','final estimate'});
 lgd.Location = 'northwest';
+
+AxesH    = gca;
+AxesH.Box = 'on';
+AxesH.FontSize = 16;

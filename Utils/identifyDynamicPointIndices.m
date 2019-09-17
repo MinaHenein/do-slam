@@ -1,6 +1,6 @@
 function dynamicPointIndices = identifyDynamicPointIndices(gtFileName)
 
-fileID = fopen(strcat(pwd,'/Data/GraphFiles/',gtFileName),'r');
+fileID = fopen(gtFileName,'r');
 Data = textscan(fileID, '%s', 'delimiter', '\n', 'whitespace', '');
 CStr = Data{1};
 fclose(fileID);
@@ -11,7 +11,7 @@ Index = find(not(cellfun('isempty',IndexC)));
 dynamicPointIndices = [];
 
 for i=1:1:length(Index)
-    fileID = fopen(strcat(pwd,'/Data/GraphFiles/',gtFileName),'r');
+    fileID = fopen(gtFileName,'r');
     line = textscan(fileID,'%s',1,'delimiter','\n','headerlines',Index(i)-1);
     splitLine = strsplit(cell2mat(line{1,1}),' ');
     label = splitLine{1,1};

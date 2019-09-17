@@ -19,7 +19,7 @@ globalFeatures.dynamicAssociation = {};
 firstCamPose = cameraPoses(:,1);
 
 for i = 1:numel(imageRange)
-    %pbar(i,numel(imageRange),[],[num2str(i),'/',num2str(numel(imageRange))],'off');
+    pbar(i,numel(imageRange),[],[num2str(i),'/',num2str(numel(imageRange))],'off');
     
     % frame i
     frameNumber = imageRange(i);
@@ -54,6 +54,7 @@ for i = 1:numel(imageRange)
         frames(i).features = frameFeatures;
     else
         if ~isempty(frameFeatures.location)
+            frames(i).features.features = mergeFeatureStructs(frames(i).features.features,frameFeatures.features);
             frames(i).features.location = [frames(i).features.location; frameFeatures.location];
             frames(i).features.moving = [frames(i).features.moving; frameFeatures.moving];
             frames(i).features.objectId = [frames(i).features.objectId; frameFeatures.objectId];

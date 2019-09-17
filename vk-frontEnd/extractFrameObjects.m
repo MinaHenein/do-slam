@@ -31,7 +31,7 @@ for i=1:numel(CStr)-1
             objectMask = getObjectMask(l,t,r,b,maskI,maskColour,settings);
             [nRows, nCols, ~] = size(maskI);
             % object occupies more than 6% of image
-            if 100*sum(sum(objectMask))/(nRows*nCols) > 1.5
+            if 100*sum(sum(objectMask))/(nRows*nCols) > 6
                 nObjects = nObjects+1;
                 % assign object bounding box
                 frameObjects(nObjects).boundingBox = [l,t,r,b];
@@ -71,9 +71,7 @@ for i=1:numel(CStr)-1
                 frameObjects(nObjects).poseCameraFrame = transformationMatrixToPose(objectPoseCameraFrame);
                 % object pose in world frame
                 cameraPoseMatrix = poseToTransformationMatrix(frame.cameraPose);
-                str2double(lineCell{1,2})
-                frame.number
-                objectPoseWorldFrame = cameraPoseMatrix * objectPoseCameraFrame
+                objectPoseWorldFrame = cameraPoseMatrix * objectPoseCameraFrame;
                 frameObjects(nObjects).poseWorldFrame = transformationMatrixToPose(objectPoseWorldFrame);
             end
         end

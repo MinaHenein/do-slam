@@ -65,8 +65,8 @@ switch setting
         dynamicPointIndicesPerObject = varargin{5};
         pointVertices = [graphN.vertices(graphN.identifyVertices('point'))];   
         
-        colors = {'magenta','radioactive green','leather','red','green','black','sapphire','swamp','light bluish green',...
-    'butterscotch','cinnamon','chartreuse','blue'}; 
+        colors = {'red','magenta','radioactive green','leather','red','green','black','sapphire','swamp','light bluish green',...
+    'butterscotch','cinnamon','chartreuse'}; 
         
         for i = 1:sum(poseVertices)
             iPose = poses(:,i);

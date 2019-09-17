@@ -1,5 +1,5 @@
-measFilePath = '/home/mina/workspace/src/Git/gtsam/Data/GraphFiles/vk-Mina/kitti-0003-0-40_Meas.graph';
-resultFilePath = '/home/mina/workspace/src/Git/gtsam/Data/GraphFiles/vk-Mina/kitti-0003-0-40_result.graph';
+measFilePath = '/home/mina/workspace/src/Git/gtsam/Data/GraphFiles/vk-Mina/kitti-0000-0-60_Meas.graph';
+resultFilePath = '/home/mina/workspace/src/Git/gtsam/Data/GraphFiles/vk-Mina/kitti-0000-0-60_result.graph';
 fileID = fopen(resultFilePath,'r');
 Data = textscan(fileID,'%s','delimiter','\n','whitespace',' ');
 resultCStr = Data{1};
@@ -23,8 +23,8 @@ for i = 1:size(resultCStr,1)
     end
 end
 
-colors = {'magenta','radioactive green','leather','blue','red','black','cornflower',...
-    'sapphire','swamp','plum','light bluish green','butterscotch','cinnamon','chartreuse','green'}; 
+colors = {'cinnamon','radioactive green','leather','blue','red','black',...
+    'sapphire','swamp','plum','light bluish green','butterscotch','chartreuse','green'}; 
 
 allDynamicPointIds = identifyDynamicPointIndices(measFilePath);
 staticPointIds = setdiff(resultPointIds, allDynamicPointIds);
@@ -33,37 +33,13 @@ objectPoints = vKITTI_pointObservability(measFilePath);
 
 clear h
 figure; hold on; axis equal;
-% l = 1; % coordinate axis length
-% A = [0 0 0 1; l 0 0 1; 0 0 0 1; 0 l 0 1; 0 0 0 1; 0 0 l 1]';
-% for i=1:1:size(resultPoses,2)
-%   B = poseToTransformationMatrix(resultPoses(:,i))*A;
-%   plot3(B(1,1:2),B(2,1:2),B(3,1:2),'-r','LineWidth',2); % x: red
-%   plot3(B(1,3:4),B(2,3:4),B(3,3:4),'-g','LineWidth',2); % y: green
-%   plot3(B(1,5:6),B(2,5:6),B(3,5:6),'-b','LineWidth',2); % z: blue
-% end
-for i=1:1:size(resultPoses,2)
+for i=1:3:size(resultPoses,2)
     iPose = resultPoses(:,i);
     plotiCamera = plotCamera('Location',iPose(1:3),'Orientation',rot(-iPose(4:6))); %LHS invert pose
     plotiCamera.Opacity = 0.1;
     plotiCamera.Size = 0.5;
     plotiCamera.Color = 'red';
 end
-
-% for i=1:size(resultPoints,2)
-%     for j = 1:size(objectPoints,1)     
-%         iObjectPoints = [objectPoints{j,:}];
-%         if ismember(resultPointIds(i),iObjectPoints)
-%             if ismember(j,[1:26,28])
-%                 scatter3(resultPoints(1,i),resultPoints(2,i),resultPoints(3,i),7,...
-%                     'MarkerEdgeColor',rgb(colors{1}),'MarkerFaceColor',rgb(colors{1}));
-%             elseif ismember(j,[27,29:42])
-%                 scatter3(resultPoints(1,i),resultPoints(2,i),resultPoints(3,i),7,...
-%                     'MarkerEdgeColor',rgb(colors{2}),'MarkerFaceColor',rgb(colors{2}));
-%             end
-%         end
-%     end
-% end
-
 
 staticPoints = zeros(3,length(staticPointIds));
 n = 0;
@@ -86,14 +62,14 @@ for j = 1:size(objectPoints,1)
             for m = 1:length(ids)
                 Points = [Points, resultPoints(:,resultPointIds == ids(m))];
             end
-            if ismember(j,[1:26,28])
+            if ismember(j,[1:2:11,12:2:16,18:25])
                 plotObject1 = plot3(Points(1,:),Points(2,:),Points(3,:),'.',...
-                    'MarkerSize',7, 'Color', rgb(colors{1}),'LineStyle','none');
+                    'MarkerSize',10, 'Color', rgb(colors{1}),'LineStyle','none');
                 h(2) = plotObject1;
                 hold on
             else
                 plotObject2 = plot3(Points(1,:),Points(2,:),Points(3,:),'.',...
-                    'MarkerSize',7, 'Color', rgb(colors{2}),'LineStyle','none');
+                    'MarkerSize',10, 'Color', rgb(colors{2}),'LineStyle','none');
                 h(3) = plotObject2;
                 hold on
             end
@@ -101,22 +77,21 @@ for j = 1:size(objectPoints,1)
     end
 end
 
-
 xlabel('x (m)')
 ylabel('y (m)')
 zlabel('z (m)')
 axis equal
-xlim([-5 10])
-zlim([30 40])
+xlim([-25 15])
+zlim([0 40])
 view(0,0)
-legend(h, {' static structure ',' object 1 ',' object 2 '})
+legend(h, {' static structure ',' van ',' cyclist '})
 
 
 AxesH    = gca;
-UpVector = [-sind(30), cosd(30), 0];
-DAR      = get(AxesH, 'DataAspectRatio');
+%UpVector = [-sind(30), cosd(30), 0];
+%DAR      = get(AxesH, 'DataAspectRatio');
 AxesH.Box = 'on';
 AxesH.FontSize = 16;
-set(AxesH, 'CameraUpVector', DAR .* UpVector);
+%set(AxesH, 'CameraUpVector', DAR .* UpVector);
  
 

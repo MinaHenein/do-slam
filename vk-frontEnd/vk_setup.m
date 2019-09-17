@@ -1,8 +1,8 @@
 % variables
-dataset = 'kitti'; %choose from {kitti,vkitti}
-sequence = '0006';
+dataset = 'vkitti'; %choose from {kitti,vkitti}
+sequence = '0001';
 variation = 'clone';
-imageRange = 40:140;
+imageRange = 335:426;
 nFeaturesPerFrame = 600; % number of features per frame
 maxBackgroundFeaturesPerFrame = 200; % max number of static background features per frame
 nFeaturesPerObject = 100; % number of features per object
@@ -11,7 +11,7 @@ settings.objectSegmentationMethod = 'GT'; % choose from {GT, MASK-RCNN, TRACK-RC
 
 settings.depth = 'GT';% choose from {GT, SPSS}
 settings.applyDepthNoise = 0;
-settings.featureMatchingMethod = 'PWC-Net';% choose from {GT, PWC-Net, flow-Net}
+settings.featureMatchingMethod = 'GT';% choose from {GT, PWC-Net, flow-Net}
 settings.applyMeasurementNoise = 1;
 
 settings.applyOdometryNoise = 1;

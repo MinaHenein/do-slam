@@ -1,6 +1,7 @@
 function [frameFeatures,globalFeatures] = extractFrameFeatures(K,rgbI,depthI,frameObjects,...
     frame,nFeaturesPerFrame,nFeaturesPerObject,globalFeatures,settings)
 
+features = [];
 featuresLocation = [];
 featuresObjectId = [];
 featuresMoving = [];
@@ -25,6 +26,7 @@ for i = 1:length(frameObjects)
     nFeaturesOnCurrentObject = sum([frame.features.objectId]==frameObjects(i).id);
     if nFeaturesPerObject - nFeaturesOnCurrentObject > 0
         strongestFeatures = corners.selectStrongest(nFeaturesPerObject - nFeaturesOnCurrentObject);
+        features = mergeFeatureStructs(features, strongestFeatures);
         featuresLocation = [featuresLocation; strongestFeatures.Location];
         nFeatures = length(strongestFeatures);
         % features on objects are assigned the object id as
@@ -52,11 +54,13 @@ if nFeaturesToExtract > 0
     end
     corners = detectFASTFeatures(rgb2gray(rgbICopy));
     strongestFeatures = corners.selectStrongest(nFeaturesToExtract);
+    features = mergeFeatureStructs(features, strongestFeatures);
     featuresLocation = [featuresLocation; strongestFeatures.Location];
     featuresId = [featuresId; [length(globalFeatures.location3D)+1:length(globalFeatures.location3D) + ...
         length(strongestFeatures)]']; 
 end
 
+frameFeatures.features = features;
 frameFeatures.location = featuresLocation;
 frameFeatures.moving   = featuresMoving;
 frameFeatures.objectId = featuresObjectId;
