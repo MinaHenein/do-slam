@@ -1,8 +1,8 @@
 % variables
-dataset = 'vkitti'; %choose from {kitti,vkitti}
-sequence = '0001';
+dataset = 'kitti'; %choose from {kitti,vkitti}
+sequence = '0005';
 variation = 'clone';
-imageRange = 335:426;
+imageRange = 185:229;
 nFeaturesPerFrame = 600; % number of features per frame
 maxBackgroundFeaturesPerFrame = 200; % max number of static background features per frame
 nFeaturesPerObject = 100; % number of features per object
@@ -15,7 +15,7 @@ settings.featureMatchingMethod = 'GT';% choose from {GT, PWC-Net, flow-Net}
 settings.applyMeasurementNoise = 1;
 
 settings.applyOdometryNoise = 1;
-settings.noiseArray = [0.001 0.001 0.037 0.0017 0.0017 0.0017 0.012 0.012 0.012];
+settings.noiseArray = [0.0004 0.0004 0.06 0.0001 0.00004 0.00009 0.012 0.012 0.012];
 rng(12);
 
 % setup

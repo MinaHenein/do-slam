@@ -53,7 +53,7 @@ colors = {'cinnamon','radioactive green','black','swamp','plum',...
 
 
 obj1FirstGTPose = [-4.0556; 1.7079; 17.5965; -0.0048; 3.1369; 0.0020]; % id = 12, frame 189 
-obj1motion = resultMotions(:,1); r1 = 13:192;
+obj1motion = resultMotions(:,1); r1 = 190:192;
 obj1Poses = zeros(6,length(r1)+1);
 obj1Poses(:,1) = obj1FirstGTPose;
 for i = 2:length(r1)+1

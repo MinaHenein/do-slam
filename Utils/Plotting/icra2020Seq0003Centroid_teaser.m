@@ -72,17 +72,7 @@ camera40PoseMatrix = poseToTransformationMatrix([0.342597572 -0.244253715 ...
 % centroid obj1 at frame 0
 obj1First3DCentroid =  [3.4080; 1.5368; 4.7588];
 % centroid obj2 at frame 25
-depthDir = 'tracking/depth/';
-depthI25 = imread(strcat(dir,depthDir,sequence,'/000025.png'));
-pixelRow = 330;
-pixelCol = 1185;
-pixelDisparity = double(depthI25(pixelRow,pixelCol))/256;
-pixelDepth = K(1,1)*0.537/pixelDisparity;
-camera3DPoint = K\[pixelCol;pixelRow;1];
-camera3DPoint = camera3DPoint * pixelDepth;
-cameraPoseMatrix = poseToTransformationMatrix(resultPoses(:,26));
-obj2First3DCentroid = cameraPoseMatrix * [camera3DPoint;1];
-obj2First3DCentroid = obj2First3DCentroid(1:3,1);
+obj2First3DCentroid = [3.7179; 1.4915; 32.5005];
 
 % all obj1 centroids at frames 0-27
 obj1Centroids3D = zeros(3,41);
